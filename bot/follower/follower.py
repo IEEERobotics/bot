@@ -1052,28 +1052,31 @@ class Follower(object):
          and not self.check_for_branch('back') \
          and not self.check_for_branch('left') \
          and     self.check_for_branch('right'):
-            self.logger.debug("C2: right known: rotate right") 
+            self.logger.debug("C1: right known: rotate right") 
             self.rotate_to_line('right')
+            self.recover()
 
         elif not self.check_for_branch('front') \
          and not self.check_for_branch('back') \
          and     self.check_for_branch('left') \
          and not self.check_for_branch('right'):
-            self.logger.debug("C3: left known: rotate left")
+            self.logger.debug("C2: left known: rotate left")
             self.rotate_to_line('left') 
+            self.recover()
 
         elif not self.check_for_branch('front') \
          and not self.check_for_branch('back') \
          and     self.check_for_branch('left') \
          and     self.check_for_branch('right'):
-            self.logger.debug("C4: sides known: roate right") 
+            self.logger.debug("C3: sides known: roate right") 
             self.rotate_to_line('right')
+            self.recover()
 
         elif not self.check_for_branch('front') \
          and     self.check_for_branch('back') \
          and not self.check_for_branch('left') \
          and not self.check_for_branch('right'):
-            self.logger.debug("C5: back known: Inch back") 
+            self.logger.debug("C4: back known: Inch back") 
             self.drive(60,180,0.1)
             self.recover()
 
@@ -1081,7 +1084,7 @@ class Follower(object):
          and      self.check_for_branch('back') \
          and not self.check_for_branch('left') \
          and     self.check_for_branch('right'):
-            self.logger.debug("C6: back/right known: rotate right") 
+            self.logger.debug("C5: back/right known: rotate right") 
             self.rotate_to_line('right')
             self.recover()
 
@@ -1089,7 +1092,7 @@ class Follower(object):
          and     self.check_for_branch('back') \
          and     self.check_for_branch('left') \
          and not self.check_for_branch('right'):
-            self.logger.debug("C7: back/left known: rotate right") 
+            self.logger.debug("C6: back/left known: rotate right") 
             self.rotate_to_line('left')
             self.recover()       
 
@@ -1098,6 +1101,42 @@ class Follower(object):
          and     self.check_for_branch('back') \
          and     self.check_for_branch('left') \
          and     self.check_for_branch('right'):
-            self.logger.debug("C8: front only known: inch fwd")
-            self.drive(60,0,0.1)
+            self.logger.debug("C7: front only known: inch fwd")
+            self.driver.rough_rotate_90('right')
+            self.driver.rough_rotate_90('right')
             self.recover()
+
+        elif    self.check_for_branch('front') \
+         and not self.check_for_branch('back') \
+         and not self.check_for_branch('left') \
+         and not self.check_for_branch('right'):
+             self.logger.debug("C8: Inch forward")
+             self.driver.drive(60,0,0.1)
+            
+        elif    self.check_for_branch('front') \
+         and not self.check_for_branch('back') \
+         and not self.check_for_branch('left') \
+         and     self.check_for_branch('right'):
+             self.logger.debug("C9: Rotate right")
+             self.driver.rotate_to_line('right')
+             self.recover()
+
+        elif     self.check_for_branch('front') \
+         and not self.check_for_branch('back') \
+         and     self.check_for_branch('left') \
+         and not self.check_for_branch('right'):
+             self.logger.debug("C10: Rotate left")
+             self.rotate_to_line('left')
+             self.recover()
+        
+        elif     self.check_for_branch('front') \
+         and     self.check_for_branch('back') \
+         and     self.check_for_branch('left') \
+         and     self.check_for_branch('right'):
+             self.logger.debug("C15: Reached activity area. Take appropriate action.")
+             return
+
+        else:
+            self.logger.debug("Recovered successfully. Now following line - Cases 11 - 14")
+            return
+

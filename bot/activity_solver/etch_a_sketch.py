@@ -24,11 +24,6 @@ class etch_a_sketch(object):
         else:
             self.vert_motor = Stepper_motor(self.config["etch_a_sketch_motors"]["left_stepper"])
             self.horiz_motor = Stepper_motor(self.config["etch_a_sketch_motors"]["right_stepper"])
-            self.vert_motor.speed = 80
-            self.horiz_motor.speed = 80
-
-        if (self.vert_motor.speed==80):
-            print "Speed Assigned"
 
     @lib.api_call
     def verify(self):
@@ -41,24 +36,24 @@ class etch_a_sketch(object):
     @lib.api_call
     def drawI(self):
         x = 0
-        while (x<6):
-            self.vert_motor.clockwise()
+        while (x<300):
+            self.horiz_motor.clockwise()
             x+=1
         sleep(1)
 
     @lib.api_call
     def drawE(self):
-        for x in xrange(1,13):
+        for x in xrange(1,130):
             self.horiz_motor.counter_clockwise()
-        for x in xrange(1,7):
+        for x in xrange(1,70):
             self.horiz_motor.clockwise()
-        for x in xrange(1,2):
+        for x in xrange(1,20):
             self.vert_motor.clockwise()
-        for x in xrange(1,7):
+        for x in xrange(1,70):
             self.horiz_motor.counter_clockwise()
-        for x in xrange(1,7):
+        for x in xrange(1,70):
             self.horiz_motor.clockwise()
-        for x in xrange(1,2):
+        for x in xrange(1,20):
             self.vert_motor.clockwise()
         sleep(1)
         

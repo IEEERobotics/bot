@@ -79,7 +79,7 @@ class Servo(object):
         :type position: int
 
         """
-        if position > 180:
+        if position > 275:
             self.logger.warning("Invalid pos {}, using 180.".format(position))
             position = 180
         elif position < 0:
@@ -88,7 +88,7 @@ class Servo(object):
             position = 0
 
         # Set duty
-        self.pwm.duty = int(round(1000000 + 1000000 * (position / 180.)))
+        self.pwm.duty = int(round(575000 + 1525000 * (position / 180.)))
         self.logger.debug("Updated {}".format(self))
 
     @lib.api_call

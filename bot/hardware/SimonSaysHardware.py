@@ -22,7 +22,7 @@ class SimonSaysHardware(object):
 
         # Variable that stores the current position of the Simon
         # says hardware.At startup it's set to 1.
-        self.position = 1
+        self.pos = 1
         
         if self.config["test_mode"]["simon_player"]:
             # add code for test mode
@@ -34,13 +34,17 @@ class SimonSaysHardware(object):
             self.stepper = Stepper_motor(
                 self.config["simon"]["stepper"])
 
-        # TODO(Vijay): Should add position property 
+    @property
+    def position(self):
         """Getter for motor's current position.
 
         :returns: Position of the motor.
 
         """
+        return self.pos
 
+    @position.setter
+    def position(self, position):
         """Setter for the motor's current position. Call it each time
         the hardware rotates. HAS to be in the range 1-4.
 
@@ -53,6 +57,7 @@ class SimonSaysHardware(object):
         :type speed: int
 
         """
+        self.pos = position
 
     def turn(self, position):
         """ Sets the servo to the specified position, according to the

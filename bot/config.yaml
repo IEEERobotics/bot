@@ -7,24 +7,25 @@ test_mode: {
     ADC: true,
     DMCC: true,
     stepper: false,
-    motor: false,
+    motor: true,
     servo: false,
+    etch_a_sketch: false,
     solenoid: true,
     simon_player: false
 }
 
 rubiks : {
-    servo_pwm: 5, # P8_13
+    servo_pwm: 6, # PWM number
     
     GPIO: {
-        FWD: 11, # P8_32
-        REV: 89, # P8_30 
-        PWR: 88  # P8_28 
+        FWD: 47,
+        REV: 27, 
+        PWR: 22 
     }
 }
 
 simon: {
-    colors: {
+    colors:{
         # gpio nums for detectors.
         red: 30,        # P8 - 4
         blue: 60,      # P8 - 6
@@ -34,10 +35,16 @@ simon: {
     # TODO(AhmedSamara) switch to pwm once PCB is in
     
     servo: 2,            # TODO(vijay)P9 - 29 or 21?? also change 
-                         # servo pwm number to 1
+                         # servo pwm number to git branch --set-upstream-to=origin/<branch> etch_a_sketch1
 
     stepper: [78, 76, 74, 72]
 }
+
+etch_a_sketch_motors: {
+    left_stepper: [44,26,46,65],
+    right_stepper: [49,15,117,14]
+}
+
 
 dmcc_drive_motors: {
     back_left: { board_num: 0, motor_num: 1 },

@@ -9,6 +9,19 @@ source $dir/adc.sh
 # Gun laser: P8_35 (gpio8)
 load_gpio 8
 
+# Etch a sketch motors.
+# left
+load_gpio 44
+load_gpio 26
+load_gpio 46
+load_gpio 65
+
+# right
+load_gpio 49
+load_gpio 15
+load_gpio 117
+load_gpio 14
+
 # Simon Arm - Stepper-motor(1) : P8_37 (gpio78)
 load_gpio 78
 

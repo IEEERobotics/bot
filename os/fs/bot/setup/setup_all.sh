@@ -66,4 +66,10 @@ run_pwm      7  # zero the servo on setup
 #9.25  GPIO3[21] = gpio117  Motor3
 #9.27  GPIO3[19] = gpio115  Motor4
 
+# IR sensor array MUX select lines
+load_gpio 44  # P8_12
+load_gpio 26  # P8_14
+load_gpio 46  # P8_16
+load_gpio 65  # P8_18
+
 enable_adcs

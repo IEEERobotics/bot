@@ -71,6 +71,10 @@ class Follower(object):
             # Check for error conditions
             if self.error != 0:
                 self.update_exit_state()
+                self.logger.warning(self.error)
+                self.logger.warning(self.front_state)
+                self.logger.warning(self.back_state)
+		self.driver.move(0,0)
                 return
             # Get the current time of the CPU
             current_time = time()
@@ -85,7 +89,7 @@ class Follower(object):
             # Update motors
             self.motors(front_error, back_error)
             # Take the current time set it equal to the previous time
-            previous_time = current_time
+            previous_time = current_time	
 
     @lib.api_call
     def center_on_x(self):
@@ -201,7 +205,7 @@ class Follower(object):
         """
         # Get the current IR readings
         if current_ir_reading is None:
-            current_ir_reading = self.ir_hub.read_all()
+            current_ir_reading = self.ir_hub.read_binary(60)
         # Heading west
         if self.heading == 0:
             # Forward is on the left side
@@ -303,13 +307,13 @@ class Follower(object):
         for index, value in enumerate(readings):
             if(value == 1):
                self.hit_position.append(index)
-        if len(self.hit_position) > 3:
+        if len(self.hit_position) > 4:
             # Error: Intersection detected
             return 17
         if len(self.hit_position) == 0:
             # Error: No line detected
             return 16
-        if len(self.hit_position) == 3:
+        if len(self.hit_position) == 4:
             # Error: Bot at large error
             return 18
         state = self.hit_position[0] * 2
@@ -334,13 +338,13 @@ class Follower(object):
         for index, value in enumerate(readings):
             if(value == 1):
                self.hit_position.append(index)
-        if len(self.hit_position) > 3:
+        if len(self.hit_position) > 4:
             # Error: Intersection detected
             return 17
         if len(self.hit_position) == 0:
             # Error: No line detected
             return 16
-        if len(self.hit_position) == 3:
+        if len(self.hit_position) == 4:
             # Error: Bot at large error
             return 18
         state = self.hit_position[0] * 2
@@ -353,20 +357,22 @@ class Follower(object):
         state = (state - 15) * -1
         return state
 
+    @lib.api_call
     def motors(self, front_error, back_error):
         """Used to update the motors speed and angular motion."""
         # Calculate translate_speed
         # MAX speed - error in the front sensor / total number
         # of states
-        translate_speed =  100 - ( front_error / 16 )
+        translate_speed =  80 - ( front_error / 16 )
         # Calculate rotate_speed
         # Max speed - Translate speed
         rotate_speed = 100 - translate_speed
         # Calculate translate_angle
         translate_angle = back_error * (180 / 16)
+        self.logger.info("pre translate_angle = {} ".format(translate_angle))
         if translate_angle < 0:
             # Swift to the left
-            translate_angle = 360 - translate_angle
+            translate_angle = 360 + translate_angle
         else:
             # swift to the right
             translate_angle = translate_angle   
@@ -382,6 +388,8 @@ class Follower(object):
         elif rotate_speed < 0:
             # If rotate_speed is greater than 100 set to 100
             rotate_speed = 0
-        # Adjust motor speeds 
-        mec_driver_mod.compound_move(
-            translate_speed, translate_angle, rotate_speed)
+        # Adjust motor speeds
+        self.logger.info("post translate_angle = {} ".format(translate_angle))
+        self.driver.move(translate_speed, translate_angle) 
+        #self.driver.compound_move(
+       #     translate_speed, translate_angle, rotate_speed)

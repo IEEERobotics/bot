@@ -198,7 +198,7 @@ class IRHub(object):
         """
         readings = self.read_all()
         for name, reading in readings.iteritems():
-            for i in len(reading):
+            for i in range(len(reading)):
                 readings[name][i] = 0 if reading[i] > thresh else 1
         return readings
 

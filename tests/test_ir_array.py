@@ -46,6 +46,7 @@ class TestIRArray(unittest.TestCase):
         
         for combo in combos:
             self.select(combo)
+            self.read()
             print self
     
     def do_loopForever(self):

@@ -61,6 +61,6 @@ class SimonPlayer(object):
                 break
 
     @lib.api_call
-    def verify(self):
+    def test_stepper(self, pos):
         """Test function for making sure the hardware works."""
-        self.simon.turn(2)
+        self.simon.turn(pos)

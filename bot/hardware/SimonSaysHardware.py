@@ -11,7 +11,7 @@ class SimonSaysHardware(object):
 
     """Simon Says manipulator that encapsulates servo and stepper"""
 
-    def __init_(self):
+    def __init__(self):
         """Build logger, get config, build stepper and servo."""
 
         # Load and store logger
@@ -22,7 +22,7 @@ class SimonSaysHardware(object):
 
         # Variable that stores the current position of the Simon
         # says hardware.At startup it's set to 0.
-        self.position = 1
+        self.position = 3
         
         if self.config["test_mode"]["simon_player"]:
             # add code for test mode
@@ -30,23 +30,18 @@ class SimonSaysHardware(object):
 
         else:
             # Build the servo and stepper motor
-            self.servo = Servo(self.config["Simon_Says"]["servo"])
+            self.servo = Servo(self.config["simon"]["servo"])
             self.stepper = Stepper_motor(
-                self.config["Simon_Says"]["stepper"])
+                self.config["simon"]["stepper"])
 
         print "Simon says hardware has been built"
 
-    @property
-    def position(self):
         """Getter for motor's current position.
 
         :returns: Position of the motor.
 
         """
-        return self.position
 
-    @position.setter
-    def position(self, pos):
         """Setter for the motor's current position. Call it each time
         the hardware rotates. HAS to be in the range 1-4.
 
@@ -59,7 +54,6 @@ class SimonSaysHardware(object):
         :type speed: int
 
         """
-        self.position = pos
 
     def turn(self, position):
         """ Sets the servo to the specified position, according to the
@@ -74,7 +68,7 @@ class SimonSaysHardware(object):
             count = position - self.position
 
             # DEBUG
-            print count
+            print "The number of clockwise movements : {}".format(count)
 
             if count > 0:
                 # rotate the specified number of times counterclockwise
@@ -101,9 +95,7 @@ class SimonSaysHardware(object):
 
         """
         # TODO: to be tested
-        self.servo.position = 0 or 180
-
-        self.servo.position = 90
+        self.servo.position = 180
 
     # Use self.position as a reference point to read in the color values.
     # Localization can be done by reading a

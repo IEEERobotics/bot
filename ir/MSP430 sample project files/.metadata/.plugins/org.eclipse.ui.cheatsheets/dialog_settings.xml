@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="CheatSheetCategoryBasedSelectionDialog">
+		<item value="338" key="DIALOG_WIDTH"/>
+		<item value="40" key="DIALOG_Y_ORIGIN"/>
+		<item value="598" key="DIALOG_HEIGHT"/>
+		<item value="559" key="DIALOG_X_ORIGIN"/>
+		<item value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI" key="DIALOG_FONT_NAME"/>
+	</section>
+</section>

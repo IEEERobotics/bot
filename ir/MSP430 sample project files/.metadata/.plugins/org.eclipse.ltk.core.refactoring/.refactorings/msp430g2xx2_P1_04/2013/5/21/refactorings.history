@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;msp430g2xx2_P1_04/msp430g2xx2_P1_04.c&apos; to &apos;g2332_pushbutton_adc_read&apos;" description="Rename resource &apos;msp430g2xx2_P1_04.c&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="msp430g2xx2_P1_04.c" name="g2332_pushbutton_adc_read" stamp="1369228062607" updateReferences="true"/>
+</session>

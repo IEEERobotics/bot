@@ -10,10 +10,10 @@ void DirectionFunction(angle, speed, RSpeed) {
 	Wheel D = Back Right
 	*/
 	//voltage multipliers based on previous derivations:
-	Va = speed * sin(angle*PI/180 + PI/4) + Rspeed;
-	Vb = speed * cos(angle*PI/180 + PI/4) - Rspeed;
-	Vc = speed * cos(angle*Pi/180 + PI/4) + Rspeed;
-	Vd = speed * sin(angle*Pi/180 + PI/4) - Rspeed;
+	double	Va = speed * sin(angle*PI/180 + PI/4) + Rspeed;
+	double	Vb = speed * cos(angle*PI/180 + PI/4) - Rspeed;
+	double	Vc = speed * cos(angle*Pi/180 + PI/4) + Rspeed;
+	double	Vd = speed * sin(angle*Pi/180 + PI/4) - Rspeed;
 		
 	//pass voltage to output, find out how to do that.
 

@@ -7,11 +7,12 @@
 	
 # Motion library to abstract wheel movement and macro moves from hardware.
 from math import sin, cos, pi
+from time import sleep
 
 def iowrite(wheel, ds):
   print wheel, ds
 	
-def move(speed, angle)
+def move(speed, angle, time=0):
   """Calculating voltage multiplier for each wheel, passing to io pins."""
 
   # Calculate voltage multipliers
@@ -25,3 +26,36 @@ def move(speed, angle)
   iowrite("front_right", front_right)
   iowrite("back_left", back_left)
   iowrite("back_right", back_right)
+  
+  # Sleep for user defined amount of time
+  sleep(time)
+  
+  # Stop robot movement.
+  iowrite("front_left", 0)
+  iowrite("front_right", 0)
+  iowrite("back_left", 0)
+  iowrite("back_right", 0)
+  
+def rotate(Rspeed, time=0):
+  """Controlling rotation of robot"""
+  
+  #Calculate voltage multipliers
+  front_left = Rspeed
+  front_right = -Rspeed
+  back_left = Rspeed
+  back_right = -Rspeed
+  
+  # Write to io pins.
+  iowrite("front_left", front_left)
+  iowrite("front_right", front_right)
+  iowrite("back_left", back_left)
+  iowrite("back_right", back_right)
+  
+  # Sleep for user defined amount of time
+  sleep(time)
+  
+  # Stop robot movement.
+  iowrite("front_left", 0)
+  iowrite("front_right", 0)
+  iowrite("back_left", 0)
+  iowrite("back_right", 0)

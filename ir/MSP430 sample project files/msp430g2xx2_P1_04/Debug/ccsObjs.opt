@@ -1,1 +1,1 @@
-"./msp430g2xx2_P1_04.obj" -l"libc.a" "../lnk_msp430g2332.cmd" 
+-l"libc.a" "../lnk_msp430g2332.cmd" 

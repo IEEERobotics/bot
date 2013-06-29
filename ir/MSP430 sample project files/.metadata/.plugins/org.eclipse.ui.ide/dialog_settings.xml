@@ -6,6 +6,10 @@
 		<item value="com.ti.ccstudio:5.3.0.201304301100"/>
 		<item value="com.ti.cgt.msp430.4.1.help:4.1.1.201211281203"/>
 		<item value="com.ti.dvt.msp430.power:3.4.0.201304031516"/>
+		<item value="com.ti.mcu.msp430ware.product.ui:1.40.0.26"/>
+		<item value="com.ti.mcu.msp430ware.product_1.40.0.26:1.40.0.26"/>
+		<item value="com.ti.sdo.grace.product.ui:2.10.0.78"/>
+		<item value="com.ti.sdo.grace.product_2.10.0.78:2.10.0.78"/>
 		<item value="org.eclipse.cdt.build.crossgcc:1.1.0.201209170703"/>
 		<item value="org.eclipse.cdt.debug.gdbjtag:7.0.0.201209170703"/>
 		<item value="org.eclipse.cdt.gdb:7.0.0.201209170703"/>
@@ -54,6 +58,8 @@
 		<item value="org.eclipse.rse.telnet:2.3.0.201209191030-775FD3879AE8YB_E8OA4"/>
 		<item value="org.eclipse.rse.terminals:1.2.1.201209191030-773Ep7H8AG8_DZK9Q9252"/>
 		<item value="org.eclipse.rse:3.4.1.201209191030-7L7IFBY83omx__z0RFpKdWB-r5MS"/>
+		<item value="org.eclipse.rtsc.xdctools.product.ui:3.25.0.48"/>
+		<item value="org.eclipse.rtsc.xdctools.product_3.25.0.48:3.25.0.48"/>
 		<item value="org.eclipse.tm.terminal.serial:2.1.100.201209191030-308Z31231A2A2141"/>
 		<item value="org.eclipse.tm.terminal.ssh:2.1.100.201209191030-308Z31231A2A2141"/>
 		<item value="org.eclipse.tm.terminal.telnet:2.1.100.201209191030-308Z31231A2A2141"/>
@@ -61,4 +67,11 @@
 		<item value="org.eclipse.tm.terminal:3.2.1.201209191030-41031231A2A2141"/>
 		<item value="org.eclipse.wst.jsdt.feature:1.4.1.v201208171701-7H7DFg0FC7sReqSyfqesWi"/>
 	</list>
+	<section name="SaveAsDialogSettings">
+		<item value="525" key="DIALOG_WIDTH"/>
+		<item value="154" key="DIALOG_Y_ORIGIN"/>
+		<item value="579" key="DIALOG_HEIGHT"/>
+		<item value="215" key="DIALOG_X_ORIGIN"/>
+		<item value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI" key="DIALOG_FONT_NAME"/>
+	</section>
 </section>

@@ -1,0 +1,1 @@
+"./main.obj" -l"libc.a" "../lnk_msp430g2332.cmd" 

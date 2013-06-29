@@ -2,7 +2,7 @@
 <java version="1.6.0_13" class="java.beans.XMLDecoder"> 
  <object class="com.ti.dvt.datamodel.solution.SolutionManager$PersistState"> 
   <void property="defaultSolution"> 
-   <string>C:/Users/Neal/Dropbox/MSP430 files\dvt\AnalysisSolutionsTemp\AnalysisSolution1369405558239\null</string> 
+   <string>C:/Users/Neal/Dropbox/IR_Array/MSP430 sample project files\dvt\AnalysisSolutionsTemp\AnalysisSolution1372044766098\null</string> 
   </void> 
   <void property="openedSolutions"> 
    <void method="add"> 
@@ -12,7 +12,7 @@
     <string>C:\ti\ccsv5\ccs_base\DebugServer\..\dvt_3.4.0.201304031516\RTA6\solutions\cce_rta6</string> 
    </void> 
    <void method="add"> 
-    <string>C:/Users/Neal/Dropbox/MSP430 files\dvt\AnalysisSolutionsTemp\AnalysisSolution1369405558239\null</string> 
+    <string>C:/Users/Neal/Dropbox/IR_Array/MSP430 sample project files\dvt\AnalysisSolutionsTemp\AnalysisSolution1372044766098\null</string> 
    </void> 
   </void> 
  </object> 

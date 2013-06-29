@@ -13,16 +13,16 @@
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="ADC10AE0" key="selection"/>
+		<item value="ADC10SHT_2" key="selection"/>
 		<list key="findhistory">
+			<item value="ADC10SHT_2"/>
+			<item value="ADC10"/>
+			<item value="ADC10A"/>
+			<item value="ADC10AE"/>
 			<item value="ADC10AE0"/>
+			<item value="Selects Ch"/>
+			<item value="select"/>
 			<item value=" ADC10"/>
-			<item value=" ADC10A"/>
-			<item value=" ADC10AE0"/>
-			<item value="INCH_1"/>
-			<item value="_Data"/>
-			<item value="MST_Data"/>
-			<item value=" MST_Data"/>
 		</list>
 		<list key="replacehistory">
 		</list>

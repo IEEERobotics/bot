@@ -1,0 +1,23 @@
+GRACE_SRC = ../src
+
+ifneq (,$(findstring :,$(WINDIR)$(windir)$(COMSPEC)$(comspec)))
+    # if Windows, use copy to touch file dates
+    TOUCH = copy /b $(subst /,\,$@)+,, $(subst /,\,$@)
+else
+    TOUCH = touch $@
+endif
+
+# include Grace generated top-level makefile
+-include $(GRACE_SRC)/makefile.libs
+
+ifneq (clean,$(MAKECMDGOALS))
+# ensure this file is reloaded when .cfg files change but after config runs
+$(GRACE_SRC)/makefile.libs: $(GEN_OPTS) $(CFG_SRCS)
+	-@$(TOUCH)
+endif
+
+#add generated makefile to list of files to delete during a clean
+#GEN_MISC_FILES__QUOTED += "$(GRACE_SRC)/makefile.libs" 
+
+#add generated source dir to list of directories to delete during a clean
+#GEN_MISC_DIRS__QUOTED += "$(GRACE_SRC)"

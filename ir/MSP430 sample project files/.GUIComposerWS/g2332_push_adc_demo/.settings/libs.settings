@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<libraries>
+<library id="dojo" name="dojo" version="1.8" virtualRoot="lib/davinci.dojo_1_8/WebContent/dojo"/>
+<library id="DojoThemes" name="DojoThemes" required="true" version="1.8" virtualRoot="lib/davinci.dojo_1_8/WebContent/maqetta/themes"/>
+<library id="gc" name="gc" version="1.1" virtualRoot="lib/davinci.gc_1_1/WebContent/gc"/>
+<library id="maqetta" name="maqetta" required="true" version="0.3" virtualRoot="lib/davinci.gc_1_1/WebContent/maqetta"/>
+<library id="html" name="html" required="true" version="0.8"/>
+</libraries>

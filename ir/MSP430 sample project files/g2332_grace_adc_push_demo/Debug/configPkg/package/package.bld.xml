@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<!--  This file conforms to the DTD xdc/bld/build.dtd -->
+<package name="configPkg" version="" producerId="undefined">
+    <units>
+    </units>
+    <sources>
+        <srcFile name="package/cfg/main_pe430.c"/>
+    </sources>
+    <configscripts>
+        <srcFile name="C:/Users/Neal/Dropbox/IR_Array/MSP430 sample project files/g2332_grace_adc_push_demo/main.cfg"/>
+    </configscripts>
+    <makefiles>
+        <srcFile name="package.mak" src="package.bld"/>
+        <srcFile name="package/package.xdc.dep" src="package.xdc"/>
+        <srcFile name="package/cfg/main_pe430.mak" src="package.bld"/>
+        <srcFile name="package/cfg/main_pe430.oe430.dep" src="package/cfg/main_pe430.c"/>
+        <srcFile name="package/cfg/main_pe430.dep" src="package/cfg/main_pe430.cfg"/>
+        <srcFile name="package/cfg/main.xe430.mak" src="package.bld"/>
+        <srcFile name="package/rel/configPkg.tar.dep" src="package/rel/configPkg.xdc.inc"/>
+    </makefiles>
+    <targets>
+        <target name="ti.targets.msp430.elf.MSP430"
+            version="ti.targets.msp430.elf.MSP430{1,0,4.1,5"
+            rawVersion="4.1.5"
+            platform="ti.platforms.exp430F5438"
+            isa="430"
+            suffix="e430"
+            rootDir="C:/ti/ccsv5/tools/compiler/msp430_4.1.5"
+            os="undefined"
+            rts="ti.targets.msp430.rts430">
+            <model endian="little"
+                codeModel="small"
+                dataModel="small"/>
+        </target>
+    </targets>
+    <libraries>
+    </libraries>
+    <configurations>
+    <configuration name="main"
+        pname="main.pe430"
+        target="ti.targets.msp430.elf.MSP430"
+        platform="ti.platforms.msp430:MSP430G2332"
+        profile="debug"
+        isPartial="false"
+        xCfgScript="package/cfg/main_pe430.cfg"
+        xCfgPrefix="package/cfg/main_pe430"
+        cfgScript="C:/Users/Neal/Dropbox/IR_Array/MSP430 sample project files/g2332_grace_adc_push_demo/main.cfg"
+        cfgArgs="null"
+        />
+    </configurations>
+    <executables>
+    <executable name="main"
+        pname="main.xe430"
+        target="ti.targets.msp430.elf.MSP430"
+        platform="ti.platforms.msp430:MSP430G2332"
+        profile="debug"
+        xCfgScript="package/cfg/main_pe430.cfg"
+        xCfgPrefix="package/cfg/main_pe430"
+        cfgScript="C:/Users/Neal/Dropbox/IR_Array/MSP430 sample project files/g2332_grace_adc_push_demo/main.cfg"
+        cfgArgs="null"
+        />
+    </executables>
+    <tests>
+    <test exeName="main.xe430"
+        args=""
+        groupName="main.xe430"
+        refOutput="undefined"
+        refExitCode="0"
+        execArgs=""
+        />
+    </tests>
+    <releases relDir="package/rel/">
+    <release name="configPkg"
+        pname="configPkg.tar"
+        label="default"
+    >
+        <file name="package/package.bld.xml"/>
+        <file name="package/build.cfg"/>
+        <file name="package/package.xdc.inc"/>
+    </release>
+    </releases>
+    <repositories>
+    </repositories>
+</package>

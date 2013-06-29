@@ -1,0 +1,16 @@
+
+**** Build of configuration Debug for project msp430g2xx2_P1_04 ****
+
+"C:\\ti\\ccsv5\\utils\\bin\\gmake" -k all 
+'Building target: msp430g2xx2_P1_04.out'
+'Invoking: MSP430 Linker'
+"C:/ti/ccsv5/tools/compiler/msp430_4.1.5/bin/cl430" -vmsp --abi=eabi -g --advice:power=all --define=__MSP430G2332__ --diag_warning=225 --display_error_number --diag_wrap=off --printf_support=minimal -z --stack_size=80 -m"msp430g2xx2_P1_04.map" --heap_size=80 -i"C:/ti/ccsv5/ccs_base/msp430/include" -i"C:/ti/ccsv5/tools/compiler/msp430_4.1.5/lib" -i"C:/ti/ccsv5/tools/compiler/msp430_4.1.5/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="msp430g2xx2_P1_04_linkInfo.xml" --rom_model -o "msp430g2xx2_P1_04.out"  -l"libc.a" "../lnk_msp430g2332.cmd" 
+<Linking>
+warning #10211-D: cannot resolve archive C:/ti/ccsv5/tools/compiler/msp430_4.1.5/lib/libc.a to a compatible library, as no input files have been encountered
+fatal error #10009: no input files
+
+>> Compilation failure
+gmake: *** [msp430g2xx2_P1_04.out] Error 1
+gmake: Target `all' not remade because of errors.
+
+**** Build Finished ****

@@ -1,0 +1,41 @@
+
+**** Build of configuration Debug for project g2332_grace_adc_push_demo ****
+
+"C:\\ti\\ccsv5\\utils\\bin\\gmake" -k all 
+'Building file: ../main.cfg'
+'Invoking: XDCtools'
+"C:/ti/xdctools_3_25_00_48/xs" --xdcpath="C:/ti/grace_2_10_00_78/packages;C:/ti/ccsv5/ccs_base/msp430/msp430ware_1_40_00_26/packages;C:/ti/ccsv5/ccs_base;" xdc.tools.configuro -o configPkg -t ti.targets.msp430.elf.MSP430 -p ti.platforms.msp430:MSP430G2332 -r debug -c "C:/ti/ccsv5/tools/compiler/msp430_4.1.5" --compileOptions "--symdebug:dwarf --optimize_with_debug" "../main.cfg"
+making package.mak (because of package.bld) ...
+generating interfaces for package configPkg (because package/package.xdc.inc is older than package.xdc) ...
+configuring main.xe430 from package/cfg/main_pe430.cfg ...
+cle430 package/cfg/main_pe430.c ...
+'Finished building: ../main.cfg'
+' '
+        1 file(s) copied.
+making ../src/grace/grace.lib ...
+gmake[1]: Nothing to be done for `all'.
+'Building file: ../main.c'
+'Invoking: MSP430 Compiler'
+"C:/ti/ccsv5/tools/compiler/msp430_4.1.5/bin/cl430" -vmsp --abi=eabi -g --include_path="C:/ti/ccsv5/ccs_base/msp430/include" --include_path="C:/ti/ccsv5/tools/compiler/msp430_4.1.5/include" --include_path="C:/ti/ccsv5/ccs_base/msp430/msp430ware_1_40_00_26" --advice:power=all --define=__MSP430G2332__ --diag_warning=225 --display_error_number --diag_wrap=off --printf_support=minimal --preproc_with_compile --preproc_dependency="main.pp" --cmd_file="./configPkg/compiler.opt"  "../main.c"
+'Finished building: ../main.c'
+' '
+'Building file: ../src/grace/InterruptVectors_init.c'
+'Invoking: MSP430 Compiler'
+"C:/ti/ccsv5/tools/compiler/msp430_4.1.5/bin/cl430" -vmsp --abi=eabi -g --include_path="C:/ti/ccsv5/ccs_base/msp430/include" --include_path="C:/ti/ccsv5/tools/compiler/msp430_4.1.5/include" --include_path="C:/ti/ccsv5/ccs_base/msp430/msp430ware_1_40_00_26" --advice:power=all --define=__MSP430G2332__ --diag_warning=225 --display_error_number --diag_wrap=off --printf_support=minimal --preproc_with_compile --preproc_dependency="src/grace/InterruptVectors_init.pp" --obj_directory="src/grace" --cmd_file="./configPkg/compiler.opt"  "../src/grace/InterruptVectors_init.c"
+'Finished building: ../src/grace/InterruptVectors_init.c'
+' '
+'Building target: g2332_grace_adc_push_demo.out'
+'Invoking: MSP430 Linker'
+"C:/ti/ccsv5/tools/compiler/msp430_4.1.5/bin/cl430" -vmsp --abi=eabi -g --advice:power=all --define=__MSP430G2332__ --diag_warning=225 --display_error_number --diag_wrap=off --printf_support=minimal -z --stack_size=80 -m"g2332_grace_adc_push_demo.map" --heap_size=80 -i"C:/ti/ccsv5/ccs_base/msp430/include" -i"C:/ti/ccsv5/tools/compiler/msp430_4.1.5/lib" -i"C:/ti/ccsv5/tools/compiler/msp430_4.1.5/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="g2332_grace_adc_push_demo_linkInfo.xml" --rom_model -o "g2332_grace_adc_push_demo.out" -l"./configPkg/linker.cmd"  "./src/grace/InterruptVectors_init.obj" "./main.obj" -l"libc.a" "../lnk_msp430g2332.cmd" 
+<Linking>
+"../lnk_msp430g2332.cmd", line 111: warning #10374-D: Interrupt vector "PORT1" does not have an interrupt handler routine.
+'Finished building target: g2332_grace_adc_push_demo.out'
+' '
+"../lnk_msp430g2332.cmd", line 112: warning #10374-D: Interrupt vector "PORT2" does not have an interrupt handler routine.
+"../lnk_msp430g2332.cmd", line 113: warning #10374-D: Interrupt vector "USI" does not have an interrupt handler routine.
+"../lnk_msp430g2332.cmd", line 117: warning #10374-D: Interrupt vector "TIMER0_A1" does not have an interrupt handler routine.
+"../lnk_msp430g2332.cmd", line 118: warning #10374-D: Interrupt vector "TIMER0_A0" does not have an interrupt handler routine.
+"../lnk_msp430g2332.cmd", line 119: warning #10374-D: Interrupt vector "WDT" does not have an interrupt handler routine.
+"../lnk_msp430g2332.cmd", line 123: warning #10374-D: Interrupt vector "NMI" does not have an interrupt handler routine.
+
+**** Build Finished ****

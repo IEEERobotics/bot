@@ -1,0 +1,306 @@
+digraph configuration {
+    size="7.5,10";
+    rankdir=LR;
+    ranksep=".50 equally";
+    concentrate=true;
+    compound=true;
+    label="\nConfiguration for configPkg/main.xe430"
+  node [font=Helvetica, fontsize=14, fontcolor=black];  subgraph cluster0 {label=""; __cfg [label="C:/Users/Neal/Dropbox/IR_Array/MSP430 sample project files/g2332_grace_adc_push_demo/main.cfg", color=white, fontcolor=blue];
+    node [font=Helvetica, fontsize=10];    subgraph cluster1 {
+        label="";
+        xdc_services_global__top [shape=box,label="xdc.services.global\n1, 0, 0", color=white];
+        xdc_services_global__bot [shape=point,label="", style=invis];
+        xdc_services_global_Clock [style=filled,fillcolor=lightgray, label="Clock"];
+        xdc_services_global__top -> xdc_services_global_Clock[style=invis];
+        xdc_services_global_Clock -> xdc_services_global__bot[style=invis];
+    }
+    subgraph cluster2 {
+        label="";
+        xdc__top [shape=box,label="xdc\n1, 1, 1", color=white];
+        xdc__bot [shape=point,label="", style=invis];
+    }
+    subgraph cluster3 {
+        label="";
+        xdc_corevers__top [shape=box,label="xdc.corevers\n16, 0, 2, 0", color=white];
+    }
+    subgraph cluster4 {
+        label="";
+        xdc_shelf__top [shape=box,label="xdc.shelf\n1, 0, 0", color=white];
+    }
+    subgraph cluster5 {
+        label="";
+        xdc_services_spec__top [shape=box,label="xdc.services.spec\n1, 0, 0, 0", color=white];
+    }
+    subgraph cluster6 {
+        label="";
+        xdc_services_intern_xsr__top [shape=box,label="xdc.services.intern.xsr\n1, 0, 0", color=white];
+    }
+    subgraph cluster7 {
+        label="";
+        xdc_services_intern_gen__top [shape=box,label="xdc.services.intern.gen\n1, 0, 0, 0", color=white];
+    }
+    subgraph cluster8 {
+        label="";
+        xdc_services_intern_cmd__top [shape=box,label="xdc.services.intern.cmd\n1, 0, 0, 0", color=white];
+    }
+    subgraph cluster9 {
+        label="";
+        xdc_bld__top [shape=box,label="xdc.bld\n1, 0, 2", color=white];
+        xdc_bld__bot [shape=point,label="", style=invis];
+    }
+    subgraph cluster10 {
+        label="";
+        ti_targets__top [shape=box,label="ti.targets\n1, 0, 3", color=white];
+        ti_targets__bot [shape=point,label="", style=invis];
+    }
+    subgraph cluster11 {
+        label="";
+        ti_targets_msp430_elf__top [shape=box,label="ti.targets.msp430.elf\n1, 0, 0", color=white];
+        ti_targets_msp430_elf__bot [shape=point,label="", style=invis];
+    }
+    subgraph cluster12 {
+        label="";
+        xdc_services_getset__top [shape=box,label="xdc.services.getset\n1, 0, 0", color=white];
+        xdc_services_getset__bot [shape=point,label="", style=invis];
+    }
+    subgraph cluster13 {
+        label="";
+        xdc_rov__top [shape=box,label="xdc.rov\n1, 0, 0", color=white];
+        xdc_rov__bot [shape=point,label="", style=invis];
+    }
+    subgraph cluster14 {
+        label="";
+        xdc_runtime__top [shape=box,label="xdc.runtime\n2, 1, 0", color=white];
+        xdc_runtime__bot [shape=point,label="", style=invis];
+    }
+    subgraph cluster15 {
+        label="";
+        ti_targets_msp430_rts430__top [shape=box,label="ti.targets.msp430.rts430\n1, 0, 0", color=white];
+    }
+    subgraph cluster16 {
+        label="";
+        xdc_services_io__top [shape=box,label="xdc.services.io\n1, 0, 0", color=white];
+        xdc_services_io__bot [shape=point,label="", style=invis];
+    }
+    subgraph cluster17 {
+        label="";
+        xdc_cfg__top [shape=box,label="xdc.cfg\n1, 0, 2, 0", color=white];
+        xdc_cfg__bot [shape=point,label="", style=invis];
+        xdc_cfg_Program [style=filled,fillcolor=lightgray, label="Program"];
+        xdc_cfg__top -> xdc_cfg_Program[style=invis];
+        xdc_cfg_Program -> xdc_cfg__bot[style=invis];
+        xdc_cfg_Main [style=filled,fillcolor=lightgray, label="Main"];
+        xdc_cfg__top -> xdc_cfg_Main[style=invis];
+        xdc_cfg_Main -> xdc_cfg__bot[style=invis];
+        xdc_cfg_SourceDir [style=filled,fillcolor=lightgray, label="SourceDir"];
+        xdc_cfg__top -> xdc_cfg_SourceDir[style=invis];
+        xdc_cfg_SourceDir -> xdc_cfg__bot[style=invis];
+    }
+    subgraph cluster18 {
+        label="";
+        xdc_platform__top [shape=box,label="xdc.platform\n1, 0, 1, 0", color=white];
+        xdc_platform__bot [shape=point,label="", style=invis];
+        xdc_platform_ExeContext [style=filled,fillcolor=lightgray, label="ExeContext"];
+        xdc_platform__top -> xdc_platform_ExeContext[style=invis];
+        xdc_platform_ExeContext -> xdc_platform__bot[style=invis];
+    }
+    subgraph cluster19 {
+        label="";
+        ti_catalog_msp430__top [shape=box,label="ti.catalog.msp430\n1, 0, 0", color=white];
+        ti_catalog_msp430__bot [shape=point,label="", style=invis];
+        ti_catalog_msp430_MSP430 [style=filled,fillcolor=lightgray, label="MSP430"];
+        ti_catalog_msp430__top -> ti_catalog_msp430_MSP430[style=invis];
+        ti_catalog_msp430_MSP430 -> ti_catalog_msp430__bot[style=invis];
+    }
+    subgraph cluster20 {
+        label="";
+        ti_catalog__top [shape=box,label="ti.catalog\n1, 0, 0", color=white];
+    }
+    subgraph cluster21 {
+        label="";
+        ti_catalog_msp430_peripherals_interrupt__top [shape=box,label="ti.catalog.msp430.peripherals.interrupt\n1, 0, 0", color=white];
+        ti_catalog_msp430_peripherals_interrupt__bot [shape=point,label="", style=invis];
+        ti_catalog_msp430_peripherals_interrupt_Interrupt_Controller [style=filled,fillcolor=lightgray, label="Interrupt_Controller"];
+        ti_catalog_msp430_peripherals_interrupt__top -> ti_catalog_msp430_peripherals_interrupt_Interrupt_Controller[style=invis];
+        ti_catalog_msp430_peripherals_interrupt_Interrupt_Controller -> ti_catalog_msp430_peripherals_interrupt__bot[style=invis];
+    }
+    subgraph cluster22 {
+        label="";
+        ti_catalog_msp430_peripherals_watchdog__top [shape=box,label="ti.catalog.msp430.peripherals.watchdog\n1, 0, 0", color=white];
+        ti_catalog_msp430_peripherals_watchdog__bot [shape=point,label="", style=invis];
+        ti_catalog_msp430_peripherals_watchdog_WDTplus [style=filled,fillcolor=lightgray, label="WDTplus"];
+        ti_catalog_msp430_peripherals_watchdog__top -> ti_catalog_msp430_peripherals_watchdog_WDTplus[style=invis];
+        ti_catalog_msp430_peripherals_watchdog_WDTplus -> ti_catalog_msp430_peripherals_watchdog__bot[style=invis];
+    }
+    subgraph cluster23 {
+        label="";
+        ti_catalog_msp430_peripherals_special_function__top [shape=box,label="ti.catalog.msp430.peripherals.special_function\n1, 0, 0", color=white];
+        ti_catalog_msp430_peripherals_special_function__bot [shape=point,label="", style=invis];
+        ti_catalog_msp430_peripherals_special_function_IE1 [style=filled,fillcolor=lightgray, label="IE1"];
+        ti_catalog_msp430_peripherals_special_function__top -> ti_catalog_msp430_peripherals_special_function_IE1[style=invis];
+        ti_catalog_msp430_peripherals_special_function_IE1 -> ti_catalog_msp430_peripherals_special_function__bot[style=invis];
+        ti_catalog_msp430_peripherals_special_function_IE2 [style=filled,fillcolor=lightgray, label="IE2"];
+        ti_catalog_msp430_peripherals_special_function__top -> ti_catalog_msp430_peripherals_special_function_IE2[style=invis];
+        ti_catalog_msp430_peripherals_special_function_IE2 -> ti_catalog_msp430_peripherals_special_function__bot[style=invis];
+        ti_catalog_msp430_peripherals_special_function_SR [style=filled,fillcolor=lightgray, label="SR"];
+        ti_catalog_msp430_peripherals_special_function__top -> ti_catalog_msp430_peripherals_special_function_SR[style=invis];
+        ti_catalog_msp430_peripherals_special_function_SR -> ti_catalog_msp430_peripherals_special_function__bot[style=invis];
+    }
+    subgraph cluster24 {
+        label="";
+        ti_catalog_msp430_peripherals_timer__top [shape=box,label="ti.catalog.msp430.peripherals.timer\n1, 0, 0", color=white];
+        ti_catalog_msp430_peripherals_timer__bot [shape=point,label="", style=invis];
+        ti_catalog_msp430_peripherals_timer_Timer0_A3 [style=filled,fillcolor=lightgray, label="Timer0_A3"];
+        ti_catalog_msp430_peripherals_timer__top -> ti_catalog_msp430_peripherals_timer_Timer0_A3[style=invis];
+        ti_catalog_msp430_peripherals_timer_Timer0_A3 -> ti_catalog_msp430_peripherals_timer__bot[style=invis];
+    }
+    subgraph cluster25 {
+        label="";
+        ti_catalog_msp430_peripherals_communication__top [shape=box,label="ti.catalog.msp430.peripherals.communication\n1, 0, 0", color=white];
+        ti_catalog_msp430_peripherals_communication__bot [shape=point,label="", style=invis];
+        ti_catalog_msp430_peripherals_communication_USI [style=filled,fillcolor=lightgray, label="USI"];
+        ti_catalog_msp430_peripherals_communication__top -> ti_catalog_msp430_peripherals_communication_USI[style=invis];
+        ti_catalog_msp430_peripherals_communication_USI -> ti_catalog_msp430_peripherals_communication__bot[style=invis];
+    }
+    subgraph cluster26 {
+        label="";
+        ti_catalog_msp430_peripherals_memory__top [shape=box,label="ti.catalog.msp430.peripherals.memory\n1, 0, 0", color=white];
+        ti_catalog_msp430_peripherals_memory__bot [shape=point,label="", style=invis];
+        ti_catalog_msp430_peripherals_memory_Flash_2xx [style=filled,fillcolor=lightgray, label="Flash_2xx"];
+        ti_catalog_msp430_peripherals_memory__top -> ti_catalog_msp430_peripherals_memory_Flash_2xx[style=invis];
+        ti_catalog_msp430_peripherals_memory_Flash_2xx -> ti_catalog_msp430_peripherals_memory__bot[style=invis];
+    }
+    subgraph cluster27 {
+        label="";
+        ti_catalog_msp430_peripherals_clock__top [shape=box,label="ti.catalog.msp430.peripherals.clock\n1, 0, 0", color=white];
+        ti_catalog_msp430_peripherals_clock__bot [shape=point,label="", style=invis];
+        ti_catalog_msp430_peripherals_clock_BCSplus [style=filled,fillcolor=lightgray, label="BCSplus"];
+        ti_catalog_msp430_peripherals_clock__top -> ti_catalog_msp430_peripherals_clock_BCSplus[style=invis];
+        ti_catalog_msp430_peripherals_clock_BCSplus -> ti_catalog_msp430_peripherals_clock__bot[style=invis];
+    }
+    subgraph cluster28 {
+        label="";
+        ti_catalog_msp430_peripherals_oa__top [shape=box,label="ti.catalog.msp430.peripherals.oa\n1, 0, 0", color=white];
+        ti_catalog_msp430_peripherals_oa__bot [shape=point,label="", style=invis];
+    }
+    subgraph cluster29 {
+        label="";
+        ti_catalog_msp430_peripherals_gpio__top [shape=box,label="ti.catalog.msp430.peripherals.gpio\n1, 0, 0", color=white];
+        ti_catalog_msp430_peripherals_gpio__bot [shape=point,label="", style=invis];
+        ti_catalog_msp430_peripherals_gpio_GPIO_MSP430G2x32 [style=filled,fillcolor=lightgray, label="GPIO_MSP430G2x32"];
+        ti_catalog_msp430_peripherals_gpio__top -> ti_catalog_msp430_peripherals_gpio_GPIO_MSP430G2x32[style=invis];
+        ti_catalog_msp430_peripherals_gpio_GPIO_MSP430G2x32 -> ti_catalog_msp430_peripherals_gpio__bot[style=invis];
+    }
+    subgraph cluster30 {
+        label="";
+        ti_catalog_msp430_peripherals_comparator__top [shape=box,label="ti.catalog.msp430.peripherals.comparator\n1, 0, 0", color=white];
+        ti_catalog_msp430_peripherals_comparator__bot [shape=point,label="", style=invis];
+    }
+    subgraph cluster31 {
+        label="";
+        ti_catalog_msp430_peripherals_svs__top [shape=box,label="ti.catalog.msp430.peripherals.svs\n1, 0, 0", color=white];
+        ti_catalog_msp430_peripherals_svs__bot [shape=point,label="", style=invis];
+    }
+    subgraph cluster32 {
+        label="";
+        ti_catalog_msp430_peripherals_dac__top [shape=box,label="ti.catalog.msp430.peripherals.dac\n1, 0, 0", color=white];
+        ti_catalog_msp430_peripherals_dac__bot [shape=point,label="", style=invis];
+    }
+    subgraph cluster33 {
+        label="";
+        ti_catalog_msp430_peripherals_adc__top [shape=box,label="ti.catalog.msp430.peripherals.adc\n1, 0, 0", color=white];
+        ti_catalog_msp430_peripherals_adc__bot [shape=point,label="", style=invis];
+        ti_catalog_msp430_peripherals_adc_ADC10 [style=filled,fillcolor=lightgray, label="ADC10"];
+        ti_catalog_msp430_peripherals_adc__top -> ti_catalog_msp430_peripherals_adc_ADC10[style=invis];
+        ti_catalog_msp430_peripherals_adc_ADC10 -> ti_catalog_msp430_peripherals_adc__bot[style=invis];
+    }
+    subgraph cluster34 {
+        label="";
+        ti_catalog_msp430_init__top [shape=box,label="ti.catalog.msp430.init\n1, 0, 0", color=white];
+        ti_catalog_msp430_init__bot [shape=point,label="", style=invis];
+        ti_catalog_msp430_init_Boot [style=filled,fillcolor=lightgray, label="Boot"];
+        ti_catalog_msp430_init__top -> ti_catalog_msp430_init_Boot[style=invis];
+        ti_catalog_msp430_init_Boot -> ti_catalog_msp430_init__bot[style=invis];
+    }
+    subgraph cluster35 {
+        label="";
+        ti_platforms_msp430__top [shape=box,label="ti.platforms.msp430\n1, 0, 0", color=white];
+        ti_platforms_msp430__bot [shape=point,label="", style=invis];
+        ti_platforms_msp430_Platform [style=filled,fillcolor=lightgray, label="Platform"];
+        ti_platforms_msp430__top -> ti_platforms_msp430_Platform[style=invis];
+        ti_platforms_msp430_Platform -> ti_platforms_msp430__bot[style=invis];
+    }
+    subgraph cluster36 {
+        label="";
+        ti_mcu_msp430_csl_interrupt_vectors__top [shape=box,label="ti.mcu.msp430.csl.interrupt_vectors\n1, 0, 0", color=white];
+        ti_mcu_msp430_csl_interrupt_vectors__bot [shape=point,label="", style=invis];
+        ti_mcu_msp430_csl_interrupt_vectors_InterruptVectors [style=filled,fillcolor=lightgray, label="InterruptVectors"];
+        ti_mcu_msp430_csl_interrupt_vectors__top -> ti_mcu_msp430_csl_interrupt_vectors_InterruptVectors[style=invis];
+        ti_mcu_msp430_csl_interrupt_vectors_InterruptVectors -> ti_mcu_msp430_csl_interrupt_vectors__bot[style=invis];
+    }
+    subgraph cluster37 {
+        label="";
+        ti_mcu_msp430_csl_gpio__top [shape=box,label="ti.mcu.msp430.csl.gpio\n1, 0, 0", color=white];
+        ti_mcu_msp430_csl_gpio__bot [shape=point,label="", style=invis];
+        ti_mcu_msp430_csl_gpio_GPIO [style=filled,fillcolor=lightgray, label="GPIO"];
+        ti_mcu_msp430_csl_gpio__top -> ti_mcu_msp430_csl_gpio_GPIO[style=invis];
+        ti_mcu_msp430_csl_gpio_GPIO -> ti_mcu_msp430_csl_gpio__bot[style=invis];
+    }
+    subgraph cluster38 {
+        label="";
+        ti_mcu_msp430_csl_system__top [shape=box,label="ti.mcu.msp430.csl.system\n1, 0, 0", color=white];
+        ti_mcu_msp430_csl_system__bot [shape=point,label="", style=invis];
+        ti_mcu_msp430_csl_system_System [style=filled,fillcolor=lightgray, label="System"];
+        ti_mcu_msp430_csl_system__top -> ti_mcu_msp430_csl_system_System[style=invis];
+        ti_mcu_msp430_csl_system_System -> ti_mcu_msp430_csl_system__bot[style=invis];
+    }
+    subgraph cluster39 {
+        label="";
+        ti_mcu_msp430_csl__top [shape=box,label="ti.mcu.msp430.csl\n1, 0, 0", color=white];
+        ti_mcu_msp430_csl__bot [shape=point,label="", style=invis];
+        ti_mcu_msp430_csl_CSL [style=filled,fillcolor=lightgray, label="CSL"];
+        ti_mcu_msp430_csl__top -> ti_mcu_msp430_csl_CSL[style=invis];
+        ti_mcu_msp430_csl_CSL -> ti_mcu_msp430_csl__bot[style=invis];
+    }
+    subgraph cluster40 {
+        label="";
+        ti_mcu_msp430_csl_adc__top [shape=box,label="ti.mcu.msp430.csl.adc\n1, 0, 0", color=white];
+        ti_mcu_msp430_csl_adc__bot [shape=point,label="", style=invis];
+        ti_mcu_msp430_csl_adc_ADC10 [style=filled,fillcolor=lightgray, label="ADC10"];
+        ti_mcu_msp430_csl_adc__top -> ti_mcu_msp430_csl_adc_ADC10[style=invis];
+        ti_mcu_msp430_csl_adc_ADC10 -> ti_mcu_msp430_csl_adc__bot[style=invis];
+    }
+    subgraph cluster41 {
+        label="";
+        ti_mcu_msp430_csl_timer__top [shape=box,label="ti.mcu.msp430.csl.timer\n1, 0, 0", color=white];
+        ti_mcu_msp430_csl_timer__bot [shape=point,label="", style=invis];
+    }
+    subgraph cluster42 {
+        label="";
+        ti_mcu_msp430_csl_clock__top [shape=box,label="ti.mcu.msp430.csl.clock\n1, 0, 0", color=white];
+        ti_mcu_msp430_csl_clock__bot [shape=point,label="", style=invis];
+        ti_mcu_msp430_csl_clock_BCSplus [style=filled,fillcolor=lightgray, label="BCSplus"];
+        ti_mcu_msp430_csl_clock__top -> ti_mcu_msp430_csl_clock_BCSplus[style=invis];
+        ti_mcu_msp430_csl_clock_BCSplus -> ti_mcu_msp430_csl_clock__bot[style=invis];
+    }
+    subgraph cluster43 {
+        label="";
+        ti_mcu_msp430_csl_watchdog__top [shape=box,label="ti.mcu.msp430.csl.watchdog\n1, 0, 0", color=white];
+        ti_mcu_msp430_csl_watchdog__bot [shape=point,label="", style=invis];
+        ti_mcu_msp430_csl_watchdog_WDTplus [style=filled,fillcolor=lightgray, label="WDTplus"];
+        ti_mcu_msp430_csl_watchdog__top -> ti_mcu_msp430_csl_watchdog_WDTplus[style=invis];
+        ti_mcu_msp430_csl_watchdog_WDTplus -> ti_mcu_msp430_csl_watchdog__bot[style=invis];
+    }
+    subgraph cluster44 {
+        label="";
+        configPkg__top [shape=box,label="configPkg\n", color=white];
+    }
+  }
+  node [font=Helvetica, fontsize=10];
+    ti_targets_msp430_elf_MSP430__1_0_4__1_0_1 [shape=record,label="ti.targets.msp430.elf.MSP430|1,0,4.1,0,1",style=filled, fillcolor=lightgrey];
+    ti_targets_msp430_rts430__top -> ti_targets_msp430_elf_MSP430__1_0_4__1_0_1 [ltail=cluster15];
+    ti_targets_msp430_elf_MSP430__1_0_4__1_0_1 [shape=record,label="ti.targets.msp430.elf.MSP430|1,0,4.1,0,1",style=filled, fillcolor=lightgrey];
+    ti_catalog_msp430_init__bot -> ti_targets_msp430_elf_MSP430__1_0_4__1_0_1 [ltail=cluster34];
+    ti_targets_msp430_elf_MSP430__1_0_4__1_5 [shape=record,label="ti.targets.msp430.elf.MSP430|1,0,4.1,5",style=filled, fillcolor=lightgrey];
+    configPkg__top -> ti_targets_msp430_elf_MSP430__1_0_4__1_5 [ltail=cluster44];
+}

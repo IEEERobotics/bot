@@ -1,0 +1,62 @@
+#
+# This file was generated based on the configuration script:
+#     C:\Users\Neal\Dropbox\IR_Array\MSP430 sample project files\g2332_grace_adc_push_demo\main.cfg
+#
+# This makefile may be included in other makefiles that need to build
+# the libraries containing the compiled source files generated as
+# part of the configuration step.
+
+#
+# ======== GEN_SRC_DIR =========
+# The path to the sources generated during configuration
+#
+# This path must be either absolute or relative to the build directory.
+#
+# The absolute path to the generated source directory (at the time the
+# sources were generated) is:
+#    C:\Users\Neal\Dropbox\IR_Array\MSP430 sample project files\g2332_grace_adc_push_demo\src
+#
+GEN_SRC_DIR ?= ../src
+
+ifeq (,$(wildcard $(GEN_SRC_DIR)))
+$(error "ERROR: GEN_SRC_DIR must be set to the directory containing the generated sources")
+endif
+
+#
+# ======== .force ========
+# The .force goal is used to force the build of any goal that names it as
+# a prerequisite
+#
+.PHONY: .force
+      
+#
+# ======== library macros ========
+#
+grace_SRC = $(GEN_SRC_DIR)/grace
+grace_LIB = $(GEN_SRC_DIR)/grace/grace.lib
+
+#
+# ======== dependencies ========
+#
+all: $(grace_LIB)
+clean: .grace_clean
+
+
+# ======== convenient build goals ========
+.PHONY: grace
+grace: $(GEN_SRC_DIR)/grace/grace.lib
+
+# CDT managed make executables depend on $(OBJS)
+OBJS += $(grace_LIB)
+
+#
+# ======== rules ========
+#
+$(grace_LIB): .force 
+	@echo making $@ ...
+	@$(MAKE) --no-print-directory -C $(grace_SRC)
+	
+.grace_clean:
+	@echo cleaning $(grace_SRC) ...
+	-@$(MAKE) --no-print-directory -C $(grace_SRC) clean
+

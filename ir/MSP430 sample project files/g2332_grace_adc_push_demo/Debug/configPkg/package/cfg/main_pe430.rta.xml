@@ -1,0 +1,13 @@
+<xdc.runtime.Types.RtaDecoderData>
+  <targetName>ti.targets.msp430.elf.MSP430</targetName>
+  <binaryParser>ti.targets.omf.elf.Elf32</binaryParser>
+  <endian>little</endian>
+  <bitsPerChar>8</bitsPerChar>
+  <argSize>2</argSize>
+  <eventSize>32</eventSize>
+  <dataTransportClassName>undefined</dataTransportClassName>
+  <controlTransportClassName>undefined</controlTransportClassName>
+  <loggers-length>0</loggers-length>
+  <modMap-length>0</modMap-length>
+  <evtMap-length>0</evtMap-length>
+</xdc.runtime.Types.RtaDecoderData>

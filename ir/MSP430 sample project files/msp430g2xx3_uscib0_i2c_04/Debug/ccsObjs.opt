@@ -1,0 +1,1 @@
+"./msp430g2xx3_uscib0_i2c_04.obj" -l"libc.a" "../lnk_msp430g2553.cmd" 

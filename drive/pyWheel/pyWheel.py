@@ -13,7 +13,16 @@ def iowrite(wheel, ds):
   print wheel, ds
 	
 def move(speed, angle, time=0):
-  """Calculating voltage multiplier for each wheel, passing to io pins."""
+  """Calculating voltage multiplier for each wheel, passing to io pins.
+
+  :param speed: Magnitude of robot's translation speed.
+  :type speed: float.
+  :param angle: Angle at which robot should translate.
+  :type angle: float.
+  :param time: Time in seconds that robot should do this move.
+  :type time: float.
+
+  """
 
   # Calculate voltage multipliers
   front_left = speed * sin(angle*pi/180 + pi/4)

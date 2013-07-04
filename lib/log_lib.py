@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
+from os import getcwd, path
+
 import logging.handlers
-from os import getcwd
 
 LOG_FILE = "logs/bot.log"
 
@@ -23,6 +24,11 @@ def get_logger(prefix=None):
   logger = logging.getLogger(__name__)
   logger.setLevel(logging.DEBUG)
 
+  # Check if log exists and should therefore be rolled
+  needRoll = False
+  if path.isfile(qual_log_file):
+    needRoll = True
+
   # Build file output formatter
   file_formatter = logging.Formatter("%(asctime)s | %(levelname)s | "
                                      "%(filename)s | %(funcName)s | "
@@ -34,8 +40,9 @@ def get_logger(prefix=None):
                                        "%(message)s")
 
   # Build file handler (for output log output to files)
-  file_handler = logging.handlers.RotatingFileHandler(qual_log_file, mode="a", 
-                                            maxBytes=15728640, backupCount=50)
+  file_handler = logging.handlers.RotatingFileHandler(qual_log_file, mode="a",
+                                                      backupCount=50, 
+                                                      delay=True)
   file_handler.setLevel(logging.DEBUG)
   file_handler.setFormatter(file_formatter)
 
@@ -47,6 +54,10 @@ def get_logger(prefix=None):
   # Add handlers to logger
   logger.addHandler(file_handler)
   logger.addHandler(stream_handler)
+
+  # This is a stale log, so roll it
+  if needRoll:
+    logger.handlers[0].doRollover()
 
   logger.debug("Logger built")
   return logger

@@ -6,6 +6,20 @@ import logging.handlers
 
 LOG_FILE = "logs/bot.log"
 
+
+def prepend_prefix(path_from_proj_root):
+    """Return corrected absolute path from project root, accouting for CWD.
+
+    :param path_from_proj_root: Path from project's root directory to file.
+    :type path_from_proj_root: string.
+    :returns: Path from CWD to file.
+
+    """
+
+    prefix = "../" * getcwd().split("/bot")[1].count("/")
+    return prefix + path_from_proj_root
+
+
 def get_logger(prefix=None):
     """Build and return a logger for formatted stream and file output.
 
@@ -17,8 +31,7 @@ def get_logger(prefix=None):
 
     # Setup path to log output. Allows usage from any subpackage.
     if prefix is None:
-        prefix = "../" * getcwd().split("/bot")[1].count("/")
-        qual_log_file = prefix + LOG_FILE
+        qual_log_file = prepend_prefix(LOG_FILE)
 
     # Build logger
     logger = logging.getLogger(__name__)

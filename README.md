@@ -24,10 +24,11 @@ If you really care, give [Google's Shell Style Guide][1] a read. Don't be too pe
 
 ### Docstring Style
 
-Use [Sphinx-style docstrings].
+Use [Sphinx-style docstrings]. You may also find [this][2] docstring and Sphinx information helpful.
 
 
 [PEP8]: http://www.python.org/dev/peps/pep-0008/
 [PEP7]: http://www.python.org/dev/peps/pep-0007/
 [1]: https://google-styleguide.googlecode.com/svn/trunk/shell.xml
 [Sphinx-style docstrings]: http://pythonhosted.org/an_example_pypi_project/sphinx.html#full-code-example
+[2]: http://stackoverflow.com/questions/5334531/python-documentation-standard-for-docstring

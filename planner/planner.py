@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+"""Code related to plan-execution."""
+
 
 import yaml
 
@@ -42,5 +44,4 @@ class Planner:
         self.logger.info("Strategy file: " + qual_strat_file)
 
         strat_fd = open(qual_strat_file)
-        self.strat = yaml.load(strat_fd)
-        #self.logger.debug("Strategy: " + str(self.strat))
+        return yaml.load(strat_fd)

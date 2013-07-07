@@ -1,37 +1,50 @@
 #!/usr/bin/env python
+"""Library of useful functions that apply to many modules."""
 
 from os import getcwd, path
+import yaml
 
 import logging.handlers
-
-LOG_FILE = "logs/bot.log"
-
 
 def prepend_prefix(path_from_proj_root):
     """Return corrected absolute path from project root, accouting for CWD.
 
     :param path_from_proj_root: Path from project's root directory to file.
-    :type path_from_proj_root: string.
+    :type path_from_proj_root: string
     :returns: Path from CWD to file.
 
     """
-
     prefix = "../" * getcwd().split("/bot")[1].count("/")
     return prefix + path_from_proj_root
+
+
+def get_config(config_file="config.yaml"):
+    """Load and return configuration options.
+
+    :param config_file: YAML file to load config from.
+    :type config_file: string
+    :returns: Dict description of configuration for this round.
+
+    """
+    qual_config_file = prepend_prefix(config_file)
+    config_fd = open(qual_config_file)
+    return yaml.load(config_fd)
 
 
 def get_logger(prefix=None):
     """Build and return a logger for formatted stream and file output.
 
     :param prefix: Optional path from CWD to dir that contains logs dir.
-    :type prefix: string.
+    :type prefix: string
     :returns: The constructed logging object.
 
     """
+    # Get config so that path to log file can be read.
+    config = get_config()
 
     # Setup path to log output. Allows usage from any subpackage.
     if prefix is None:
-        qual_log_file = prepend_prefix(LOG_FILE)
+        qual_log_file = prepend_prefix(config["log_file"])
 
     # Build logger
     logger = logging.getLogger(__name__)
@@ -53,8 +66,9 @@ def get_logger(prefix=None):
                                          "%(message)s")
 
     # Build file handler (for output log output to files)
-    file_handler = logging.handlers.RotatingFileHandler(qual_log_file, mode="a",
-                                                        backupCount=50, 
+    file_handler = logging.handlers.RotatingFileHandler(qual_log_file,
+                                                        mode="a",
+                                                        backupCount=50,
                                                         delay=True)
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(file_formatter)

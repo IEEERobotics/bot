@@ -1,0 +1,2 @@
+strategy: planner/strategies/strategy0.yaml
+log_file: logs/bot.log

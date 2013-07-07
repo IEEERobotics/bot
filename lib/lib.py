@@ -6,9 +6,11 @@ import yaml
 
 import logging.handlers
 
+_logger = None
+
 
 def prepend_prefix(path_from_proj_root):
-    """Return corrected absolute path from project root, accouting for CWD.
+    """Return corrected absolute path from project root, accounting for CWD.
 
     :param path_from_proj_root: Path from project's root directory to file.
     :type path_from_proj_root: string
@@ -35,11 +37,25 @@ def get_config(config_file="config.yaml"):
 def get_logger(prefix=None):
     """Build and return a logger for formatted stream and file output.
 
+    Note that if a logger has already been built, a new one will not
+    be created. The previously created logger will be returned. This
+    prevents running unnecessary setup twice, as well as premature logrolls.
+    Two logger objects would not actually be created, as logger acts as
+    a singleton.
+
+    TODO (dfarrell07): Refactor to not use a global
+
     :param prefix: Optional path from CWD to dir that contains logs dir.
     :type prefix: string
     :returns: The constructed logging object.
 
     """
+    # Don't run setup if logger has been built (would logroll early)
+    global _logger
+    if _logger is not None:
+        _logger.debug("Logger already exists")
+        return _logger
+
     # Get config so that path to log file can be read.
     config = get_config()
 
@@ -88,4 +104,5 @@ def get_logger(prefix=None):
         logger.handlers[0].doRollover()
 
     logger.debug("Logger built")
+    _logger = logger
     return logger

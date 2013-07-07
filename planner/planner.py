@@ -32,8 +32,6 @@ class Planner:
     def load_strategy(self):
         """Load the YAML description of the strategy for this round.
 
-        :strat_file: File to read solution strategy from, interpreted as YAML.
-        :type strat_file: string
         :returns: Dict description of strategy for this round.
 
         """

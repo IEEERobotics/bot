@@ -5,6 +5,7 @@ import yaml
 
 import lib.lib as lib
 
+
 class Planner:
 
     """Manage execution of user-defined strategy.

@@ -12,6 +12,8 @@ Code for the IEEE Robotics Team's 2014 robot(s).
 2. Re-read [PEP8]
 3. Pedantically follow [PEP8]
 
+I suggest running the program pep8 against your code before each commit. It's likely available by default in your Linux distro's repos (tested on Ubuntu).
+
 #### C
 
 [PEP7] will be the standard, but pay special attention to exception #2, as I expect C code will be more likely to pull code blocks from other libs.

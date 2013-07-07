@@ -6,6 +6,7 @@ import yaml
 
 import logging.handlers
 
+
 def prepend_prefix(path_from_proj_root):
     """Return corrected absolute path from project root, accouting for CWD.
 

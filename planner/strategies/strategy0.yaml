@@ -1,3 +1,20 @@
 name: strat0
-action_num: 0
-description: Follow line
+actions:
+    - action_num: 0
+      type: movement
+      description: Follow line
+    - action_num: 1
+      type: movement
+      description: Turn left
+    - action_num: 2
+      type: movement
+      description: Follow line
+    - action_num: 3
+      type: movement
+      description: Rotate 90 degrees counterclockwise
+    - action_num: 4
+      type: movement
+      description: Get square on block
+    - action_num: 5
+      type: fire
+      description: Fire dart

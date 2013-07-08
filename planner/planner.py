@@ -6,6 +6,7 @@ import yaml
 import lib.lib as lib
 import driver.mech_driver as mdriver
 import gunner.gunner as gunner
+import follower.follower as follower
 
 
 class Planner:
@@ -38,6 +39,9 @@ class Planner:
         # Build gunner, which will accept and handle fire actions
         self.gunner = gunner.Gunner()
 
+        # Build follower, which will manage following line
+        self.follower = follower.Follower()
+
         # Start executing the strategy
         self.exec_strategy()
         self.logger.debug("Done executing strategy")
@@ -59,8 +63,6 @@ class Planner:
     def exec_strategy(self):
         """Handle the actions defined in the strategy."""
         for act in self.strat["actions"]:
-            #self.logger.debug("Exec act {}: {}".format(act["action_num"],
-            #                                           act["description"]))
             self.logger.debug(act["description"]["summary"])
 
             if act["type"] == "complex_move":
@@ -68,8 +70,7 @@ class Planner:
                 self.driver.move(act["description"])
             elif act["type"] == "follow":
                 # Pass follow-line commands to follower
-                #self.follower.follow(act["description"])
-                pass
+                self.follower.follow(act["description"])
             elif act["type"] == "fire":
                 # Pass fire command to gunner
                 self.gunner.fire(act["description"])

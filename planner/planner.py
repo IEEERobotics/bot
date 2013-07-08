@@ -59,16 +59,20 @@ class Planner:
     def exec_strategy(self):
         """Handle the actions defined in the strategy."""
         for act in self.strat["actions"]:
-            self.logger.debug("Exec act {}: {}".format(act["action_num"],
-                                                       act["description"]))
+            #self.logger.debug("Exec act {}: {}".format(act["action_num"],
+            #                                           act["description"]))
+            self.logger.debug(act["description"]["summary"])
 
-            if act["type"] == "movement":
+            if act["type"] == "complex_move":
                 # Pass movement commands to driver
                 self.driver.move(act["description"])
+            elif act["type"] == "follow":
+                # Pass follow-line commands to follower
+                #self.follower.follow(act["description"])
+                pass
             elif act["type"] == "fire":
                 # Pass fire command to gunner
                 self.gunner.fire(act["description"])
-                pass
             else:
                 # Skip unknown action types
                 self.logger.error("Unknown action type: {}".format(str(act)))

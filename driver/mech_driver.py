@@ -39,46 +39,29 @@ class MechDriver(driver.Driver):
         """
         self.logger.debug("IO write: motor: {}, ds: {}".format(motor, ds))
 
-    def translate(self, speed, angle):
-        """Calculate voltage multiplier for each motor, pass to IO pins.
+    def basic_move(self, speed, angle, rotate_speed):
+        """Build low-level commands for holonomic translations with rotations.
 
         :param speed: Magnitude of robot's translation speed.
         :type speed: float
         :param angle: Angle in degrees at which robot should translate.
         :type angle: float
-
-        """
-        self.logger.debug("Translate speed: {}, angle: {}".format(speed, angle))
-
-        # Calculate voltage multipliers
-        front_left = speed * sin(angle*pi/180 + pi/4)
-        front_right = speed * cos(angle*pi/ 180 + pi/4)
-        back_left = speed * cos(angle*pi/ 180 + pi/4)
-        back_right = speed * sin(angle*pi/180 + pi/4)
-
-        # Write to IO pins.
-        self.iowrite("front_left", front_left)
-        self.iowrite("front_right", front_right)
-        self.iowrite("back_left", back_left)
-        self.iowrite("back_right", back_right)
-
-    def rotate(self, rotate_speed):
-        """Control rotation of robot.
-
         :param rotate_speed: Desired rotational speed.
         :type rotate_speed: float
 
         """
-        self.logger.debug("Rotate speed: {}".format(rotate_speed))
+        self.logger.debug("Speed: {}, angle {}, rotate speed {}".format(speed,
+                                                            angle,
+                                                            rotate_speed))
 
-        #Calculate voltage multipliers
-        front_left = rotate_speed
-        front_right = -rotate_speed
-        back_left = rotate_speed
-        back_right = -rotate_speed
+        # Calculate voltage multipliers
+        front_left_ds = speed * sin(angle*pi/180 + pi/4) + rotate_speed
+        front_right_ds = speed * cos(angle*pi/ 180 + pi/4) - rotate_speed
+        back_left_ds = speed * cos(angle*pi/ 180 + pi/4) + rotate_speed
+        back_right_ds = speed * sin(angle*pi/180 + pi/4) - rotate_speed
 
         # Write to IO pins.
-        self.iowrite("front_left", front_left)
-        self.iowrite("front_right", front_right)
-        self.iowrite("back_left", back_left)
-        self.iowrite("back_right", back_right)
+        self.iowrite("front_left", front_left_ds)
+        self.iowrite("front_right", front_right_ds)
+        self.iowrite("back_left", back_left_ds)
+        self.iowrite("back_right", back_right_ds)

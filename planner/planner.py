@@ -4,9 +4,7 @@
 import yaml
 
 import lib.lib as lib
-import drive.driver as driver
-
-import drive.driver as driver
+import driver.mech_driver as mdriver
 #import gunner.gunner as gunner
 
 
@@ -34,8 +32,8 @@ class Planner:
         self.logger.debug("Strategy loaded")
         self.logger.debug("Strategy: " + str(self.strat))
 
-        # Build driver, which will accept and handle movement actions
-        self.driver = driver.Driver()
+        # Build MechDriver, which will accept and handle movement actions
+        self.driver = mdriver.MechDriver()
 
         # Build gunner, which will accept and handle fire actions
         #self.gunner = gunner.Gunner()

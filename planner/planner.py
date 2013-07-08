@@ -5,7 +5,7 @@ import yaml
 
 import lib.lib as lib
 import driver.mech_driver as mdriver
-#import gunner.gunner as gunner
+import gunner.gunner as gunner
 
 
 class Planner:
@@ -36,7 +36,7 @@ class Planner:
         self.driver = mdriver.MechDriver()
 
         # Build gunner, which will accept and handle fire actions
-        #self.gunner = gunner.Gunner()
+        self.gunner = gunner.Gunner()
 
         # Start executing the strategy
         self.exec_strategy()
@@ -67,7 +67,7 @@ class Planner:
                 self.driver.move(act["description"])
             elif act["type"] == "fire":
                 # Pass fire command to gunner
-                #self.gunner.fire(act["description"])
+                self.gunner.fire(act["description"])
                 pass
             else:
                 # Skip unknown action types

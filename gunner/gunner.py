@@ -3,11 +3,12 @@
 
 import lib.lib as lib
 
+
 class Gunner:
 
     """Logic for aiming the turret and firing darts.
 
-    Intended to be subclassed by specializations for different firing 
+    Intended to be subclassed by specializations for different firing
     systems.
 
     """
@@ -26,3 +27,16 @@ class Gunner:
 
         """
         self.logger.debug("Fire cmd: {}".format(cmd))
+
+        if cmd["subtype"] == "basic_fire":
+            self.basic_fire()
+        else:
+            self.logger.error("Unknown fire cmd subtype")
+
+    def basic_fire(self):
+        """Handle normal fire commands.
+
+        TODO(dfarrell07): This is a stub
+
+        """
+        self.logger.debug("Fire!")

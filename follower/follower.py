@@ -5,7 +5,7 @@ import lib.lib as lib
 import lib.exceptions as ex
 
 
-class Follower:
+class Follower(object):
 
     """Follow a line. Subclass for specific hardware/methods."""
 

@@ -15,7 +15,7 @@ import gunner.wheel_gunner as wgunner
 import follower.follower as follower
 
 
-class Planner:
+class Planner(object):
 
     """Manage execution of user-defined strategy.
 

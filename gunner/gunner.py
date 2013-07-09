@@ -7,6 +7,7 @@ except ImportError, err:
     sys.stderr.write("ERROR: {}. Try installing python-yaml.\n".format(err))
 
 import lib.lib as lib
+import localizer.localizer as localizer
 
 
 class Gunner(object):
@@ -31,6 +32,10 @@ class Gunner(object):
         # Load and store targeting dict
         self.targ = self.load_targeting()
         self.logger.debug("Targeting: {}".format(self.targ))
+
+        # Load and store localizer
+        self.localizer = localizer.Localizer()
+        self.logger.debug("Gunner has localizer")
 
     def fire(self, cmd):
         """Accept and handle fire commands.

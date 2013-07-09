@@ -21,10 +21,8 @@ class MechDriver(driver.Driver):
     """
 
     def __init__(self):
-        """Setup logger."""
-
-        self.logger = lib.get_logger()
-        self.logger.debug("MechDriver has logger")
+        """Run superclass's init."""
+        super(MechDriver, self).__init__()
 
     def iowrite(self, motor, ds):
         """Write to IO pens that control the motors.

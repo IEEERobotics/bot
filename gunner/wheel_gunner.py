@@ -3,7 +3,6 @@
 
 import lib.lib as lib
 import gunner
-import localizer.localizer as localizer
 
 
 class WheelGunner(gunner.Gunner):
@@ -11,14 +10,8 @@ class WheelGunner(gunner.Gunner):
     """Specialize gunner to add wheel-based firing logic."""
 
     def __init__(self):
-        """Build and store logger."""
+        """Run superclass's init."""
         super(WheelGunner, self).__init__()
-
-        #self.logger = lib.get_logger()
-        #self.logger.debug("WheelGunner has logger")
-
-        self.localizer = localizer.Localizer()
-        self.logger.debug("Gunner has localizer")
 
     def basic_fire(self):
         """Handle normal fire commands.

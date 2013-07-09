@@ -3,7 +3,7 @@
 
 import lib.lib as lib
 
-class Localizer:
+class Localizer(object):
 
     """Interpret sensors to derive bot's location.
 

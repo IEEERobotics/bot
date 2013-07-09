@@ -3,7 +3,7 @@
 import lib.lib as lib
 
 
-class Driver:
+class Driver(object):
 
     """Handle high-level movement commands."""
 

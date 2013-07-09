@@ -1,0 +1,48 @@
+# Params for firing from each possible block location.
+# Assume for now that there are three discrete locations on each line.
+# All numbers are currently guesses.
+
+name: targeting0
+rows:
+    - row: 0
+      slots:
+        - slot: 0
+          rotate_speed: 80
+          x_angle: 50
+          y_angle: 30
+        - slot: 1
+          rotate_speed: 80
+          x_angle: 0
+          y_angle: 25
+        - slot: 2
+          rotate_speed: 80
+          x_angle: -50
+          y_angle: 30
+    - row: 1
+      slots:
+        - slot: 0
+          rotate_speed: 90
+          x_angle: 50
+          y_angle: 30
+        - slot: 1
+          rotate_speed: 90
+          x_angle: 0
+          y_angle: 25
+        - slot: 2
+          rotate_speed: 90
+          x_angle: -50
+          y_angle: 30
+    - row: 2
+      slots:
+        - slot: 0
+          rotate_speed: 100
+          x_angle: 50
+          y_angle: 30
+        - slot: 1
+          rotate_speed: 100
+          x_angle: 0
+          y_angle: 25
+        - slot: 2
+          rotate_speed: 100
+          x_angle: -50
+          y_angle: 30

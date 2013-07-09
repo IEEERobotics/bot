@@ -1,2 +1,3 @@
 strategy: planner/strategies/strategy0.yaml
 log_file: logs/bot.log
+targeting: gunner/targeting/targeting0.yaml

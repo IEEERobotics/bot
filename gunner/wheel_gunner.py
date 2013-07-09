@@ -12,8 +12,10 @@ class WheelGunner(gunner.Gunner):
 
     def __init__(self):
         """Build and store logger."""
-        self.logger = lib.get_logger()
-        self.logger.debug("WheelGunner has logger")
+        super(WheelGunner, self).__init__()
+
+        #self.logger = lib.get_logger()
+        #self.logger.debug("WheelGunner has logger")
 
         self.localizer = localizer.Localizer()
         self.logger.debug("Gunner has localizer")

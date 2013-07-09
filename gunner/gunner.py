@@ -1,10 +1,15 @@
 #!/usr/bin/env python
 """Handle aiming and firing darts."""
 
+try:
+    import yaml
+except ImportError, err:
+    sys.stderr.write("ERROR: {}. Try installing python-yaml.\n".format(err))
+
 import lib.lib as lib
 
 
-class Gunner:
+class Gunner(object):
 
     """Logic for aiming the turret and firing darts.
 
@@ -14,9 +19,18 @@ class Gunner:
     """
 
     def __init__(self):
-        """Setup and store logger."""
+        """Setup and store logger and configuration."""
+        # Load and store logger
         self.logger = lib.get_logger()
         self.logger.debug("Gunner has logger")
+
+        # Load and store configuration dict
+        self.config = lib.get_config()
+        self.logger.debug("Gunner has config")
+
+        # Load and store targeting dict
+        self.targ = self.load_targeting()
+        self.logger.debug("Targeting: {}".format(self.targ))
 
     def fire(self, cmd):
         """Accept and handle fire commands.
@@ -50,3 +64,17 @@ class Gunner:
 
         """
         self.logger.debug("Aiming turret")
+
+    def load_targeting(self):
+        """Load the YAML targeting info for each possible block position.
+
+        :returns: Dict description of targeting information for each block.
+
+        """
+        # Build valid path from CWD to targeting file
+        qual_targ_file = lib.prepend_prefix(self.config["targeting"])
+        self.logger.debug("Targeting file: " + qual_targ_file)
+
+        # Open and read targeting file
+        targ_fd = open(qual_targ_file)
+        return yaml.load(targ_fd)

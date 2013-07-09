@@ -3,6 +3,7 @@
 
 import lib.lib as lib
 import gunner
+import localizer.localizer as localizer
 
 
 class WheelGunner(gunner.Gunner):
@@ -14,12 +15,20 @@ class WheelGunner(gunner.Gunner):
         self.logger = lib.get_logger()
         self.logger.debug("WheelGunner has logger")
 
+        self.localizer = localizer.Localizer()
+        self.logger.debug("Gunner has localizer")
+
     def basic_fire(self):
         """Handle normal fire commands.
 
         TODO(dfarrell07): This is a stub
 
         """
+        # Get the block we're over
+        block = self.localizer.which_block()
+        self.logger.debug("Loc: {}".format(block))
+
+        # Aim turret and fire dart
         self.aim_turret()
         self.update_rotate_speed()
         self.advance_dart()

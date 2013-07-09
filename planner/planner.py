@@ -9,6 +9,7 @@ except ImportError, err:
     sys.stderr.write("ERROR: {}. Try installing python-yaml.\n".format(err))
 
 import lib.lib as lib
+import lib.exceptions as ex
 import driver.mech_driver as mdriver
 import gunner.wheel_gunner as wgunner
 import follower.follower as follower
@@ -66,7 +67,11 @@ class Planner:
         return yaml.load(strat_fd)
 
     def exec_strategy(self):
-        """Handle the actions defined in the strategy."""
+        """Handle the actions defined in the strategy.
+
+        :raises: FollowerException, IntersectionException, BoxException
+
+        """
         for act in self.strat["actions"]:
             self.logger.debug(act["description"]["summary"])
 
@@ -74,8 +79,19 @@ class Planner:
                 # Pass movement commands to driver
                 self.driver.move(act["description"])
             elif act["type"] == "follow":
-                # Pass follow-line commands to follower
-                self.follower.follow(act["description"])
+                try:
+                    # Pass follow-line commands to follower
+                    self.follower.follow(act["description"])
+                except ex.FollowerException as e:
+                    # Check if exceptional condition was what we expected
+                    if act["description"]["expected_result"] != str(e):
+                        # Unexpected follow result, currently can't handle
+                        self.logger.error("Unexpected: {}".format(e))
+                        self.logger.critical("Unable to recover")
+                        raise
+                    else:
+                        # Exceptional condition was expected
+                        self.logger.info("Expected: {}".format(e))
             elif act["type"] == "fire":
                 # Pass fire command to gunner
                 self.gunner.fire(act["description"])

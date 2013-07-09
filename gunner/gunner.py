@@ -36,7 +36,17 @@ class Gunner:
     def basic_fire(self):
         """Handle normal fire commands.
 
+        This is designed to be overridden by more specific subclasses.
+
         TODO(dfarrell07): This is a stub
 
         """
         self.logger.debug("Fire!")
+
+    def aim_turret(self):
+        """Aim the robot's turret such that firing will be successful.
+
+        TODO(dfarrell07): This is a stub
+
+        """
+        self.logger.debug("Aiming turret")

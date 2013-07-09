@@ -5,7 +5,7 @@ import yaml
 
 import lib.lib as lib
 import driver.mech_driver as mdriver
-import gunner.gunner as gunner
+import gunner.wheel_gunner as wgunner
 import follower.follower as follower
 
 
@@ -36,8 +36,8 @@ class Planner:
         # Build MechDriver, which will accept and handle movement actions
         self.driver = mdriver.MechDriver()
 
-        # Build gunner, which will accept and handle fire actions
-        self.gunner = gunner.Gunner()
+        # Build WheelGunner, which will accept and handle fire actions
+        self.gunner = wgunner.WheelGunner()
 
         # Build follower, which will manage following line
         self.follower = follower.Follower()

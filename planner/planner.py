@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 """Code related to plan-execution."""
 
-import yaml
+import sys
+
+try:
+    import yaml
+except ImportError, err:
+    sys.stderr.write("ERROR: {}. Try installing python-yaml.\n".format(err))
 
 import lib.lib as lib
 import driver.mech_driver as mdriver

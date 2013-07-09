@@ -2,7 +2,11 @@
 """Library of useful functions that apply to many modules."""
 
 from os import getcwd, path
-import yaml
+
+try:
+    import yaml
+except ImportError, err:
+    sys.stderr.write("ERROR: {}. Try installing python-yaml.\n".format(err))
 
 import logging.handlers
 

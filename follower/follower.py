@@ -3,7 +3,10 @@
 
 import lib.lib as lib
 
+
 class Follower:
+
+    """Follow a line. Subclass for specific hardware/methods."""
 
     def __init__(self):
         """Build and store logger."""

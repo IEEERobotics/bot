@@ -4,10 +4,11 @@
 import lib.lib as lib
 import gunner
 
+
 class WheelGunner(gunner.Gunner):
 
     """Specialize gunner to add wheel-based firing logic."""
-    
+
     def __init__(self):
         """Build and store logger."""
         self.logger = lib.get_logger()

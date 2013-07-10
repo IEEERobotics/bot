@@ -13,7 +13,7 @@ class Driver(object):
         self.logger = lib.get_logger()
         self.logger.debug("Driver has logger")
 
-        self.config = lib.get_config()
+        self.config = lib.load_config()
         self.logger.debug("Driver has config")
 
     def move(self, desc):

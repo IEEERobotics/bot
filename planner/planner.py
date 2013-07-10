@@ -3,11 +3,6 @@
 
 import sys
 
-try:
-    import yaml
-except ImportError, err:
-    sys.stderr.write("ERROR: {}. Try installing python-yaml.\n".format(err))
-
 import lib.lib as lib
 import lib.exceptions as ex
 import driver.mech_driver as mdriver
@@ -30,12 +25,12 @@ class Planner(object):
         self.logger.debug("Planner has logger")
 
         # Load and store configuration
-        self.config = lib.get_config()
+        self.config = lib.load_config()
         self.logger.debug("Planner has config")
         self.logger.debug("Config: " + str(self.config))
 
         # Load and store strategy
-        self.strat = self.load_strategy()
+        self.strat = lib.load_strategy(self.config["strategy"])
         self.logger.debug("Strategy loaded")
         self.logger.debug("Strategy: " + str(self.strat))
 
@@ -51,20 +46,6 @@ class Planner(object):
         # Start executing the strategy
         self.exec_strategy()
         self.logger.debug("Done executing strategy")
-
-    def load_strategy(self):
-        """Load the YAML description of the strategy for this round.
-
-        :returns: Dict description of strategy for this round.
-
-        """
-        # Build valid path from CWD to strategy file
-        qual_strat_file = lib.prepend_prefix(self.config["strategy"])
-        self.logger.debug("Strategy file: " + qual_strat_file)
-
-        # Open and read strategy file
-        strat_fd = open(qual_strat_file)
-        return yaml.load(strat_fd)
 
     def exec_strategy(self):
         """Handle the actions defined in the strategy.

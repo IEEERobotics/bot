@@ -1,0 +1,13 @@
+XDC_open() {
+    GEL_ProjectLoad("C:/Users/Neal/Dropbox/IR_Array/MSP430 sample project files/g2332_grace_adc_push_demo/Debug/configPkg/package/configPkg.pjt");
+    GEL_ProjectLoad("C:/Users/Neal/Dropbox/IR_Array/MSP430 sample project files/g2332_grace_adc_push_demo/Debug/configPkg/package/cfg/main_xe430.pjt");
+    GEL_ProjectSetActive("C:/Users/Neal/Dropbox/IR_Array/MSP430 sample project files/g2332_grace_adc_push_demo/Debug/configPkg/package/cfg/main_xe430.pjt");
+}
+XDC_close() {
+    GEL_ProjectClose("C:/Users/Neal/Dropbox/IR_Array/MSP430 sample project files/g2332_grace_adc_push_demo/Debug/configPkg/package/configPkg.pjt");
+    GEL_ProjectClose("C:/Users/Neal/Dropbox/IR_Array/MSP430 sample project files/g2332_grace_adc_push_demo/Debug/configPkg/package/cfg/main_xe430.pjt");
+}
+menuitem "XDC Package"
+hotmenu load_executable () { GEL_Load("C:/Users/Neal/Dropbox/IR_Array/MSP430 sample project files/g2332_grace_adc_push_demo/Debug/configPkg/main.xe430"); }
+hotmenu open_project () { XDC_open(); }
+hotmenu close_project () { XDC_close(); }

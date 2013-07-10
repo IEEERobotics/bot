@@ -28,3 +28,6 @@ sphinx-apidoc -o . .. -f
 rm modules.rst
 
 make html
+
+echo
+echo "Open doc/.build/html/index.html in a browser for docs."

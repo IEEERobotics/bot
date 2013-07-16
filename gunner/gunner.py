@@ -1,11 +1,6 @@
 #!/usr/bin/env python
 """Handle aiming and firing darts."""
 
-try:
-    import yaml
-except ImportError, err:
-    sys.stderr.write("ERROR: {}. Try installing python-yaml.\n".format(err))
-
 import lib.lib as lib
 import localizer.localizer as localizer
 
@@ -26,11 +21,11 @@ class Gunner(object):
         self.logger.debug("Gunner has logger")
 
         # Load and store configuration dict
-        self.config = lib.get_config()
+        self.config = lib.load_config()
         self.logger.debug("Gunner has config")
 
         # Load and store targeting dict
-        self.targ = self.load_targeting()
+        self.targ = lib.load_targeting(self.config["targeting"])
         self.logger.debug("Targeting: {}".format(self.targ))
 
         # Load and store localizer
@@ -69,17 +64,3 @@ class Gunner(object):
 
         """
         self.logger.debug("Aiming turret")
-
-    def load_targeting(self):
-        """Load the YAML targeting info for each possible block position.
-
-        :returns: Dict description of targeting information for each block.
-
-        """
-        # Build valid path from CWD to targeting file
-        qual_targ_file = lib.prepend_prefix(self.config["targeting"])
-        self.logger.debug("Targeting file: " + qual_targ_file)
-
-        # Open and read targeting file
-        targ_fd = open(qual_targ_file)
-        return yaml.load(targ_fd)

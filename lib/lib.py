@@ -25,7 +25,7 @@ def prepend_prefix(path_from_proj_root):
     return prefix + path_from_proj_root
 
 
-def get_config(config_file="config.yaml"):
+def load_config(config_file="config.yaml"):
     """Load and return configuration options.
 
     :param config_file: YAML file to load config from.
@@ -36,6 +36,36 @@ def get_config(config_file="config.yaml"):
     qual_config_file = prepend_prefix(config_file)
     config_fd = open(qual_config_file)
     return yaml.load(config_fd)
+
+
+def load_strategy(strat_file):
+    """Load the YAML description of the strategy for this round.
+
+    :param strat_file: Name of strategy file to load.
+    :returns: Dict description of strategy for this round.
+
+    """
+    # Build valid path from CWD to strategy file
+    qual_strat_file = prepend_prefix(strat_file)
+
+    # Open and read strategy file
+    strat_fd = open(qual_strat_file)
+    return yaml.load(strat_fd)
+
+
+def load_targeting(targ_file):
+    """Load the YAML targeting info for each possible block position.
+
+    :param targ_file: Name of targeting file to load.
+    :returns: Dict description of targeting information for each block.
+
+    """
+    # Build valid path from CWD to targeting file
+    qual_targ_file = prepend_prefix(targ_file)
+
+    # Open and read targeting file
+    targ_fd = open(qual_targ_file)
+    return yaml.load(targ_fd)
 
 
 def get_logger(prefix=None):
@@ -61,7 +91,7 @@ def get_logger(prefix=None):
         return _logger
 
     # Get config so that path to log file can be read.
-    config = get_config()
+    config = load_config()
 
     # Setup path to log output. Allows usage from any subpackage.
     if prefix is None:

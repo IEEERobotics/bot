@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Module for handling high-level movement commands."""
+
 import lib.lib as lib
 
 
@@ -13,7 +14,7 @@ class Driver(object):
         self.logger = lib.get_logger()
         self.logger.debug("Driver has logger")
 
-        self.config = lib.get_config()
+        self.config = lib.load_config()
         self.logger.debug("Driver has config")
 
     def move(self, desc):

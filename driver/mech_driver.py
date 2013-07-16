@@ -54,8 +54,8 @@ class MechDriver(driver.Driver):
 
         # Calculate voltage multipliers
         front_left_ds = speed * sin(angle*pi/180 + pi/4) + rotate_speed
-        front_right_ds = speed * cos(angle*pi/ 180 + pi/4) - rotate_speed
-        back_left_ds = speed * cos(angle*pi/ 180 + pi/4) + rotate_speed
+        front_right_ds = speed * cos(angle*pi/180 + pi/4) - rotate_speed
+        back_left_ds = speed * cos(angle*pi/180 + pi/4) + rotate_speed
         back_right_ds = speed * sin(angle*pi/180 + pi/4) - rotate_speed
 
         # Write to IO pins.

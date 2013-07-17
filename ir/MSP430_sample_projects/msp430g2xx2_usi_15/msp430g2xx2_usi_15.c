@@ -85,61 +85,18 @@ int I2C_State, Bytecount, transmit = 0;     // State variables
 
 void Data_RX(void);
 void TX_Data(void);
-
-
-#define TIMEOUT 10000
-#define TIMEBLINK 10
-
-volatile unsigned int i;
-
-void configureClocks();
-
-
-
-//****************************************************************************************************
-
-
 int main(void)
 {
   WDTCTL = WDTPW + WDTHOLD;                 // Stop watchdog
-  //if (CALBC1_1MHZ==0xFF)					// If calibration constant erased
-  //{
-  //  while(1);                               // do not load, trap CPU!!
-  //}
-
+  if (CALBC1_1MHZ==0xFF)					// If calibration constant erased
+  {											
+    while(1);                               // do not load, trap CPU!!	
+  }
   DCOCTL = 0;                               // Select lowest DCOx and MODx settings
   BCSCTL1 = CALBC1_1MHZ;                    // Set DCO
   DCOCTL = CALDCO_1MHZ;
-  
-
-  //Use P2 for Debug purposes
-  /* P2.0 debug setup_USI_slave
-   * P2.1 debug data_rx
-   * P2.2 debug data_tx
-   * P2.3
-   * P2.4
-   * P2.5  debug interrupt
-   */
-  P2DIR |= 0x3F;				//All six pins out
-  P2OUT = 0x00;					//initalize 0
-
   Setup_USI_Slave();
-
-  //*******************
-  // timer stuff
-
-  //use UART settings defined above
-  //configureClocks();							//setup clocks
-
-  P1DIR |= 0x02;                            // P1.1 output
-  CCTL0 = CCIE;                             // CCR0 interrupt enabled
-  CCR0 = TIMEOUT;
-  TACTL = TASSEL_2 + MC_2;                  // SMCLK, countmode
-
-  i = 0;
-
-  //******
-
+  
   LPM0;                                     // CPU off, await USI interrupt
   _NOP();
 }
@@ -152,8 +109,6 @@ int main(void)
 #pragma vector = USI_VECTOR
 __interrupt void USI_TXRX (void)
 {
-	P2OUT ^= BIT5; 			//toggle for debug interupt
-
   if (USICTL1 & USISTTIFG)                  // Start entry?
   {
     P1OUT |= 0x01;                          // LED on: sequence start
@@ -253,7 +208,6 @@ __interrupt void USI_TXRX (void)
 }
 
 void Data_RX(void){
-	P2OUT ^= BIT1; 		//toggle for debug data_rx
   
               USICTL0 &= ~USIOE;            // SDA = input
               USICNT |=  0x08;              // Bit counter = 8, RX data
@@ -261,8 +215,6 @@ void Data_RX(void){
 }
 
 void TX_Data(void){
-	P2OUT ^= BIT2;		//toggle for debug data_tx
-
               USICTL0 |= USIOE;             // SDA = output
               USISRL = SLV_Data++;
               USICNT |=  0x08;              // Bit counter = 8, TX data
@@ -270,12 +222,11 @@ void TX_Data(void){
 }
 
 void Setup_USI_Slave(void){
-	P2OUT ^=	BIT0;	//toggle for debug setup_USI_slave
-
   P1OUT = 0xC0;                             // P1.6 & P1.7 Pullups
   P1REN |= 0xC0;                            // P1.6 & P1.7 Pullups
   P1DIR = 0xFF;                             // Unused pins as outputs
-
+  P2OUT = 0;
+  P2DIR = 0xFF;
   
   USICTL0 = USIPE6+USIPE7+USISWRST;         // Port & USI mode setup
   USICTL1 = USII2C+USIIE+USISTTIE;          // Enable I2C mode & USI interrupts
@@ -290,27 +241,3 @@ void Setup_USI_Slave(void){
 }
 
 
-// Timer A0 interrupt service routine
-#pragma vector=TIMER0_A0_VECTOR
-__interrupt void Timer_A (void)
-{
-	i++;
-
-	if(i>=TIMEBLINK){
-			P1OUT ^= 0x02;                            // Toggle P1.1,  yellow led on breadboard
-  	  i = 0;
-
-	}
-
-  CCR0 += TIMEOUT;                            // Add Offset to CCR0
-}
-
-void configureClocks()// Uart using 1MHz settings in main
-{
- // Set system DCO to 16MHz
- //BCSCTL1 = CALBC1_16MHZ;
- //DCOCTL = CALDCO_16MHZ;
-
- // Set LFXT1 to the VLO @ 12kHz
- //BCSCTL3 |= LFXT1S_2;
- }

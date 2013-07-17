@@ -8,7 +8,7 @@ CG_TOOL_ROOT := C:/ti/ccsv5/tools/compiler/msp430_4.1.5
 
 ORDERED_OBJS += \
 $(GEN_CMDS__FLAG) \
-"./msp430g2xx2_usi_06.obj" \
+"./msp430g2xx2_usi_16.obj" \
 -l"libc.a" \
 "../lnk_msp430g2332.cmd" \
 
@@ -109,21 +109,21 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: msp430g2xx2_usi_06.out
+all: msp430g2xx2_usi_16.out
 
 # Tool invocations
-msp430g2xx2_usi_06.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+msp430g2xx2_usi_16.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MSP430 Linker'
-	"C:/ti/ccsv5/tools/compiler/msp430_4.1.5/bin/cl430" -vmsp --abi=eabi -g --advice:power=all --define=__MSP430G2332__ --diag_warning=225 --display_error_number --diag_wrap=off --printf_support=minimal -z --stack_size=80 -m"msp430g2xx2_usi_06.map" --heap_size=80 -i"C:/ti/ccsv5/ccs_base/msp430/include" -i"C:/ti/ccsv5/tools/compiler/msp430_4.1.5/lib" -i"C:/ti/ccsv5/tools/compiler/msp430_4.1.5/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="msp430g2xx2_usi_06_linkInfo.xml" --rom_model -o "msp430g2xx2_usi_06.out" $(ORDERED_OBJS)
+	"C:/ti/ccsv5/tools/compiler/msp430_4.1.5/bin/cl430" -vmsp --abi=eabi -g --advice:power=all --define=__MSP430G2332__ --diag_warning=225 --display_error_number --diag_wrap=off --printf_support=minimal -z --stack_size=80 -m"msp430g2xx2_usi_16.map" --heap_size=80 -i"C:/ti/ccsv5/ccs_base/msp430/include" -i"C:/ti/ccsv5/tools/compiler/msp430_4.1.5/lib" -i"C:/ti/ccsv5/tools/compiler/msp430_4.1.5/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="msp430g2xx2_usi_16_linkInfo.xml" --rom_model -o "msp430g2xx2_usi_16.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(MSP430_EXECUTABLE_OUTPUTS__QUOTED) "msp430g2xx2_usi_06.out"
-	-$(RM) "msp430g2xx2_usi_06.pp" 
-	-$(RM) "msp430g2xx2_usi_06.obj" 
+	-$(RM) $(MSP430_EXECUTABLE_OUTPUTS__QUOTED) "msp430g2xx2_usi_16.out"
+	-$(RM) "msp430g2xx2_usi_16.pp" 
+	-$(RM) "msp430g2xx2_usi_16.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

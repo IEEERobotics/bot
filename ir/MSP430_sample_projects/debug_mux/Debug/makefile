@@ -8,7 +8,7 @@ CG_TOOL_ROOT := C:/ti/ccsv5/tools/compiler/msp430_4.1.5
 
 ORDERED_OBJS += \
 $(GEN_CMDS__FLAG) \
-"./main.obj" \
+"./adc_mux_main.obj" \
 -l"libc.a" \
 "../lnk_msp430g2332.cmd" \
 
@@ -122,8 +122,8 @@ debug_mux.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(MSP430_EXECUTABLE_OUTPUTS__QUOTED) "debug_mux.out"
-	-$(RM) "main.pp" 
-	-$(RM) "main.obj" 
+	-$(RM) "adc_mux_main.pp" 
+	-$(RM) "adc_mux_main.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

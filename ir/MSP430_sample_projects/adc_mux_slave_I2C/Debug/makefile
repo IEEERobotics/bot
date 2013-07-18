@@ -8,7 +8,7 @@ CG_TOOL_ROOT := C:/ti/ccsv5/tools/compiler/msp430_4.1.5
 
 ORDERED_OBJS += \
 $(GEN_CMDS__FLAG) \
-"./main.obj" \
+"./I2C_mux_main.obj" \
 -l"libc.a" \
 "../lnk_msp430g2332.cmd" \
 
@@ -122,8 +122,8 @@ adc_mux_slave_I2C.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(MSP430_EXECUTABLE_OUTPUTS__QUOTED) "adc_mux_slave_I2C.out"
-	-$(RM) "main.pp" 
-	-$(RM) "main.obj" 
+	-$(RM) "I2C_mux_main.pp" 
+	-$(RM) "I2C_mux_main.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

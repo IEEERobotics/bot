@@ -61,44 +61,44 @@ class MechDriver(driver.Driver):
         back_left = speed * cos(angle*pi/ 180 + pi/4) + rotate_speed
         back_right = speed * sin(angle*pi/180 + pi/4) - rotate_speed
 		
-		#Calculate duty cycle (ratio to max_speed)
-		#Todo for Ahmed: Run tests to find out what max_speed should be, if it should just be 'speed'.
-		front_left_ds = floor(front_left / max_speed * 100)
-		front_right_ds = floor(front_right / max_speed * 100)
-		back_left_ds = floor(back_left / max_speed * 100)
-		back_right_ds = floor(back_right / max_speed * 100) 
+	#Calculate duty cycle (ratio to max_speed)
+	#Todo for Ahmed: Run tests to find out what max_speed should be, if it should just be 'speed'.
+	front_left_ds = floor(front_left / max_speed * 100)
+	front_right_ds = floor(front_right / max_speed * 100)
+	back_left_ds = floor(back_left / max_speed * 100)
+	back_right_ds = floor(back_right / max_speed * 100) 
 		
-		#Prevent invalid duty cycle values.
-		if front_left_ds > 100:
-		  front_left_ds = 100
-		if front_right_ds >100:
-		  front_right_ds = 100
-		if back_left_ds > 100:
-		  back_left_ds = 100
-		if back_right_ds > 100:
-		  back_right_ds = 100
-		  
-		if front_left_ds < 0:
-		  front_left_ds = 0
-		if front_right_ds <0:
-		  front_right_ds = 0
-		if back_left_ds < 0:
-		  back_left_ds = 0
-		if back_right_ds < 0:
-		  back_right_ds = 0
+	#Prevent invalid duty cycle values.
+	if front_left_ds > 100:
+	  front_left_ds = 100
+	if front_right_ds >100:
+	  front_right_ds = 100
+	if back_left_ds > 100:
+	  back_left_ds = 100
+	if back_right_ds > 100:
+	  back_right_ds = 100
+	  
+	if front_left_ds < 0:
+	  front_left_ds = 0
+	if front_right_ds <0:
+	  front_right_ds = 0
+	if back_left_ds < 0:
+	  back_left_ds = 0
+	if back_right_ds < 0:
+	  back_right_ds = 0
 		 
 		
-		#Determine direction of wheel.
-		#Bool will determine value of direction pin.
-		if front_left > 0:
-		  front_left_forward = True
-		if front_right > 0:
-		  front_right_forward = True
-		if back_left > 0:
-		  back_left_forward = True
-		if back_right > 0:
-		  back_right_foward = True
-  
+	#Determine direction of wheel.
+	#Bool will determine value of direction pin.
+	if front_left > 0:
+	  front_left_forward = True
+	if front_right > 0:
+	  front_right_forward = True
+	if back_left > 0:
+	  back_left_forward = True
+	if back_right > 0:
+	  back_right_foward = True
+ 
         # Write to IO pins.
         self.iowrite("front_left", front_left_ds)
         self.iowrite("front_right", front_right_ds)

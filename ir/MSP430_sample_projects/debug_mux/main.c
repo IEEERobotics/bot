@@ -33,6 +33,16 @@
 // Toggle on P1.3 outputs frequency of watchdog_timer and adc reads
 // NGOHARA - 7/2/13
 
+//Changed pin outs to work with pins needed for I2C
+// P1.0	\\							XIN  \\
+// P1.1 \\							XOUT \\
+// P1.2 <-- ADC						Test \\
+// P1.3 --> Debug Toggle			RDT  <--  Reset_Push
+// P1.4 --> Sel_A					P1.7 -->  SDA
+// P1.5 --> Sel_B					P1.6 <--  SCL
+// P2.0	--> Sel_C					P2.5 --> LEDON_2 (IR array 2 on)
+// P2.1 --> Sel_D					P2.4 --> LEDON_1 (IR array 1 on)
+// P2.2 \\							P2.3 --> Inhibit (Mux_off)
 
 //Next, removed all PWN and watchdog code, and put in following timer code
 
@@ -72,6 +82,80 @@ unsigned int ir_select = 0;	//variable for controlling 16b mux select
 #define TIMER		1000
 
 
+// Store the adc value to memory, and
+// handles the 16 bit analog mux with pins P1.4-7, inclusive.
+void toggle_16b_mux(void){
+
+	adcvalue[mem_num] = ADC10MEM;		//Question, am I reading before it's sampled?
+	mem_num ++;
+	if(mem_num >31){
+		mem_num = 0;
+		//P1OUT ^= BIT3; 		//Toggle P1.3 for frequency output
+	}
+
+	ir_select = ir_select+1;
+	if(ir_select > 15) ir_select = 0;
+
+	//  & Mask to clear select,  Mask and Shift Sel bits
+	P1OUT = (P1OUT &  0x0F) + ((0x03 & ir_select) << 4);		//clears select bits, and or in new select
+	P2OUT = (P2OUT &  0x3C) + ((0x0C & ir_select) >> 2);
+}
+
+
+//new main for timer
+int main(void)
+{
+  WDTCTL = WDTPW + WDTHOLD;                 // Stop WDT
+
+  //configure Port 1
+  P1DIR |= BIT3 + BIT4 + BIT5;	// P1.3 for debug, 		P1.4,5 used for 16b mux select
+  P1OUT = 0x00;									//initialize off
+  P1OUT = 0xC0;                        // P1.6 & P1.7 Pullups
+  P1REN |= 0xC0;                       // P1.6 & P1.7 Pullups
+
+  //Configure Port 2 pins
+    P2DIR = 0x3F;								// All six pins (P2.0-P2.5) output (though P2.2 unused)
+    P2OUT = 0x00;								//Initialize all off
+    P2REN = 0x00;								//No pullup resistors
+
+  CCTL0 = CCIE;                             // CCR0 interrupt enabled
+  CCR0 = TIMER;
+  TACTL = TASSEL_2 + MC_1;                  // SMCLK, upmode
+
+	//adc setup
+  	ADC10CTL0 = ADC10ON + ADC10SHT_2 + SREF_0;
+	ADC10AE0 |= 0x02;                         // P1.2 ADC option select
+	ADC10DTC1 = ADC10SSEL_0 + 0x001;          // 1 conversion
+
+	//Setup Enable Bits
+	P2OUT |= BIT4 + BIT5;	//Inhibit (P2.3) =0, LEDON_1 and LEDON_2 (P2.4 and P2.5) = 1
+
+
+  _BIS_SR(LPM0_bits + GIE);                 // Enter LPM0 w/ interrupt
+}
+
+// Timer A0 interrupt service routine
+#pragma vector=TIMER0_A0_VECTOR
+__interrupt void Timer_A (void)
+{
+
+	//For debug purposes, comment out when not in use.
+	//P1OUT ^= BIT3;					//Toggle P1.3 for frequency output
+
+	ADC10CTL0 |= ENC + ADC10SC;             // Start sampling
+
+	//Old visual with LEDs, removed for needed pins - NGOHARA 7/17/13
+    //run_LEDS();		//performs adc save and changes LEDS
+
+    toggle_16b_mux(); // handles mux select
+
+  	//For debug purposes, comment out when not in use.
+  	P1OUT ^= BIT3;					//Toggle P1.3 for frequency output
+}
+
+
+
+/*
 void run_LEDS(void){
 
 	adcvalue[mem_num] = ADC10MEM;
@@ -81,25 +165,6 @@ void run_LEDS(void){
 		//P1OUT ^= BIT3; 		//Toggle P1.3 for frequency output
 	}
 
-	/*//shift register loop
-	for(mem_num=31; mem_num>=0; mem_num--){
-
-    	if(mem_num==31){
-    		adcvalue[31] = ADC10MEM;
-    	}
-    	else{
-    		adcvalue[mem_num]=adcvalue[mem_num+1];
-    	}
-    }
-	*/
-
-    /* Old memory
-    adcvalue4 = adcvalue3;
-     adcvalue3 = adcvalue2;
-     adcvalue2 = adcvalue1;
-     adcvalue1 = adcvalue;
-     adcvalue = ADC10MEM;
-	*/
 
      //Six LEDS, scroll from OFF to all on on Port 2
      // will implement an input check, to turn off this function if not enabled
@@ -120,61 +185,8 @@ void run_LEDS(void){
      }
 
 }
+*/
 
-
-// handles the 16 bit analog mux with pins P1.4-7, inclusive.
-void toggle_16b_mux(void){
-
-	ir_select = ir_select+1;
-	if(ir_select > 15) ir_select = 0;
-
-	P1OUT = (P1OUT &  0x0F) + (ir_select << 4);		//clears select bits, and or in new select
-}
-
-
-//new main for timer
-int main(void)
-{
-  WDTCTL = WDTPW + WDTHOLD;                 // Stop WDT
-
-  //configure Port 1
-  P1DIR |= BIT3 + BIT4 + BIT5 + BIT6 + BIT7;	// P1.3 for debug, 		P1.4-7 used for 16b mux select
-  P1OUT = 0x00;									//initialize off (and mux in select 0)
-
-  //Configure Port 2 pins
-    P2DIR = 0x3F;								// All six pins (P2.0-P2.5) output
-    P2OUT = 0x00;								//Initialize all off
-    P2REN = 0x00;								//No pullup resistors
-
-  CCTL0 = CCIE;                             // CCR0 interrupt enabled
-  CCR0 = TIMER;
-  TACTL = TASSEL_2 + MC_1;                  // SMCLK, upmode
-
-	//adc setup
-  	ADC10CTL0 = ADC10ON + ADC10SHT_2 + SREF_0;
-	ADC10AE0 |= 0x01;                         // P1.0 ADC option select
-	ADC10DTC1 = ADC10SSEL_0 + 0x001;          // 1 conversion
-
-  _BIS_SR(LPM0_bits + GIE);                 // Enter LPM0 w/ interrupt
-}
-
-// Timer A0 interrupt service routine
-#pragma vector=TIMER0_A0_VECTOR
-__interrupt void Timer_A (void)
-{
-
-	//For debug purposes, comment out when not in use.
-	//P1OUT ^= BIT3;					//Toggle P1.3 for frequency output
-
-	ADC10CTL0 |= ENC + ADC10SC;             // Start sampling
-
-    run_LEDS();		//performs adc save and changes LEDS
-
-    toggle_16b_mux(); // handles mux select
-
-  	//For debug purposes, comment out when not in use.
-  	P1OUT ^= BIT3;					//Toggle P1.3 for frequency output
-}
 
 
 //old main

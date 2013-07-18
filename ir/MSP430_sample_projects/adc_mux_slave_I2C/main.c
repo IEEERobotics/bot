@@ -64,6 +64,7 @@ int main(void)
   BCSCTL1 = CALBC1_1MHZ;               // Set DCO
   DCOCTL = CALDCO_1MHZ;
 
+  //old pinout of I2C code
   P1OUT = 0xC0;                        // P1.6 & P1.7 Pullups
   P1REN |= 0xC0;                       // P1.6 & P1.7 Pullups
   P1DIR = 0xFF;                        // Unused pins as outputs
@@ -73,6 +74,7 @@ int main(void)
   //added from adc code - NGOHARA 7/16/13
   CCTL0 = CCIE;                             // CCR0 interrupt enabled
   CCR0 = TIMER;
+  //SELS = 0;						// SMCLK Source Select 0:DCOCLK
   //TACTL = TASSEL_2 + MC_1;                  // SMCLK, upmode
 
   USICTL0 = USIPE6+USIPE7+USISWRST;    // Port & USI mode setup

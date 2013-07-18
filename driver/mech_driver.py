@@ -54,7 +54,7 @@ class MechDriver(driver.Driver):
                                                             angle,
                                                             rotate_speed))
 
-<<<<<<< HEAD
+
         # Calculate speed ratios
         front_left = speed * sin(angle*pi/180 + pi/4) + rotate_speed
         front_right = speed * cos(angle*pi/ 180 + pi/4) - rotate_speed

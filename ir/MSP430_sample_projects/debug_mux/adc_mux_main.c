@@ -123,9 +123,9 @@ int main(void)
   TACTL = TASSEL_2 + MC_1;                  // SMCLK, upmode
 
 	//adc setup
-  	ADC10CTL0 = ADC10ON + ADC10SHT_2 + SREF_0;
-	ADC10AE0 |= 0x02;                         // P1.2 ADC option select
-	ADC10DTC1 = ADC10SSEL_0 + 0x001;          // 1 conversion
+  	ADC10CTL0 = ADC10ON + ADC10SHT_0 + SREF_0;
+	ADC10AE0 |= 0x01;							//ADC enable
+	ADC10DTC1 = INCH_2 + ADC10SSEL_3 + CONSEQ_0;          // Source P1.2, Use SMCLK,  1 source 1 conversion
 
 	//Setup Enable Bits
 	P2OUT |= BIT4 + BIT5;	//Inhibit (P2.3) =0, LEDON_1 and LEDON_2 (P2.4 and P2.5) = 1

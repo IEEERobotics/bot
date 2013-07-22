@@ -46,12 +46,14 @@ volatile int mem_num = 0;	//adcvalue array place
 volatile unsigned int ir_select = 0;	//variable for controlling 16b mux select
 
 #define DIV_SIX		0x00AA		// 1/6 of 0x03FF for seven regions
-#define TIMER		500
+#define TIMER		5
 
 
 volatile char SLV_Data = 0;                     // Variable for transmitted data
 volatile char SLV_Addr = 0x90;                  // Address is 0x48<<1 for R/W
 volatile int I2C_State = 0;                     // State variable
+
+void toggle_16b_mux(void);
 
 int main(void)
 {
@@ -78,6 +80,12 @@ int main(void)
   CCR0 = TIMER;
   TACTL = TASSEL_2 + MC_1;                  // SMCLK, upmode
 
+	//adc setup
+	ADC10CTL0 = ADC10ON + ADC10SHT_0 + SREF_0;
+	ADC10AE0 |= 0x01;
+	ADC10DTC1 = ADC10SSEL_0 + 0x001;          // 1 conversion
+
+	//Setup I2C
   USICTL0 = USIPE6+USIPE7+USISWRST;    // Port & USI mode setup
   USICTL1 = USII2C+USIIE+USISTTIE;     // Enable I2C mode & USI interrupts
   USICKCTL = USICKPL;                  // Setup clock polarity
@@ -174,36 +182,46 @@ __interrupt void USI_TXRX (void)
   USICTL1 &= ~USIIFG;                  // Clear pending flags
 }
 
-// Timer A0 interrupt service routine
-#pragma vector=TIMER0_A0_VECTOR
-__interrupt void Timer_A (void)
-{
-	//For debug purposes, comment out when not in use.
-	  	P1OUT ^= BIT3;					//Toggle P1.3 for frequency output
-}
 
-/*
+
 // Timer A0 interrupt service routine
 #pragma vector=TIMER0_A0_VECTOR
 __interrupt void Timer_A (void)
 {
 
 	//For debug purposes, comment out when not in use.
-	//P1OUT ^= BIT3;					//Toggle P1.3 for frequency output
+	P1OUT ^= BIT3;					//Toggle P1.3 for frequency output
 
 	ADC10CTL0 |= ENC + ADC10SC;             // Start sampling
 
-    run_LEDS();		//performs adc save and changes LEDS
+	//Old visual with LEDs, removed for needed pins - NGOHARA 7/17/13
+    //run_LEDS();		//performs adc save and changes LEDS
 
     toggle_16b_mux(); // handles mux select
 
   	//For debug purposes, comment out when not in use.
   	P1OUT ^= BIT3;					//Toggle P1.3 for frequency output
 }
-*/
 
 
+// Store the adc value to memory, and
+// handles the 16 bit analog mux with pins P1.4-7, inclusive.
+void toggle_16b_mux(void){
 
+	adcvalue[mem_num] = ADC10MEM;		//Question, am I reading before it's sampled?
+	mem_num ++;
+	if(mem_num >31){
+		mem_num = 0;
+		//P1OUT ^= BIT3; 		//Toggle P1.3 for frequency output
+	}
+
+	ir_select = ir_select+1;
+	if(ir_select > 15) ir_select = 0;
+
+	//  & Mask to clear select,  Mask and Shift Sel bits
+	P1OUT = (P1OUT &  0x0F) + ((0x03 & ir_select) << 4);		//clears select bits, and or in new select
+	P2OUT = (P2OUT &  0x3C) + ((0x0C & ir_select) >> 2);
+}
 
 /* --COPYRIGHT--,BSD_EX
  * Copyright (c) 2012, Texas Instruments Incorporated

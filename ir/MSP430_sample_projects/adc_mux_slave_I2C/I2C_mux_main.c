@@ -90,9 +90,12 @@ int main(void)
   TACTL = TASSEL_2 + MC_1;                  // SMCLK, upmode
 
 	//adc setup
-	ADC10CTL0 = ADC10ON + ADC10SHT_0 + SREF_0;
+	ADC10CTL0 = ADC10ON + ADC10SHT_0 + SREF_0 + ADC10IE;	//ADC on, 4*ADC10CLK, VCC&GND, Interrupt Enable
 	ADC10AE0 |= 0x01;							//ADC enable
-	ADC10CTL1 = INCH_2 + BIT4 + BIT3 ;          // Source P1.2, Use SMCLK,  1 source 1 conversion
+	ADC10CTL1 = INCH_2 + CONSEQ_0 ;          // Source P1.2, Use SMCLK,  1 source 1 conversion
+
+	//Setup Enable Bits
+	P2OUT |= BIT4 + BIT5;	//Inhibit (P2.3) =0, LEDON_1 and LEDON_2 (P2.4 and P2.5) = 1
 
 	//Setup I2C
   USICTL0 = USIPE6+USIPE7+USISWRST;    // Port & USI mode setup
@@ -257,17 +260,17 @@ __interrupt void Timer_A (void)
 {
 
 	//For debug purposes, comment out when not in use.
-	//P1OUT ^= BIT3;					//Toggle P1.3 for frequency output
+	P1OUT ^= BIT3;					//Toggle P1.3 for frequency output
 
 	ADC10CTL0 |= ENC + ADC10SC;             // Start sampling
 
 	//Old visual with LEDs, removed for needed pins - NGOHARA 7/17/13
     //run_LEDS();		//performs adc save and changes LEDS
 
-    toggle_16b_mux(); // handles mux select
+    //toggle_16b_mux(); // handles mux select
 
   	//For debug purposes, comment out when not in use.
-  	P1OUT ^= BIT3;					//Toggle P1.3 for frequency output
+  	//P1OUT ^= BIT3;					//Toggle P1.3 for frequency output
 }
 
 
@@ -289,6 +292,24 @@ void toggle_16b_mux(void){
 	P1OUT = (P1OUT &  0x0F) + ((0x03 & ir_select) << 4);		//clears select bits, and or in new select
 	P2OUT = (P2OUT &  0x3C) + ((0x0C & ir_select) >> 2);
 }
+
+
+// ADC10 Interrupt service routine - NGOHARA 7/23/13
+#pragma vector=ADC10_VECTOR
+__interrupt void ADC10 (void)
+{
+
+	 toggle_16b_mux(); // handles mux select
+
+	//For debug purposes, comment out when not in use.
+	  	P1OUT ^= BIT3;					//Toggle P1.3 for frequency output
+
+}
+
+
+
+
+
 
 /* --COPYRIGHT--,BSD_EX
  * Copyright (c) 2012, Texas Instruments Incorporated

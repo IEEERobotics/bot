@@ -111,7 +111,7 @@ int main(void)
   BCSCTL1 = CALDCO_16MHZ;                    // Set DCO
   DCOCTL = CALDCO_16MHZ;
 
-
+  //BCSCTL2 = SELS; 				//Set SMCLK to use DCOCLK
 
   P1OUT = 0xC0;                             // P1.6 & P1.7 Pullups, others to 0
   P1REN |= 0xC0;                            // P1.6 & P1.7 Pullups

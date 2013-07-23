@@ -112,7 +112,7 @@ int main(void)
   BCSCTL1 = CALBC1_1MHZ;               // Set DCO
   DCOCTL = CALDCO_1MHZ;
 
-  BCSCTL2 = SELS; 				//Set SMCLK to use DCOCLK
+  BCSCTL2 |= ~SELS + +DIVS_0; 				//Set SMCLK to use DCOCLK
 
   //configure Port 1
   P1DIR |= BIT3 + BIT4 + BIT5;	// P1.3 for debug, 		P1.4,5 used for 16b mux select
@@ -131,9 +131,9 @@ int main(void)
   TACTL = TASSEL_2 + MC_1;                  // SMCLK, upmode
 
 	//adc setup
-  	ADC10CTL0 = ADC10ON + ADC10SHT_0 + SREF_0;
+	ADC10CTL0 = ADC10ON + ADC10SHT_0 + SREF_0 + ADC10IE;	//ADC on, 4*ADC10CLK, VCC&GND, Interrupt Enable
 	ADC10AE0 |= BIT2;							//ADC enable for A2 (P1.2)
-	ADC10CTL1 = INCH_2 + BIT4 + BIT3 ;          // Source P1.2, Use SMCLK,  1 source 1 conversion
+	ADC10CTL1 = INCH_2 + CONSEQ_0 ;          // Source P1.2, Use SMCLK,  1 source 1 conversion
 
 
 	//Setup Enable Bits
@@ -149,22 +149,42 @@ __interrupt void Timer_A (void)
 {
 
 	//For debug purposes, comment out when not in use.
-	//P1OUT ^= BIT3;					//Toggle P1.3 for frequency output
+	P1OUT ^= BIT3;					//Toggle P1.3 for frequency output
 
 	ADC10CTL0 |= ENC + ADC10SC;             // Start sampling
 
 	//Old visual with LEDs, removed for needed pins - NGOHARA 7/17/13
     //run_LEDS();		//performs adc save and changes LEDS
 
-    toggle_16b_mux(); // handles mux select
+
 
   	//For debug purposes, comment out when not in use.
-  	P1OUT ^= BIT3;					//Toggle P1.3 for frequency output
+  	//P1OUT ^= BIT3;					//Toggle P1.3 for frequency output
+}
+
+
+// ADC10 Interrupt service routine - NGOHARA 7/23/13
+#pragma vector=ADC10_VECTOR
+__interrupt void ADC10 (void)
+{
+
+	 toggle_16b_mux(); // handles mux select
+
+	//For debug purposes, comment out when not in use.
+	  	P1OUT ^= BIT3;					//Toggle P1.3 for frequency output
+
 }
 
 
 
+
+
+
+
+
 /*
+ * old code
+ *
 void run_LEDS(void){
 
 	adcvalue[mem_num] = ADC10MEM;

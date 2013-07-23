@@ -107,6 +107,13 @@ int main(void)
 {
   WDTCTL = WDTPW + WDTHOLD;                 // Stop WDT
 
+  //from I2C
+  DCOCTL = 0;                               // Select lowest DCOx and MODx settings
+  BCSCTL1 = CALBC1_1MHZ;               // Set DCO
+  DCOCTL = CALDCO_1MHZ;
+
+  BCSCTL2 = SELS; 				//Set SMCLK to use DCOCLK
+
   //configure Port 1
   P1DIR |= BIT3 + BIT4 + BIT5;	// P1.3 for debug, 		P1.4,5 used for 16b mux select
   P1OUT = 0x00;									//initialize off
@@ -118,14 +125,16 @@ int main(void)
     P2OUT = 0x00;								//Initialize all off
     P2REN = 0x00;								//No pullup resistors
 
+
   CCTL0 = CCIE;                             // CCR0 interrupt enabled
   CCR0 = TIMER;
   TACTL = TASSEL_2 + MC_1;                  // SMCLK, upmode
 
 	//adc setup
   	ADC10CTL0 = ADC10ON + ADC10SHT_0 + SREF_0;
-	ADC10AE0 |= 0x01;							//ADC enable
-	ADC10DTC1 = INCH_2 + ADC10SSEL_3 + CONSEQ_0;          // Source P1.2, Use SMCLK,  1 source 1 conversion
+	ADC10AE0 |= BIT2;							//ADC enable for A2 (P1.2)
+	ADC10CTL1 = INCH_2 + BIT4 + BIT3 ;          // Source P1.2, Use SMCLK,  1 source 1 conversion
+
 
 	//Setup Enable Bits
 	P2OUT |= BIT4 + BIT5;	//Inhibit (P2.3) =0, LEDON_1 and LEDON_2 (P2.4 and P2.5) = 1

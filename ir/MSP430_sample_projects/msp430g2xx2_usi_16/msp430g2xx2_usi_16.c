@@ -108,8 +108,10 @@ int main(void)
     while(1);                               // do not load, trap CPU!!	
   }
   DCOCTL = 0;                               // Select lowest DCOx and MODx settings
-  BCSCTL1 = CALBC1_1MHZ;                    // Set DCO
-  DCOCTL = CALDCO_1MHZ;
+  BCSCTL1 = CALDCO_16MHZ;                    // Set DCO
+  DCOCTL = CALDCO_16MHZ;
+
+
 
   P1OUT = 0xC0;                             // P1.6 & P1.7 Pullups, others to 0
   P1REN |= 0xC0;                            // P1.6 & P1.7 Pullups

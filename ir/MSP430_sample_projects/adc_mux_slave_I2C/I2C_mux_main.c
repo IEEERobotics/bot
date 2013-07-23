@@ -40,6 +40,8 @@
 
 #include <msp430.h>
 
+//ADC function and vars
+void toggle_16b_mux(void);
 volatile unsigned int adcvalue[32];	 //variable for storing current digital value of ADC input
 volatile int mem_num = 0;	//adcvalue array place
 
@@ -48,12 +50,19 @@ volatile unsigned int ir_select = 0;	//variable for controlling 16b mux select
 #define DIV_SIX		0x00AA		// 1/6 of 0x03FF for seven regions
 #define TIMER		5
 
+//I2C functions and vars
+#define Number_of_Bytes  5                  // **** How many bytes?? ****
 
-volatile char SLV_Data = 0;                     // Variable for transmitted data
-volatile char SLV_Addr = 0x90;                  // Address is 0x48<<1 for R/W
-volatile int I2C_State = 0;                     // State variable
+void Setup_USI_Slave(void);
 
-void toggle_16b_mux(void);
+char MST_Data = 0;                          // Variable for received data
+char SLV_Data = 0x55;
+char SLV_Addr = 0x90;                       // Address is 0x48<<1 for R/W
+int I2C_State, Bytecount, transmit = 0;     // State variables
+
+void Data_RX(void);
+void TX_Data(void);
+
 
 int main(void)
 {
@@ -82,8 +91,8 @@ int main(void)
 
 	//adc setup
 	ADC10CTL0 = ADC10ON + ADC10SHT_0 + SREF_0;
-	ADC10AE0 |= 0x01;
-	ADC10DTC1 = ADC10SSEL_0 + 0x001;          // 1 conversion
+	ADC10AE0 |= 0x01;							//ADC enable
+	ADC10CTL1 = INCH_2 + BIT4 + BIT3 ;          // Source P1.2, Use SMCLK,  1 source 1 conversion
 
 	//Setup I2C
   USICTL0 = USIPE6+USIPE7+USISWRST;    // Port & USI mode setup
@@ -101,85 +110,143 @@ int main(void)
   }
 }
 
-//******************************************************
+//******************************************************************************
 // USI interrupt service routine
-//******************************************************
+// Rx bytes from master: State 2->4->6->8
+// Tx bytes to Master: State 2->4->10->12->14
+//******************************************************************************
 #pragma vector = USI_VECTOR
 __interrupt void USI_TXRX (void)
 {
-  if (USICTL1 & USISTTIFG)             // Start entry?
+  if (USICTL1 & USISTTIFG)                  // Start entry?
   {
-    P1OUT |= 0x01;                     // LED on: Sequence start
-    I2C_State = 2;                     // Enter 1st state on start
+    P1OUT |= 0x01;                          // LED on: sequence start
+    I2C_State = 2;                          // Enter 1st state on start
   }
 
-  switch(I2C_State)
+  switch(__even_in_range(I2C_State,14))
     {
-      case 0: //Idle, should not get here
+      case 0:                               // Idle, should not get here
               break;
 
-      case 2: //RX Address
-              USICNT = (USICNT & 0xE0) + 0x08; // Bit counter = 8, RX Address
-              USICTL1 &= ~USISTTIFG;   // Clear start flag
-              I2C_State = 4;           // Go to next state: check address
+      case 2: // RX Address
+              USICNT = (USICNT & 0xE0) + 0x08; // Bit counter = 8, RX address
+              USICTL1 &= ~USISTTIFG;        // Clear start flag
+              I2C_State = 4;                // Go to next state: check address
               break;
 
       case 4: // Process Address and send (N)Ack
-              if (USISRL & 0x01)       // If read...
-                SLV_Addr++;            // Save R/W bit
-              USICTL0 |= USIOE;        // SDA = output
-              if (USISRL == SLV_Addr)  // Address match?
+              if (USISRL & 0x01){            // If master read...
+                SLV_Addr = 0x91;             // Save R/W bit
+                transmit = 1;}
+              else{transmit = 0;
+                  SLV_Addr = 0x90;}
+              USICTL0 |= USIOE;             // SDA = output
+              if (USISRL == SLV_Addr)       // Address match?
               {
-                USISRL = 0x00;         // Send Ack
-                P1OUT &= ~0x01;        // LED off
-                I2C_State = 8;         // Go to next state: TX data
+                USISRL = 0x00;              // Send Ack
+                P1OUT &= ~0x01;             // LED off
+                if (transmit == 0){
+                  I2C_State = 6;}           // Go to next state: RX data
+                if (transmit == 1){
+                  I2C_State = 10;}          // Else go to next state: TX data
               }
               else
               {
-                USISRL = 0xFF;         // Send NAck
-                P1OUT |= 0x01;         // LED on: error
-                I2C_State = 6;         // Go to next state: prep for next Start
+                USISRL = 0xFF;              // Send NAck
+                P1OUT |= 0x01;              // LED on: error
+                I2C_State = 8;              // next state: prep for next Start
               }
-              USICNT |= 0x01;          // Bit counter = 1, send (N)Ack bit
+              USICNT |= 0x01;               // Bit counter = 1, send (N)Ack bit
               break;
 
-      case 6: // Prep for Start condition
-              USICTL0 &= ~USIOE;       // SDA = input
-              SLV_Addr = 0x90;         // Reset slave address
-              I2C_State = 0;           // Reset state machine
+    case 6: // Receive data byte
+              Data_RX();
               break;
 
-      case 8: // Send Data byte
-              USICTL0 |= USIOE;        // SDA = output
-              USISRL = SLV_Data;       // Send data byte
-              USICNT |=  0x08;         // Bit counter = 8, TX data
-              I2C_State = 10;          // Go to next state: receive (N)Ack
-              break;
-
-      case 10:// Receive Data (N)Ack
-              USICTL0 &= ~USIOE;       // SDA = input
-              USICNT |= 0x01;          // Bit counter = 1, receive (N)Ack
-              I2C_State = 12;          // Go to next state: check (N)Ack
-              break;
-
-      case 12:// Process Data Ack/NAck
-              if (USISRL & 0x01)       // If Nack received...
+      case 8:// Check Data & TX (N)Ack
+              USICTL0 |= USIOE;             // SDA = output
+              if (Bytecount <= (Number_of_Bytes-2))
+                                            // If not last byte
               {
-                P1OUT |= 0x01;         // LED on: error
+                USISRL = 0x00;              // Send Ack
+                I2C_State = 6;              // Rcv another byte
+                Bytecount++;
+                USICNT |= 0x01;             // Bit counter = 1, send (N)Ack bit
               }
-              else                     // Ack received
+              else                          // Last Byte
               {
-                P1OUT &= ~0x01;        // LED off
-                SLV_Data++;            // Increment Slave data
+                USISRL = 0xFF;              // Send NAck
+              USICTL0 &= ~USIOE;            // SDA = input
+              SLV_Addr = 0x90;              // Reset slave address
+              I2C_State = 0;                // Reset state machine
+              Bytecount =0;                 // Reset counter for next TX/RX
               }
-              // Prep for Start condition
-              USICTL0 &= ~USIOE;       // SDA = input
-              SLV_Addr = 0x90;         // Reset slave address
-              I2C_State = 0;           // Reset state machine
-              break;
-    }
 
-  USICTL1 &= ~USIIFG;                  // Clear pending flags
+
+              break;
+
+     case 10: // Send Data byte
+              TX_Data();
+              break;
+
+      case 12:// Receive Data (N)Ack
+              USICTL0 &= ~USIOE;            // SDA = input
+              USICNT |= 0x01;               // Bit counter = 1, receive (N)Ack
+              I2C_State = 14;               // Go to next state: check (N)Ack
+              break;
+
+      case 14:// Process Data Ack/NAck
+           if (USISRL & 0x01)               // If Nack received...
+              {
+              USICTL0 &= ~USIOE;            // SDA = input
+              SLV_Addr = 0x90;              // Reset slave address
+              I2C_State = 0;                // Reset state machine
+               Bytecount = 0;
+             // LPM0_EXIT;                  // Exit active for next transfer
+              }
+              else                          // Ack received
+              {
+                P1OUT &= ~0x01;             // LED off
+                TX_Data();                  // TX next byte
+               }
+	       break;
+
+      }
+  USICTL1 &= ~USIIFG;                       // Clear pending flags
+}
+
+void Data_RX(void){
+
+              USICTL0 &= ~USIOE;            // SDA = input
+              USICNT |=  0x08;              // Bit counter = 8, RX data
+              I2C_State = 8;                // next state: Test data and (N)Ack
+}
+
+void TX_Data(void){
+              USICTL0 |= USIOE;             // SDA = output
+              USISRL = SLV_Data++;
+              USICNT |=  0x08;              // Bit counter = 8, TX data
+              I2C_State = 12;               // Go to next state: receive (N)Ack
+}
+
+void Setup_USI_Slave(void){
+  P1OUT = 0xC0;                             // P1.6 & P1.7 Pullups
+  P1REN |= 0xC0;                            // P1.6 & P1.7 Pullups
+  P1DIR = 0xFF;                             // Unused pins as outputs
+  P2OUT = 0;
+  P2DIR = 0xFF;
+
+  USICTL0 = USIPE6+USIPE7+USISWRST;         // Port & USI mode setup
+  USICTL1 = USII2C+USIIE+USISTTIE;          // Enable I2C mode & USI interrupts
+  USICKCTL = USICKPL;                       // Setup clock polarity
+  USICNT |= USIIFGCC;                       // Disable automatic clear control
+  USICTL0 &= ~USISWRST;                     // Enable USI
+  USICTL1 &= ~USIIFG;                       // Clear pending flag
+
+  transmit = 0;
+  _EINT();
+
 }
 
 
@@ -190,7 +257,7 @@ __interrupt void Timer_A (void)
 {
 
 	//For debug purposes, comment out when not in use.
-	P1OUT ^= BIT3;					//Toggle P1.3 for frequency output
+	//P1OUT ^= BIT3;					//Toggle P1.3 for frequency output
 
 	ADC10CTL0 |= ENC + ADC10SC;             // Start sampling
 

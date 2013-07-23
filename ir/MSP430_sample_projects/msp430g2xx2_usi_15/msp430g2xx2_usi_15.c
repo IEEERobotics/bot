@@ -93,8 +93,8 @@ int main(void)
     while(1);                               // do not load, trap CPU!!	
   }
   DCOCTL = 0;                               // Select lowest DCOx and MODx settings
-  BCSCTL1 = CALBC1_1MHZ;                    // Set DCO
-  DCOCTL = CALDCO_1MHZ;
+  BCSCTL1 = CALDCO_16MHZ;                    // Set DCO
+  DCOCTL = CALDCO_16MHZ;
   Setup_USI_Slave();
   
   LPM0;                                     // CPU off, await USI interrupt

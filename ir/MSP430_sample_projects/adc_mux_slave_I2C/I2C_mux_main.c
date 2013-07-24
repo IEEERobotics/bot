@@ -67,13 +67,13 @@ void TX_Data(void);
 int main(void)
 {
   WDTCTL = WDTPW + WDTHOLD;            // Stop watchdog
-  if (CALBC1_1MHZ==0xFF)			   // If calibration constants erased
+  if (CALBC1_16MHZ==0xFF)			   // If calibration constants erased
   {
     while(1);                          // do not load, trap CPU!!
   }
   DCOCTL = 0;                               // Select lowest DCOx and MODx settings
-  BCSCTL1 = CALBC1_1MHZ;               // Set DCO
-  DCOCTL = CALDCO_1MHZ;
+  BCSCTL1 = CALBC1_16MHZ;               // Set DCO
+  DCOCTL = CALDCO_16MHZ;
 
   BCSCTL2 = SELS; 				//Set SMCLK to use DCOCLK
 
@@ -84,7 +84,7 @@ int main(void)
   P2OUT = 0;
   P2DIR = 0xFF;
 
-  /*
+
   //added from adc code - NGOHARA 7/16/13
   CCTL0 = CCIE;                             // CCR0 interrupt enabled
   CCR0 = TIMER;
@@ -97,7 +97,7 @@ int main(void)
 
 	//Setup Enable Bits
 	P2OUT |= BIT4 + BIT5;	//Inhibit (P2.3) =0, LEDON_1 and LEDON_2 (P2.4 and P2.5) = 1
-*/
+
 
 	//Setup I2C
   USICTL0 = USIPE6+USIPE7+USISWRST;    // Port & USI mode setup

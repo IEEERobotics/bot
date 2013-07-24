@@ -109,8 +109,8 @@ int main(void)
 
   //from I2C
   DCOCTL = 0;                               // Select lowest DCOx and MODx settings
-  BCSCTL1 = CALBC1_1MHZ;               // Set DCO
-  DCOCTL = CALDCO_1MHZ;
+  BCSCTL1 = CALBC1_16MHZ;               // Set DCO
+  DCOCTL = CALDCO_16MHZ;
 
   BCSCTL2 |= ~SELS + +DIVS_0; 				//Set SMCLK to use DCOCLK
 

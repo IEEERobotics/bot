@@ -94,8 +94,10 @@ void Setup_USI_Master_RX(void);
 char MST_Data = 0x55;                       // Variable for transmitted data
 char SLV_Addr = 0x90;                       
 int I2C_State, Bytecount, Transmit, number_of_bytes, repeated_start = 0;     
+
 void Data_TX (void);
 void Data_RX (void);
+
 int main(void)
 {
   volatile unsigned int i;                  // Use volatile to prevent removal
@@ -108,6 +110,8 @@ int main(void)
   DCOCTL = 0;                               // Select lowest DCOx and MODx settings
   BCSCTL1 = CALBC1_1MHZ;                    // Set DCO
   DCOCTL = CALDCO_1MHZ;
+
+  //BCSCTL2 = SELS; 				//Set SMCLK to use DCOCLK
 
   P1OUT = 0xC0;                             // P1.6 & P1.7 Pullups, others to 0
   P1REN |= 0xC0;                            // P1.6 & P1.7 Pullups
@@ -161,38 +165,41 @@ __interrupt void USI_TXRX (void)
 
       case 4: // Process Address Ack/Nack & handle data TX
              
- if(Transmit == 1){
-              USICTL0 |= USIOE;             // SDA = output
-              if (USISRL & 0x01)            // If Nack received...
-              { // Send stop...
-                USISRL = 0x00;
-                USICNT |=  0x01;            // Bit counter=1, SCL high, SDA low
-                I2C_State = 14;             // Go to next state: generate Stop
-                P1OUT |= 0x01;              // Turn on LED: error
-              }
-              else
-              { // Ack received, TX data to slave... 
-              USISRL = MST_Data++;            // Load data byte
-              USICNT |=  0x08;              // Bit counter = 8, start TX
-              I2C_State = 10;               // next state: receive data (N)Ack
-              Bytecount++;
-              P1OUT &= ~0x01;               // Turn off LED
-              break;
-              }
- } if(Transmit == 0){
+    	  	  if(Transmit == 1){
+				  USICTL0 |= USIOE;             // SDA = output
+				  if (USISRL & 0x01)            // If Nack received...
+					  { // Send stop...
+						USISRL = 0x00;
+						USICNT |=  0x01;            // Bit counter=1, SCL high, SDA low
+						I2C_State = 14;             // Go to next state: generate Stop
+						P1OUT |= 0x01;              // Turn on LED: error
+					  }
 
-               if (USISRL & 0x01)            // If Nack received
-              { // Prep Stop Condition
-                USICTL0 |= USIOE;
-                USISRL = 0x00;
-                USICNT |=  0x01;            // Bit counter= 1, SCL high, SDA low
-                I2C_State = 8;              // Go to next state: generate Stop
-                P1OUT |= 0x01;              // Turn on LED: error
-              }
-              else{ Data_RX();}             // Ack received
-              
+				  else
+					  { // Ack received, TX data to slave...
+					  USISRL = MST_Data++;            // Load data byte
+					  USICNT |=  0x08;              // Bit counter = 8, start TX
+					  I2C_State = 10;               // next state: receive data (N)Ack
+					  Bytecount++;
+					  P1OUT &= ~0x01;               // Turn off LED
+					  break;
+				  }
+    	  	  }
 
-}
+    	  	  if(Transmit == 0){
+
+				   if (USISRL & 0x01)            // If Nack received
+				  { // Prep Stop Condition
+					USICTL0 |= USIOE;
+					USISRL = 0x00;
+					USICNT |=  0x01;            // Bit counter= 1, SCL high, SDA low
+					I2C_State = 8;              // Go to next state: generate Stop
+					P1OUT |= 0x01;              // Turn on LED: error
+				  }
+				  else{ Data_RX();}             // Ack received
+
+
+    	  	  }
               break;
 
 case 6: // Send Data Ack/Nack bit      
@@ -262,6 +269,7 @@ case 6: // Send Data Ack/Nack bit
 
   USICTL1 &= ~USIIFG;                       // Clear pending flag
 }
+// END interrupt USI_TXRX -------------------------------------------------------------------------------------------------
 
 
 void Data_TX (void){

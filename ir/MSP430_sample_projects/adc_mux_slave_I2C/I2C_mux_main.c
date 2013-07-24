@@ -84,6 +84,7 @@ int main(void)
   P2OUT = 0;
   P2DIR = 0xFF;
 
+  /*
   //added from adc code - NGOHARA 7/16/13
   CCTL0 = CCIE;                             // CCR0 interrupt enabled
   CCR0 = TIMER;
@@ -96,6 +97,7 @@ int main(void)
 
 	//Setup Enable Bits
 	P2OUT |= BIT4 + BIT5;	//Inhibit (P2.3) =0, LEDON_1 and LEDON_2 (P2.4 and P2.5) = 1
+*/
 
 	//Setup I2C
   USICTL0 = USIPE6+USIPE7+USISWRST;    // Port & USI mode setup

@@ -78,12 +78,22 @@ int main(void)
   BCSCTL2 = SELS; 				//Set SMCLK to use DCOCLK
 
   //old pinout of I2C code
-  P1OUT = 0xC0;                        // P1.6 & P1.7 Pullups
-  P1REN |= 0xC0;                       // P1.6 & P1.7 Pullups
-  P1DIR = 0xFF;                        // Unused pins as outputs
-  P2OUT = 0;
-  P2DIR = 0xFF;
+  //P1OUT = 0xC0;                        // P1.6 & P1.7 Pullups
+  //P1REN |= 0xC0;                       // P1.6 & P1.7 Pullups
+  //P1DIR = 0xFF;                        // Unused pins as outputs
+  //P2OUT = 0;
+  //P2DIR = 0xFF;
 
+  //configure Port 1
+  P1DIR |= BIT3 + BIT4 + BIT5;	// P1.3 for debug, 		P1.4,5 used for 16b mux select
+  P1OUT = 0x00;									//initialize off
+  P1OUT |= 0xC0;                        // P1.6 & P1.7 Pullups
+  P1REN |= 0xC0;                       // P1.6 & P1.7 Pullups
+
+  //Configure Port 2 pins
+    P2DIR = 0x3F;								// All six pins (P2.0-P2.5) output (though P2.2 unused)
+    P2OUT = 0x00;								//Initialize all off
+    P2REN = 0x00;								//No pullup resistors
 
   //added from adc code - NGOHARA 7/16/13
   CCTL0 = CCIE;                             // CCR0 interrupt enabled
@@ -92,7 +102,7 @@ int main(void)
 
 	//adc setup
 	ADC10CTL0 = ADC10ON + ADC10SHT_0 + SREF_0 + ADC10IE;	//ADC on, 4*ADC10CLK, VCC&GND, Interrupt Enable
-	ADC10AE0 |= 0x01;							//ADC enable
+	ADC10AE0 |= BIT2;							//ADC enable for A2 (P1.2)
 	ADC10CTL1 = INCH_2 + CONSEQ_0 ;          // Source P1.2, Use SMCLK,  1 source 1 conversion
 
 	//Setup Enable Bits

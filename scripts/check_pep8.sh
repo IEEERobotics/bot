@@ -2,14 +2,25 @@
 
 # Check source file for PEP8 conformance.
 
-pep8 start.py \
-     lib/lib.py \
-     planner/planner.py \
-     driver/driver.py \
-     gunner/gunner.py \
-     gunner/wheel_gunner.py \
-     driver/mech_driver.py \
-     localizer/localizer.py \
-     follower/follower.py \
-     lib/exceptions.py
-     
+cd ../bot &> /dev/null
+cd_return=$?
+if [ $cd_return -ne "0" ]
+then
+    cd ../../bot &> /dev/null
+    cd2_return=$?
+    if [ $cd2_return -ne "0" ]
+    then
+        echo "Error: Failed to cd to bot dir. Run from bot/ or bot/*."
+        exit 1
+    fi
+fi
+
+which pep8 &> /dev/null
+have_pep8=$?
+if [ $have_pep8 -ne 0 ]
+then
+    echo "You need pep8. Install it with your package manager."
+    exit 1
+fi
+
+pep8 `find ./* -name "*.py" | grep -v "doc/"`

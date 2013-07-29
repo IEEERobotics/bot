@@ -8,12 +8,12 @@ then
     cd2_return=$?
     if [ $cd2_return -ne "0" ]
     then
-        echo "Error: Failed to cd to doc dir. Run from bot/ or bot/scripts/."
+        echo "Error: Failed to cd to doc dir. Run from bot/ or bot/*."
         exit 1
     fi
 fi
 
-which sphinx-apidoc
+which sphinx-apidoc &> /dev/null
 have_sphinx=$?
 if [ $have_sphinx -ne 0 ]
 then

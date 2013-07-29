@@ -35,27 +35,14 @@ class Gunner(object):
     def fire(self, cmd):
         """Accept and handle fire commands.
 
-        TODO(dfarrell07): This is a stub.
+        This method is not meant to be called, but instead is meant to show
+        that subclasses should override it in their implementation.
 
         :param cmd: Command describing firing action to be executed.
 
         """
-        self.logger.debug("Fire cmd: {}".format(cmd))
-
-        if cmd["subtype"] == "basic_fire":
-            self.basic_fire()
-        else:
-            self.logger.error("Unknown fire cmd subtype")
-
-    def basic_fire(self):
-        """Handle normal fire commands.
-
-        This is designed to be overridden by more specific subclasses.
-
-        TODO(dfarrell07): This is a stub
-
-        """
-        self.logger.debug("Fire!")
+        self.logger.error("The fire method must be overridden by a subclass.")
+        raise NotImplementedError("Subclass must override this method.")
 
     def aim_turret(self):
         """Aim the robot's turret such that firing will be successful.

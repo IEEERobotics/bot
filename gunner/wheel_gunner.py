@@ -13,7 +13,7 @@ class WheelGunner(gunner.Gunner):
         """Run superclass's init."""
         super(WheelGunner, self).__init__()
 
-    def basic_fire(self):
+    def fire(self, cmd):
         """Handle normal fire commands.
 
         TODO(dfarrell07): This is a stub

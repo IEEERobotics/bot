@@ -35,4 +35,3 @@ actions:
       type: fire
       description:
         summary:  Fire dart at target.
-        subtype: basic_fire

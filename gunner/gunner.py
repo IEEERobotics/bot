@@ -1,11 +1,6 @@
 #!/usr/bin/env python
 """Handle aiming and firing darts."""
 
-try:
-    import yaml
-except ImportError, err:
-    sys.stderr.write("ERROR: {}. Try installing python-yaml.\n".format(err))
-
 import lib.lib as lib
 import localizer.localizer as localizer
 
@@ -26,11 +21,11 @@ class Gunner(object):
         self.logger.debug("Gunner has logger")
 
         # Load and store configuration dict
-        self.config = lib.get_config()
+        self.config = lib.load_config()
         self.logger.debug("Gunner has config")
 
         # Load and store targeting dict
-        self.targ = self.load_targeting()
+        self.targ = lib.load_targeting(self.config["targeting"])
         self.logger.debug("Targeting: {}".format(self.targ))
 
         # Load and store localizer
@@ -40,27 +35,14 @@ class Gunner(object):
     def fire(self, cmd):
         """Accept and handle fire commands.
 
-        TODO(dfarrell07): This is a stub.
+        This method is not meant to be called, but instead is meant to show
+        that subclasses should override it in their implementation.
 
         :param cmd: Command describing firing action to be executed.
 
         """
-        self.logger.debug("Fire cmd: {}".format(cmd))
-
-        if cmd["subtype"] == "basic_fire":
-            self.basic_fire()
-        else:
-            self.logger.error("Unknown fire cmd subtype")
-
-    def basic_fire(self):
-        """Handle normal fire commands.
-
-        This is designed to be overridden by more specific subclasses.
-
-        TODO(dfarrell07): This is a stub
-
-        """
-        self.logger.debug("Fire!")
+        self.logger.error("The fire method must be overridden by a subclass.")
+        raise NotImplementedError("Subclass must override this method.")
 
     def aim_turret(self):
         """Aim the robot's turret such that firing will be successful.
@@ -69,17 +51,3 @@ class Gunner(object):
 
         """
         self.logger.debug("Aiming turret")
-
-    def load_targeting(self):
-        """Load the YAML targeting info for each possible block position.
-
-        :returns: Dict description of targeting information for each block.
-
-        """
-        # Build valid path from CWD to targeting file
-        qual_targ_file = lib.prepend_prefix(self.config["targeting"])
-        self.logger.debug("Targeting file: " + qual_targ_file)
-
-        # Open and read targeting file
-        targ_fd = open(qual_targ_file)
-        return yaml.load(targ_fd)

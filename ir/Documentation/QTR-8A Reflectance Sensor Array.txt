@@ -1,0 +1,3 @@
+Here is the website for the pololu part used in this IR Array device
+
+http://www.pololu.com/catalog/product/960

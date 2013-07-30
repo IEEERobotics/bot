@@ -1,5 +1,6 @@
 """Define custom exceptions."""
 
+
 class FollowerException(Exception):
 
     """Base exception for follower-related exceptions."""
@@ -8,13 +9,14 @@ class FollowerException(Exception):
         """Define a human-readable name for exception.
 
         Note that this name should be equal to the name used
-        in strategy YAML files when describing the expected 
+        in strategy YAML files when describing the expected
         result of a follow action.
 
         :returns: Name of exception.
 
         """
         return "FollowerException"
+
 
 class IntersectionException(FollowerException):
 
@@ -24,13 +26,14 @@ class IntersectionException(FollowerException):
         """Define a human-readable name for exception.
 
         Note that this name should be equal to the name used
-        in strategy YAML files when describing the expected 
+        in strategy YAML files when describing the expected
         result of a follow action.
 
         :returns: Name of exception.
 
         """
         return "IntersectionException"
+
 
 class BoxException(FollowerException):
 
@@ -40,7 +43,7 @@ class BoxException(FollowerException):
         """Define a human-readable name for exception.
 
         Note that this name should be equal to the name used
-        in strategy YAML files when describing the expected 
+        in strategy YAML files when describing the expected
         result of a follow action.
 
         :returns: Name of exception.

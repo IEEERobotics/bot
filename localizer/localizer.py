@@ -3,6 +3,7 @@
 
 import lib.lib as lib
 
+
 class Localizer(object):
 
     """Interpret sensors to derive bot's location.
@@ -27,4 +28,4 @@ class Localizer(object):
         :returns: The position of the block we're sitting on.
 
         """
-        return {"row" : "first", "slot" : "first"}
+        return {"row": "first", "slot": "first"}

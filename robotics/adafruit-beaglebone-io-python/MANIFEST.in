@@ -1,5 +1,0 @@
-include distribute_setup.py
-include README.rst
-include CHANGELOG.rst
-recursive-include source *.h
-recursive-include overlays *.dts *.py

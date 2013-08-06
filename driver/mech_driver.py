@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Pass low-level move commands to motors with mecanum wheels."""
 
-from math import sin, cos, pi, floor
+from math import sin, cos, pi, floor, fabs
 
 import driver
 import lib.lib as lib
@@ -23,9 +23,8 @@ class MechDriver(driver.Driver):
     def __init__(self):
         """Run superclass's init."""
         super(MechDriver, self).__init__()
-        max_speed = 10
 
-    def iowrite(self, motor, ds):
+    def iowrite(self, motor, ds, direction):
         """Write to IO pens that control the motors.
 
         TODO(dfarrell07): This is a stub
@@ -36,8 +35,45 @@ class MechDriver(driver.Driver):
         :type ds: float
         """
         self.logger.debug("IO write: motor: {}, ds: {}".format(motor, ds))
+    
+    def rotate(self,rotate_speed):
+        """Pass rotation speed as -100 to 100 (positive is clockwise)
+        
+        """
+        self.logger.debug("rotate speed: {}".format(rotate_speed)
+        
+        # Determine direction.
+        if rotate_speed > 0:
+            front_left_forward = True
+            front_right_forward = False
+            back_left_forward = True
+            back_right_foward = False
+        else:
+            rotate_speed = fabs(rotate_speed)
+            front_left_forward = False
+            front_right_forward = True
+            back_left_forward = False
+            back_right_foward = True
+        
+        # Check for invalid value.
+        if rotate_speed > 100:
+            rotate_speed = 100
 
-    def basic_move(self, speed, angle, rotate_speed):
+        # Set duty cycles.
+        front_left_ds = fabs(floor(rotate_speed))
+        front_right_ds = fabs(floor(rotate_speed))
+        back_left_ds = fabs(floor(rotate_speed))
+        back_right_ds = fabs(floor(rotate_speed))
+
+        # Write to IO pins.
+        # Also remember to write to direction pins.
+        self.iowrite("front_left", front_left_ds, front_left_forward)
+        self.iowrite("front_right", front_right_ds, front_right_forward)
+        self.iowrite("back_left", back_left_ds, back_left_forward)
+        self.iowrite("back_right", back_right_ds, back_right_foward)
+     
+
+    def basic_move(self, speed, angle):
         """Build low-level commands for holonomic translations with rotations.
 
         :param speed: Magnitude of robot's translation speed.
@@ -48,24 +84,20 @@ class MechDriver(driver.Driver):
         :type rotate_speed: float
 
         """
-        self.logger.debug("Speed: {}, angle {}, rotate speed {}".format(speed,
-                                                            angle,
-                                                            rotate_speed))
+        self.logger.debug("Speed: {}, angle {}".format(speed, angle))
 
         # Calculate wheel speed ratios
         # note: This is not the same as the car speed.
-        front_left = speed * sin(angle * pi / 180 + pi / 4) + rotate_speed
-        front_right = speed * cos(angle * pi / 180 + pi / 4) - rotate_speed
-        back_left = speed * cos(angle * pi / 180 + pi / 4) + rotate_speed
-        back_right = speed * sin(angle * pi / 180 + pi / 4) - rotate_speed
-
-        # Calculate duty cycle (ratio to max_speed)
-        # Todo for Ahmed: Run tests to find out what max_speed should be.
-        # I think it's 3.3 (max output voltage) but check.
-        front_left_ds = floor(front_left / max_speed * 100)
-        front_right_ds = floor(front_right / max_speed * 100)
-        back_left_ds = floor(back_left / max_speed * 100)
-        back_right_ds = floor(back_right / max_speed * 100)
+        front_left = speed * sin(angle * pi / 180 + pi / 4)
+        front_right = speed * cos(angle * pi / 180 + pi / 4)
+        back_left = speed * cos(angle * pi / 180 + pi / 4)
+        back_right = speed * sin(angle * pi / 180 + pi / 4)
+    
+        # Calculate duty cycle as absolute/whole number.
+        front_left_ds = fabs(floor(front_left))
+        front_right_ds = fabs(floor(front_right))
+        back_left_ds = fabs(floor(back_left))
+        back_right_ds = fabs(floor(back_right))
 
         # Prevent invalid duty cycle values.
         if front_left_ds > 100:

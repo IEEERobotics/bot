@@ -33,15 +33,14 @@ class MechDriver(driver.Driver):
         :type ds: string
         :param ds: Duty cycle that motor should be set to.
         :type ds: float
+
         """
         self.logger.debug("IO write: motor: {}, ds: {}".format(motor, ds))
-    
-    def rotate(self,rotate_speed):
-        """Pass rotation speed as -100 to 100 (positive is clockwise)
-        
-        """
-        self.logger.debug("rotate speed: {}".format(rotate_speed)
-        
+
+    def rotate(self, rotate_speed):
+        """Pass rotation speed as -100 to 100 (positive is clockwise)."""
+        self.logger.debug("rotate speed: {}".format(rotate_speed))
+
         # Determine direction.
         if rotate_speed > 0:
             front_left_forward = True
@@ -54,7 +53,7 @@ class MechDriver(driver.Driver):
             front_right_forward = True
             back_left_forward = False
             back_right_foward = True
-        
+
         # Check for invalid value.
         if rotate_speed > 100:
             rotate_speed = 100
@@ -71,7 +70,6 @@ class MechDriver(driver.Driver):
         self.iowrite("front_right", front_right_ds, front_right_forward)
         self.iowrite("back_left", back_left_ds, back_left_forward)
         self.iowrite("back_right", back_right_ds, back_right_foward)
-     
 
     def basic_move(self, speed, angle):
         """Build low-level commands for holonomic translations with rotations.
@@ -92,7 +90,7 @@ class MechDriver(driver.Driver):
         front_right = speed * cos(angle * pi / 180 + pi / 4)
         back_left = speed * cos(angle * pi / 180 + pi / 4)
         back_right = speed * sin(angle * pi / 180 + pi / 4)
-    
+
         # Calculate duty cycle as absolute/whole number.
         front_left_ds = fabs(floor(front_left))
         front_right_ds = fabs(floor(front_right))

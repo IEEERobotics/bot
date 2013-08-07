@@ -1,7 +1,9 @@
 """Abstraction layer for motors."""
 
-import lib.lib as lib
 import pybbb.bbb.pwm as pwm_mod
+
+import lib.lib as lib
+
 
 class Motor(object):
     """Class for abstracting motor settings."""
@@ -17,15 +19,19 @@ class Motor(object):
         self.logger = lib.get_logger()
         self.logger.debug("Motor {} has logger".format(num))
 
+        # Store ID number of motor
         self.num = num
 
-        self.pwm = pwm_mod.pwm(num)
+        # Build PWM object for BBB interaction
+        self.pwm = pwm_mod.PWM(num)
         self.logger.debug("Built {}".format(str(self.pwm)))
 
+        # Set motor speed/direction to current value of PWM duty/polarity
         self._speed = self.pwm.duty
         self.logger.debug("Motor {} speed: {}".format(num, self._speed))
         self._direction = self.pwm.polarity
-        self.logger.debug("Motor {} direction: {}".format(num, self._direction))
+        self.logger.debug("Motor {} direction: {}".format(num,
+                                                          self._direction))
 
     @property
     def speed(self):
@@ -40,6 +46,13 @@ class Motor(object):
         :type speed: int
 
         """
+        if speed > 100:
+            self.logger.warn("Invalid speed {}, using 100.".format(speed))
+            speed = 100
+        elif speed < 0:
+            self.logger.warn("Invalid speed {}, using 0.".format(speed))
+            speed = 0
+
         self.pwm.duty = speed
         self.logger.debug("Set motor {} speed to {}".format(self.num, speed))
 
@@ -56,6 +69,10 @@ class Motor(object):
         :type direction: int
 
         """
-        self.pwm.polarity = direction
-        self.logger.debug("Set motor {} direction to {}".format(self.num, direction))
+        if direction != 0 and direction != 1:
+            self.logger.warn("Invalid dir {}, no update.".format(direction))
+            return
 
+        self.pwm.polarity = direction
+        self.logger.debug("Set motor {} direction to {}".format(self.num,
+                                                                direction))

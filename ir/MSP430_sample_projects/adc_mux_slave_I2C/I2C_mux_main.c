@@ -53,11 +53,15 @@ volatile unsigned int ir_select = 0;	//variable for controlling 16b mux select
 //I2C functions and vars
 #define Number_of_Bytes  5                  // **** How many bytes?? ****
 
+//-------------------------/* Increment this Address number by 2 for each additional I2C device attached to master *///---------------
+#define THIS_SLAVE_ADDRESS		0x90		// Address is 0x48<<1 for R/W
+//------------------------------------------------------------------------------------------------------------------------------------
+
 void Setup_USI_Slave(void);
 
 char MST_Data = 0;                          // Variable for received data
 char SLV_Data = 0x55;
-char SLV_Addr = 0x90;                       // Address is 0x48<<1 for R/W
+char SLV_Addr = THIS_SLAVE_ADDRESS;
 int I2C_State, Bytecount, transmit = 0;     // State variables
 
 void Data_RX(void);
@@ -155,7 +159,7 @@ __interrupt void USI_TXRX (void)
                 SLV_Addr = 0x91;             // Save R/W bit
                 transmit = 1;}
               else{transmit = 0;
-                  SLV_Addr = 0x90;}
+                  SLV_Addr = THIS_SLAVE_ADDRESS;}
               USICTL0 |= USIOE;             // SDA = output
               if (USISRL == SLV_Addr)       // Address match?
               {
@@ -191,9 +195,9 @@ __interrupt void USI_TXRX (void)
               }
               else                          // Last Byte
               {
-                USISRL = 0xFF;              // Send NAck
+              USISRL = 0xFF;              // Send NAck
               USICTL0 &= ~USIOE;            // SDA = input
-              SLV_Addr = 0x90;              // Reset slave address
+              SLV_Addr = THIS_SLAVE_ADDRESS;// Reset slave address
               I2C_State = 0;                // Reset state machine
               Bytecount =0;                 // Reset counter for next TX/RX
               }
@@ -215,7 +219,7 @@ __interrupt void USI_TXRX (void)
            if (USISRL & 0x01)               // If Nack received...
               {
               USICTL0 &= ~USIOE;            // SDA = input
-              SLV_Addr = 0x90;              // Reset slave address
+              SLV_Addr = THIS_SLAVE_ADDRESS;// Reset slave address
               I2C_State = 0;                // Reset state machine
                Bytecount = 0;
              // LPM0_EXIT;                  // Exit active for next transfer

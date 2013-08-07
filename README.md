@@ -2,6 +2,25 @@
 
 Code for the IEEE Robotics Team's 2014 robot(s).
 
+## Getting Started
+
+If you're pulling the code for the first time, navigate to the directory where you'd like to store the repo and then run:
+
+```bash
+git clone --recursive git@github.com:NCSUhardware/bot.git
+```
+
+If you already have the repo and simply need the [pybbb] submodule (bot/pybbb is empty), then run the following from the root of the repo:
+
+```bash
+git pull # Always a good idea
+git submodule init
+git submodule update
+```
+
+The extra submodule-related steps are necessary to retrieve the [pybbb] library that we use for interaction with the BeagleBone Black. For more information, see the [git-scm section on submodules].
+
+
 ## Style
 
 ### Code Style
@@ -29,6 +48,8 @@ If you really care, give [Google's Shell Style Guide][1] a read. Don't be too pe
 Use [Sphinx-style docstrings]. You may also find [this][2] docstring and Sphinx information helpful.
 
 
+[pybbb]: https://github.com/NCSUhardware/pybbb
+[git-scm section on submodules]: http://git-scm.com/book/en/Git-Tools-Submodules#Cloning-a-Project-with-Submodules
 [PEP8]: http://www.python.org/dev/peps/pep-0008/
 [PEP7]: http://www.python.org/dev/peps/pep-0007/
 [1]: https://google-styleguide.googlecode.com/svn/trunk/shell.xml

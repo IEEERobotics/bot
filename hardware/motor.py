@@ -8,7 +8,7 @@ import lib.lib as lib
 class Motor(object):
     """Class for abstracting motor settings."""
 
-    def __init__(self, num):
+    def __init__(self, num, testing=False):
         """Setup logger and PWM interface.
 
         :param num: ID number of this motor. Also defines PWM number.
@@ -22,9 +22,22 @@ class Motor(object):
         # Store ID number of motor
         self.num = num
 
-        # Build PWM object for BBB interaction
-        self.pwm = pwm_mod.PWM(num)
-        self.logger.debug("Built {}".format(str(self.pwm)))
+        if testing:
+            self.logger.debug("TEST MODE: Motor {}".format(num))
+            config = lib.load_config()
+
+            # Get dir of simulated hardware files from config
+            test_base_dir = lib.prepend_prefix(config["test_base_dir"])
+            self.logger.debug("Test HW dir: {}".format(test_base_dir))
+
+            # Build PWM object for BBB interaction, provide test dir
+            self.pwm = pwm_mod.PWM(num, test_base_dir)
+            self.logger.debug("Built {}".format(str(self.pwm)))
+        else:
+            self.logger.debug("EMBEDDED MODE: Motor {}".format(num))
+            # Build PWM object for BBB interaction
+            self.pwm = pwm_mod.PWM(num)
+            self.logger.debug("Built {}".format(str(self.pwm)))
 
         # Set motor speed/direction to current value of PWM duty/polarity
         self._speed = self.pwm.duty

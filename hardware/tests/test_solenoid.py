@@ -21,8 +21,25 @@ class TestState(unittest.TestCase):
 
     def setUp(self):
         """Build solenoid object."""
-        self.s_mod = 0
-        self.solenoid = s_mod.Solenoid(self.s_mod, testing=True)
+        # ID number of solenoid
+        self.s_num = 0
+
+        # Load config
+        self.config = lib.load_config()
+        self.test_dir = self.config["test_gpio_base_dir"] + str(self.s_num)
+
+        # Create test directory if it doesn't exist
+        if not os.path.exists(self.test_dir):
+            os.makedirs(self.test_dir)
+
+        # Set known values in all simulated hardware files
+        with open(self.test_dir + "/value", "w") as f:
+            f.write("0\n")
+        with open(self.test_dir + "/direction", "w") as f:
+            f.write("out\n")
+
+        # Build solenoid in testing mode
+        self.solenoid = s_mod.Solenoid(self.s_num, testing=True)
         logger.debug("Built {}".format(self.solenoid))
 
     def test_extended(self):
@@ -54,12 +71,12 @@ class TestState(unittest.TestCase):
             state = random.choice(["extended", "retracted"])
             if state == "extended":
                 self.solenoid.extend()
-                with open(config["test_gpio_base_dir"] + str(self.s_mod) +
+                with open(config["test_gpio_base_dir"] + str(self.s_num) +
                                                     '/value', 'r') as f:
                     assert int(f.read()) == 0
             else:
                 self.solenoid.retract()
-                with open(config["test_gpio_base_dir"] + str(self.s_mod) +
+                with open(config["test_gpio_base_dir"] + str(self.s_num) +
                                                     '/value', 'r') as f:
                     assert int(f.read()) == 1
 
@@ -69,13 +86,30 @@ class TestDirection(unittest.TestCase):
 
     def setUp(self):
         """Build solenoid object."""
-        self.s_mod = 0
-        self.solenoid = s_mod.Solenoid(self.s_mod, testing=True)
+        # ID number of solenoid
+        self.s_num = 0
+
+        # Load config
+        self.config = lib.load_config()
+        self.test_dir = self.config["test_gpio_base_dir"] + str(self.s_num)
+
+        # Create test directory if it doesn't exist
+        if not os.path.exists(self.test_dir):
+            os.makedirs(self.test_dir)
+
+        # Set known values in all simulated hardware files
+        with open(self.test_dir + "/value", "w") as f:
+            f.write("0\n")
+        with open(self.test_dir + "/direction", "w") as f:
+            f.write("out\n")
+
+        # Build solenoid in testing mode
+        self.solenoid = s_mod.Solenoid(self.s_num, testing=True)
         logger.debug("Built {}".format(self.solenoid))
 
     def test_direction(self):
         """Confirm that the solenoid's GPIO is set to output."""
         config = lib.load_config()
-        with open(config["test_gpio_base_dir"] + str(self.s_mod) +
+        with open(config["test_gpio_base_dir"] + str(self.s_num) +
                                                  '/direction', 'r') as f:
             assert f.read() == "out\n"

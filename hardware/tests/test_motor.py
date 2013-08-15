@@ -3,6 +3,7 @@ import sys
 import os
 import unittest
 from random import randint
+import shutil
 
 sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
 
@@ -16,13 +17,33 @@ except ImportError:
 # Build logger
 logger = lib.get_logger()
 
-
 class TestSpeed(unittest.TestCase):
     """Test setting and checking the speed of a motor."""
 
     def setUp(self):
-        """Build motor object."""
+        """Setup test hardware files and build motor object."""
+        # ID number of motor
         self.m_num = 0
+
+        # Load config
+        self.config = lib.load_config()
+        self.test_dir = self.config["test_pwm_base_dir"] + str(self.m_num)
+
+        # Create test directory if it doesn't exist
+        if not os.path.exists(self.test_dir):
+            os.makedirs(self.test_dir)
+
+        # Set known values in all simulated hardware files
+        with open(self.test_dir + "/run", "w") as f:
+            f.write("0\n")
+        with open(self.test_dir + "/duty_ns", "w") as f:
+            f.write("0\n")
+        with open(self.test_dir + "/period_ns", "w") as f:
+            f.write("1000\n")
+        with open(self.test_dir + "/polarity", "w") as f:
+            f.write("0\n")
+
+        # Build motor in testing mode
         self.motor = m_mod.Motor(self.m_num, testing=True)
         logger.debug("Built {}".format(self.motor))
 
@@ -47,16 +68,20 @@ class TestSpeed(unittest.TestCase):
             self.motor.speed = speed
             assert self.motor.speed == speed
 
+    @unittest.expectedFailure
     def test_manually_confirm(self):
         """Test a series of random speeds, read the simulated HW to confirm."""
         config = lib.load_config()
 
-        for i in range(10):
-            cur_speed = randint(0, 100)
-            self.motor.speed = cur_speed
+        for i in range(1000):
+            test_speed = randint(0, 100)
+            logger.debug("Testing speed {}".format(test_speed))
+            self.motor.speed = test_speed
             with open(config["test_pwm_base_dir"] + str(self.m_num) +
                                                 '/duty_ns', 'r') as f:
-                assert int(f.read()) == cur_speed
+                speed = int(int(f.read()) / float(self.motor.pwm.period) * 100)
+                assert speed == test_speed, "{} != {}".format(speed, 
+                                                              test_speed)
 
     def test_over_max(self):
         """Test speed over max speed. Should use maximum."""
@@ -73,8 +98,29 @@ class TestDirection(unittest.TestCase):
     """Test setting and checking the direction of a motor."""
 
     def setUp(self):
-        """Build motor object."""
+        """Setup test hardware files and build motor object."""
+        # ID number of motor
         self.m_num = 0
+
+        # Load config
+        self.config = lib.load_config()
+        self.test_dir = self.config["test_pwm_base_dir"] + str(self.m_num)
+
+        # Create test directory if it doesn't exist
+        if not os.path.exists(self.test_dir):
+            os.makedirs(self.test_dir)
+
+        # Set known values in all simulated hardware files
+        with open(self.test_dir + "/run", "w") as f:
+            f.write("0\n")
+        with open(self.test_dir + "/duty_ns", "w") as f:
+            f.write("0\n")
+        with open(self.test_dir + "/period_ns", "w") as f:
+            f.write("1000\n")
+        with open(self.test_dir + "/polarity", "w") as f:
+            f.write("0\n")
+
+        # Build motor in testing mode
         self.motor = m_mod.Motor(self.m_num, testing=True)
         logger.debug("Built {}".format(self.motor))
 

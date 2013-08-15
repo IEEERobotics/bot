@@ -87,7 +87,6 @@ def get_logger(prefix=None):
     # Don't run setup if logger has been built (would logroll early)
     global _logger
     if _logger is not None:
-        _logger.debug("Logger already exists")
         return _logger
 
     # Get config so that path to log file can be read.

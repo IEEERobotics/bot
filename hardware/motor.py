@@ -24,6 +24,8 @@ class Motor(object):
 
         if testing:
             self.logger.debug("TEST MODE: Motor {}".format(num))
+
+            # Load system configuration
             config = lib.load_config()
 
             # Get dir of simulated hardware files from config
@@ -35,16 +37,10 @@ class Motor(object):
             self.logger.debug("Built {}".format(str(self.pwm)))
         else:
             self.logger.debug("EMBEDDED MODE: Motor {}".format(num))
+
             # Build PWM object for BBB interaction
             self.pwm = pwm_mod.PWM(num)
             self.logger.debug("Built {}".format(str(self.pwm)))
-
-        # Set motor speed/direction to current value of PWM duty/polarity
-        self._speed = self.pwm.duty
-        self.logger.debug("Motor {} speed: {}".format(num, self._speed))
-        self._direction = self.pwm.polarity
-        self.logger.debug("Motor {} direction: {}".format(num,
-                                                          self._direction))
 
     @property
     def speed(self):

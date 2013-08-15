@@ -25,9 +25,6 @@ class Solenoid(object):
         # Store ID number of solenoid
         self.num = num
 
-        # Init state value to track GPIO/solenoid state
-        self._state = None
-
         if testing:
             self.logger.debug("TEST MODE: Solenoid {}".format(num))
             config = lib.load_config()

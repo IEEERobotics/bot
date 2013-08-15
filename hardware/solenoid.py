@@ -11,7 +11,7 @@ RETRACTED = 1
 class Solenoid(object):
     """Class for abstracting solenoid settings."""
 
-    def __init__(self, num):
+    def __init__(self, num, testing=False):
         """Setup logger and GPIO interface.
 
         :param num: ID number of this solenoid. Also defines GPIO number.
@@ -28,9 +28,22 @@ class Solenoid(object):
         # Init state value to track GPIO/solenoid state
         self._state = None
 
-        # Build GPIO object for BBB interaction
-        self.gpio = gpio_mod.GPIO(num)
-        self.logger.debug("Built {}".format(str(self.gpio)))
+        if testing:
+            self.logger.debug("TEST MODE: Solenoid {}".format(num))
+            config = lib.load_config()
+
+            # Get dir of simulated hardware files from config
+            test_dir = lib.prepend_prefix(config["test_gpio_base_dir"])
+            self.logger.debug("Test GPIO base dir: {}".format(test_dir))
+
+            # Build GPIO object for BBB interaction, provide test dir
+            self.gpio = gpio_mod.GPIO(num, test_dir)
+            self.logger.debug("Built {}".format(str(self.gpio)))
+        else:
+            self.logger.debug("EMBEDDED MODE: Solenoid {}".format(num))
+            # Build GPIO object for BBB interaction
+            self.gpio = gpio_mod.GPIO(num)
+            self.logger.debug("Built {}".format(str(self.gpio)))
 
         # Set GPIO to output signal
         self.gpio.output()
@@ -49,8 +62,8 @@ class Solenoid(object):
         """Getter for state of the solenoid (extended/retracted)."""
         val = self.gpio.value
         if val == RETRACTED:
-            return = "retracted"
+            return "retracted"
         elif val == EXTENDED:
-            return = "extended"
+            return "extended"
         else:
             self.logger.error("Invalid GPIO state: {}".format(val))

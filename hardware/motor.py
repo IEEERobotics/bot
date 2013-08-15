@@ -28,7 +28,7 @@ class Motor(object):
 
             # Get dir of simulated hardware files from config
             test_base_dir = lib.prepend_prefix(config["test_base_dir"])
-            self.logger.debug("Test HW dir: {}".format(test_base_dir))
+            self.logger.debug("Test HW base dir: {}".format(test_base_dir))
 
             # Build PWM object for BBB interaction, provide test dir
             self.pwm = pwm_mod.PWM(num, test_base_dir)
@@ -82,7 +82,11 @@ class Motor(object):
         :type direction: int
 
         """
-        if direction != 0 and direction != 1:
+        if direction == "foward":
+            direction = 1
+        elif direction == "reverse":
+            direction = 0
+        elif direction != 0 and direction != 1:
             self.logger.warn("Invalid dir {}, no update.".format(direction))
             return
 

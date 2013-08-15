@@ -47,6 +47,15 @@ If you really care, give [Google's Shell Style Guide][1] a read. Don't be too pe
 
 Use [Sphinx-style docstrings]. You may also find [this][2] docstring and Sphinx information helpful.
 
+## Testing
+
+Create unit tests for any code you write. Be sure to run all tests before committing, to validate that you haven't broken anything.
+
+While in the root directory of the project, run our automated tests with:
+
+```bash
+python -m unittest discover
+```
 
 [pybbb]: https://github.com/NCSUhardware/pybbb
 [git-scm section on submodules]: http://git-scm.com/book/en/Git-Tools-Submodules#Cloning-a-Project-with-Submodules

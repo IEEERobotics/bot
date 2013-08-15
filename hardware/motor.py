@@ -79,7 +79,7 @@ class Motor(object):
         :type direction: int
 
         """
-        if direction == "foward":
+        if direction == "forward":
             direction = 1
         elif direction == "reverse":
             direction = 0

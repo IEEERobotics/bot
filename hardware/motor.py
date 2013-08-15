@@ -13,11 +13,12 @@ class Motor(object):
 
         :param num: ID number of this motor. Also defines PWM number.
         :type num: int
+        :param testing: If True, use test hw dir given by config, else real hw.
+        :type testing: boolean
 
         """
         # Get and store logger object
         self.logger = lib.get_logger()
-        self.logger.debug("Motor {} has logger".format(num))
 
         # Store ID number of motor
         self.num = num
@@ -45,7 +46,7 @@ class Motor(object):
     @property
     def speed(self):
         """Getter for motor's speed as % of max (same as duty cycle)."""
-        return self.pwm.duty
+        return int((self.pwm.duty / float(self.pwm.period)) * 100)
 
     @speed.setter
     def speed(self, speed):
@@ -62,7 +63,7 @@ class Motor(object):
             self.logger.warn("Invalid speed {}, using 0.".format(speed))
             speed = 0
 
-        self.pwm.duty = speed
+        self.pwm.duty = int((speed / 100.) * self.pwm.period)
         self.logger.debug("Set motor {} speed to {}".format(self.num, speed))
 
     @property

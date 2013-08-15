@@ -54,14 +54,15 @@ class TestState(unittest.TestCase):
             state = random.choice(["extended", "retracted"])
             if state == "extended":
                 self.solenoid.extend()
-                with open(config["test_gpio_base_dir"] + str(self.s_mod) + 
+                with open(config["test_gpio_base_dir"] + str(self.s_mod) +
                                                     '/value', 'r') as f:
                     assert int(f.read()) == 0
             else:
                 self.solenoid.retract()
-                with open(config["test_gpio_base_dir"] + str(self.s_mod) + 
+                with open(config["test_gpio_base_dir"] + str(self.s_mod) +
                                                     '/value', 'r') as f:
                     assert int(f.read()) == 1
+
 
 class TestDirection(unittest.TestCase):
     """Test the direction setting of the solenoid's GPIO pin."""
@@ -75,7 +76,6 @@ class TestDirection(unittest.TestCase):
     def test_direction(self):
         """Confirm that the solenoid's GPIO is set to output."""
         config = lib.load_config()
-        with open(config["test_gpio_base_dir"] + str(self.s_mod) + 
+        with open(config["test_gpio_base_dir"] + str(self.s_mod) +
                                                  '/direction', 'r') as f:
             assert f.read() == "out\n"
-

@@ -38,9 +38,7 @@ class MechDriver(driver.Driver):
         self.logger.debug("IO write: motor: {}, ds: {}".format(motor, ds))
 
     def rotate(self, rotate_speed):
-        """Pass rotation speed as -100 to 100 (positive is clockwise).
-        
-        """
+        """Pass rotation speed as -100 to 100 (positive is clockwise)."""
         self.logger.debug("rotate speed: {}".format(rotate_speed))
 
         # Determine direction.

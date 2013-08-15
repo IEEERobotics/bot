@@ -43,7 +43,7 @@ class TestSpeed(unittest.TestCase):
 
     def test_accel(self):
         """Test a series of increasing speeds."""
-        for speed in range (0, 100, 5):
+        for speed in range(0, 100, 5):
             self.motor.speed = speed
             assert self.motor.speed == speed
 
@@ -54,7 +54,7 @@ class TestSpeed(unittest.TestCase):
         for i in range(10):
             cur_speed = randint(0, 100)
             self.motor.speed = cur_speed
-            with open(config["test_pwm_base_dir"] + str(self.m_num) + 
+            with open(config["test_pwm_base_dir"] + str(self.m_num) +
                                                 '/duty_ns', 'r') as f:
                 assert int(f.read()) == cur_speed
 

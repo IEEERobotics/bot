@@ -1,3 +1,4 @@
+"""Test cases for solenoid abstraction class."""
 import sys
 import os
 import unittest
@@ -20,13 +21,13 @@ class TestState(unittest.TestCase):
     """Test extending and retracting a solenoid"""
 
     def setUp(self):
-        """Build solenoid object."""
+        """Setup test hardware files and build solenoid object."""
         # ID number of solenoid
         self.s_num = 0
 
         # Load config
-        self.config = lib.load_config()
-        self.test_dir = self.config["test_gpio_base_dir"] + str(self.s_num)
+        config = lib.load_config()
+        self.test_dir = config["test_gpio_base_dir"] + str(self.s_num)
 
         # Create test directory if it doesn't exist
         if not os.path.exists(self.test_dir):
@@ -40,7 +41,6 @@ class TestState(unittest.TestCase):
 
         # Build solenoid in testing mode
         self.solenoid = s_mod.Solenoid(self.s_num, testing=True)
-        logger.debug("Built {}".format(self.solenoid))
 
     def test_extended(self):
         """Test extending solenoid."""
@@ -54,7 +54,7 @@ class TestState(unittest.TestCase):
 
     def test_series(self):
         """Randomly extend and retract the solenoid."""
-        for i in range(25):
+        for i in range(100):
             state = random.choice(["extended", "retracted"])
             if state == "extended":
                 self.solenoid.extend()
@@ -65,19 +65,15 @@ class TestState(unittest.TestCase):
 
     def test_manually_confirm(self):
         """Test extending and retracting, read the simulated HW to confirm."""
-        config = lib.load_config()
-
-        for i in range(10):
+        for i in range(100):
             state = random.choice(["extended", "retracted"])
             if state == "extended":
                 self.solenoid.extend()
-                with open(config["test_gpio_base_dir"] + str(self.s_num) +
-                                                    '/value', 'r') as f:
+                with open(self.test_dir + '/value', 'r') as f:
                     assert int(f.read()) == 0
             else:
                 self.solenoid.retract()
-                with open(config["test_gpio_base_dir"] + str(self.s_num) +
-                                                    '/value', 'r') as f:
+                with open(self.test_dir + '/value', 'r') as f:
                     assert int(f.read()) == 1
 
 
@@ -85,13 +81,13 @@ class TestDirection(unittest.TestCase):
     """Test the direction setting of the solenoid's GPIO pin."""
 
     def setUp(self):
-        """Build solenoid object."""
+        """Setup test hardware files and build solenoid object."""
         # ID number of solenoid
         self.s_num = 0
 
         # Load config
-        self.config = lib.load_config()
-        self.test_dir = self.config["test_gpio_base_dir"] + str(self.s_num)
+        config = lib.load_config()
+        self.test_dir = config["test_gpio_base_dir"] + str(self.s_num)
 
         # Create test directory if it doesn't exist
         if not os.path.exists(self.test_dir):
@@ -105,11 +101,8 @@ class TestDirection(unittest.TestCase):
 
         # Build solenoid in testing mode
         self.solenoid = s_mod.Solenoid(self.s_num, testing=True)
-        logger.debug("Built {}".format(self.solenoid))
 
     def test_direction(self):
         """Confirm that the solenoid's GPIO is set to output."""
-        config = lib.load_config()
-        with open(config["test_gpio_base_dir"] + str(self.s_num) +
-                                                 '/direction', 'r') as f:
+        with open(self.test_dir + '/direction', 'r') as f:
             assert f.read() == "out\n"

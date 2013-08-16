@@ -1,3 +1,4 @@
+"""Test cases for servo abstraction class."""
 import sys
 import os
 import unittest
@@ -20,13 +21,13 @@ class TestPosition(unittest.TestCase):
     """Test setting and checking the position of a servo."""
 
     def setUp(self):
-        """Build servo object."""
+        """Setup test hardware files and build servo object."""
         # ID number of servo
         self.s_num = 0
 
         # Load config
-        self.config = lib.load_config()
-        self.test_dir = self.config["test_pwm_base_dir"] + str(self.s_num)
+        config = lib.load_config()
+        self.test_dir = config["test_pwm_base_dir"] + str(self.s_num)
 
         # Create test directory if it doesn't exist
         if not os.path.exists(self.test_dir):
@@ -36,15 +37,14 @@ class TestPosition(unittest.TestCase):
         with open(self.test_dir + "/run", "w") as f:
             f.write("0\n")
         with open(self.test_dir + "/duty_ns", "w") as f:
-            f.write("0\n")
+            f.write("1500\n")
         with open(self.test_dir + "/period_ns", "w") as f:
-            f.write("1000\n")
+            f.write("20000\n")
         with open(self.test_dir + "/polarity", "w") as f:
             f.write("0\n")
 
         # Build servo in testing mode
         self.servo = s_mod.Servo(self.s_num, testing=True)
-        logger.debug("Built {}".format(self.servo))
 
     def test_0(self):
         """Test setting servo position to max in zero direction."""
@@ -67,20 +67,19 @@ class TestPosition(unittest.TestCase):
             self.servo.position = position
             assert self.servo.position == position, self.servo.position
 
-    @unittest.expectedFailure
     def test_manually_confirm(self):
         """Test a series of random positions, read simulated HW to confirm."""
-        for i in range(1000):
-            cur_position = randint(0, 100)
-            logger.debug("Testing position {}".format(cur_position))
-            self.servo.position = cur_position
+        for i in range(100):
+            test_position = randint(0, 100)
+            self.servo.position = test_position
             with open(self.test_dir + "/duty_ns", "r") as f:
+                # Duty is read like this by PWM getter
                 duty = int(f.read())
-                read_position = int(((duty - 1000) / 1000.) * 100)
-                logger.debug("Read position: {}".format(read_position))
-                assert read_position == cur_position, "{} != {}".format(
+                # Position is derived this way in position getter
+                read_position = int(round(((duty - 1000) / 1000.) * 100))
+                assert read_position == test_position, "{} != {}".format(
                                                         read_position,
-                                                        cur_position)
+                                                        test_position)
 
     def test_over_max(self):
         """Test position over max position. Should use maximum."""

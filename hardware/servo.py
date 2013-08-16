@@ -13,7 +13,7 @@ class Servo(object):
 
         :param num: ID number of this servo. Also defines PWM number.
         :type num: int
-        :param testing: If True, use test hw dir given by config, else real hw.
+        :param testing: If True, use test HW dir given by config, else real HW.
         :type testing: boolean
 
         """
@@ -24,7 +24,9 @@ class Servo(object):
         self.num = num
 
         if testing:
-            self.logger.debug("TEST MODE: Servo {}".format(num))
+            self.logger.debug("TEST MODE: Servo {}".format(self.num))
+
+            # Load config
             config = lib.load_config()
 
             # Get dir of simulated hardware files from config
@@ -32,13 +34,14 @@ class Servo(object):
             self.logger.debug("Test HW base dir: {}".format(test_dir))
 
             # Build PWM object for BBB interaction, provide test dir
-            self.pwm = pwm_mod.PWM(num, test_dir)
-            self.logger.debug("Built {}".format(str(self.pwm)))
+            self.pwm = pwm_mod.PWM(self.num, test_dir)
+            self.logger.debug("Built {}".format(self.pwm))
         else:
-            self.logger.debug("EMBEDDED MODE: Servo {}".format(num))
+            self.logger.debug("EMBEDDED MODE: Servo {}".format(self.num))
+
             # Build PWM object for BBB interaction
-            self.pwm = pwm_mod.PWM(num)
-            self.logger.debug("Built {}".format(str(self.pwm)))
+            self.pwm = pwm_mod.PWM(self.num)
+            self.logger.debug("Built {}".format(self.pwm))
 
         # Set servo to use a 20000ns period TODO(dfarrell07): Confirm this
         self.pwm.period = 20000
@@ -48,9 +51,14 @@ class Servo(object):
         self.logger.debug("Setup {}".format(self))
 
     def __str__(self):
-        return "Servo #{}: pos:{} duty/period: {}/{} pol:{}".format(self.num, 
+        """Override string representation of this object for readability.
+
+        :returns: Human readable representation of this object.
+
+        """
+        return "Servo #{}: pos:{} duty/period: {}/{} pol:{}".format(self.num,
                                                              self.position,
-                                                             self.pwm.duty, 
+                                                             self.pwm.duty,
                                                              self.pwm.period,
                                                              self.pwm.polarity)
 
@@ -61,8 +69,10 @@ class Servo(object):
         position = ((duty - 1000) / 1000) * 100 where 1000 <= duty <= 2000
         and position is a percent of the possible movement range.
 
+        :returns: Position of servo. 0 is fully one direction, 100 the other.
+
         """
-        return int(((self.pwm.duty - 1000) / 1000.) * 100)
+        return int(round(((self.pwm.duty - 1000) / 1000.) * 100))
 
     @position.setter
     def position(self, position):
@@ -83,5 +93,5 @@ class Servo(object):
             position = 0
 
         # Set duty
-        self.pwm.duty = int(1000 + 1000 * (position / 100.))
+        self.pwm.duty = int(round(1000 + 1000 * (position / 100.)))
         self.logger.debug("Updated {}".format(self))

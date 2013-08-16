@@ -42,17 +42,19 @@ class MechDriver(driver.Driver):
         self.logger.debug("rotate speed: {}".format(rotate_speed))
 
         # Determine direction.
+        # These values are based on the file on
+        # data in MecanumWheelDirection.png
         if rotate_speed > 0:
-            front_left_forward = True
-            front_right_forward = False
-            back_left_forward = True
-            back_right_foward = False
-        else:
-            rotate_speed = fabs(rotate_speed)
             front_left_forward = False
             front_right_forward = True
             back_left_forward = False
             back_right_foward = True
+        else:
+            rotate_speed = fabs(rotate_speed)
+            front_left_forward = True
+            front_right_forward = False
+            back_left_forward = True
+            back_right_foward = False
 
         # Check for invalid value.
         if rotate_speed > 100:
@@ -138,7 +140,7 @@ class MechDriver(driver.Driver):
             back_right_foward = False
 
         # Write to IO pins.
-        self.iowrite("front_left", front_left_ds)
-        self.iowrite("front_right", front_right_ds)
-        self.iowrite("back_left", back_left_ds)
-        self.iowrite("back_right", back_right_ds)
+        self.iowrite("front_left", front_left_ds, front_left_forward)
+        self.iowrite("front_right", front_right_ds, front_right_forward)
+        self.iowrite("back_left", back_left_ds, back_left_forward)
+        self.iowrite("back_right", back_right_ds, back_right_forward)

@@ -45,13 +45,31 @@ If you really care, give [Google's Shell Style Guide][1] a read. Don't be too pe
 
 ### Docstring Style
 
-Use [Sphinx-style docstrings]. You may also find [this][2] docstring and Sphinx information helpful.
+For general docstring style guidence, see [PEP257]. Specialize your docstrings for Sphinx, as described [here][2]. You may also find [this][3] docstring and Sphinx information helpful.
 
+## Testing
+
+Create unit tests for any code you write. Be sure to run all tests before committing, to validate that you haven't broken anything.
+
+While in the root directory of the project, run our automated tests with:
+
+```bash
+python -m unittest discover
+```
+
+To run a specific test case, use this syntax (from the root of the repo):
+
+```bash
+python -m unittest hardware.tests.test_motor.TestSpeed.test_accel
+```
+
+Where `hardware.tests.test_motor.TestSpeed.test_accel` is of the form package.package.module.class.method. Modify that structure to fit your current working directory and/or the path to the test you want to run.
 
 [pybbb]: https://github.com/NCSUhardware/pybbb
 [git-scm section on submodules]: http://git-scm.com/book/en/Git-Tools-Submodules#Cloning-a-Project-with-Submodules
 [PEP8]: http://www.python.org/dev/peps/pep-0008/
 [PEP7]: http://www.python.org/dev/peps/pep-0007/
 [1]: https://google-styleguide.googlecode.com/svn/trunk/shell.xml
-[Sphinx-style docstrings]: http://pythonhosted.org/an_example_pypi_project/sphinx.html#full-code-example
-[2]: http://stackoverflow.com/questions/5334531/python-documentation-standard-for-docstring
+[2]: http://pythonhosted.org/an_example_pypi_project/sphinx.html#full-code-example
+[3]: http://stackoverflow.com/questions/5334531/python-documentation-standard-for-docstring
+[PEP257]: http://www.python.org/dev/peps/pep-0257/

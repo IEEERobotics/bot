@@ -16,6 +16,8 @@ class Solenoid(object):
 
         :param num: ID number of this solenoid. Also defines GPIO number.
         :type num: int
+        :param testing: If True, use test hw dir given by config, else real hw.
+        :type testing: boolean
 
         """
         # Get and store logger object
@@ -27,6 +29,8 @@ class Solenoid(object):
 
         if testing:
             self.logger.debug("TEST MODE: Solenoid {}".format(num))
+
+            # Load system configuration
             config = lib.load_config()
 
             # Get dir of simulated hardware files from config
@@ -38,6 +42,7 @@ class Solenoid(object):
             self.logger.debug("Built {}".format(str(self.gpio)))
         else:
             self.logger.debug("EMBEDDED MODE: Solenoid {}".format(num))
+
             # Build GPIO object for BBB interaction
             self.gpio = gpio_mod.GPIO(num)
             self.logger.debug("Built {}".format(str(self.gpio)))
@@ -45,6 +50,9 @@ class Solenoid(object):
         # Set GPIO to output signal
         self.gpio.output()
         self.logger.debug("{} set to output".format(str(self.gpio)))
+
+    def __str__(self):
+        return "Solenoid #{}: {}".format(self.num, self.state)
 
     def extend(self):
         """Set solenoid to extended position."""

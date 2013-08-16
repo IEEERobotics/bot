@@ -43,6 +43,11 @@ class Motor(object):
             self.pwm = pwm_mod.PWM(num)
             self.logger.debug("Built {}".format(str(self.pwm)))
 
+    def __str__(self):
+        return "Motor #{}: speed:{} direction:{}".format(self.num, 
+                                                         self.speed,
+                                                         self.direction)
+
     @property
     def speed(self):
         """Getter for motor's speed as % of max (same as duty cycle)."""

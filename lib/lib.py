@@ -37,8 +37,8 @@ def load_config(config_file="config.yaml"):
     qual_config_file = prepend_prefix(config_file)
 
     # Open and read config file
-    config_fd = open(qual_config_file)
-    return yaml.load(config_fd)
+    with open(qual_config_file) as config_fd:
+        return yaml.load(config_fd)
 
 
 def load_strategy(strat_file):
@@ -52,23 +52,27 @@ def load_strategy(strat_file):
     qual_strat_file = prepend_prefix(strat_file)
 
     # Open and read strategy file
-    strat_fd = open(qual_strat_file)
-    return yaml.load(strat_fd)
+    with open(qual_strat_file) as strat_fd:
+        return yaml.load(strat_fd)
 
 
-def load_targeting(targ_file):
+def load_targeting(targ_file=None):
     """Load the YAML targeting info for each possible block position.
 
     :param targ_file: Name of targeting file to load.
     :returns: Dict description of targeting information for each block.
 
     """
+    if targ_file is None:
+        config = load_config()
+        targ_file = config["targeting"]
+
     # Build valid path from CWD to targeting file
     qual_targ_file = prepend_prefix(targ_file)
 
     # Open and read targeting file
-    targ_fd = open(qual_targ_file)
-    return yaml.load(targ_fd)
+    with open(qual_targ_file) as targ_fd:
+        return yaml.load(targ_fd)
 
 
 def set_testing(state, config_file="config.yaml"):

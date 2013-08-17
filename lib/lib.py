@@ -33,7 +33,10 @@ def load_config(config_file="config.yaml"):
     :returns: Dict description of configuration for this round.
 
     """
+    # Build valid path from CWD to config file
     qual_config_file = prepend_prefix(config_file)
+
+    # Open and read config file
     config_fd = open(qual_config_file)
     return yaml.load(config_fd)
 
@@ -66,6 +69,27 @@ def load_targeting(targ_file):
     # Open and read targeting file
     targ_fd = open(qual_targ_file)
     return yaml.load(targ_fd)
+
+
+def set_testing(state, config_file="config.yaml"):
+    # Confirm that state is a boolean value
+    if type(state) != bool:
+        print "ERROR: State should be a boolean, not updating."
+        return
+
+    # Build valid path from CWD to config file
+    qual_config_file = prepend_prefix(config_file)
+
+    # Open and read config file
+    with open(qual_config_file, "r") as config_fd:
+        config = yaml.load(config_fd)
+
+    # Update config file with new state
+    config["testing"] = state
+
+    # Write new config
+    with open(qual_config_file, "w") as config_fd:
+        yaml.dump(config, config_fd)
 
 
 def get_logger(prefix=None):

@@ -11,7 +11,7 @@ REVERSE = 0
 class Motor(object):
     """Class for abstracting motor settings."""
 
-    def __init__(self, num, testing=False):
+    def __init__(self, num):
         """Setup logger and PWM interface.
 
         :param num: ID number of this motor. Also defines PWM number.
@@ -26,11 +26,11 @@ class Motor(object):
         # Store ID number of motor
         self.num = num
 
-        if testing:
-            self.logger.debug("TEST MODE: Motor {}".format(self.num))
+        # Load system configuration
+        config = lib.load_config()
 
-            # Load system configuration
-            config = lib.load_config()
+        if config["testing"]:
+            self.logger.debug("TEST MODE: Motor {}".format(self.num))
 
             # Get dir of simulated hardware files from config
             test_dir = lib.prepend_prefix(config["test_pwm_base_dir"])

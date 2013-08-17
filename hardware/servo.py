@@ -8,7 +8,7 @@ import lib.lib as lib
 class Servo(object):
     """Class for abstracting servo settings."""
 
-    def __init__(self, num, testing=False):
+    def __init__(self, num):
         """Setup logger and PWM interface.
 
         :param num: ID number of this servo. Also defines PWM number.
@@ -23,11 +23,11 @@ class Servo(object):
         # Store ID number of servo
         self.num = num
 
-        if testing:
-            self.logger.debug("TEST MODE: Servo {}".format(self.num))
+        # Load config
+        config = lib.load_config()
 
-            # Load config
-            config = lib.load_config()
+        if config["testing"]:
+            self.logger.debug("TEST MODE: Servo {}".format(self.num))
 
             # Get dir of simulated hardware files from config
             test_dir = lib.prepend_prefix(config["test_pwm_base_dir"])

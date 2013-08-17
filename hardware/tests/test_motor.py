@@ -29,6 +29,9 @@ class TestSpeed(unittest.TestCase):
         config = lib.load_config()
         self.test_dir = config["test_pwm_base_dir"] + str(self.m_num)
 
+        # Set testing flag in config
+        lib.set_testing(True)
+
         # Create test directory if it doesn't exist
         if not os.path.exists(self.test_dir):
             os.makedirs(self.test_dir)
@@ -44,7 +47,11 @@ class TestSpeed(unittest.TestCase):
             f.write("0\n")
 
         # Build motor in testing mode
-        self.motor = m_mod.Motor(self.m_num, testing=True)
+        self.motor = m_mod.Motor(self.m_num)
+
+    def tearDown(self):
+        # Reset testing flag in config to False
+        lib.set_testing(False)
 
     def test_off(self):
         """Test turning the motor off."""
@@ -103,6 +110,9 @@ class TestDirection(unittest.TestCase):
         config = lib.load_config()
         self.test_dir = config["test_pwm_base_dir"] + str(self.m_num)
 
+        # Set testing flag in config
+        lib.set_testing(True)
+
         # Create test directory if it doesn't exist
         if not os.path.exists(self.test_dir):
             os.makedirs(self.test_dir)
@@ -118,7 +128,11 @@ class TestDirection(unittest.TestCase):
             f.write("0\n")
 
         # Build motor in testing mode
-        self.motor = m_mod.Motor(self.m_num, testing=True)
+        self.motor = m_mod.Motor(self.m_num)
+
+    def tearDown(self):
+        # Reset testing flag in config to False
+        lib.set_testing(False)
 
     def test_forward(self):
         """Test motor in forward direction using text and int syntax."""

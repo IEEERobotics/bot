@@ -29,6 +29,9 @@ class TestPosition(unittest.TestCase):
         config = lib.load_config()
         self.test_dir = config["test_pwm_base_dir"] + str(self.s_num)
 
+        # Set testing flag in config
+        lib.set_testing(True)
+
         # Create test directory if it doesn't exist
         if not os.path.exists(self.test_dir):
             os.makedirs(self.test_dir)
@@ -44,7 +47,11 @@ class TestPosition(unittest.TestCase):
             f.write("0\n")
 
         # Build servo in testing mode
-        self.servo = s_mod.Servo(self.s_num, testing=True)
+        self.servo = s_mod.Servo(self.s_num)
+
+    def tearDown(self):
+        # Reset testing flag in config to False
+        lib.set_testing(False)
 
     def test_0(self):
         """Test setting servo position to max in zero direction."""

@@ -29,6 +29,9 @@ class TestState(unittest.TestCase):
         config = lib.load_config()
         self.test_dir = config["test_gpio_base_dir"] + str(self.s_num)
 
+        # Set testing flag in config
+        lib.set_testing(True)
+
         # Create test directory if it doesn't exist
         if not os.path.exists(self.test_dir):
             os.makedirs(self.test_dir)
@@ -40,7 +43,11 @@ class TestState(unittest.TestCase):
             f.write("out\n")
 
         # Build solenoid in testing mode
-        self.solenoid = s_mod.Solenoid(self.s_num, testing=True)
+        self.solenoid = s_mod.Solenoid(self.s_num)
+
+    def tearDown(self):
+        # Reset testing flag in config to False
+        lib.set_testing(False)
 
     def test_extended(self):
         """Test extending solenoid."""
@@ -89,6 +96,9 @@ class TestDirection(unittest.TestCase):
         config = lib.load_config()
         self.test_dir = config["test_gpio_base_dir"] + str(self.s_num)
 
+        # Set testing flag in config
+        lib.set_testing(True)
+
         # Create test directory if it doesn't exist
         if not os.path.exists(self.test_dir):
             os.makedirs(self.test_dir)
@@ -100,7 +110,11 @@ class TestDirection(unittest.TestCase):
             f.write("out\n")
 
         # Build solenoid in testing mode
-        self.solenoid = s_mod.Solenoid(self.s_num, testing=True)
+        self.solenoid = s_mod.Solenoid(self.s_num)
+
+    def tearDown(self):
+        # Reset testing flag in config to False
+        lib.set_testing(False)
 
     def test_direction(self):
         """Confirm that the solenoid's GPIO is set to output."""

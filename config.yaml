@@ -1,5 +1,3 @@
-strategy: planner/strategies/strategy0.yaml
-log_file: logs/bot.log
-targeting: gunner/targeting/targeting0.yaml
-test_pwm_base_dir: simulator/pins/pwm/pwm
-test_gpio_base_dir: simulator/pins/gpio/gpio
+{log_file: logs/bot.log, strategy: planner/strategies/strategy0.yaml, targeting: gunner/targeting/targeting0.yaml,
+  test_gpio_base_dir: simulator/pins/gpio/gpio, test_pwm_base_dir: simulator/pins/pwm/pwm,
+  testing: false}

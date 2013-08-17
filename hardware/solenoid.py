@@ -9,9 +9,10 @@ RETRACTED = 1
 
 
 class Solenoid(object):
+
     """Class for abstracting solenoid settings."""
 
-    def __init__(self, num, testing=False):
+    def __init__(self, num):
         """Setup logger and GPIO interface.
 
         :param num: ID number of this solenoid. Also defines GPIO number.
@@ -26,11 +27,11 @@ class Solenoid(object):
         # Store ID number of solenoid
         self.num = num
 
-        if testing:
-            self.logger.debug("TEST MODE: Solenoid {}".format(self.num))
+        # Load system configuration
+        config = lib.load_config()
 
-            # Load system configuration
-            config = lib.load_config()
+        if config["testing"]:
+            self.logger.debug("TEST MODE: Solenoid {}".format(self.num))
 
             # Get dir of simulated hardware files from config
             test_dir = lib.prepend_prefix(config["test_gpio_base_dir"])

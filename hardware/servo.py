@@ -64,34 +64,36 @@ class Servo(object):
 
     @property
     def position(self):
-        """Getter for servo's position. 0% is fully one dir, 100% the other.
+        """Getter for servo's position as an angle.
 
-        position = ((duty - 1000) / 1000) * 100 where 1000 <= duty <= 2000
-        and position is a percent of the possible movement range.
+        position = ((duty - 1000) / 1000) * 180 where 1000 <= duty <= 2000
 
-        :returns: Position of servo. 0 is fully one direction, 100 the other.
+        TODO(dfarrell07): This needs to be calibrated.
+
+        :returns: Position of servo as an angle 0-180.
 
         """
-        return int(round(((self.pwm.duty - 1000) / 1000.) * 100))
+        return int(round(((self.pwm.duty - 1000) / 1000.) * 180))
 
     @position.setter
     def position(self, position):
-        """Setter for servo's position. 0% is fully one dir, 100% the other.
+        """Setter for servo's position as an angle.
 
-        duty = 1000 + 1000 * (position / 100) where position is a percent
-        of the possible movement range.
+        duty = 1000 + 1000 * (position / 180)
 
-        :param position: Position to move the servo to (50 being the middle).
+        TODO(dfarrell07): This needs to be calibrated.
+
+        :param position: Position to move the servo to (0-180 degrees).
         :type position: int
 
         """
-        if position > 100:
-            self.logger.warn("Invalid pos {}, using 100.".format(position))
-            position = 100
+        if position > 180:
+            self.logger.warn("Invalid pos {}, using 180.".format(position))
+            position = 180
         elif position < 0:
             self.logger.warn("Invalid position {}, using 0.".format(position))
             position = 0
 
         # Set duty
-        self.pwm.duty = int(round(1000 + 1000 * (position / 100.)))
+        self.pwm.duty = int(round(1000 + 1000 * (position / 180.)))
         self.logger.debug("Updated {}".format(self))

@@ -58,40 +58,40 @@ class TestPosition(unittest.TestCase):
         self.servo.position = 0
         assert self.servo.position == 0, self.servo.position
 
-    def test_100(self):
-        """Test setting servo position to max in 100 direction."""
-        self.servo.position = 100
-        assert self.servo.position == 100, self.servo.position
+    def test_180(self):
+        """Test setting servo position to max in 180 direction."""
+        self.servo.position = 180
+        assert self.servo.position == 180, self.servo.position
 
     def test_middle(self):
         """Test the servo at middle position."""
-        self.servo.position = 50
-        assert self.servo.position == 50, self.servo.position
+        self.servo.position = 90
+        assert self.servo.position == 90, self.servo.position
 
     def test_series(self):
         """Test a series of positions."""
-        for position in range(0, 100, 5):
+        for position in range(0, 180, 5):
             self.servo.position = position
             assert self.servo.position == position, self.servo.position
 
     def test_manually_confirm(self):
         """Test a series of random positions, read simulated HW to confirm."""
         for i in range(100):
-            test_position = randint(0, 100)
+            test_position = randint(0, 180)
             self.servo.position = test_position
             with open(self.test_dir + "/duty_ns", "r") as f:
                 # Duty is read like this by PWM getter
                 duty = int(f.read())
                 # Position is derived this way in position getter
-                read_position = int(round(((duty - 1000) / 1000.) * 100))
+                read_position = int(round(((duty - 1000) / 1000.) * 180))
                 assert read_position == test_position, "{} != {}".format(
                                                         read_position,
                                                         test_position)
 
     def test_over_max(self):
         """Test position over max position. Should use maximum."""
-        self.servo.position = 101
-        assert self.servo.position == 100, \
+        self.servo.position = 181
+        assert self.servo.position == 180, \
                                       "Actual: {}".format(self.servo.position)
 
     def test_under_min(self):

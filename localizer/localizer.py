@@ -28,4 +28,4 @@ class Localizer(object):
         :returns: The position of the block we're sitting on.
 
         """
-        return {"row": "first", "slot": "first"}
+        return {"row": 0, "slot": 0}

@@ -6,6 +6,7 @@ import hardware.servo as servo
 SERVO_X_ID = 0
 SERVO_Y_ID = 1
 
+
 class Turret(object):
 
     """Abstract x and y servos into a turret."""
@@ -16,14 +17,14 @@ class Turret(object):
         self.logger = lib.get_logger()
 
         # Build and store abstraction of servos for x and y axis movement
-        self.servos = {"servo_x": servo.Servo(SERVO_X_ID), 
+        self.servos = {"servo_x": servo.Servo(SERVO_X_ID),
                        "servo_y": servo.Servo(SERVO_Y_ID)
                         }
 
     def __str__(self):
         """Represent turret in a human-readable way."""
-        return "Turret: servo_x: {}, servo_y: {}".format(self.servos["servo_x"],
-                                                         self.servos["servo_y"])
+        return "Turret: servo_x:{}, servo_y:{}".format(self.servos["servo_x"],
+                                                       self.servos["servo_y"])
 
     @property
     def x_angle(self):

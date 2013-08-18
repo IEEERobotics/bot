@@ -18,6 +18,7 @@ logger = lib.get_logger()
 
 
 class TestState(unittest.TestCase):
+
     """Test extending and retracting a solenoid"""
 
     def setUp(self):
@@ -86,6 +87,7 @@ class TestState(unittest.TestCase):
 
 
 class TestDirection(unittest.TestCase):
+
     """Test the direction setting of the solenoid's GPIO pin."""
 
     def setUp(self):

@@ -18,6 +18,7 @@ logger = lib.get_logger()
 
 
 class TestAngle(unittest.TestCase):
+
     """Test setting and checking the X and Y angles of the turret."""
 
     def setUp(self):
@@ -34,7 +35,7 @@ class TestAngle(unittest.TestCase):
 
         # Collect simulated hardware test directories
         self.test_dirs = {
-            "dir_x": config["test_pwm_base_dir"] + str(t_mod.SERVO_X_ID), 
+            "dir_x": config["test_pwm_base_dir"] + str(t_mod.SERVO_X_ID),
             "dir_y": config["test_pwm_base_dir"] + str(t_mod.SERVO_Y_ID)
             }
 
@@ -115,7 +116,7 @@ class TestAngle(unittest.TestCase):
         """Test a series of random angles, read the simulated HW to confirm."""
         for i in range(10):
             test_x_angle = randint(0, 180)
-            self.turret.x_angle= test_x_angle
+            self.turret.x_angle = test_x_angle
             with open(self.test_dirs["dir_x"] + '/duty_ns', 'r') as f:
                 # Duty is read like this by PWM getter
                 duty = int(f.read())
@@ -125,7 +126,7 @@ class TestAngle(unittest.TestCase):
                                                     read_angle,
                                                     test_x_angle)
             test_y_angle = randint(0, 180)
-            self.turret.y_angle= test_y_angle
+            self.turret.y_angle = test_y_angle
             with open(self.test_dirs["dir_y"] + '/duty_ns', 'r') as f:
                 # Duty is read like this by PWM getter
                 duty = int(f.read())

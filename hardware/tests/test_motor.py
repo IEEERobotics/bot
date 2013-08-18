@@ -18,6 +18,7 @@ logger = lib.get_logger()
 
 
 class TestSpeed(unittest.TestCase):
+
     """Test setting and checking the speed of a motor."""
 
     def setUp(self):
@@ -100,6 +101,7 @@ class TestSpeed(unittest.TestCase):
 
 
 class TestDirection(unittest.TestCase):
+
     """Test setting and checking the direction of a motor."""
 
     def setUp(self):

@@ -18,6 +18,7 @@ logger = lib.get_logger()
 
 
 class TestUpdateRotateSpeed(unittest.TestCase):
+
     """Test updating wheel rotation speed."""
 
     def setUp(self):
@@ -107,6 +108,7 @@ class TestUpdateRotateSpeed(unittest.TestCase):
 
 
 class TestFire(unittest.TestCase):
+
     """Test firing a dart.
 
     TODO(dfarrell07): Write test_manually_confirm test to check HW state.
@@ -163,6 +165,7 @@ class TestFire(unittest.TestCase):
 
 
 class TestAdvanceDart(unittest.TestCase):
+
     """Test firing a dart.
 
     TODO(dfarrell07): Write test_manually_confirm test to check HW state.

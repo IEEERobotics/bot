@@ -18,6 +18,7 @@ logger = lib.get_logger()
 
 
 class TestPosition(unittest.TestCase):
+
     """Test setting and checking the position of a servo."""
 
     def setUp(self):

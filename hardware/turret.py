@@ -3,6 +3,7 @@
 import lib.lib as lib
 import hardware.servo as servo
 
+
 class Turret(object):
 
     """Abstract x and y servos into a turret."""
@@ -18,7 +19,7 @@ class Turret(object):
 
     def __str__(self):
         """Represent turret in a human-readable way."""
-        return "Turret: servo_x: {}, servo_y: {}".format(self.servo_x, 
+        return "Turret: servo_x: {}, servo_y: {}".format(self.servo_x,
                                                          self.servo_y)
 
     @property

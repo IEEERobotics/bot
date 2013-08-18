@@ -104,6 +104,7 @@ class TestUpdateRotateSpeed(unittest.TestCase):
         self.wg.wheel_speed = -1
         assert self.wg.wheel_speed == 0
 
+
 class TestFire(unittest.TestCase):
     """Test firing a dart.
 
@@ -156,7 +157,7 @@ class TestFire(unittest.TestCase):
         TODO(dfarrell07): Flesh out this test.
 
         """
-        self.wg.fire({"summary" : "Test fire"})
+        self.wg.fire({"summary": "Test fire"})
 
 
 class TestAdvanceDart(unittest.TestCase):

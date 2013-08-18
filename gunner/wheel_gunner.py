@@ -26,18 +26,27 @@ class WheelGunner(gunner.Gunner):
         self.motors.append(motor.Motor(1))
 
     def fire(self, cmd):
-        """Handle normal fire commands.
+        """Get location, aim the turret, accelerate wheels and advance dart.
 
-        TODO(dfarrell07): This is a stub
+        :param cmd: Description of fire command. Currently just text summary.
 
         """
+        self.logger.debug("{}".format(cmd["summary"]))
+
         # Get the block we're over
         block = self.localizer.which_block()
-        self.logger.debug("Loc: {}".format(block))
+        self.logger.debug("Location: {}".format(block))
+
+        # Get targeting information for the block we're over
+        x = self.targ["rows"][block["row"]]["slots"][block["slot"]]["x_angle"]
+        y = self.targ["rows"][block["row"]]["slots"][block["slot"]]["y_angle"]
+        spd = self.targ["rows"][block["row"]]["slots"][block["slot"]]["speed"]
 
         # Aim turret and fire dart
-        self.aim_turret()
-        self.update_rotate_speed()
+        self.aim_turret(x, y)
+        # TODO(dfarrell07): Wait until turret has moved
+        self.wheel_speed = spd
+        # TODO(dfarrell07): Confirm speed via encoders
         self.advance_dart()
         self.logger.info("Fired dart")
 

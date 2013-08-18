@@ -71,13 +71,13 @@ class TestPosition(unittest.TestCase):
 
     def test_series(self):
         """Test a series of positions."""
-        for position in range(0, 180, 5):
+        for position in range(0, 180, 18):
             self.servo.position = position
             assert self.servo.position == position, self.servo.position
 
     def test_manually_confirm(self):
         """Test a series of random positions, read simulated HW to confirm."""
-        for i in range(100):
+        for i in range(10):
             test_position = randint(0, 180)
             self.servo.position = test_position
             with open(self.test_dir + "/duty_ns", "r") as f:

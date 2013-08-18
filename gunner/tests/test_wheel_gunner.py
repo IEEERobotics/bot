@@ -33,6 +33,7 @@ class TestUpdateRotateSpeed(unittest.TestCase):
         self.test_dirs = []
 
         # Collect simulated hardware test directories
+        # TODO(dfarrell07): Remove magic nums by reading HW IDs from config
         for m_num in range(0, 2):
             self.test_dirs.append(config["test_pwm_base_dir"] + str(m_num))
 
@@ -76,13 +77,13 @@ class TestUpdateRotateSpeed(unittest.TestCase):
 
     def test_accel(self):
         """Test a series of increasing speeds."""
-        for speed in range(0, 100, 5):
+        for speed in range(0, 100, 10):
             self.wg.wheel_speed = speed
             assert self.wg.wheel_speed == speed
 
     def test_manually_confirm(self):
         """Test a series of random speeds, read the simulated HW to confirm."""
-        for i in range(100):
+        for i in range(10):
             test_speed = randint(0, 100)
             self.wg.wheel_speed = test_speed
             for test_dir, motor in zip(self.test_dirs, self.wg.motors):
@@ -125,6 +126,7 @@ class TestFire(unittest.TestCase):
         self.test_dirs = []
 
         # Collect simulated hardware test directories
+        # TODO(dfarrell07): Remove magic nums by reading HW IDs from config
         for m_num in range(0, 2):
             self.test_dirs.append(config["test_pwm_base_dir"] + str(m_num))
 
@@ -180,6 +182,7 @@ class TestAdvanceDart(unittest.TestCase):
         self.test_dirs = []
 
         # Collect simulated hardware test directories
+        # TODO(dfarrell07): Remove magic nums by reading HW IDs from config
         for m_num in range(0, 2):
             self.test_dirs.append(config["test_pwm_base_dir"] + str(m_num))
 

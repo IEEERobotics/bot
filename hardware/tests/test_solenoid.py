@@ -62,7 +62,7 @@ class TestState(unittest.TestCase):
 
     def test_series(self):
         """Randomly extend and retract the solenoid."""
-        for i in range(100):
+        for i in range(10):
             state = random.choice(["extended", "retracted"])
             if state == "extended":
                 self.solenoid.extend()
@@ -73,7 +73,7 @@ class TestState(unittest.TestCase):
 
     def test_manually_confirm(self):
         """Test extending and retracting, read the simulated HW to confirm."""
-        for i in range(100):
+        for i in range(10):
             state = random.choice(["extended", "retracted"])
             if state == "extended":
                 self.solenoid.extend()

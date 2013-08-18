@@ -71,13 +71,13 @@ class TestSpeed(unittest.TestCase):
 
     def test_accel(self):
         """Test a series of increasing speeds."""
-        for speed in range(0, 100, 5):
+        for speed in range(0, 100, 10):
             self.motor.speed = speed
             assert self.motor.speed == speed
 
     def test_manually_confirm(self):
         """Test a series of random speeds, read the simulated HW to confirm."""
-        for i in range(100):
+        for i in range(10):
             test_speed = randint(0, 100)
             self.motor.speed = test_speed
             with open(self.test_dir + '/duty_ns', 'r') as f:

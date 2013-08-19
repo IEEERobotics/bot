@@ -6,6 +6,7 @@ import lib.lib as lib
 
 
 class Servo(object):
+
     """Class for abstracting servo settings."""
 
     def __init__(self, num):

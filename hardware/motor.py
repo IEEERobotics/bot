@@ -9,6 +9,7 @@ REVERSE = 0
 
 
 class Motor(object):
+
     """Class for abstracting motor settings."""
 
     def __init__(self, num):

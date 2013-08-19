@@ -18,6 +18,7 @@ logger = lib.get_logger()
 
 
 class TestPosition(unittest.TestCase):
+
     """Test setting and checking the position of a servo."""
 
     def setUp(self):
@@ -30,6 +31,7 @@ class TestPosition(unittest.TestCase):
         self.test_dir = config["test_pwm_base_dir"] + str(self.s_num)
 
         # Set testing flag in config
+        self.orig_test_state = config["testing"]
         lib.set_testing(True)
 
         # Create test directory if it doesn't exist
@@ -50,8 +52,8 @@ class TestPosition(unittest.TestCase):
         self.servo = s_mod.Servo(self.s_num)
 
     def tearDown(self):
-        # Reset testing flag in config to False
-        lib.set_testing(False)
+        """Restore testing flag state in config file."""
+        lib.set_testing(self.orig_test_state)
 
     def test_0(self):
         """Test setting servo position to max in zero direction."""
@@ -70,13 +72,13 @@ class TestPosition(unittest.TestCase):
 
     def test_series(self):
         """Test a series of positions."""
-        for position in range(0, 180, 5):
+        for position in range(0, 180, 18):
             self.servo.position = position
             assert self.servo.position == position, self.servo.position
 
     def test_manually_confirm(self):
         """Test a series of random positions, read simulated HW to confirm."""
-        for i in range(100):
+        for i in range(10):
             test_position = randint(0, 180)
             self.servo.position = test_position
             with open(self.test_dir + "/duty_ns", "r") as f:

@@ -21,3 +21,4 @@
 *.lib
 *.exclude
 *.cfg
+MSP430_sample_projects/*

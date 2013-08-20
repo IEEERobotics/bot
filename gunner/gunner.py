@@ -2,8 +2,8 @@
 """Handle aiming and firing darts."""
 
 import lib.lib as lib
-import localizer.localizer as localizer
-import hardware.turret as turret
+import localizer.localizer as l_mod
+import hardware.turret as t_mod
 
 
 class Gunner(object):
@@ -30,11 +30,12 @@ class Gunner(object):
         self.logger.debug("Targeting: {}".format(self.targ))
 
         # Load and store localizer
-        self.localizer = localizer.Localizer()
+        self.localizer = l_mod.Localizer()
         self.logger.debug("Gunner has localizer")
 
         # Build turrent hardware abstraction
-        self.turret = turret.Turret()
+        self.turret = t_mod.Turret()
+        self.logger.debug("Gunner has turret")
 
     def fire(self, cmd):
         """Accept and handle fire commands.
@@ -56,5 +57,5 @@ class Gunner(object):
 
         """
         self.logger.debug("Aiming turret to ({}, {})".format(x_angle, y_angle))
-        turret.x_angle = x_angle
-        turret.y_angle = y_angle
+        self.turret.x_angle = x_angle
+        self.turret.y_angle = y_angle

@@ -1,4 +1,4 @@
-"""Test cases wheel gunner."""
+"""Test cases for wheel gunner."""
 import sys
 import os
 import unittest

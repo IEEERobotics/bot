@@ -31,7 +31,7 @@ The extra submodule-related steps are necessary to retrieve the [pybbb] library 
 2. Re-read [PEP8]
 3. Pedantically follow [PEP8]
 
-I suggest running the program pep8 against your code before each commit. It's likely available by default in your Linux distro's repos (tested on Ubuntu).
+I suggest running the program pep8 against your code before each commit. You can use the bot/scripts/check_pep8.sh script to test all *.py files in the repo. The pep8 package is likely available by default in your Linux distro's repos (tested on Ubuntu), but you'll need to install it (ie `sudo apt-get install pep8`, `yum install pep8`, `pip install pep8`, `easy_install pep8`).
 
 #### C
 

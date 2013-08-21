@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Library of useful functions that apply to many modules."""
 
 from os import getcwd, path

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Module for handling high-level movement commands."""
 
 import lib.lib as lib

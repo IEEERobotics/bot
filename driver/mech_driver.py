@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Pass low-level move commands to motors with mecanum wheels."""
 
 from math import sin, cos, pi, floor, fabs

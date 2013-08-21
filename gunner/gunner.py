@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Handle aiming and firing darts."""
 
 import lib.lib as lib

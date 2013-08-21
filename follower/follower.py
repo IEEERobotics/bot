@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Logic for line following."""
 
 import lib.lib as lib

@@ -1,4 +1,3 @@
-#/usr/bin/env python
 """Logic for determining the bot's location."""
 
 import lib.lib as lib

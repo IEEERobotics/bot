@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Logic for firing using a wheel-based design."""
 
 from time import sleep

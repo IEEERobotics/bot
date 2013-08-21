@@ -22,7 +22,7 @@ The extra submodule-related steps are necessary to retrieve the [pybbb] library 
 
 You likey don't have python-yaml installed by default. It's required for reading YAML files, which therefore makes it a hard requirement for running most of our code.
 
-If runing `which python-yaml` from a shell returns no results, you'll need to install the python-yaml package with your perfered package manager (ie `apt-get install python-yaml`).
+If runing `which python-yaml` from a shell returns no results, or if you see `ImportError: No module named yaml` while running our unit tests, you'll need to install the python-yaml package with your perfered package manager (ie `apt-get install python-yaml`).
 
 ## Style
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Code related to plan-execution."""
 
 import sys

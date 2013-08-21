@@ -9,6 +9,7 @@ RETRACTED = 1
 
 
 class Solenoid(object):
+
     """Class for abstracting solenoid settings."""
 
     def __init__(self, num):
@@ -20,21 +21,44 @@ class Solenoid(object):
         """
         # Get and store logger object
         self.logger = lib.get_logger()
-        self.logger.debug("Solenoid {} has logger".format(num))
 
         # Store ID number of solenoid
         self.num = num
 
-        # Init state value to track GPIO/solenoid state
-        self._state = None
+        # Load system configuration
+        config = lib.load_config()
 
-        # Build GPIO object for BBB interaction
-        self.gpio = gpio_mod.GPIO(num)
-        self.logger.debug("Built {}".format(str(self.gpio)))
+        if config["testing"]:
+            self.logger.debug("TEST MODE: Solenoid {}".format(self.num))
+
+            # Get dir of simulated hardware files from config
+            test_dir = lib.prepend_prefix(config["test_gpio_base_dir"])
+            self.logger.debug("Test GPIO base dir: {}".format(test_dir))
+
+            # Build GPIO object for BBB interaction, provide test dir
+            self.gpio = gpio_mod.GPIO(self.num, test_dir)
+            self.logger.debug("Built {}".format(self.gpio))
+        else:
+            self.logger.debug("EMBEDDED MODE: Solenoid {}".format(self.num))
+
+            # Build GPIO object for BBB interaction
+            self.gpio = gpio_mod.GPIO(self.num)
+            self.logger.debug("Built {}".format(self.gpio))
 
         # Set GPIO to output signal
         self.gpio.output()
-        self.logger.debug("{} set to output".format(str(self.gpio)))
+
+        # Set solenoid to be initially retracted
+        self.retract()
+        self.logger.debug("Setup {}".format(self))
+
+    def __str__(self):
+        """Override string representation of this object for readability.
+
+        :returns: Human readable representation of this object.
+
+        """
+        return "Solenoid #{}: {}".format(self.num, self.state)
 
     def extend(self):
         """Set solenoid to extended position."""
@@ -46,11 +70,15 @@ class Solenoid(object):
 
     @property
     def state(self):
-        """Getter for state of the solenoid (extended/retracted)."""
+        """Getter for state of the solenoid (extended/retracted).
+
+        :returns: State of the solenoid ("extended" or "retracted").
+
+        """
         val = self.gpio.value
         if val == RETRACTED:
-            return = "retracted"
+            return "retracted"
         elif val == EXTENDED:
-            return = "extended"
+            return "extended"
         else:
             self.logger.error("Invalid GPIO state: {}".format(val))

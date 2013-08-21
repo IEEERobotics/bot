@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Pass low-level move commands to motors with mecanum wheels."""
 
 from math import sin, cos, pi, floor, fabs
@@ -38,9 +37,7 @@ class MechDriver(driver.Driver):
         self.logger.debug("IO write: motor: {}, ds: {}, direction: {}".format(motor, ds, direction))
 
     def rotate(self, rotate_speed):
-        """Pass rotation speed as -100 to 100 (positive is clockwise).
-        
-        """
+        """Pass rotation speed as -100 to 100 (positive is clockwise)."""
         self.logger.debug("rotate speed: {}".format(rotate_speed))
 
         # Determine direction.

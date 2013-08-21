@@ -1,4 +1,3 @@
-#/usr/bin/env python
 """Logic for determining the bot's location."""
 
 import lib.lib as lib
@@ -28,4 +27,4 @@ class Localizer(object):
         :returns: The position of the block we're sitting on.
 
         """
-        return {"row": "first", "slot": "first"}
+        return {"row": 0, "slot": 0}

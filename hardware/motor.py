@@ -4,8 +4,12 @@ import pybbb.bbb.pwm as pwm_mod
 
 import lib.lib as lib
 
+FORWARD = 1
+REVERSE = 0
+
 
 class Motor(object):
+
     """Class for abstracting motor settings."""
 
     def __init__(self, num):
@@ -17,26 +21,53 @@ class Motor(object):
         """
         # Get and store logger object
         self.logger = lib.get_logger()
-        self.logger.debug("Motor {} has logger".format(num))
 
         # Store ID number of motor
         self.num = num
 
-        # Build PWM object for BBB interaction
-        self.pwm = pwm_mod.PWM(num)
-        self.logger.debug("Built {}".format(str(self.pwm)))
+        # Load system configuration
+        config = lib.load_config()
 
-        # Set motor speed/direction to current value of PWM duty/polarity
-        self._speed = self.pwm.duty
-        self.logger.debug("Motor {} speed: {}".format(num, self._speed))
-        self._direction = self.pwm.polarity
-        self.logger.debug("Motor {} direction: {}".format(num,
-                                                          self._direction))
+        if config["testing"]:
+            self.logger.debug("TEST MODE: Motor {}".format(self.num))
+
+            # Get dir of simulated hardware files from config
+            test_dir = lib.prepend_prefix(config["test_pwm_base_dir"])
+            self.logger.debug("Test HW base dir: {}".format(test_dir))
+
+            # Build PWM object for BBB interaction, provide test dir
+            self.pwm = pwm_mod.PWM(self.num, test_dir)
+            self.logger.debug("Built {}".format(self.pwm))
+        else:
+            self.logger.debug("EMBEDDED MODE: Motor {}".format(self.num))
+
+            # Build PWM object for BBB interaction
+            self.pwm = pwm_mod.PWM(self.num)
+            self.logger.debug("Built {}".format(self.pwm))
+
+        # Setup initial speed and direction
+        self.speed = 0
+        self.direction = FORWARD
+        self.logger.debug("Setup {}".format(self))
+
+    def __str__(self):
+        """Override string representation of this object for readability.
+
+        :returns: Human readable representation of this object.
+
+        """
+        return "Motor #{}: speed:{} direction:{}".format(self.num,
+                                                         self.speed,
+                                                         self.direction)
 
     @property
     def speed(self):
-        """Getter for motor's speed as % of max (same as duty cycle)."""
-        return self.pwm.duty
+        """Getter for motor's speed as % of max (same as duty cycle).
+
+        :returns: Current motor speed as percent of max speed.
+
+        """
+        return int(round((self.pwm.duty / float(self.pwm.period)) * 100))
 
     @speed.setter
     def speed(self, speed):
@@ -53,13 +84,22 @@ class Motor(object):
             self.logger.warn("Invalid speed {}, using 0.".format(speed))
             speed = 0
 
-        self.pwm.duty = speed
-        self.logger.debug("Set motor {} speed to {}".format(self.num, speed))
+        self.pwm.duty = int(round((speed / 100.) * self.pwm.period))
+        self.logger.debug("Updated speed {}".format(self))
 
     @property
     def direction(self):
-        """Getter for motor's direction (same as polarity)."""
-        return self.pwm.polarity
+        """Getter for motor's direction (same as polarity).
+
+        :returns: Direction of motor ("forward" or "reverse").
+
+        """
+        if self.pwm.polarity == FORWARD:
+            return "forward"
+        elif self.pwm.polarity == REVERSE:
+            return "reverse"
+        else:
+            self.logger.error("Invalid polarity: {}".format(self.pwm))
 
     @direction.setter
     def direction(self, direction):
@@ -69,10 +109,13 @@ class Motor(object):
         :type direction: int
 
         """
-        if direction != 0 and direction != 1:
+        if direction == "forward":
+            direction = FORWARD
+        elif direction == "reverse":
+            direction = REVERSE
+        elif direction != 0 and direction != 1:
             self.logger.warn("Invalid dir {}, no update.".format(direction))
             return
 
         self.pwm.polarity = direction
-        self.logger.debug("Set motor {} direction to {}".format(self.num,
-                                                                direction))
+        self.logger.debug("Updated direction {}".format(self))

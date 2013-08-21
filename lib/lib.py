@@ -1,14 +1,14 @@
-#!/usr/bin/env python
 """Library of useful functions that apply to many modules."""
 
 from os import getcwd, path
+import logging.handlers
 
 try:
     import yaml
 except ImportError, err:
+    import sys
     sys.stderr.write("ERROR: {}. Try installing python-yaml.\n".format(err))
-
-import logging.handlers
+    raise
 
 _logger = None
 
@@ -33,9 +33,12 @@ def load_config(config_file="config.yaml"):
     :returns: Dict description of configuration for this round.
 
     """
+    # Build valid path from CWD to config file
     qual_config_file = prepend_prefix(config_file)
-    config_fd = open(qual_config_file)
-    return yaml.load(config_fd)
+
+    # Open and read config file
+    with open(qual_config_file) as config_fd:
+        return yaml.load(config_fd)
 
 
 def load_strategy(strat_file):
@@ -49,23 +52,48 @@ def load_strategy(strat_file):
     qual_strat_file = prepend_prefix(strat_file)
 
     # Open and read strategy file
-    strat_fd = open(qual_strat_file)
-    return yaml.load(strat_fd)
+    with open(qual_strat_file) as strat_fd:
+        return yaml.load(strat_fd)
 
 
-def load_targeting(targ_file):
+def load_targeting(targ_file=None):
     """Load the YAML targeting info for each possible block position.
 
     :param targ_file: Name of targeting file to load.
     :returns: Dict description of targeting information for each block.
 
     """
+    if targ_file is None:
+        config = load_config()
+        targ_file = config["targeting"]
+
     # Build valid path from CWD to targeting file
     qual_targ_file = prepend_prefix(targ_file)
 
     # Open and read targeting file
-    targ_fd = open(qual_targ_file)
-    return yaml.load(targ_fd)
+    with open(qual_targ_file) as targ_fd:
+        return yaml.load(targ_fd)
+
+
+def set_testing(state, config_file="config.yaml"):
+    # Confirm that state is a boolean value
+    if type(state) != bool:
+        print "ERROR: State should be a boolean, not updating."
+        return
+
+    # Build valid path from CWD to config file
+    qual_config_file = prepend_prefix(config_file)
+
+    # Open and read config file
+    with open(qual_config_file, "r") as config_fd:
+        config = yaml.load(config_fd)
+
+    # Update config file with new state
+    config["testing"] = state
+
+    # Write new config
+    with open(qual_config_file, "w") as config_fd:
+        yaml.dump(config, config_fd)
 
 
 def get_logger(prefix=None):
@@ -87,7 +115,6 @@ def get_logger(prefix=None):
     # Don't run setup if logger has been built (would logroll early)
     global _logger
     if _logger is not None:
-        _logger.debug("Logger already exists")
         return _logger
 
     # Get config so that path to log file can be read.

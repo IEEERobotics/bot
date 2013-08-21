@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Module for handling high-level movement commands."""
 
 import lib.lib as lib
@@ -20,10 +19,12 @@ class Driver(object):
     def move(self, desc):
         """Accept and handle a movement command.
 
-        TODO(dfarrell07): This is a stub.
+        This method is not meant to be called, but instead is meant to show
+        that subclasses should override it in their implementation.
 
         :param desc: Description of movement command to handle.
         :type desc: string
 
         """
-        self.logger.debug("Mv cmd: {}".format(desc))
+        self.logger.error("The move method must be overridden by a subclass.")
+        raise NotImplementedError("Subclass must override this method.")

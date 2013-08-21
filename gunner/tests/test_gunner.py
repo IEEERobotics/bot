@@ -34,7 +34,8 @@ class TestAimTurret(unittest.TestCase):
         # Collect simulated hardware test directories
         self.test_dirs = {}
         for servo in config["turret_servos"]:
-            self.test_dirs[servo["axis"]] = config["test_pwm_base_dir"] + str(servo["PWM"])
+            test_dir = config["test_pwm_base_dir"] + str(servo["PWM"])
+            self.test_dirs[servo["axis"]] = test_dir
 
         # Set simulated directories to known state
         for test_dir in self.test_dirs.values():
@@ -133,7 +134,8 @@ class TestFire(unittest.TestCase):
         # Collect simulated hardware test directories
         self.test_dirs = {}
         for servo in config["turret_servos"]:
-            self.test_dirs[servo["axis"]] = config["test_pwm_base_dir"] + str(servo["PWM"])
+            test_dir = config["test_pwm_base_dir"] + str(servo["PWM"])
+            self.test_dirs[servo["axis"]] = test_dir
 
         # Set simulated directories to known state
         for test_dir in self.test_dirs.values():

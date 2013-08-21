@@ -35,7 +35,8 @@ class TestUpdateRotateSpeed(unittest.TestCase):
 
         # Collect simulated hardware test directories
         for motor in config["gun_motors"]:
-            self.test_dirs.append(config["test_pwm_base_dir"] + str(motor["PWM"]))
+            self.test_dirs.append(config["test_pwm_base_dir"]
+                                  + str(motor["PWM"]))
 
         # Set simulated directories to known state
         for test_dir in self.test_dirs:
@@ -128,7 +129,8 @@ class TestFire(unittest.TestCase):
 
         # Collect simulated hardware test directories
         for motor in config["gun_motors"]:
-            self.test_dirs.append(config["test_pwm_base_dir"] + str(motor["PWM"]))
+            self.test_dirs.append(config["test_pwm_base_dir"] +
+                                  str(motor["PWM"]))
 
         # Set simulated directories to known state
         for test_dir in self.test_dirs:
@@ -184,7 +186,8 @@ class TestAdvanceDart(unittest.TestCase):
 
         # Collect simulated hardware test directories
         for motor in config["gun_motors"]:
-            self.test_dirs.append(config["test_pwm_base_dir"] + str(motor["PWM"]))
+            self.test_dirs.append(config["test_pwm_base_dir"] +
+                                  str(motor["PWM"]))
 
         # Set simulated directories to known state
         for test_dir in self.test_dirs:

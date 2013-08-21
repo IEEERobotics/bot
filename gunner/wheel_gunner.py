@@ -17,7 +17,7 @@ class WheelGunner(gunner.Gunner):
         super(WheelGunner, self).__init__()
 
         # Build solenoid for advancing dart
-        self.dart_sol = s_mod.Solenoid(self.config["dart_solenoid"]["GPIO"])
+        self.gun_sol = s_mod.Solenoid(self.config["gun_sol"]["GPIO"])
 
         # Build motors for driving wheels
         self.motors = []
@@ -71,6 +71,6 @@ class WheelGunner(gunner.Gunner):
     def advance_dart(self):
         """Cause hardware to push a dart into the spinning wheels."""
         self.logger.debug("Advancing dart")
-        self.dart_sol.extend()
+        self.gun_sol.extend()
         sleep(.5)
-        self.dart_sol.retract()
+        self.gun_sol.retract()

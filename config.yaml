@@ -1,3 +1,18 @@
-{log_file: logs/bot.log, strategy: planner/strategies/strategy0.yaml, targeting: gunner/targeting/targeting0.yaml,
-  test_gpio_base_dir: simulator/pins/gpio/gpio, test_pwm_base_dir: simulator/pins/pwm/pwm,
-  testing: true}
+dart_solenoid: {GPIO: 0}
+drive_motors:
+- {PWM: 0, position: front_right}
+- {PWM: 1, position: front_left}
+- {PWM: 2, position: back_left}
+- {PWM: 3, position: back_right}
+gun_motors:
+- {PWM: 4}
+- {PWM: 5}
+log_file: logs/bot.log
+strategy: planner/strategies/strategy0.yaml
+targeting: gunner/targeting/targeting0.yaml
+test_gpio_base_dir: simulator/pins/gpio/gpio
+test_pwm_base_dir: simulator/pins/pwm/pwm
+testing: false
+turret_servos:
+- {PWM: 6, axis: servo_x}
+- {PWM: 7, axis: servo_y}

@@ -5,8 +5,8 @@ from time import sleep
 
 import lib.lib as lib
 import gunner
-import hardware.motor as motor
-import hardware.solenoid as solenoid
+import hardware.motor as m_mod
+import hardware.solenoid as s_mod
 
 
 class WheelGunner(gunner.Gunner):
@@ -18,12 +18,12 @@ class WheelGunner(gunner.Gunner):
         super(WheelGunner, self).__init__()
 
         # Build solenoid for advancing dart
-        self.dart_sol = solenoid.Solenoid(0)
+        self.dart_sol = s_mod.Solenoid(self.config["dart_solenoid"]["GPIO"])
 
         # Build motors for driving wheels
         self.motors = []
-        self.motors.append(motor.Motor(0))
-        self.motors.append(motor.Motor(1))
+        for motor in self.config["gun_motors"]:
+            self.motors.append(m_mod.Motor(motor["PWM"]))
 
     def fire(self, cmd):
         """Get location, aim the turret, accelerate wheels and advance dart.
@@ -70,11 +70,7 @@ class WheelGunner(gunner.Gunner):
         self.logger.debug("New wheel speed: {}".format(speed))
 
     def advance_dart(self):
-        """Cause hardware to push a dart into the spinning wheels.
-
-        TODO(dfarrell07): This is a stub.
-
-        """
+        """Cause hardware to push a dart into the spinning wheels."""
         self.logger.debug("Advancing dart")
         self.dart_sol.extend()
         sleep(.5)

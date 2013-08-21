@@ -34,9 +34,8 @@ class TestUpdateRotateSpeed(unittest.TestCase):
         self.test_dirs = []
 
         # Collect simulated hardware test directories
-        # TODO(dfarrell07): Remove magic nums by reading HW IDs from config
-        for m_num in range(0, 2):
-            self.test_dirs.append(config["test_pwm_base_dir"] + str(m_num))
+        for motor in config["gun_motors"]:
+            self.test_dirs.append(config["test_pwm_base_dir"] + str(motor["PWM"]))
 
         # Set simulated directories to known state
         for test_dir in self.test_dirs:
@@ -128,9 +127,8 @@ class TestFire(unittest.TestCase):
         self.test_dirs = []
 
         # Collect simulated hardware test directories
-        # TODO(dfarrell07): Remove magic nums by reading HW IDs from config
-        for m_num in range(0, 2):
-            self.test_dirs.append(config["test_pwm_base_dir"] + str(m_num))
+        for motor in config["gun_motors"]:
+            self.test_dirs.append(config["test_pwm_base_dir"] + str(motor["PWM"]))
 
         # Set simulated directories to known state
         for test_dir in self.test_dirs:
@@ -185,9 +183,8 @@ class TestAdvanceDart(unittest.TestCase):
         self.test_dirs = []
 
         # Collect simulated hardware test directories
-        # TODO(dfarrell07): Remove magic nums by reading HW IDs from config
-        for m_num in range(0, 2):
-            self.test_dirs.append(config["test_pwm_base_dir"] + str(m_num))
+        for motor in config["gun_motors"]:
+            self.test_dirs.append(config["test_pwm_base_dir"] + str(motor["PWM"]))
 
         # Set simulated directories to known state
         for test_dir in self.test_dirs:

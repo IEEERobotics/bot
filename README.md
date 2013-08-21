@@ -20,6 +20,9 @@ git submodule update
 
 The extra submodule-related steps are necessary to retrieve the [pybbb] library that we use for interaction with the BeagleBone Black. For more information, see the [git-scm section on submodules].
 
+You likey don't have python-yaml installed by default. It's required for reading YAML files, which therefore makes it a hard requirement for running most of our code.
+
+If runing `which python-yaml` from a shell returns no results, you'll need to install the python-yaml package with your perfered package manager (ie `apt-get install python-yaml`).
 
 ## Style
 

@@ -41,6 +41,23 @@ def load_config(config_file="config.yaml"):
         return yaml.load(config_fd)
 
 
+def write_config(new_config, config_file="config.yaml"):
+    """Write an updated version of config back to the config file.
+
+    :param new_config: Updated version of config to write.
+    :type new_config: dict
+    :param config_file: YAML file to write config to.
+    :type config_file: string
+
+    """
+    # Build valid path from CWD to config file
+    qual_config_file = prepend_prefix(config_file)
+
+    # Write new config
+    with open(qual_config_file, "w") as config_fd:
+        yaml.dump(new_config, config_fd)
+
+
 def load_strategy(strat_file):
     """Load the YAML description of the strategy for this round.
 
@@ -76,6 +93,17 @@ def load_targeting(targ_file=None):
 
 
 def set_testing(state, config_file="config.yaml"):
+    """Set the testing flag in config to the given boolean value.
+
+    The testing flag is used to either load point code to simulated hardware
+    files or real file descriptions on the BBB.
+
+    :param state: Value to set testing config flag to.
+    :type state: boolean
+    :param config_file: YAML file to write config to.
+    :type config_file: string
+
+    """
     # Confirm that state is a boolean value
     if type(state) != bool:
         print "ERROR: State should be a boolean, not updating."
@@ -91,9 +119,8 @@ def set_testing(state, config_file="config.yaml"):
     # Update config file with new state
     config["testing"] = state
 
-    # Write new config
-    with open(qual_config_file, "w") as config_fd:
-        yaml.dump(config, config_fd)
+    # Write updated config
+    write_config(config)
 
 
 def get_logger(prefix=None):

@@ -30,6 +30,7 @@ class Planner(object):
 
         # Load and store strategy
         self.strat = lib.load_strategy(self.config["strategy"])
+        assert self.strat is not None, "Strategy seems to be empty"
         self.logger.debug("Strategy loaded")
         self.logger.debug("Strategy: " + str(self.strat))
 

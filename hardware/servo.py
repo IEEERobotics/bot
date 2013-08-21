@@ -14,8 +14,6 @@ class Servo(object):
 
         :param num: ID number of this servo. Also defines PWM number.
         :type num: int
-        :param testing: If True, use test HW dir given by config, else real HW.
-        :type testing: boolean
 
         """
         # Get and store logger object

@@ -35,7 +35,7 @@ class MechDriver(driver.Driver):
         :type ds: float
 
         """
-        self.logger.debug("IO write: motor: {}, ds: {}".format(motor, ds))
+        self.logger.debug("IO write: motor: {}, ds: {}, direction: {}".format(motor, ds, direction))
 
     def rotate(self, rotate_speed):
         """Pass rotation speed as -100 to 100 (positive is clockwise).
@@ -44,7 +44,7 @@ class MechDriver(driver.Driver):
         self.logger.debug("rotate speed: {}".format(rotate_speed))
 
         # Determine direction.
-        # These values are based on the file on
+        # These values are based on the file in
         # data in MecanumWheelDirection.png
         if rotate_speed > 0:
             front_left_forward = False
@@ -58,9 +58,11 @@ class MechDriver(driver.Driver):
             back_left_forward = True
             back_right_foward = False
 
-        # Check for invalid value.
+        # Check for invalid values.
         if rotate_speed > 100:
             rotate_speed = 100
+        if rotate_speed < 0:
+            rotate_speed = 0
 
         # Set duty cycles.
         front_left_ds = fabs(floor(rotate_speed))
@@ -69,7 +71,6 @@ class MechDriver(driver.Driver):
         back_right_ds = fabs(floor(rotate_speed))
 
         # Write to IO pins.
-        # Also remember to write to direction pins.
         self.iowrite("front_left", front_left_ds, front_left_forward)
         self.iowrite("front_right", front_right_ds, front_right_forward)
         self.iowrite("back_left", back_left_ds, back_left_forward)

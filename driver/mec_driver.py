@@ -6,7 +6,7 @@ import driver
 import lib.lib as lib
 
 
-class MechDriver(driver.Driver):
+class MecDriver(driver.Driver):
 
     """Subclass of Driver for movement with mecanum wheels.
 
@@ -21,7 +21,7 @@ class MechDriver(driver.Driver):
 
     def __init__(self):
         """Run superclass's init."""
-        super(MechDriver, self).__init__()
+        super(MecDriver, self).__init__()
 
     def iowrite(self, motor, ds, direction):
         """Write to IO pens that control the motors.

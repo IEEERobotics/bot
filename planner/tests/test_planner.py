@@ -41,7 +41,7 @@ class TestExecStrategy(unittest.TestCase):
             test_dir = self.config["test_pwm_base_dir"] + str(servo["PWM"])
             self.ts_test_dirs[servo["axis"]] = test_dir
 
-        # Collect simulated mech_driver motor hardware test directories
+        # Collect simulated mec_driver motor hardware test directories
         self.md_test_dirs = {}
         for motor in self.config["drive_motors"]:
             test_dir = self.config["test_pwm_base_dir"] + str(motor["PWM"])
@@ -112,7 +112,7 @@ class TestExecStrategy(unittest.TestCase):
     def test_rote_move(self):
         """Test a rote move action.
 
-        This test fails because mech_driver doesn't override driver's move
+        This test fails because mec_driver doesn't override driver's move
         method. The move method should accept a command string and handle it
         as a rote move or a command from follower.
 

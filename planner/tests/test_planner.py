@@ -1,4 +1,4 @@
-"""Test cases planner."""
+"""Test cases for planner."""
 import sys
 import os
 import unittest
@@ -85,3 +85,52 @@ class TestExecStrategy(unittest.TestCase):
         lib.set_strat("test_empty.yaml")
         with self.assertRaises(AssertionError):
             p_mod.Planner()
+
+    def test_follow_intersectionEx(self):
+        """Test a follow action with an expected IntersectionException.
+
+        This test currently only checks that no exception is raised.
+
+        TODO(dfarrell07): Find other ways to confirm correct behavior.
+
+        """
+        lib.set_strat("test_follow_intersectionEx.yaml")
+        p_mod.Planner()
+
+    def test_follow_boxEx(self):
+        """Test a follow action with an expected BoxException.
+
+        This test currently only checks that no exception is raised.
+
+        TODO(dfarrell07): Find other ways to confirm correct behavior.
+
+        """
+        lib.set_strat("test_follow_boxEx.yaml")
+        p_mod.Planner()
+
+    @unittest.expectedFailure
+    def test_rote_move(self):
+        """Test a rote move action.
+
+        This test fails because mech_driver doesn't override driver's move
+        method. The move method should accept a command string and handle it
+        as a rote move or a command from follower.
+
+        This test currently only checks that no exception is raised.
+
+        TODO(dfarrell07): Find other ways to confirm correct behavior.
+
+        """
+        lib.set_strat("test_rote_move.yaml")
+        p_mod.Planner()
+
+    def test_fire(self):
+        """Test a fire action.
+
+        This test currently only checks that no exception is raised.
+
+        TODO(dfarrell07): Find other ways to confirm correct behavior.
+
+        """
+        lib.set_strat("test_fire.yaml")
+        p_mod.Planner()

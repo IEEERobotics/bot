@@ -1,0 +1,7 @@
+name: test_rote_move
+actions:
+    - action_num: 0
+      type: rote_move
+      description: 
+        summary: Turn left at intersection.
+        subtype: left_intersection

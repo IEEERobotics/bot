@@ -4,12 +4,6 @@ import os
 import unittest
 from random import randint
 
-try:
-    import yaml
-except ImportError, err:
-    sys.stderr.write("ERROR: {}. Try installing python-yaml.\n".format(err))
-    raise
-
 sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
 
 try:
@@ -29,10 +23,8 @@ class TestExecStrategy(unittest.TestCase):
 
     def setUp(self):
         """Setup test hardware files and build planner object."""
-        # Load config
-        self.config = lib.load_config()
-
         # Store original test flag and then set it to True
+        self.config = lib.load_config()
         self.orig_test_state = self.config["testing"]
         self.orig_strat_file = self.config["strategy"]
         lib.set_testing(True)
@@ -86,27 +78,10 @@ class TestExecStrategy(unittest.TestCase):
     def tearDown(self):
         """Restore testing flag state and strategy in config file."""
         lib.set_testing(self.orig_test_state)
-        self.config["strategy"] = self.orig_strat_file
-        lib.write_config(self.config)
-
-    def set_strategy(self, strat_file):
-        """Modify config.yaml to point planer at the given strategy file.
-
-        The given strat_file is assumed to exist in the directory pointed to
-        by test_strat_base_dir in config.yaml.
-
-        :param strat_file: Strategy file to set in config.yaml.
-        :type strat_file: string
-
-        """
-        # Update config with new strategy
-        strat_file_path = self.config["test_strat_base_dir"] + strat_file
-        self.config["strategy"] = strat_file_path
-
-        # Write new config
-        lib.write_config(self.config)
+        lib.set_strat_qual(self.orig_strat_file)
 
     def test_empty(self):
-        self.set_strategy("test_empty.yaml")
+        """Test planner's handling of an empty strategy file."""
+        lib.set_strat("test_empty.yaml")
         with self.assertRaises(AssertionError):
             p_mod.Planner()

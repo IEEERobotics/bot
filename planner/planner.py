@@ -51,7 +51,7 @@ class Planner(object):
         for act in self.strat["actions"]:
             self.logger.debug(act["description"]["summary"])
 
-            if act["type"] == "complex_move":
+            if act["type"] == "rote_move":
                 # Pass movement commands to driver
                 self.driver.move(act["description"])
             elif act["type"] == "follow":

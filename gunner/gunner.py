@@ -18,23 +18,18 @@ class Gunner(object):
         """Setup and store logger and configuration."""
         # Load and store logger
         self.logger = lib.get_logger()
-        self.logger.debug("Gunner has logger")
 
         # Load and store configuration dict
         self.config = lib.load_config()
-        self.logger.debug("Gunner has config")
 
         # Load and store targeting dict
         self.targ = lib.load_targeting(self.config["targeting"])
-        self.logger.debug("Targeting: {}".format(self.targ))
 
         # Load and store localizer
         self.localizer = l_mod.Localizer()
-        self.logger.debug("Gunner has localizer")
 
         # Build turrent hardware abstraction
         self.turret = t_mod.Turret()
-        self.logger.debug("Gunner has turret")
 
     def fire(self, cmd):
         """Accept and handle fire commands.

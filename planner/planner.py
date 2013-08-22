@@ -21,18 +21,13 @@ class Planner(object):
         """Setup planner by getting a logger, config and strategy."""
         # Get and store logger object
         self.logger = lib.get_logger()
-        self.logger.debug("Planner has logger")
 
         # Load and store configuration
         self.config = lib.load_config()
-        self.logger.debug("Planner has config")
-        self.logger.debug("Config: " + str(self.config))
 
         # Load and store strategy
         self.strat = lib.load_strategy(self.config["strategy"])
         assert self.strat is not None, "Strategy seems to be empty"
-        self.logger.debug("Strategy loaded")
-        self.logger.debug("Strategy: " + str(self.strat))
 
         # Build MechDriver, which will accept and handle movement actions
         self.driver = mdriver.MechDriver()

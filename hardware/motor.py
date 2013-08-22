@@ -33,22 +33,19 @@ class Motor(object):
 
             # Get dir of simulated hardware files from config
             test_dir = lib.prepend_prefix(config["test_pwm_base_dir"])
-            self.logger.debug("Test HW base dir: {}".format(test_dir))
 
             # Build PWM object for BBB interaction, provide test dir
             self.pwm = pwm_mod.PWM(self.num, test_dir)
-            self.logger.debug("Built {}".format(self.pwm))
         else:
             self.logger.debug("EMBEDDED MODE: Motor {}".format(self.num))
 
             # Build PWM object for BBB interaction
             self.pwm = pwm_mod.PWM(self.num)
-            self.logger.debug("Built {}".format(self.pwm))
 
         # Setup initial speed and direction
         self.speed = 0
         self.direction = FORWARD
-        self.logger.debug("Setup {}".format(self))
+        self.logger.info("Setup {}".format(self))
 
     def __str__(self):
         """Override string representation of this object for readability.

@@ -31,15 +31,11 @@ class TestAimTurret(unittest.TestCase):
         self.orig_test_state = config["testing"]
         lib.set_testing(True)
 
-        # List of directories containing simulated hardware
-        self.test_dirs = []
-
-        # TODO(dfarrell07): Read HW IDs from config
         # Collect simulated hardware test directories
-        self.test_dirs = {
-            "dir_x": config["test_pwm_base_dir"] + str(t_mod.SERVO_X_ID),
-            "dir_y": config["test_pwm_base_dir"] + str(t_mod.SERVO_Y_ID)
-            }
+        self.test_dirs = {}
+        for servo in config["turret_servos"]:
+            test_dir = config["test_pwm_base_dir"] + str(servo["PWM"])
+            self.test_dirs[servo["axis"]] = test_dir
 
         # Set simulated directories to known state
         for test_dir in self.test_dirs.values():
@@ -79,7 +75,7 @@ class TestAimTurret(unittest.TestCase):
             test_x_angle = randint(0, 180)
             test_y_angle = randint(0, 180)
             self.gunner.aim_turret(test_x_angle, test_y_angle)
-            with open(self.test_dirs["dir_x"] + '/duty_ns', 'r') as f:
+            with open(self.test_dirs["servo_x"] + '/duty_ns', 'r') as f:
                 # Duty is read like this by PWM getter
                 duty = int(f.read())
                 # Angle is derived this way in angle getter
@@ -88,7 +84,7 @@ class TestAimTurret(unittest.TestCase):
                                                     read_angle,
                                                     test_x_angle)
             self.gunner.y_angle = test_y_angle
-            with open(self.test_dirs["dir_y"] + '/duty_ns', 'r') as f:
+            with open(self.test_dirs["servo_y"] + '/duty_ns', 'r') as f:
                 # Duty is read like this by PWM getter
                 duty = int(f.read())
                 # Angle is derived this way in angle getter
@@ -135,16 +131,14 @@ class TestFire(unittest.TestCase):
         self.orig_test_state = config["testing"]
         lib.set_testing(True)
 
-        # List of directories containing simulated hardware
-        self.test_dirs = []
-
         # Collect simulated hardware test directories
-        # TODO(dfarrell07): Remove magic nums by reading HW IDs from config
-        for m_num in range(0, 2):
-            self.test_dirs.append(config["test_pwm_base_dir"] + str(m_num))
+        self.test_dirs = {}
+        for servo in config["turret_servos"]:
+            test_dir = config["test_pwm_base_dir"] + str(servo["PWM"])
+            self.test_dirs[servo["axis"]] = test_dir
 
         # Set simulated directories to known state
-        for test_dir in self.test_dirs:
+        for test_dir in self.test_dirs.values():
             # Create test directory if it doesn't exist
             if not os.path.exists(test_dir):
                 os.makedirs(test_dir)

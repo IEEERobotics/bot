@@ -1,0 +1,6 @@
+name: test_fire
+actions:
+    - action_num: 0
+      type: fire
+      description:
+        summary:  Fire dart at target.

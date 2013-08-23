@@ -30,14 +30,11 @@ class TestAngle(unittest.TestCase):
         self.orig_test_state = config["testing"]
         lib.set_testing(True)
 
-        # List of directories containing simulated hardware
-        self.test_dirs = []
-
         # Collect simulated hardware test directories
-        self.test_dirs = {
-            "dir_x": config["test_pwm_base_dir"] + str(t_mod.SERVO_X_ID),
-            "dir_y": config["test_pwm_base_dir"] + str(t_mod.SERVO_Y_ID)
-            }
+        self.test_dirs = {}
+        for servo in config["turret_servos"]:
+            test_dir = config["test_pwm_base_dir"] + str(servo["PWM"])
+            self.test_dirs[servo["axis"]] = test_dir
 
         # Set simulated directories to known state
         for test_dir in self.test_dirs.values():
@@ -117,7 +114,7 @@ class TestAngle(unittest.TestCase):
         for i in range(10):
             test_x_angle = randint(0, 180)
             self.turret.x_angle = test_x_angle
-            with open(self.test_dirs["dir_x"] + '/duty_ns', 'r') as f:
+            with open(self.test_dirs["servo_x"] + '/duty_ns', 'r') as f:
                 # Duty is read like this by PWM getter
                 duty = int(f.read())
                 # Angle is derived this way in angle getter
@@ -127,7 +124,7 @@ class TestAngle(unittest.TestCase):
                                                     test_x_angle)
             test_y_angle = randint(0, 180)
             self.turret.y_angle = test_y_angle
-            with open(self.test_dirs["dir_y"] + '/duty_ns', 'r') as f:
+            with open(self.test_dirs["servo_y"] + '/duty_ns', 'r') as f:
                 # Duty is read like this by PWM getter
                 duty = int(f.read())
                 # Angle is derived this way in angle getter

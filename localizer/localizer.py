@@ -1,4 +1,3 @@
-#/usr/bin/env python
 """Logic for determining the bot's location."""
 
 import lib.lib as lib
@@ -18,7 +17,6 @@ class Localizer(object):
     def __init__(self):
         """Setup and store logger."""
         self.logger = lib.get_logger()
-        self.logger.debug("Localizer has logger")
 
     def which_block(self):
         """Determine the discrete location of the block we're sitting on.

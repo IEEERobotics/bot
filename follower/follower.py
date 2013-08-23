@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Logic for line following."""
 
 import lib.lib as lib
@@ -12,7 +11,6 @@ class Follower(object):
     def __init__(self):
         """Build and store logger."""
         self.logger = lib.get_logger()
-        self.logger.debug("Follower has logger")
 
     def follow(self, cmd):
         """Accept and handle fire commands.
@@ -22,7 +20,6 @@ class Follower(object):
         :param cmd: Description of fire action to execute.
 
         """
-        self.logger.debug("Follow cmd: {}".format(cmd))
         self.always_work(cmd)
 
     def always_work(self, cmd):

@@ -1,14 +1,14 @@
-#!/usr/bin/env python
 """Library of useful functions that apply to many modules."""
 
 from os import getcwd, path
+import logging.handlers
 
 try:
     import yaml
 except ImportError, err:
+    import sys
     sys.stderr.write("ERROR: {}. Try installing python-yaml.\n".format(err))
-
-import logging.handlers
+    raise
 
 _logger = None
 
@@ -39,6 +39,23 @@ def load_config(config_file="config.yaml"):
     # Open and read config file
     with open(qual_config_file) as config_fd:
         return yaml.load(config_fd)
+
+
+def write_config(new_config, config_file="config.yaml"):
+    """Write an updated version of config back to the config file.
+
+    :param new_config: Updated version of config to write.
+    :type new_config: dict
+    :param config_file: YAML file to write config to.
+    :type config_file: string
+
+    """
+    # Build valid path from CWD to config file
+    qual_config_file = prepend_prefix(config_file)
+
+    # Write new config
+    with open(qual_config_file, "w") as config_fd:
+        yaml.dump(new_config, config_fd)
 
 
 def load_strategy(strat_file):
@@ -76,24 +93,73 @@ def load_targeting(targ_file=None):
 
 
 def set_testing(state, config_file="config.yaml"):
+    """Set the testing flag in config to the given boolean value.
+
+    The testing flag is used to either load point code to simulated hardware
+    files or real file descriptions on the BBB.
+
+    :param state: Value to set testing config flag to.
+    :type state: boolean
+    :param config_file: YAML file to write config to.
+    :type config_file: string
+
+    """
     # Confirm that state is a boolean value
     if type(state) != bool:
         print "ERROR: State should be a boolean, not updating."
         return
 
-    # Build valid path from CWD to config file
-    qual_config_file = prepend_prefix(config_file)
+    # Get current config
+    config = load_config()
 
-    # Open and read config file
-    with open(qual_config_file, "r") as config_fd:
-        config = yaml.load(config_fd)
-
-    # Update config file with new state
+    # Update config with new testing state
     config["testing"] = state
 
+    # Write updated config
+    write_config(config)
+
+
+def set_strat(strat_file):
+    """Modify config.yaml to point to the given strategy file.
+
+    The given strat_file is assumed to exist in the directory pointed to
+    by test_strat_base_dir in config.yaml. If that assumption doesn't hold,
+    use set_strat_qual to pass a full path from the root of the repo.
+
+    :param strat_file: Strategy file to set in config.yaml.
+    :type strat_file: string
+
+    """
+    # Get current config
+    config = load_config()
+
+    # Update config with new strategy
+    strat_file_qual = config["test_strat_base_dir"] + strat_file
+    config["strategy"] = strat_file_qual
+
     # Write new config
-    with open(qual_config_file, "w") as config_fd:
-        yaml.dump(config, config_fd)
+    write_config(config)
+
+
+def set_strat_qual(strat_file_qual):
+    """Modify config.yaml to point to the given strategy file.
+
+    The given strat_file_qual is assumed to be a path from the root of the
+    repo to a strategy file. If you just want to use pass the name of the file
+    and use test_strat_base_dir from config.yaml, instead call set_strat.
+
+    :param strat_file: Qualified strategy file to set in config.yaml.
+    :type strat_file: string
+
+    """
+    # Get current config
+    config = load_config()
+
+    # Update config with new strategy
+    config["strategy"] = strat_file_qual
+
+    # Write new config
+    write_config(config)
 
 
 def get_logger(prefix=None):

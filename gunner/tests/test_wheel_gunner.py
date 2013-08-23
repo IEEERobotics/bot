@@ -30,28 +30,28 @@ class TestUpdateRotateSpeed(unittest.TestCase):
         self.orig_test_state = config["testing"]
         lib.set_testing(True)
 
-        # List of directories containing simulated hardware
-        self.test_dirs = []
+        # TODO(dfarrell07): Clear gun_sol hardware dirs
 
         # Collect simulated hardware test directories
-        # TODO(dfarrell07): Remove magic nums by reading HW IDs from config
-        for m_num in range(0, 2):
-            self.test_dirs.append(config["test_pwm_base_dir"] + str(m_num))
+        self.m_test_dirs = []
+        for motor in config["gun_motors"]:
+            self.m_test_dirs.append(config["test_pwm_base_dir"]
+                                  + str(motor["PWM"]))
 
         # Set simulated directories to known state
-        for test_dir in self.test_dirs:
+        for m_test_dir in self.m_test_dirs:
             # Create test directory if it doesn't exist
-            if not os.path.exists(test_dir):
-                os.makedirs(test_dir)
+            if not os.path.exists(m_test_dir):
+                os.makedirs(m_test_dir)
 
             # Set known values in all simulated hardware files
-            with open(test_dir + "/run", "w") as f:
+            with open(m_test_dir + "/run", "w") as f:
                 f.write("0\n")
-            with open(test_dir + "/duty_ns", "w") as f:
+            with open(m_test_dir + "/duty_ns", "w") as f:
                 f.write("0\n")
-            with open(test_dir + "/period_ns", "w") as f:
+            with open(m_test_dir + "/period_ns", "w") as f:
                 f.write("1000\n")
-            with open(test_dir + "/polarity", "w") as f:
+            with open(m_test_dir + "/polarity", "w") as f:
                 f.write("0\n")
 
         # Build wheel gunner
@@ -87,8 +87,8 @@ class TestUpdateRotateSpeed(unittest.TestCase):
         for i in range(10):
             test_speed = randint(0, 100)
             self.wg.wheel_speed = test_speed
-            for test_dir, motor in zip(self.test_dirs, self.wg.motors):
-                with open(test_dir + '/duty_ns', 'r') as f:
+            for m_test_dir, motor in zip(self.m_test_dirs, self.wg.motors):
+                with open(m_test_dir + '/duty_ns', 'r') as f:
                     # Duty is read like this by PWM getter
                     duty = int(f.read())
                     # Speed is derived this way in position getter
@@ -125,27 +125,29 @@ class TestFire(unittest.TestCase):
         lib.set_testing(True)
 
         # List of directories containing simulated hardware
-        self.test_dirs = []
+        self.m_test_dirs = []
+
+        # TODO(dfarrell07): Clear gun_sol hardware dirs
 
         # Collect simulated hardware test directories
-        # TODO(dfarrell07): Remove magic nums by reading HW IDs from config
-        for m_num in range(0, 2):
-            self.test_dirs.append(config["test_pwm_base_dir"] + str(m_num))
+        for motor in config["gun_motors"]:
+            self.m_test_dirs.append(config["test_pwm_base_dir"] +
+                                  str(motor["PWM"]))
 
         # Set simulated directories to known state
-        for test_dir in self.test_dirs:
+        for m_test_dir in self.m_test_dirs:
             # Create test directory if it doesn't exist
-            if not os.path.exists(test_dir):
-                os.makedirs(test_dir)
+            if not os.path.exists(m_test_dir):
+                os.makedirs(m_test_dir)
 
             # Set known values in all simulated hardware files
-            with open(test_dir + "/run", "w") as f:
+            with open(m_test_dir + "/run", "w") as f:
                 f.write("0\n")
-            with open(test_dir + "/duty_ns", "w") as f:
+            with open(m_test_dir + "/duty_ns", "w") as f:
                 f.write("0\n")
-            with open(test_dir + "/period_ns", "w") as f:
+            with open(m_test_dir + "/period_ns", "w") as f:
                 f.write("1000\n")
-            with open(test_dir + "/polarity", "w") as f:
+            with open(m_test_dir + "/polarity", "w") as f:
                 f.write("0\n")
 
         # Build wheel gunner
@@ -181,28 +183,28 @@ class TestAdvanceDart(unittest.TestCase):
         self.orig_test_state = config["testing"]
         lib.set_testing(True)
 
-        # List of directories containing simulated hardware
-        self.test_dirs = []
+        # TODO(dfarrell07): Clear gun_sol hardware dirs
 
         # Collect simulated hardware test directories
-        # TODO(dfarrell07): Remove magic nums by reading HW IDs from config
-        for m_num in range(0, 2):
-            self.test_dirs.append(config["test_pwm_base_dir"] + str(m_num))
+        self.m_test_dirs = []
+        for motor in config["gun_motors"]:
+            self.m_test_dirs.append(config["test_pwm_base_dir"] +
+                                  str(motor["PWM"]))
 
         # Set simulated directories to known state
-        for test_dir in self.test_dirs:
+        for m_test_dir in self.m_test_dirs:
             # Create test directory if it doesn't exist
-            if not os.path.exists(test_dir):
-                os.makedirs(test_dir)
+            if not os.path.exists(m_test_dir):
+                os.makedirs(m_test_dir)
 
             # Set known values in all simulated hardware files
-            with open(test_dir + "/run", "w") as f:
+            with open(m_test_dir + "/run", "w") as f:
                 f.write("0\n")
-            with open(test_dir + "/duty_ns", "w") as f:
+            with open(m_test_dir + "/duty_ns", "w") as f:
                 f.write("0\n")
-            with open(test_dir + "/period_ns", "w") as f:
+            with open(m_test_dir + "/period_ns", "w") as f:
                 f.write("1000\n")
-            with open(test_dir + "/polarity", "w") as f:
+            with open(m_test_dir + "/polarity", "w") as f:
                 f.write("0\n")
 
         # Build wheel gunner
@@ -214,4 +216,4 @@ class TestAdvanceDart(unittest.TestCase):
 
     def test_advance_dart(self):
         self.wg.advance_dart()
-        assert self.wg.dart_sol.state == "retracted"
+        assert self.wg.gun_sol.state == "retracted"

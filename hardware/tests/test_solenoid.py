@@ -23,16 +23,16 @@ class TestState(unittest.TestCase):
 
     def setUp(self):
         """Setup test hardware files and build solenoid object."""
-        # ID number of solenoid
-        self.s_num = 0
-
         # Load config
         config = lib.load_config()
-        self.test_dir = config["test_gpio_base_dir"] + str(self.s_num)
 
         # Set testing flag in config
         self.orig_test_state = config["testing"]
         lib.set_testing(True)
+
+        # Get ID of solenoid, define test directory
+        self.s_num = config["gun_sol"]["GPIO"]
+        self.test_dir = config["test_gpio_base_dir"] + str(self.s_num)
 
         # Create test directory if it doesn't exist
         if not os.path.exists(self.test_dir):
@@ -92,16 +92,16 @@ class TestDirection(unittest.TestCase):
 
     def setUp(self):
         """Setup test hardware files and build solenoid object."""
-        # ID number of solenoid
-        self.s_num = 0
-
         # Load config
         config = lib.load_config()
-        self.test_dir = config["test_gpio_base_dir"] + str(self.s_num)
 
         # Set testing flag in config
         self.orig_test_state = config["testing"]
         lib.set_testing(True)
+
+        # Get ID of solenoid, define test directory
+        self.s_num = config["gun_sol"]["GPIO"]
+        self.test_dir = config["test_gpio_base_dir"] + str(self.s_num)
 
         # Create test directory if it doesn't exist
         if not os.path.exists(self.test_dir):

@@ -8,12 +8,13 @@ gun_motors:
 - {PWM: 5}
 gun_sol: {GPIO: 0}
 log_file: logs/bot.log
+sol_extend_delay: 0.5
 strategy: planner/strategies/strategy0.yaml
 targeting: gunner/targeting/targeting0.yaml
 test_gpio_base_dir: simulator/pins/gpio/gpio
 test_pwm_base_dir: simulator/pins/pwm/pwm
 test_strat_base_dir: planner/tests/strategies/
-testing: true
+testing: false
 turret_servos:
 - {PWM: 6, axis: servo_x}
 - {PWM: 7, axis: servo_y}

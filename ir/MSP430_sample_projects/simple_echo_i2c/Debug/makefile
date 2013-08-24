@@ -6,7 +6,7 @@ CG_TOOL_ROOT := /opt/ti/ccsv5/tools/compiler/msp430_4.1.2
 
 ORDERED_OBJS += \
 $(GEN_CMDS__FLAG) \
-"./main.obj" \
+"./simple_echo_i2c_main.obj" \
 -l"libc.a" \
 "../lnk_msp430g2332.cmd" \
 
@@ -120,8 +120,8 @@ simple_echo_i2c.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(MSP430_EXECUTABLE_OUTPUTS__QUOTED) "simple_echo_i2c.out"
-	-$(RM) "main.pp" 
-	-$(RM) "main.obj" 
+	-$(RM) "simple_echo_i2c_main.pp" 
+	-$(RM) "simple_echo_i2c_main.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

@@ -72,5 +72,6 @@ class WheelGunner(gunner.Gunner):
         """Cause hardware to push a dart into the spinning wheels."""
         self.logger.debug("Advancing dart")
         self.gun_sol.extend()
-        sleep(.5)
+        if not self.config["testing"]:
+            sleep(self.config["sol_extend_delay"])
         self.gun_sol.retract()

@@ -11,7 +11,7 @@ actions:
         summary: Follow line until intersection of main-line and fire-line one.
         expected_result: IntersectionException
     - action_num: 2
-      type: complex_move
+      type: rote_move
       description: 
         summary: Turn left at intersection.
         subtype: left_intersection
@@ -21,13 +21,13 @@ actions:
         summary: Follow line until target box is found.
         expected_result: BoxException
     - action_num: 4
-      type: complex_move
+      type: rote_move
       description: 
         summary: Rotate 90 degrees counterclockwise.
         subtype: measured_rotate
         degrees: 90
     - action_num: 5
-      type: complex_move
+      type: rote_move
       description: 
         summary: Get square on block.
         subtype: block-align

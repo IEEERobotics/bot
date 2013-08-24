@@ -4,7 +4,7 @@ import sys
 
 import lib.lib as lib
 import lib.exceptions as ex
-import driver.mech_driver as mdriver
+import driver.mec_driver as mdriver
 import gunner.wheel_gunner as wgunner
 import follower.follower as follower
 
@@ -21,20 +21,16 @@ class Planner(object):
         """Setup planner by getting a logger, config and strategy."""
         # Get and store logger object
         self.logger = lib.get_logger()
-        self.logger.debug("Planner has logger")
 
         # Load and store configuration
         self.config = lib.load_config()
-        self.logger.debug("Planner has config")
-        self.logger.debug("Config: " + str(self.config))
 
         # Load and store strategy
         self.strat = lib.load_strategy(self.config["strategy"])
-        self.logger.debug("Strategy loaded")
-        self.logger.debug("Strategy: " + str(self.strat))
+        assert self.strat is not None, "Strategy seems to be empty"
 
-        # Build MechDriver, which will accept and handle movement actions
-        self.driver = mdriver.MechDriver()
+        # Build MecDriver, which will accept and handle movement actions
+        self.driver = mdriver.MecDriver()
 
         # Build WheelGunner, which will accept and handle fire actions
         self.gunner = wgunner.WheelGunner()
@@ -55,7 +51,7 @@ class Planner(object):
         for act in self.strat["actions"]:
             self.logger.debug(act["description"]["summary"])
 
-            if act["type"] == "complex_move":
+            if act["type"] == "rote_move":
                 # Pass movement commands to driver
                 self.driver.move(act["description"])
             elif act["type"] == "follow":

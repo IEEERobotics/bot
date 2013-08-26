@@ -19,7 +19,7 @@ class Motor(object):
 
     """
 
-    def __init__(self, pwm_num, gpio_num=None):
+    def __init__(self, pwm_num, gpio_num=None, inverted=False):
         """Setup logger and PWM interface.
 
         Note that the default gpio_num=None param implies that the motor
@@ -30,7 +30,9 @@ class Motor(object):
         :type pwm_num: int
         :param gpio_num: Optional GPIO number for this motor.
         :type gpio_num: int
-
+        :param inverted: Whether to treat direction as inverted.
+        :type inverted: bool
+        
         """
         # Get and store logger object
         self.logger = lib.get_logger()
@@ -38,6 +40,9 @@ class Motor(object):
         # Store PWM and GPIO numbers of motor
         self.pwm_num = pwm_num
         self.gpio_num = gpio_num
+
+        # Set motor-specific forward and reverse values based on inverted; TODO make this a config flag
+        self.invert(inverted)
 
         # Load system configuration
         config = lib.load_config()
@@ -85,6 +90,14 @@ class Motor(object):
                                                              self.speed,
                                                              self.direction,
                                                              self.velocity)
+    def invert(self, inverted):
+        self.inverted = inverted
+        if self.inverted:
+            self.forward = REVERSE
+            self.reverse = FORWARD
+        else:
+            self.forward = FORWARD
+            self.reverse = REVERSE
 
     @property
     def speed(self):
@@ -128,9 +141,9 @@ class Motor(object):
             self.logger.warn("{} doesn't own a GPIO".format(self))
             return None
 
-        if self.gpio.value == FORWARD:
+        if self.gpio.value == self.forward:
             return "forward"
-        elif self.gpio.value == REVERSE:
+        elif self.gpio.value == self.reverse:
             return "reverse"
         else:
             self.logger.error("Invalid polarity: {}".format(self.gpio))
@@ -152,9 +165,9 @@ class Motor(object):
             return None
 
         if direction == "forward":
-            direction = FORWARD
+            direction = self.forward
         elif direction == "reverse":
-            direction = REVERSE
+            direction = self.reverse
         elif direction != 0 and direction != 1:
             self.logger.warn("Invalid dir {}, no update.".format(direction))
             return

@@ -41,10 +41,10 @@ class Server(object):
         # Testing flag will cause objects to run on simulated hardware
         if testing == "True":
             self.logger.info("Server will build bot objects in test mode")
-            lib.set_testing(bool(testing))
+            lib.set_testing(True)
         elif testing == "False":
             self.logger.info("Server will build bot objects in non-test mode")
-            lib.set_testing(bool(testing))
+            lib.set_testing(False)
         else:
             self.logger.info("Defaulting to config testing flag: {}".format(
                                                     self.config["testing"]))

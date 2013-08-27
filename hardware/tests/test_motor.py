@@ -24,32 +24,41 @@ class TestSpeed(unittest.TestCase):
     def setUp(self):
         """Setup test hardware files and build motor object."""
         # ID number of motor
-        self.m_num = 0
+        self.pwm_num = 0
+        self.gpio_num = 0
 
         # Load config
         config = lib.load_config()
-        self.test_dir = config["test_pwm_base_dir"] + str(self.m_num)
+        self.pwm_test_dir = config["test_pwm_base_dir"] + str(self.pwm_num)
+        self.gpio_test_dir = config["test_gpio_base_dir"] + str(self.gpio_num)
 
         # Set testing flag in config
         self.orig_test_state = config["testing"]
         lib.set_testing(True)
 
-        # Create test directory if it doesn't exist
-        if not os.path.exists(self.test_dir):
-            os.makedirs(self.test_dir)
+        # Create test directories if they don't exist
+        for test_dir in [self.pwm_test_dir, self.gpio_test_dir]:
+            if not os.path.exists(test_dir):
+                os.makedirs(test_dir)
 
-        # Set known values in all simulated hardware files
-        with open(self.test_dir + "/run", "w") as f:
+        # Set known values in PWM simulated hardware files
+        with open(self.pwm_test_dir + "/run", "w") as f:
             f.write("0\n")
-        with open(self.test_dir + "/duty_ns", "w") as f:
+        with open(self.pwm_test_dir + "/duty_ns", "w") as f:
             f.write("0\n")
-        with open(self.test_dir + "/period_ns", "w") as f:
+        with open(self.pwm_test_dir + "/period_ns", "w") as f:
             f.write("1000\n")
-        with open(self.test_dir + "/polarity", "w") as f:
+        with open(self.pwm_test_dir + "/polarity", "w") as f:
             f.write("0\n")
+
+        # Set known values in GPIO simulated hardware files
+        with open(self.gpio_test_dir + "/value", "w") as f:
+            f.write("0\n")
+        with open(self.gpio_test_dir + "/direction", "w") as f:
+            f.write("out\n")
 
         # Build motor in testing mode
-        self.motor = m_mod.Motor(self.m_num)
+        self.motor = m_mod.Motor(self.pwm_num, self.gpio_num)
 
     def tearDown(self):
         """Restore testing flag state in config file."""
@@ -81,7 +90,7 @@ class TestSpeed(unittest.TestCase):
         for i in range(10):
             test_speed = randint(0, 100)
             self.motor.speed = test_speed
-            with open(self.test_dir + '/duty_ns', 'r') as f:
+            with open(self.pwm_test_dir + '/duty_ns', 'r') as f:
                 # Duty is read like this by PWM getter
                 duty = int(f.read())
                 # Speed is derived this way in position getter
@@ -107,32 +116,41 @@ class TestDirection(unittest.TestCase):
     def setUp(self):
         """Setup test hardware files and build motor object."""
         # ID number of motor
-        self.m_num = 0
+        self.pwm_num = 0
+        self.gpio_num = 0
 
         # Load config
         config = lib.load_config()
-        self.test_dir = config["test_pwm_base_dir"] + str(self.m_num)
+        self.pwm_test_dir = config["test_pwm_base_dir"] + str(self.pwm_num)
+        self.gpio_test_dir = config["test_gpio_base_dir"] + str(self.gpio_num)
 
-        # Store original test flag and then set it to True
+        # Set testing flag in config
         self.orig_test_state = config["testing"]
         lib.set_testing(True)
 
-        # Create test directory if it doesn't exist
-        if not os.path.exists(self.test_dir):
-            os.makedirs(self.test_dir)
+        # Create test directories if they don't exist
+        for test_dir in [self.pwm_test_dir, self.gpio_test_dir]:
+            if not os.path.exists(test_dir):
+                os.makedirs(test_dir)
 
-        # Set known values in all simulated hardware files
-        with open(self.test_dir + "/run", "w") as f:
+        # Set known values in PWM simulated hardware files
+        with open(self.pwm_test_dir + "/run", "w") as f:
             f.write("0\n")
-        with open(self.test_dir + "/duty_ns", "w") as f:
+        with open(self.pwm_test_dir + "/duty_ns", "w") as f:
             f.write("0\n")
-        with open(self.test_dir + "/period_ns", "w") as f:
+        with open(self.pwm_test_dir + "/period_ns", "w") as f:
             f.write("1000\n")
-        with open(self.test_dir + "/polarity", "w") as f:
+        with open(self.pwm_test_dir + "/polarity", "w") as f:
             f.write("0\n")
+
+        # Set known values in GPIO simulated hardware files
+        with open(self.gpio_test_dir + "/value", "w") as f:
+            f.write("0\n")
+        with open(self.gpio_test_dir + "/direction", "w") as f:
+            f.write("out\n")
 
         # Build motor in testing mode
-        self.motor = m_mod.Motor(self.m_num)
+        self.motor = m_mod.Motor(self.pwm_num, self.gpio_num)
 
     def tearDown(self):
         """Restore testing flag state in config file."""

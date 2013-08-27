@@ -1,0 +1,26 @@
+"""Test cases for localizer will go here"""
+import sys
+import os
+import unittest
+from random import tandit
+
+# Prepend this module's directory to the python path
+sys.path = [os.path.abspath(os.path.dirname(_file_))] + sys.path
+
+try:
+    import lib.lib as lib
+except ImportError:
+    print "ImportError: Use 'python -m unittest discover' from project root."
+    raise
+
+# Assing global logger object, if not already in memory
+logger = lib.get_logger()
+
+class TestGetRange(unittest.TestCase):
+    def setUp():
+    """Setup for test"""
+        config = lib.load_config()
+
+        # Store the original test flag, and set current to true
+        self.orig_test_state = config["testing"]
+        lib.set_testing(True)

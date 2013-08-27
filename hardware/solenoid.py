@@ -29,16 +29,12 @@ class Solenoid(object):
         config = lib.load_config()
 
         if config["testing"]:
-            self.logger.debug("TEST MODE: Solenoid {}".format(self.num))
-
             # Get dir of simulated hardware files from config
             test_dir = lib.prepend_prefix(config["test_gpio_base_dir"])
 
             # Build GPIO object for BBB interaction, provide test dir
             self.gpio = gpio_mod.GPIO(self.num, test_dir)
         else:
-            self.logger.debug("EMBEDDED MODE: Solenoid {}".format(self.num))
-
             # Build GPIO object for BBB interaction
             self.gpio = gpio_mod.GPIO(self.num)
 

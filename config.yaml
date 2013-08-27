@@ -1,12 +1,12 @@
 drive_motors:
-- {PWM: 0, position: front_right}
-- {PWM: 1, position: front_left}
-- {PWM: 2, position: back_left}
-- {PWM: 3, position: back_right}
+- {GPIO: 0, PWM: 0, position: front_right}
+- {GPIO: 1, PWM: 1, position: front_left}
+- {GPIO: 2, PWM: 2, position: back_left}
+- {GPIO: 3, PWM: 3, position: back_right}
 gun_motors:
-- {PWM: 4}
-- {PWM: 5}
-gun_sol: {GPIO: 0}
+- {GPIO: 4, PWM: 4}
+- {GPIO: 5, PWM: 5}
+gun_sol: {GPIO: 6}
 log_file: logs/bot.log
 sol_extend_delay: 0.5
 strategy: planner/strategies/strategy0.yaml

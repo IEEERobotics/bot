@@ -4,18 +4,12 @@ from math import sin, cos, pi, floor, fabs
 
 import driver
 import lib.lib as lib
+import hardware.motor as m_mod
 
 
 class MecDriver(driver.Driver):
 
     """Subclass of Driver for movement with mecanum wheels.
-
-    TODO(dfarrell07): Override Driver.move with translate + rotate combo code.
-
-    Motor A = front left
-    Motor B = front Right
-    Motor C = Back Left
-    Motor D = Back Right
 
     """
 
@@ -40,6 +34,13 @@ class MecDriver(driver.Driver):
 
         """
         self.logger.debug("IO write: motor: {}, ds: {}, direction: {}".format(motor, ds, direction))
+
+    def stop_move(self)
+        # Write 0 to all io to stop movement.
+        self.iowrite("front_left", 0, True)
+        self.iowrite("front_right", 0, True)
+        self.iowrite("back_left", 0, True)
+        self.iowrite("back_right", 0, True)
 
     def rotate(self, rotate_speed):
         """Pass rotation speed as -100 to 100 (positive is clockwise)."""

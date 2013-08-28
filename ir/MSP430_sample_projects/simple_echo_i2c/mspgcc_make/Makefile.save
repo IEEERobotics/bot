@@ -10,18 +10,18 @@
 # the binary flashed on the device after build, use "bin prog".
 
 # Source files, C, C++  and Assembly
-SOURCEC   = main.c
+SOURCEC   = simple_echo_i2c_main.c
 SOURCECPP =
 SOURCEASM =
 
 # bin:binary file, lib:library, prog:program device
-BUILD     = bin prog
+BUILD     = bin
 
 # Target binary without extension.
 TARGET    = main
 
 # Include paths, f.ex. -I. -Isome/path
-INCLUDES  =
+INCLUDES  = -I
 
 # Libraries to link with, f.ex. -lcomm
 # ...and where to find them f.ex. -Llib -Lsome/path

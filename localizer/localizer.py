@@ -15,7 +15,7 @@ class Localizer(object):
     """
 
     def __init__(self):
-        """Setup and store logger."""
+        """Setup and store a global logger,if not already in memory."""
         self.logger = lib.get_logger()
 
     def which_block(self):

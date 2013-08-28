@@ -26,16 +26,12 @@ class Servo(object):
         config = lib.load_config()
 
         if config["testing"]:
-            self.logger.debug("TEST MODE: Servo {}".format(self.num))
-
             # Get dir of simulated hardware files from config
             test_dir = lib.prepend_prefix(config["test_pwm_base_dir"])
 
             # Build PWM object for BBB interaction, provide test dir
             self.pwm = pwm_mod.PWM(self.num, test_dir)
         else:
-            self.logger.debug("EMBEDDED MODE: Servo {}".format(self.num))
-
             # Build PWM object for BBB interaction
             self.pwm = pwm_mod.PWM(self.num)
 

@@ -25,8 +25,8 @@ class MecDriver(driver.Driver):
         
         # Create motor object
         self.motors = {}
-        for motor in self.config["drive+motors"]:
-            self.motors[motor["position"]] = md.Motor(motor("PWM"))
+        for motor in self.config["drive_motors"]:
+            self.motors[motor["position"]] = m_mod.Motor(motor["PWM"])
 
     def iowrite(self, motor, ds, direction):
         """Write to IO pens that control the motors.

@@ -2,7 +2,6 @@
 
 from math import sin, cos, pi, fabs, sqrt
 
-import hardware.motor as m_mod
 import driver
 import lib.lib as lib
 import hardware.motor as m_mod
@@ -21,6 +20,7 @@ class MecDriver(driver.Driver):
         for motor in self.config["drive_motors"]:
             self.motors[motor["position"]] = m_mod.Motor(motor["PWM"],
                                                          motor["GPIO"])
+
     def __str__(self):
         """Show status of motors."""
         return "fr: {}, fl: {} br: {}, bl: {}".format(

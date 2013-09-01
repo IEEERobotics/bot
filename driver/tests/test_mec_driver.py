@@ -2,10 +2,6 @@
 import sys
 import os
 import unittest
-<<<<<<< HEAD
-from random import randint
-=======
->>>>>>> d6588c19596a41199ceea9a02ed278813eda3fc7
 
 sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
 
@@ -54,20 +50,12 @@ class TestRotate(unittest.TestCase):
             with open(test_dir + "period_ns", "w") as f:
                 f.write("0\n")
 
-<<<<<<< HEAD
-        # Build mech_driver
-=======
         # Build mec_driver
->>>>>>> d6588c19596a41199ceea9a02ed278813eda3fc7
         self.md = md.MecDriver()
 
     def tearDown(self):
         """Restore testing flag state in config file."""
-<<<<<<< HEAD
-        lib.set_testing(self.orig_test)
-=======
         lib.set_testing(self.orig_test_state)
->>>>>>> d6588c19596a41199ceea9a02ed278813eda3fc7
 
     @unittest.skip("Broken test")
     def test_rotate(self):

@@ -69,10 +69,10 @@ class MecDriver(driver.Driver):
         assert 0 <= angle <= 360
 
         # Calculate motor speeds
-        front_left = speed * sqrt(2) * sin(angle * pi / 180 + pi / 4)
-        front_right = speed * sqrt(2) * cos(angle * pi / 180 + pi / 4)
-        back_left = speed * sqrt(2) * cos(angle * pi / 180 + pi / 4)
-        back_right = speed * sqrt(2) * sin(angle * pi / 180 + pi / 4)
+        front_left = speed * sin(angle * pi / 180 + pi / 4)
+        front_right = speed * cos(angle * pi / 180 + pi / 4)
+        back_left = speed * cos(angle * pi / 180 + pi / 4)
+        back_right = speed * sin(angle * pi / 180 + pi / 4)
 
         # Set motor directions
         self.motors["front_left"] = "forward" if front_left > 0 else "reverse"

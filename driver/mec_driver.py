@@ -2,6 +2,7 @@
 
 from math import sin, cos, pi, floor, fabs
 
+import hardware.motor as m_mod
 import driver
 import lib.lib as lib
 
@@ -26,7 +27,7 @@ class MecDriver(driver.Driver):
         # Create motor object
         self.motors = {}
         for motor in self.config["drive_motors"]:
-            self.motors[motor["position"]] = m_mod.Motor(motor["PWM"])
+            self.motors[motor["position"]] = m_mod.Motor(motor["PWM"], motor["GPIO"])
 
     def iowrite(self, motor, ds, direction):
         """Write to IO pens that control the motors.

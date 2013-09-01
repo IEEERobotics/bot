@@ -2,13 +2,13 @@
 import sys
 import os
 import unittest
-from random import tandit
+from random import randint
 
-sys.path = [os.path.abspath(os.path.dirname(_file_))] + sys.path
+sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
 
 try:
     import lib.lib as lib
-    import driver.mech_driver as md
+    import driver.mec_driver as md
 except ImportError:
     print "ImportError: Use 'python -m unittest discover' from project root."
     raise
@@ -52,11 +52,11 @@ class TestRotate(unittest.TestCase):
                 f.write("0\n")
 
         # Build mech_driver
-        self.md = md.MechDriver()
+        self.md = md.MecDriver()
 
     def tearDown(self):
         """Restore testing flag state in config file."""
-        lib.set_testing(self.orig_test
+        lib.set_testing(self.orig_test)
 
     def test_rotate(self):
         self.md.rotate(0)

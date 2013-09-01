@@ -53,7 +53,7 @@ class MecDriver(driver.Driver):
             self.motors[key] = magnatude
 
         self.logger.debug("Magnitude: {}, direction: {}".format(magnatude,
-                                                               direction))
+                                                                direction))
 
     def move(self, speed, angle):
         """Move holonomically without rotation.
@@ -73,9 +73,10 @@ class MecDriver(driver.Driver):
         front_right = speed * cos(angle * pi / 180 + pi / 4)
         back_left = speed * cos(angle * pi / 180 + pi / 4)
         back_right = speed * sin(angle * pi / 180 + pi / 4)
-        
-        #find largest motor speed, use to normalize vectors and maintain maximum efficiency
-        max = max([front_left,front_right,back_left,back_right])
+
+        #find largest motor speed
+        #use to normalize multipliers and maintain maximum efficiency
+        max = max([front_left, front_right, back_left, back_right])
         front_left = front_left / max * 100
         front_right = front_right / max * 100
         back_left = back_left / max * 100

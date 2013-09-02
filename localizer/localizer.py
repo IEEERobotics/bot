@@ -1,63 +1,76 @@
 """
-Interpret sensors to derive bot's location.
+Localizer: A Minimalist Implementation
 
-Note that this is meant to be simple localization, preferably
-as computationally light and easy to understand as possible.
-The required level of detail is to be able to say which of the
-set of discrete block positions the block is located in.
+Requisites:
+    - One SR04 Ultrasonic transmitter/receiver pair
+    - Two GPIO pins on our microcontroller
+    - A guranteed orientation for the robot at firing time
+    - Knowledge of which of the three firing lines the bot is on.
+          I assume we'll hit them sequentially
 
-Tentative:
-    There will be four ultrasonic sensors facing outwardly in the four
-    cardinal directions on the bot.
-
-    These four sensors can uniquely identify the robtos proximity to a
-    possible shooting block as long as these requirements are fulfilled.
-
-        1 - The robot knows which of the two straight shooting lines it is on
-
-range = high level time * velocity (340M/S) / 2; we suggest to use over 60ms
-measurement cycle, in order to avoid detecting a previous ping
-
-Will I need some way to use standard deviation to pull 'bad' measurements
-out of the list of 'pinged' distances when localizing?
-
-Most likely, localization will spur a call to the gunner to look
-up an orientation mapped to the discrete set of possible
-shooting positions
+This version of localzer will:
+    - Determine the bot's distance from the 'right' wall.
+    - The measured distance will be checked against a pre-existing list
+          of discrete firing point distances for each line.
 """
 
-import lib.lib as lib
-
-#globals might be a bad idea.
-MAX_RANGE = 4
-MIN_RANGE = .04
-
-#This assumes we will be getting back a positionally defined array
-(FRONT, BACK, LEFT, RIGHT) = range(4)
-
+try:
+    import lib.lib as lib
+except ImportError:
+    print "ImportError: Use 'python -m unittest discover' from project root."
+    raise
 
 class Localizer(object):
 
+    #From SR04 documentation
+    MAX_RANGE = 4
+    MIN_RANGE = .04
+
+    #Differences between expected and found values shouldn't exceed this
+    MAX_ERROR = 2*.0254
+
+    #Firing position lists for each line.
+    #Converting inches to meters
+    LINE_1 = [
+        7*.0254, 9*.0254, 11*.0254, 13*.0254, 15*.0254, 17*.0254, 19*.0254,
+        21*.0254, 23*.0254, 25*.0254, 27*.0254, 29*.0254, 31*.0254
+    ]
+    #Coming soon
+    LINE_2 = []
+    #Distance from firing position to the right wall will be the same as first
+    LINE_3 = LINE_1
+
     def __init__(self):
-        """Setup and store a global logger,if not already in memory."""
+        """
+        Setup and store a global logger,if not already in memory.
+        """
         self.logger = lib.get_logger()
 
-    def which_block(self, distList):
-        """Determine the discrete location of the block we're sitting on.
-
-        :returns: The position of the block we're sitting on.
-
+    def which_block(self, lineList, distance):
         """
+        input: One of the three line's list of firing positions
+        and a distance to be compared to each item inside it.
 
-        for dist in distList:
-            if dist > MAX_RANGE or dist < MIN_RANGE:
-                self.logger.warn('%s is not within the sensors 
-                    advertised range', dist
-                )
+        returns: The index of the firing position from the line list that is
+        closest to the distance retrieved from the ultrasonic sensor
+        """
+        if distance > self.MAX_RANGE or distance < self.MIN_RANGE:
+            self.logger.warn(
+                """%s meters is not within the sensor\'s
+                advertised range
+                """, distance
+            )
 
-        return {"row": 0, "slot": 0}
+        diff = {}
+        i = 0
+        for item in lineList:
+            diff[i] = (abs(item - distance))
+            i += 1
 
+        #firingPos will be the index of the closest firing position in the line's list
+        firingPos = min(diff, key=diff.get)
 
+        if diff[firingPos] > self.MAX_ERROR:
+            self.logger.warn('%s meters is too much error', diff[firingPos])
 
-    def getPos(self):
-        return 1
+        return firingPos

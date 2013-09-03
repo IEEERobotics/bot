@@ -77,10 +77,10 @@ class MecDriver(driver.Driver):
         #find largest motor speed
         #use to normalize multipliers and maintain maximum efficiency
         max = max([front_left, front_right, back_left, back_right])
-        front_left = front_left / max * 100
-        front_right = front_right / max * 100
-        back_left = back_left / max * 100
-        back_right = back_right / max * 100
+        front_left = front_left / max * speed
+        front_right = front_right / max * speed
+        back_left = back_left / max * speed
+        back_right = back_right / max * speed
 
         # Set motor directions
         self.motors["front_left"] = "forward" if front_left > 0 else "reverse"

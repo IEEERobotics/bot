@@ -97,7 +97,7 @@ class MecDriver(driver.Driver):
 
         self.logger.debug("Speed: {}, angle: {}".format(speed, angle))
 
-    def compound_move(self, translate_speed, translate_angle, rotate_speed, rotate_angle)
+    def compound_move(self, translate_speed, translate_angle, rotate_speed, rotate_angle):
         """Translate and move at same time.
             Note: I have no idea how to predict where the bot ends up 
             during compound movement.
@@ -105,6 +105,7 @@ class MecDriver(driver.Driver):
 
         """
         
+        #Speeds should add up to 100.
         total_speed = translate_speed + rotate_speed
         assert total_speed <= 100
         

@@ -8,8 +8,7 @@ CG_TOOL_ROOT := C:/ti/ccsv5/tools/compiler/msp430_4.1.5
 
 ORDERED_OBJS += \
 $(GEN_CMDS__FLAG) \
-"./main.obj" \
-"./fast_changes_to_i2c_main.obj" \
+"./quick_i2c_main.obj" \
 -l"libc.a" \
 "../lnk_msp430g2332.cmd" \
 
@@ -110,21 +109,21 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: fast_changes_to_i2c.out
+all: quick_i2c.out
 
 # Tool invocations
-fast_changes_to_i2c.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+quick_i2c.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MSP430 Linker'
-	"C:/ti/ccsv5/tools/compiler/msp430_4.1.5/bin/cl430" -vmsp --abi=eabi -g --advice:power=all --define=__MSP430G2332__ --diag_warning=225 --display_error_number --diag_wrap=off --printf_support=minimal -z --stack_size=80 -m"fast_changes_to_i2c.map" --heap_size=80 -i"C:/ti/ccsv5/ccs_base/msp430/include" -i"C:/ti/ccsv5/tools/compiler/msp430_4.1.5/lib" -i"C:/ti/ccsv5/tools/compiler/msp430_4.1.5/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="fast_changes_to_i2c_linkInfo.xml" --rom_model -o "fast_changes_to_i2c.out" $(ORDERED_OBJS)
+	"C:/ti/ccsv5/tools/compiler/msp430_4.1.5/bin/cl430" -vmsp --abi=eabi -g --advice:power=all --define=__MSP430G2332__ --diag_warning=225 --display_error_number --diag_wrap=off --printf_support=minimal -z --stack_size=80 -m"quick_i2c.map" --heap_size=80 -i"C:/ti/ccsv5/ccs_base/msp430/include" -i"C:/ti/ccsv5/tools/compiler/msp430_4.1.5/lib" -i"C:/ti/ccsv5/tools/compiler/msp430_4.1.5/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="quick_i2c_linkInfo.xml" --rom_model -o "quick_i2c.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(MSP430_EXECUTABLE_OUTPUTS__QUOTED) "fast_changes_to_i2c.out"
-	-$(RM) "fast_changes_to_i2c_main.pp" "main.pp" 
-	-$(RM) "fast_changes_to_i2c_main.obj" "main.obj" 
+	-$(RM) $(MSP430_EXECUTABLE_OUTPUTS__QUOTED) "quick_i2c.out"
+	-$(RM) "quick_i2c_main.pp" 
+	-$(RM) "quick_i2c_main.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

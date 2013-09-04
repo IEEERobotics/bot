@@ -1,3 +1,7 @@
+// found from ti
+// seen in wendlers/msp430-i2cslave
+// on https://github.com/wendlers/msp430-i2cslave/tree/master/slave/src
+
 #ifndef TI_USCI_I2C_SLAVE
 #define TI_USCI_I2C_SLAVE
 

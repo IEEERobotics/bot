@@ -11,12 +11,12 @@ set_duty     0  250000
 set_polarity 0 0
 load_gpio 117
 
-# Drive motor 1: P9_29 (pwm1/ehr0B), P9_27 (gpio125)
+# Drive motor 1: P9_29 (pwm1/ehr0B), P9_27 (gpio115)
 load_pwm     1
 set_period   1 1000000
 set_duty     1  250000
 set_polarity 1 0
-load_gpio 125
+load_gpio 115
 
 # Drive motor 2: P8_19 (pwm5/ehr2B), P8_15 (gpio47)
 load_pwm     5

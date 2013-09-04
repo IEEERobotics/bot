@@ -1,6 +1,6 @@
 drive_motors:
 - {GPIO: 117, PWM: 0, position: front_right}  # Drive motor 0: P9_31 (pwm0/ehr0A), P9_25 (gpio117)
-- {GPIO: 125, PWM: 1, position: front_left}   # Drive motor 1: P9_29 (pwm1/ehr0B), P9_27 (gpio125)
+- {GPIO: 115, PWM: 1, position: front_left}   # Drive motor 1: P9_29 (pwm1/ehr0B), P9_27 (gpio115)
 - {GPIO: 47, PWM: 5, position: back_left}     # Drive motor 2: P8_19 (pwm5/ehr2B), P8_15 (gpio47)
 - {GPIO: 45, PWM: 6, position: back_right}    # Drive motor 3: P8_13 (pwm6/ehr2A), P8_11 (gpio45)
 gun_motors:

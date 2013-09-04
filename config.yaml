@@ -1,12 +1,12 @@
 drive_motors:
-- {GPIO: 0, PWM: 0, position: front_right}
-- {GPIO: 1, PWM: 1, position: front_left}
-- {GPIO: 2, PWM: 2, position: back_left}
-- {GPIO: 3, PWM: 3, position: back_right}
+- {GPIO: 117, PWM: 0, position: front_right}  # Drive motor 0: P9_31 (pwm0/ehr0A), P9_25 (gpio117)
+- {GPIO: 125, PWM: 1, position: front_left}   # Drive motor 1: P9_29 (pwm1/ehr0B), P9_27 (gpio125)
+- {GPIO: 62, PWM: 5, position: back_left}     # Drive motor 2: P8_19 (pwm5/ehr2B), P8_21 (gpio62)
+- {GPIO: 45, PWM: 6, position: back_right}    # Drive motor 3: P8_13 (pwm6/ehr2A), P8_11 (gpio45)
 gun_motors:
-- {GPIO: 4, PWM: 4}
-- {GPIO: 5, PWM: 5}
-gun_sol: {GPIO: 6}
+- {GPIO: -1, PWM: 3}  # Gun motor 0: P9_14 (pwm3/ehr1A)
+- {GPIO: -1, PWM: 4}  # Gun motor 1: P9_16 (pwm4/ehr1B)
+gun_sol: {GPIO: 60}   # Gun solenoid/trigger: P9_12 (gpio60)
 log_file: logs/bot.log
 sol_extend_delay: 0.5
 strategy: planner/strategies/strategy0.yaml
@@ -16,5 +16,5 @@ test_pwm_base_dir: simulator/pins/pwm/pwm
 test_strat_base_dir: planner/tests/strategies/
 testing: false
 turret_servos:
-- {PWM: 6, axis: servo_x}
-- {PWM: 7, axis: servo_y}
+- {PWM: 2, axis: servo_x}  # Turret servo - pan: P9_42 (pwm2/ecap0)
+- {PWM: 7, axis: servo_y}  # Turret servo - tilt: P9_28 (pwm7/ecap2)

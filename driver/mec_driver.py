@@ -76,11 +76,11 @@ class MecDriver(driver.Driver):
 
         #find largest motor speed
         #use to normalize multipliers and maintain maximum efficiency
-        max = max([front_left, front_right, back_left, back_right])
-        front_left = front_left / max * 100
-        front_right = front_right / max * 100
-        back_left = back_left / max * 100
-        back_right = back_right / max * 100
+        max_wheel_speed = max([front_left, front_right, back_left, back_right])
+        front_left = front_left / max_wheel_speed * speed
+        front_right = front_right / max_wheel_speed * speed
+        back_left = back_left / max_wheel_speed * speed
+        back_right = back_right / max_wheel_speed * speed
 
         # Set motor directions
         self.motors["front_left"] = "forward" if front_left > 0 else "reverse"
@@ -96,3 +96,46 @@ class MecDriver(driver.Driver):
         self.motors["back_right"] = fabs(back_right)
 
         self.logger.debug("Speed: {}, angle: {}".format(speed, angle))
+
+    def compound_move(self, translate_speed, translate_angle, rotate_speed, rotate_angle):
+        """Translate and move at same time.
+            Note: I have no idea how to predict where the bot ends up 
+            during compound movement.
+            speed, rotate_speed is number between 0,100.
+
+        """
+        
+        #Speeds should add up to 100.
+        total_speed = translate_speed + rotate_speed
+        assert total_speed <= 100
+        
+        #Calculate overall voltage multiplier
+        front_left = translate_speed * sin(angle * pi / 180 + pi / 4) + rotate_speed
+        front_right = translate_speed * cos(angle * pi / 180 + pi / 4) - rotate_speed
+        back_left = translate_speed * cos(angle * pi / 180 + pi / 4) + rotate_speed
+        back_right = translate_speed * sin(angle * pi / 180 + pi / 4) - rotate_speed
+
+        #Normalize so that at least one wheel_speed equals maximum possible wheel_speed.
+        max_wheel_speed = max([front_left, front_right, back_left, back_right])
+        front_left = front_left / max_wheel_speed * total_speed
+        front_right = front_right / max_wheel_speed * total_speed
+        back_left = back_left / max_wheel_speed * total_speed
+        back_right = back_right / max_wheel_speed * total_speed
+
+        # Set motor directions
+        self.motors["front_left"] = "forward" if front_left > 0 else "reverse"
+        self.motors["front_right"] = "forward" if front_right > 0 else \
+                                                                  "reverse"
+        self.motors["back_left"] = "forward" if back_left > 0 else "reverse"
+        self.motors["back_right"] = "forward" if back_right > 0 else "reverse"
+
+        # Set motor speeds
+        self.motors["front_left"] = fabs(front_left)
+        self.motors["front_right"] = fabs(front_right)
+        self.motors["back_left"] = fabs(back_left)
+        self.motors["back_right"] = fabs(back_right)
+
+        self.logger.debug("Translate_speed: {}, Translate_angle: {}, rotate_speed: {}, rotate_angle: {}".format(translate_speed, 
+                                                                                                                translate_angle, 
+                                                                                                                rotate_speed,
+                                                                                                                rotate_angle))

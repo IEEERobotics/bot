@@ -25,9 +25,12 @@ class TestMotion(unittest.TestCase):
         self.config = lib.load_config()
         
         # Create motor objects to test
-        self.drive_motors = [None] * 2
-        self.drive_motors[0] = m_mod.Motor(0, 117)  # TODO get from config file
-        self.drive_motors[1] = m_mod.Motor(1, 115)  # TODO get from config file
+        self.num_motors = 4
+        self.drive_motors = [None] * self.num_motors
+        for i in xrange(self.num_motors):
+            self.drive_motors[i] = m_mod.Motor(self.config['drive_motors'][i]['PWM'], self.config['drive_motors'][i]['GPIO'])
+        
+        # NOTE: 0 = front_right, 1 = front_left, 2 = back_left, 3 = back_right
         
         # Set initial speeds to zero
         self.stop()
@@ -37,18 +40,12 @@ class TestMotion(unittest.TestCase):
         self.stop()
     
     def test_forward(self):
-        self.drive_motors[0].direction = 1
-        self.drive_motors[1].direction = 1
-        self.drive_motors[0].speed = 50
-        self.drive_motors[1].speed = 50
+        self.move([1, 1, 0, 0], [50, 50, 50, 50])
         time.sleep(2)
         self.stop()
     
     def test_backward(self):
-        self.drive_motors[0].direction = 0
-        self.drive_motors[1].direction = 0
-        self.drive_motors[0].speed = 50
-        self.drive_motors[1].speed = 50
+        self.move([0, 0, 1, 1], [50, 50, 50, 50])
         time.sleep(2)
         self.stop()
     
@@ -56,28 +53,24 @@ class TestMotion(unittest.TestCase):
         self.test_forward()
         self.test_backward()
     
-    def test_twist(self):
-        # Turn one way
-        self.drive_motors[0].direction = 0
-        self.drive_motors[1].direction = 1
-        self.drive_motors[0].speed = 50
-        self.drive_motors[1].speed = 50
-        time.sleep(1)
-        self.stop()
-        
-        # Turn the other way
-        self.drive_motors[0].direction = 1
-        self.drive_motors[1].direction = 0
-        self.drive_motors[0].speed = 50
-        self.drive_motors[1].speed = 50
+    def test_strafe(self, dir=0):
+        self.move([dir, 1 - dir, 1 - dir, dir], [50, 50, 50, 50])
         time.sleep(1)
         self.stop()
     
     def test_dance(self):
         """Twist a few times."""
         for i in xrange(5):
-            self.test_twist()
+            self.test_strafe(0)
+            self.test_strafe(1)
     
+    def move(self, dirs, speeds):
+        # NOTE: dirs and speeds must be the same length as self.drive_motors
+        for motor, dir, speed in zip(self.drive_motors, dirs, speeds):
+            if motor is None: continue
+            motor.direction = dir
+            motor.speed = speed
+
     def stop(self):
         for motor in self.drive_motors:
             if motor is None: continue

@@ -31,16 +31,10 @@ class TestExecStrategy(unittest.TestCase):
 
         # Collect simulated wheel_gunner hardware test directories
         self.wg_pwm_test_dirs = []
-        self.wg_gpio_test_dirs = []
         for motor in self.config["gun_motors"]:
             # Collect PWM test dir
             pwm_test_dir = self.config["test_pwm_base_dir"] + str(motor["PWM"])
             self.wg_pwm_test_dirs.append(pwm_test_dir)
-
-            # Collect GPIO test dir
-            gpio_test_dir = self.config["test_gpio_base_dir"] +\
-                                                        str(motor["GPIO"])
-            self.wg_gpio_test_dirs.append(gpio_test_dir)
 
         # Collect simulated turret servo hardware test directories
         self.ts_test_dirs = {}
@@ -66,8 +60,7 @@ class TestExecStrategy(unittest.TestCase):
                             str(self.config["gun_sol"]["GPIO"])]
 
         # Collect simulated GPIO hardware test directories
-        gpio_test_dirs = self.sol_test_dir + self.md_gpio_test_dirs.values() +\
-                                             self.wg_gpio_test_dirs
+        gpio_test_dirs = self.sol_test_dir + self.md_gpio_test_dirs.values()
 
         # Collect simulated PWM hardware test directories
         pwm_test_dirs = self.wg_pwm_test_dirs + self.ts_test_dirs.values() +\
@@ -83,9 +76,9 @@ class TestExecStrategy(unittest.TestCase):
             with open(test_dir + "/run", "w") as f:
                 f.write("0\n")
             with open(test_dir + "/duty_ns", "w") as f:
-                f.write("0\n")
+                f.write("1500000\n")
             with open(test_dir + "/period_ns", "w") as f:
-                f.write("1000\n")
+                f.write("2000000\n")
             with open(test_dir + "/polarity", "w") as f:
                 f.write("0\n")
 

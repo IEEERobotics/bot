@@ -85,7 +85,7 @@ class TestPosition(unittest.TestCase):
                 # Duty is read like this by PWM getter
                 duty = int(f.read())
                 # Position is derived this way in position getter
-                read_position = int(round(((duty - 1000) / 1000.) * 180))
+                read_position = int(round(((duty - 1000) / 1000000.) * 180))
                 assert read_position == test_position, "{} != {}".format(
                                                         read_position,
                                                         test_position)

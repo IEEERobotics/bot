@@ -12,9 +12,9 @@ CONTROL_SERVER_HOST = "localhost"
 CONTROL_SERVER_PORT = 5005
 
 COMMAND_BUFFER_SIZE = 64  # bytes
-COMMAND_PROMPT = "> "  # set to None to prevent printing a prompt
+COMMAND_PROMPT = None  #"> "  # set to None to prevent printing a prompt
 
-class ControlRequestHandler(SocketServer.BaseRequestHandler):
+class ControlRequestHandler(SocketServer.StreamRequestHandler):
   """Handles incoming commands and actuates bot accordingly."""
   
   def handle(self):
@@ -27,11 +27,12 @@ class ControlRequestHandler(SocketServer.BaseRequestHandler):
     print "[{}] Serving client {}:{}".format(myThread.name, clientHost, clientPort)
     
     while True:
-      if COMMAND_PROMPT is not None: self.request.sendall(COMMAND_PROMPT)
-      data = self.request.recv(COMMAND_BUFFER_SIZE)  # TODO remove max limit if possible? read line by line?
+      if COMMAND_PROMPT is not None: self.wfile.write(COMMAND_PROMPT)  #self.request.sendall(COMMAND_PROMPT)
+      #print "Waiting for input..."  # [debug]
+      data = self.rfile.readline().strip()
       if not data or data.startswith('\x04'): break  # client has quit or EOF received, nothing more to do here
       
-      data = data.strip()
+      #print "[{}] Recvd: {}".format(myThread.name, data)  # [debug]
       tokens = data.split(' ')
       cmd = tokens[0]
       isValid = False  # whther the command is valid or not
@@ -42,8 +43,9 @@ class ControlRequestHandler(SocketServer.BaseRequestHandler):
         # TODO parse movement parameters and move bot in desired direction
         isValid = True
       
-      response = "{} (cmd: {}) [{}]\n".format(("OK" if isValid else "ERROR"), cmd, myThread.name)  # ACK
-      self.request.sendall(response)
+      # TODO use response delay to throttle messages
+      response = "OK\n" if isValid else "ERROR (cmd: {})\n".format(cmd)  # ACK
+      self.wfile.write(response)
     
     logger.info("[{}] Done.".format(myThread.name))
     print "[{}] Done.".format(myThread.name)

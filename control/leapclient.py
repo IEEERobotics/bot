@@ -31,7 +31,7 @@ class LeapControlClient(Leap.Listener):
     print "LeapControlClient.on_init(): Initialized"
     
     self.serverHost = sys.argv[1] if len(sys.argv) > 1 else server.CONTROL_SERVER_HOST
-    self.serverPort = sys.argv[2] if len(sys.argv) > 2 else server.CONTROL_SERVER_PORT
+    self.serverPort = int(sys.argv[2]) if len(sys.argv) > 2 else server.CONTROL_SERVER_PORT
     try:
       self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       self.sock.connect((self.serverHost, self.serverPort))

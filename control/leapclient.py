@@ -76,7 +76,7 @@ class LeapControlClient(Leap.Listener):
     strafe = 0.
     turn = 0.
     
-    if not frame.hands.empty:
+    if not frame.hands.is_empty:
       hand = frame.hands[0]  # get the first hand
       fingers = hand.fingers  # get list of fingers on this hand
       # NOTE Useful hand properties: hand.sphere_radius, hand.palm_position, hand.palm_normal, hand.direction

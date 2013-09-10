@@ -1,6 +1,6 @@
 """Pass low-level move commands to motors with mecanum wheels."""
 
-from math import sin, cos, pi, floor, fabs
+from math import sin, cos, pi, fabs, sqrt
 
 import driver
 import lib.lib as lib
@@ -8,39 +8,27 @@ import hardware.motor as m_mod
 
 
 class MecDriver(driver.Driver):
-
     """Subclass of Driver for movement with mecanum wheels.
 
     """
 
     def __init__(self):
-        """Run superclass's init."""
+        """Run superclass's init, build motor abstraction objects."""
         super(MecDriver, self).__init__()
-        
-        # Create motor object
+
+        # Create motor objects
         self.motors = {}
         for motor in self.config["drive_motors"]:
-            self.motors[motor["position"]] = m_mod.Motor(motor["PWM"])
+            self.motors[motor["position"]] = m_mod.Motor(motor["PWM"],
+                                                         motor["GPIO"])
 
-    def iowrite(self, motor, ds, direction):
-        """Write to IO pens that control the motors.
-
-        TODO(dfarrell07): This is a stub
-
-        :param motor: Motor to set speed of.
-        :type ds: string
-        :param ds: Duty cycle that motor should be set to.
-        :type ds: float
-
-        """
-        self.logger.debug("IO write: motor: {}, ds: {}, direction: {}".format(motor, ds, direction))
-
-    def stop_move(self)
-        # Write 0 to all io to stop movement.
-        self.iowrite("front_left", 0, True)
-        self.iowrite("front_right", 0, True)
-        self.iowrite("back_left", 0, True)
-        self.iowrite("back_right", 0, True)
+    def __str__(self):
+        """Show status of motors."""
+        return "fr: {}, fl: {} br: {}, bl: {}".format(
+                                                self.motors["front_right"],
+                                                self.motors["front_left"],
+                                                self.motors["back_right"],
+                                                self.motors["back_left"])
 
     def rotate(self, rotate_speed):
         """Pass rotation speed as -100 to 100 (positive is clockwise)."""
@@ -54,99 +42,108 @@ class MecDriver(driver.Driver):
             front_right_forward = True
             back_left_forward = False
             back_right_foward = True
+
+        # Validate params
+        assert direction == "cw" or direction == "ccw"
+        assert 0 <= magnatude <= 100
+
+        # Set motor direction, based on http://goo.gl/B1KEUV
+        if direction == "cw":
+            self.motors["front_right"].direction = "reverse"
+            self.motors["back_left"].direction = "forward"
+
         else:
-            rotate_speed = fabs(rotate_speed)
-            front_left_forward = True
-            front_right_forward = False
-            back_left_forward = True
-            back_right_foward = False
+            self.motors["front_left"].direction = "reverse"
+            self.motors["back_right"].direction = "forward"
 
-        # Check for invalid values.
-        if rotate_speed > 100:
-            rotate_speed = 100
-        if rotate_speed < 0:
-            rotate_speed = 0
+        # Set motor speeds
+        for key in self.motors.keys():
+            self.motors[key] = magnatude
 
-        # Set duty cycles.
-        front_left_ds = fabs(floor(rotate_speed))
-        front_right_ds = fabs(floor(rotate_speed))
-        back_left_ds = fabs(floor(rotate_speed))
-        back_right_ds = fabs(floor(rotate_speed))
+        self.logger.debug("Magnitude: {}, direction: {}".format(magnatude,
+                                                                direction))
 
-        # Write to IO pins.
-        self.iowrite("front_left", front_left_ds, front_left_forward)
-        self.iowrite("front_right", front_right_ds, front_right_forward)
-        self.iowrite("back_left", back_left_ds, back_left_forward)
-        self.iowrite("back_right", back_right_ds, back_right_foward)
+    def move(self, speed, angle):
+        """Move holonomically without rotation.
 
-    def basic_move(self, speed, angle):
-        """Build low-level commands for holonomic translations with rotations.
-
-        :param speed: Magnitude of robot's translation speed.
+        :param speed: Magnitude of robot's translation speed (% of max).
         :type speed: float
-        :param angle: Angle in degrees at which robot should translate.
+        :param angle: Angle of translation in degrees (90=left, 270=right).
         :type angle: float
-        :param rotate_speed: Desired rotational speed.
-        :type rotate_speed: float
 
         """
-        self.logger.debug("Speed: {}, angle {}".format(speed, angle))
+        # Validate params
+        assert 0 <= speed <= 100
+        assert 0 <= angle <= 360
 
-        # Calculate wheel speed ratios
-        # note: This is not the same as the car speed.
+        # Calculate motor speeds
         front_left = speed * sin(angle * pi / 180 + pi / 4)
         front_right = speed * cos(angle * pi / 180 + pi / 4)
         back_left = speed * cos(angle * pi / 180 + pi / 4)
         back_right = speed * sin(angle * pi / 180 + pi / 4)
 
-        # Calculate duty cycle as absolute/whole number.
-        front_left_ds = fabs(floor(front_left))
-        front_right_ds = fabs(floor(front_right))
-        back_left_ds = fabs(floor(back_left))
-        back_right_ds = fabs(floor(back_right))
+        #find largest motor speed
+        #use to normalize multipliers and maintain maximum efficiency
+        max_wheel_speed = max([front_left, front_right, back_left, back_right])
+        front_left = front_left / max_wheel_speed * speed
+        front_right = front_right / max_wheel_speed * speed
+        back_left = back_left / max_wheel_speed * speed
+        back_right = back_right / max_wheel_speed * speed
 
-        # Prevent invalid duty cycle values.
-        if front_left_ds > 100:
-            front_left_ds = 100
-        if front_right_ds > 100:
-            front_right_ds = 100
-        if back_left_ds > 100:
-            back_left_ds = 100
-        if back_right_ds > 100:
-            back_right_ds = 100
+        # Set motor directions
+        self.motors["front_left"] = "forward" if front_left > 0 else "reverse"
+        self.motors["front_right"] = "forward" if front_right > 0 else \
+                                                                  "reverse"
+        self.motors["back_left"] = "forward" if back_left > 0 else "reverse"
+        self.motors["back_right"] = "forward" if back_right > 0 else "reverse"
 
-        # Prevent invalid less than zero duty cycles.
-        if front_left_ds < 0:
-            front_left_ds = 0
-        if front_right_ds < 0:
-            front_right_ds = 0
-        if back_left_ds < 0:
-            back_left_ds = 0
-        if back_right_ds < 0:
-            back_right_ds = 0
+        # Set motor speeds
+        self.motors["front_left"] = fabs(front_left)
+        self.motors["front_right"] = fabs(front_right)
+        self.motors["back_left"] = fabs(back_left)
+        self.motors["back_right"] = fabs(back_right)
 
-        # Determine direction of wheel.
-        # Bool will determine value of direction pin.
-        if front_left > 0:
-            front_left_forward = True
-        else:
-            front_left_forward = False
-        if front_right > 0:
-            front_right_forward = True
-        else:
-            front_right_forward = False
+        self.logger.debug("Speed: {}, angle: {}".format(speed, angle))
 
-        if back_left > 0:
-            back_left_forward = True
-        else:
-            back_left_forward = False
-        if back_right > 0:
-            back_right_foward = True
-        else:
-            back_right_foward = False
+    def compound_move(self, translate_speed, translate_angle, rotate_speed):
+        """Translate and move at same time.
+            Note: I have no idea how to predict where the bot ends up 
+            during compound movement.
+            speed, rotate_speed is number between 0,100.
 
-        # Write to IO pins.
-        self.iowrite("front_left", front_left_ds, front_left_forward)
-        self.iowrite("front_right", front_right_ds, front_right_forward)
-        self.iowrite("back_left", back_left_ds, back_left_forward)
-        self.iowrite("back_right", back_right_ds, back_right_forward)
+        """
+        
+        #Speeds should add up to 100.
+        total_speed = translate_speed + rotate_speed
+        assert total_speed <= 100
+        
+        #Calculate overall voltage multiplier
+        front_left = translate_speed * sin(angle * pi / 180 + pi / 4) + rotate_speed
+        front_right = translate_speed * cos(angle * pi / 180 + pi / 4) - rotate_speed
+        back_left = translate_speed * cos(angle * pi / 180 + pi / 4) + rotate_speed
+        back_right = translate_speed * sin(angle * pi / 180 + pi / 4) - rotate_speed
+
+        #Normalize so that at least one wheel_speed equals maximum wheel_speed.
+        max_wheel_speed = max([front_left, front_right, back_left, back_right])
+        front_left = front_left / max_wheel_speed * total_speed
+        front_right = front_right / max_wheel_speed * total_speed
+        back_left = back_left / max_wheel_speed * total_speed
+        back_right = back_right / max_wheel_speed * total_speed
+
+        # Set motor directions
+        self.motors["front_left"] = "forward" if front_left > 0 else "reverse"
+        self.motors["front_right"] = "forward" if front_right > 0 else \
+                                                                  "reverse"
+        self.motors["back_left"] = "forward" if back_left > 0 else "reverse"
+        self.motors["back_right"] = "forward" if back_right > 0 else "reverse"
+
+        # Set motor speeds
+        self.motors["front_left"] = fabs(front_left)
+        self.motors["front_right"] = fabs(front_right)
+        self.motors["back_left"] = fabs(back_left)
+        self.motors["back_right"] = fabs(back_right)
+
+        self.logger.debug("Translate_speed: {}, Translate_angle: {}, rotate_speed: {}, rotate_angle: {}".format(translate_speed, 
+                                                                                                                translate_angle, 
+                                                                                                                rotate_speed,
+                                                                                                                rotate_angle))

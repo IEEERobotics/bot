@@ -35,11 +35,8 @@ class Servo(object):
             # Build PWM object for BBB interaction
             self.pwm = pwm_mod.PWM(self.num)
 
-        # Set servo to use a 20000ns period TODO(dfarrell07): Confirm this
-        self.pwm.period = 20000
-
         # Set servo to middle position
-        self.pwm.duty = 1500
+        self.pwm.duty = 1500000
         self.logger.info("Setup {}".format(self))
 
     def __str__(self):
@@ -58,20 +55,21 @@ class Servo(object):
     def position(self):
         """Getter for servo's position as an angle.
 
-        position = ((duty - 1000) / 1000) * 180 where 1000 <= duty <= 2000
+        position = ((duty - 1000000) / 1000000) * 180 where 
+        1000000 <= duty <= 2000000
 
         TODO(dfarrell07): This needs to be calibrated.
 
         :returns: Position of servo as an angle 0-180.
 
         """
-        return int(round(((self.pwm.duty - 1000) / 1000.) * 180))
+        return int(round(((self.pwm.duty - 1000000) / 1000000.) * 180))
 
     @position.setter
     def position(self, position):
         """Setter for servo's position as an angle.
 
-        duty = 1000 + 1000 * (position / 180)
+        duty = 1000000 + 1000000 * (position / 180)
 
         TODO(dfarrell07): This needs to be calibrated.
 
@@ -87,5 +85,5 @@ class Servo(object):
             position = 0
 
         # Set duty
-        self.pwm.duty = int(round(1000 + 1000 * (position / 180.)))
+        self.pwm.duty = int(round(1000000 + 1000000 * (position / 180.)))
         self.logger.debug("Updated {}".format(self))

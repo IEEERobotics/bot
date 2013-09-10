@@ -45,9 +45,9 @@ class TestSpeed(unittest.TestCase):
         with open(self.pwm_test_dir + "/run", "w") as f:
             f.write("0\n")
         with open(self.pwm_test_dir + "/duty_ns", "w") as f:
-            f.write("0\n")
+            f.write("1500000\n")
         with open(self.pwm_test_dir + "/period_ns", "w") as f:
-            f.write("1000\n")
+            f.write("2000000\n")
         with open(self.pwm_test_dir + "/polarity", "w") as f:
             f.write("0\n")
 
@@ -137,9 +137,9 @@ class TestDirection(unittest.TestCase):
         with open(self.pwm_test_dir + "/run", "w") as f:
             f.write("0\n")
         with open(self.pwm_test_dir + "/duty_ns", "w") as f:
-            f.write("0\n")
+            f.write("1500000\n")
         with open(self.pwm_test_dir + "/period_ns", "w") as f:
-            f.write("1000\n")
+            f.write("2000000\n")
         with open(self.pwm_test_dir + "/polarity", "w") as f:
             f.write("0\n")
 

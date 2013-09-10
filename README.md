@@ -18,7 +18,7 @@ git submodule init
 git submodule update
 ```
 
-The extra submodule-related steps are necessary to retrieve the [pybbb] library that we use for interaction with the BeagleBone Black. For more information, see the [git-scm section on submodules].
+The extra submodule-related steps are necessary to retrieve the [pybbb] library that we use for interaction with the BeagleBone Black. For more information, see the [git-scm section on submodules]. For more information about getting setup with Git, this [multi-OS guide] should be useful.
 
 You likey don't have python-yaml installed by default. It's required for reading YAML files, which therefore makes it a hard requirement for running most of our code.
 
@@ -76,3 +76,4 @@ Where `hardware.tests.test_motor.TestSpeed.test_accel` is of the form package.pa
 [2]: http://pythonhosted.org/an_example_pypi_project/sphinx.html#full-code-example
 [3]: http://stackoverflow.com/questions/5334531/python-documentation-standard-for-docstring
 [PEP257]: http://www.python.org/dev/peps/pep-0257/
+[multi-OS guide]: https://help.github.com/articles/set-up-git#platform-windows

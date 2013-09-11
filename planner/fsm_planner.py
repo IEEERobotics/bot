@@ -16,6 +16,8 @@ class StateTable(object):
         self.redFound = False
         self.xFound = False
         self.centered = False
+        self.lastHeading = 180
+        self.currentHeading = 180
         self.intersections = 0
         self.positions = 0
         self.shotsTaken = 0
@@ -223,17 +225,32 @@ class ChooseDirection(State):
         super(ChooseDirection, self).__init__()
 
     def run(self):
-        #ToDo: Add control flow for direction based on state of stateTable
-        #Reset the boolean values of the stateTable
+
+        self.stateTable.lastHeading = self.stateTable.currentHeading
+
+        # Calculate a new heading
+        heading = self.stateTable.intersections -\
+            self.stateTable.positions - self.stateTable.shotsTaken
+        if heading + 4 > 4:
+            pass
+        else:
+            heading += 4
+        if self.stateTable.intersections % 2 == 0:
+            heading = heading / 2
+        heading *= 90  # convert from cardinal direction to degrees
+        self.stateTable.currentDirection = heading
+
+        # Reset the boolean values of the stateTable
         self.stateTable.lineFound = False
         self.stateTable.blueFound = False
         self.stateTable.redFound = False
         self.stateTable.xFound = False
         self.stateTable.centered = False
-        #These are for testing
+        # These are for testing
         print "Intersections: " + str(self.stateTable.intersections)
         print "Positions: " + str(self.stateTable.positions)
         print "Shots Taken: " + str(self.stateTable.shotsTaken)
+        print "Direction: " + str(self.stateTable.currentDirection)
         print "Execute: Direction Set\n"
 
     def next(self):

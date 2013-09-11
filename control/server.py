@@ -8,7 +8,7 @@ import time
 
 import lib.lib as lib
 
-CONTROL_SERVER_HOST = "localhost"
+CONTROL_SERVER_HOST = "0.0.0.0"
 CONTROL_SERVER_PORT = 60000
 
 COMMAND_BUFFER_SIZE = 64  # bytes

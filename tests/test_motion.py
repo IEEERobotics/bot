@@ -14,14 +14,15 @@ except ImportError:
 # Build logger
 logger = lib.get_logger()
 
+
 class TestMotion(unittest.TestCase):
     """Test different motion patterns."""
-
+    
     def setUp(self):
         """Create motor objects and set initial state to 0 speed."""
         # NOTE Not setting testing flag to True here since we are using physical motors
         
-        # Load config
+        # Load config, get logger
         self.config = lib.load_config()
         
         # Create motor objects to test
@@ -39,38 +40,43 @@ class TestMotion(unittest.TestCase):
         # Set speeds back to zero
         self.stop()
     
-    def test_forward(self):
+    def do_forward(self):
+        logger.info("Testing forward motion")
         self.move([1, 1, 0, 0], [50, 50, 50, 50])
         time.sleep(2)
         self.stop()
     
-    def test_backward(self):
+    def do_backward(self):
+        logger.info("Testing backward motion")
         self.move([0, 0, 1, 1], [50, 50, 50, 50])
         time.sleep(2)
         self.stop()
     
-    def test_forward_backward(self):
-        self.test_forward()
-        self.test_backward()
+    def do_forward_backward(self):
+        logger.info("Testing forward and backward motion")
+        self.do_forward()
+        self.do_backward()
     
-    def test_strafe(self, dir=0):
-        self.move([dir, 1 - dir, 1 - dir, dir], [50, 50, 50, 50])
+    def do_strafe(self, direction=0):
+        logger.info("Testing strafe (sideways) motion with direction = {}".format(direction))
+        self.move([direction, 1 - direction, 1 - direction, direction], [50, 50, 50, 50])
         time.sleep(1)
         self.stop()
     
-    def test_dance(self):
-        """Twist a few times."""
+    def do_dance(self):
+        logger.info("Testing repeated strafe motion")
         for i in xrange(5):
-            self.test_strafe(0)
-            self.test_strafe(1)
+            self.do_strafe(0)
+            self.do_strafe(1)
     
-    def move(self, dirs, speeds):
-        # NOTE: dirs and speeds must be the same length as self.drive_motors
-        for motor, dir, speed in zip(self.drive_motors, dirs, speeds):
+    def move(self, directions, speeds):
+        # dirs and speeds must be the same length as self.drive_motors
+        assert len(self.drive_motors) == len(directions) == len(speeds)
+        for motor, direction, speed in zip(self.drive_motors, directions, speeds):
             if motor is None: continue
-            motor.direction = dir
+            motor.direction = direction
             motor.speed = speed
-
+    
     def stop(self):
         for motor in self.drive_motors:
             if motor is None: continue

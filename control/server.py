@@ -1,18 +1,23 @@
 """Direct control server that responds to commands, potentially from a remote location."""
 
+import os
 import threading
 import SocketServer
 import signal
 import logging
 import time
+import unittest
+from math import fabs
 
 import lib.lib as lib
+from driver.mec_driver import MecDriver
 
 CONTROL_SERVER_HOST = "0.0.0.0"
 CONTROL_SERVER_PORT = 60000
 
 COMMAND_BUFFER_SIZE = 64  # bytes
 COMMAND_PROMPT = None  #"> "  # set to None to prevent printing a prompt
+
 
 class ControlRequestHandler(SocketServer.StreamRequestHandler):
   """Handles incoming commands and actuates bot accordingly."""
@@ -26,6 +31,8 @@ class ControlRequestHandler(SocketServer.StreamRequestHandler):
     logger.info("[{}] Serving client {}:{}".format(myThread.name, clientHost, clientPort))
     print "[{}] Serving client {}:{}".format(myThread.name, clientHost, clientPort)
     
+    controlServer = ControlServer.getInstance()  # get singleton instance of ControlServer
+    
     while True:
       if COMMAND_PROMPT is not None: self.wfile.write(COMMAND_PROMPT)  #self.request.sendall(COMMAND_PROMPT)
       #print "Waiting for input..."  # [debug]
@@ -33,15 +40,26 @@ class ControlRequestHandler(SocketServer.StreamRequestHandler):
       if not data or data.startswith('\x04'): break  # client has quit or EOF received, nothing more to do here
       
       #print "[{}] Recvd: {}".format(myThread.name, data)  # [debug]
-      tokens = data.split(' ')
+      tokens = data.split()  # split on whitespace, collapse delimiters; TODO use JSON/YAML/ZMQ?
       cmd = tokens[0]
-      isValid = False  # whther the command is valid or not
+      isValid = False  # whether the command is valid or not
       if cmd == "stop" or cmd == "s":
-        # TODO stop bot
+        # Stop bot by setting speed to zero
+        controlServer.driver.move(0, 0)
         isValid = True
       elif cmd == "move" or cmd == "m":
-        # TODO parse movement parameters and move bot in desired direction
-        isValid = True
+        # Parse movement parameters and move bot in desired direction
+        try:
+          forward = float(tokens[1])
+          strafe = float(tokens[2])
+          turn = float(tokens[3])
+          if fabs(turn) > fabs(forward) and fabs(turn) > fabs(strafe):  # rotate only when turn dominates
+            controlServer.driver.rotate(turn)
+          else:
+            controlServer.driver.move_forward_strafe(forward, strafe)
+          isValid = True
+        except Exception as e:
+          pass  # will be reported back to client as ERROR
       
       # TODO use response delay to throttle messages
       response = "OK\n" if isValid else "ERROR (cmd: {})\n".format(cmd)  # ACK
@@ -52,18 +70,67 @@ class ControlRequestHandler(SocketServer.StreamRequestHandler):
 
 
 class ControlServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
-  """Listens on a designated port for client connections."""
-  pass
+  """Listens on a designated port for client connections. Singleton pattern."""
+  instance = None
+  
+  @classmethod
+  def getInstance(cls):
+    if cls.instance is None:
+      cls.instance = ControlServer((CONTROL_SERVER_HOST, CONTROL_SERVER_PORT), ControlRequestHandler)
+      cls.instance.driver = MecDriver()  # should Driver/MecDriver be made a singleton?
+    return cls.instance
 
-def main():
+
+class TestControlServer(unittest.TestCase):
+  """Spawn an instance of ControlServer with simulated hardware."""
+  # TODO move this to /tests/ and combine with a client test
+  
+  def setUp(self):
+    """Setup test hardware files and create mec_driver object"""
+    config = lib.load_config()
+    
+    # Store original test flag, set to true
+    self.orig_test_state = config["testing"]
+    lib.set_testing(True)
+    
+    # List of directories simulating beaglebone
+    self.test_dirs = []
+    
+    # Collect simulated hardware test directories
+    for motor in config["drive_motors"]:
+      self.test_dirs.append(config["test_pwm_base_dir"]
+                                   + str(motor["PWM"]))
+    
+    # Reset simulated directories to default
+    for test_dir in self.test_dirs:
+      # Create test directory
+      if not os.path.exists(test_dir):
+        os.makedirs(test_dir)
+      
+      # Set known value in all simulated hardware
+      with open(test_dir + "/run", "w") as f:
+        f.write("0\n")
+      with open(test_dir + "/duty_ns", "w") as f:
+        f.write("0\n")
+      with open(test_dir + "/period_ns", "w") as f:
+        f.write("1000000\n")
+  
+  def do_runServer(self):
+    run()
+  
+  def tearDown(self):
+    """Restore testing flag state in config file."""
+    lib.set_testing(self.orig_test_state)
+
+def run():
   # Get a logger
   logger = lib.get_logger()
   # TODO remove print statements by making logger output INFO messages to console
   #logger.setLevel(logging.INFO)
-  print "main(): Got logger with level: {}".format(logger.level)
+  print "run(): Got logger with level: {}".format(logger.level)
   
   # Create control server
-  controlServer = ControlServer((CONTROL_SERVER_HOST, CONTROL_SERVER_PORT), ControlRequestHandler)
+  controlServer = ControlServer.getInstance()
   
   # Create a thread to run the server in
   serverThread = threading.Thread(target=controlServer.serve_forever)
@@ -72,7 +139,7 @@ def main():
   '''
   # Define an interrupt handler to stop the server, and register it
   def interruptHandler(signum, frame):
-    print "main().interruptHandler(): signum = {}".format(signum)
+    print "run().interruptHandler(): signum = {}".format(signum)
     logger.info("Stopping ControlServer instance...")
     controlServer.shutdown()
     # Unregister this handler so that default behavior can take over
@@ -87,18 +154,18 @@ def main():
   serverThread.start()
   serverHost, serverPort = controlServer.server_address
   logger.info("ControlServer instance started on thread {}, listening at {}:{}".format(serverThread.name, serverHost, serverPort))
-  print "main(): ControlServer instance started on thread {}, listening at {}:{}".format(serverThread.name, serverHost, serverPort)
+  print "run(): ControlServer instance started on thread {}, listening at {}:{}".format(serverThread.name, serverHost, serverPort)
   
   try:
     while serverThread.isAlive():
       time.sleep(1)  # or: serverThread.join(1)
   except KeyboardInterrupt:
     logger.info("Stopping ControlServer instance...")
-    print "main(): Stopping ControlServer instance..."
+    print "run(): Stopping ControlServer instance..."
     controlServer.shutdown()
   
   logger.info("Done.")
-  print "main(): Done."
+  print "run(): Done."
 
 if __name__ == "__main__":
-  main()
+  run()  # NOTE this will run with driver connected to physical hardware pins!

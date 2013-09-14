@@ -149,6 +149,13 @@ class MecDriver(driver.Driver):
         self.motors["back_left"].speed   = fabs(back_left)
         self.motors["back_right"].speed  = fabs(back_right)
     
+    def move_forward_strafe(self, forward, strafe):
+        speed = hypot(forward, strafe) / 1.414  # scale down speed by sqrt(2) to make sure we're in range
+        if speed < MecDriver.min_speed: speed = MecDriver.min_speed
+        elif speed > MecDriver.max_speed: speed = MecDriver.max_speed
+        angle = degrees(atan2(forward, strafe)) % 360  # note order of atan2() args to get forward = 0 deg
+        self.move(speed, angle)
+    
     def compound_move(self, translate_speed, translate_angle, rotate_speed):
         """Translate and move at same time.
             Note: I have no idea how to predict where the bot ends up 

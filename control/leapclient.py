@@ -122,7 +122,7 @@ class LeapControlClient(Leap.Listener):
           if yaw < yawRange.min: yaw = yawRange.min
           elif yaw > yawRange.max: yaw = yawRange.max
           
-          # Compute turn velocity as ratio of current yaw to yaw range
+          # Compute turn velocity as ratio of current yaw to yaw range (TODO check sign convention)
           if yaw < 0: turn = (yaw - yawRange.zero_min) / (yawRange.min - yawRange.zero_min)  # turn left: +ve
           else: turn = -(yaw - yawRange.zero_max) / (yawRange.max - yawRange.zero_max)  # turn right: -ve
     
@@ -134,8 +134,7 @@ class LeapControlClient(Leap.Listener):
         cmdStr = "stop\n"
         self.isMoving = False
     else:
-      #print "Controls: forward: {:5.2f}, strafe: {:5.2f}, turn: {:5.2f}".format(forward, strafe, turn)
-      cmdStr = "move {:5.2f} {:5.2f} {:5.2f}\n".format(forward, strafe, turn)
+      cmdStr = "move {:6.2f} {:6.2f} {:6.2f}\n".format(forward * 100, strafe * 100, turn * 100)
       self.isMoving = True
     
     if cmdStr is not None and self.sock is not None:

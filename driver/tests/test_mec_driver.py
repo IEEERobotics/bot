@@ -33,7 +33,7 @@ class TestRotate(unittest.TestCase):
         self.test_dirs = []
 
         # Collect simulated hardware test directories
-        for motor in config["gun_motors"]:
+        for motor in config["drive_motors"]:
             self.test_dirs.append(config["test_pwm_base_dir"]
                                          + str(motor["PWM"]))
 
@@ -48,8 +48,8 @@ class TestRotate(unittest.TestCase):
                 f.write("0\n")
             with open(test_dir + "/duty_ns", "w") as f:
                 f.write("0\n")
-            with open(test_dir + "period_ns", "w") as f:
-                f.write("0\n")
+            with open(test_dir + "/period_ns", "w") as f:
+                f.write("1000000\n")
 
         # Build mec_driver
         self.md = MecDriver()

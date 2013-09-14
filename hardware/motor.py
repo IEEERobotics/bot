@@ -63,10 +63,11 @@ class Motor(object):
         :returns: Human readable representation of this object.
 
         """
-        return "Motor PWM:{} GPIO:{} speed:{} dir:{}".format(self.pwm_num,
+        return "Motor PWM:{} GPIO:{} speed:{} dir:{} vel:{}".format(self.pwm_num,
                                                              self.gpio_num,
                                                              self.speed,
-                                                             self.direction)
+                                                             self.direction,
+                                                             self.velocity)
 
     @property
     def speed(self):
@@ -127,3 +128,12 @@ class Motor(object):
 
         self.gpio.value = direction
         self.logger.debug("Updated direction {}".format(self))
+
+    @property
+    def velocity(self):
+        """Getter for motor's velocity as % of max (same as duty cycle), with +ve being forward, -ve backward.
+
+        :returns: Current motor velocity as percent of max, signed based on direction.
+
+        """
+        return self.speed * (1 if self.gpio.value == FORWARD else -1)

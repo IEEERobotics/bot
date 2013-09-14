@@ -52,14 +52,14 @@ load_pwm     2
 set_period   2 20000000  # 20ms, standard servo period
 set_duty     2  1500000  # 1.5ms, standard neutral point
 set_polarity 2 0
-#run_pwm      2  # do we want to zero the servo on setup?
+run_pwm      2  # zero the servo on setup
 
 # Turret servo - tilt: P9_28 (pwm7/ecap2)
 load_pwm     7
 set_period   7 20000000  # 20ms, standard servo period
 set_duty     7  1500000  # 1.5ms, standard neutral point
 set_polarity 7 0
-#run_pwm      7  # do we want to zero the servo on setup?
+run_pwm      7  # zero the servo on setup
 
 #9.12  GPIO1[28] = gpio60   Motor1
 #9.13  GPIO0[31] = gpio31   Motor2

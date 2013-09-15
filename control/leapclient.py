@@ -2,6 +2,7 @@
 # Based on Sample.py included with LeapSDK 0.8.0
 
 import sys
+import time
 import socket
 from collections import namedtuple
 
@@ -23,12 +24,9 @@ yawRange = ControlRange(-30.0, -10.0, 10.0, 30.0)  # -ve is to the left
 class LeapControlClient(Leap.Listener):
   def on_init(self, controller):
     self.logger = lib.get_logger()
-    # TODO remove print statements by making logger output INFO messages to console
     self.sock = None
     self.isMoving = False
     self.isProcessing = False  # semaphore to prevent asynchronous clashes
-    self.logger.info("Initialized")
-    print "LeapControlClient.on_init(): Initialized"
     
     self.serverHost = sys.argv[1] if len(sys.argv) > 1 else server.CONTROL_SERVER_HOST
     self.serverPort = int(sys.argv[2]) if len(sys.argv) > 2 else server.CONTROL_SERVER_PORT
@@ -38,33 +36,24 @@ class LeapControlClient(Leap.Listener):
       self.rfile = self.sock.makefile(mode="rb")
       self.wfile = self.sock.makefile(mode="wb", bufsize=0)
       self.logger.info("Connected to control server at {}:{}".format(self.serverHost, self.serverPort))
-      print "LeapControlClient.on_init(): Connected to control server at {}:{}".format(self.serverHost, self.serverPort)
     except socket.error:
       self.logger.error("Could not connect to control server at {}:{}".format(self.serverHost, self.serverPort))
-      print "LeapControlClient.on_init(): [ERROR] Could not connect to control server at {}:{}".format(self.serverHost, self.serverPort)
       self.sock = None
   
   def on_connect(self, controller):
     self.logger.info("Connected to Leap device")
-    print "LeapControlClient.on_connect(): Connected to Leap device"
   
   # TODO maintain state using on_connect(), on_disconnect()?
   def on_disconnect(self, controller):
     # Note: not dispatched when running in a debugger.
-    self.logger.info("Disconnected")
-    print "LeapControlClient.on_disconnect(): Disconnected"
+    self.logger.info("Disconnected from Leap device")
   
   def on_exit(self, controller):
-    self.logger.info("Exiting")
-    print "LeapControlClient.on_exit(): Exiting"
-    
     if self.sock is not None:
-      #self.sock.sendall("\x04\n")  # EOF
-      #self.wfile.write("\x04\n")  # EOF
+      #self.wfile.write("\x04\n")  #self.sock.sendall("\x04\n")  # EOF
       self.sock.shutdown(socket.SHUT_RDWR)
       self.sock = None
       self.logger.info("Disconnected from control server")
-      print "LeapControlClient.on_exit(): Disconnected from control server"
   
   def on_frame(self, controller):
     if self.isProcessing: return
@@ -81,20 +70,21 @@ class LeapControlClient(Leap.Listener):
       fingers = hand.fingers  # get list of fingers on this hand
       # NOTE Useful hand properties: hand.sphere_radius, hand.palm_position, hand.palm_normal, hand.direction
       
-      # Calculate the hand's pitch, roll, and yaw angles; proceed only if 3 or more fingers are seen (to prevent flaky behavior with closed fists)
-      # TODO Other filters: min hand.sphere_radius etc.
-      if len(fingers) >= 3:
-        position = hand.palm_position
-        x = position[0]
-        y = position[1]
-        z = position[2]
+      # Proceed only if 3 or more fingers are seen and other criteria met (to prevent flaky behavior)
+      position = hand.palm_position
+      x = position[0]
+      y = position[1]
+      z = position[2]
+      # TODO Use a state machine to prevent abrupt changes
+      if z <= 40 and len(fingers) >= 3:  # max hand height (z-position), min fingers; TODO other filters
+        # Calculate the hand's pitch, roll, and yaw angles
         pitch = hand.direction.pitch * Leap.RAD_TO_DEG
         roll = hand.palm_normal.roll * Leap.RAD_TO_DEG
         yaw = hand.direction.yaw * Leap.RAD_TO_DEG
-        #print "Pos: {}, pitch: {:+6.2f} deg, roll: {:+6.2f} deg, yaw: {:+6.2f} deg".format(position, pitch, roll, yaw)
-        #print "Pos: ({:+7.2f}, {:+7.2f}, {:+7.2f}), pitch: {:+6.2f} deg, roll: {:+6.2f} deg, yaw: {:+6.2f} deg".format(x, y, z, pitch, roll, yaw)
+        #print "Pos: {}, pitch: {:+6.2f} deg, roll: {:+6.2f} deg, yaw: {:+6.2f} deg".format(position, pitch, roll, yaw)  # [debug]
+        #print "Pos: ({:+7.2f}, {:+7.2f}, {:+7.2f}), pitch: {:+6.2f} deg, roll: {:+6.2f} deg, yaw: {:+6.2f} deg".format(x, y, z, pitch, roll, yaw)  # [debug]
         
-        # TODO Compute control values based on position and orientation
+        # Compute control values based on position and orientation
         # * Scheme 1: pitch = forward/backward vel., roll = left/right strafe vel., yaw = left/right turn vel.
         # ** Convert pitch => forward velocity
         if pitch <= pitchRange.zero_min or pitchRange.zero_max <= pitch:  # if pitch is outside deadband (zero span)
@@ -134,19 +124,19 @@ class LeapControlClient(Leap.Listener):
         cmdStr = "stop\n"
         self.isMoving = False
     else:
-      cmdStr = "move {:6.2f} {:6.2f} {:6.2f}\n".format(forward * 100, strafe * 100, turn * 100)
+      cmdStr = "move {:7.2f} {:7.2f} {:7.2f}\n".format(forward * 100, strafe * 100, turn * 100)
       self.isMoving = True
     
-    if cmdStr is not None and self.sock is not None:
-      #print "Sending: {}".format(repr(cmdStr))  # [debug]
-      print cmdStr,
-      self.wfile.write(cmdStr)  #self.sock.sendall(cmdStr)
-      #print "Waiting for response..."  # [debug]
-      response = self.rfile.readline().strip()  # server can use response delay to throttle commands (TODO check for OK)
-      print response
+    if cmdStr is not None:
+      print cmdStr,  # [info]
+      if self.sock is not None:
+        #print "Sending: {}".format(repr(cmdStr))  # [debug]
+        self.wfile.write(cmdStr)  #self.sock.sendall(cmdStr)
+        #print "Waiting for response..."  # [debug]
+        response = self.rfile.readline().strip()  # server can use response delay to throttle commands (TODO check for OK)
+        print response  # [info]
     
     self.isProcessing = False  # release
-
 
 
 def main():
@@ -155,10 +145,11 @@ def main():
   leapController = Leap.Controller()
   
   # Have the listener receive events from the controller
-  leapController.add_listener(leapControlClient)
+  leapController.add_listener(leapControlClient)  # yep, these names are too confusing!
+  time.sleep(0.5)  # yield so that on_connect() can happen first
   
   # Keep this process running until Enter is pressed
-  print "Press Enter to quit..."
+  print "Press Enter to quit..."  # [info]
   sys.stdin.readline()
   
   # Remove the sample listener when done

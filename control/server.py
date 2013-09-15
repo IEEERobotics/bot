@@ -17,29 +17,26 @@ CONTROL_SERVER_PORT = 60000
 
 COMMAND_BUFFER_SIZE = 64  # bytes
 COMMAND_PROMPT = None  #"> "  # set to None to prevent printing a prompt
-
+RESPONSE_DELAY = 0.05  # secs; used to throttle control messages (>= some multiple of drive motor PWM period, currently 1 ms)
 
 class ControlRequestHandler(SocketServer.StreamRequestHandler):
   """Handles incoming commands and actuates bot accordingly."""
   
   def handle(self):
     logger = lib.get_logger()  # NOTE a logger for each client request (request lasts for entire session, so this shouldn't be too bad)
-    # TODO remove print statements by making logger output INFO messages to console
     
     clientHost, clientPort = self.client_address
     myThread = threading.current_thread()
-    logger.info("[{}] Serving client {}:{}".format(myThread.name, clientHost, clientPort))
-    print "[{}] Serving client {}:{}".format(myThread.name, clientHost, clientPort)
+    logger.info("[ControlRequestHandler/{}] Serving client {}:{}".format(myThread.name, clientHost, clientPort))
     
     controlServer = ControlServer.getInstance()  # get singleton instance of ControlServer
     
     while True:
       if COMMAND_PROMPT is not None: self.wfile.write(COMMAND_PROMPT)  #self.request.sendall(COMMAND_PROMPT)
-      #print "Waiting for input..."  # [debug]
       data = self.rfile.readline().strip()
       if not data or data.startswith('\x04'): break  # client has quit or EOF received, nothing more to do here
       
-      #print "[{}] Recvd: {}".format(myThread.name, data)  # [debug]
+      #print "[ControlRequestHandler/{}] Recvd: {}".format(myThread.name, data)  # [debug]
       tokens = data.split()  # split on whitespace, collapse delimiters; TODO use JSON/YAML/ZMQ?
       cmd = tokens[0]
       isValid = False  # whether the command is valid or not
@@ -61,12 +58,14 @@ class ControlRequestHandler(SocketServer.StreamRequestHandler):
         except Exception as e:
           pass  # will be reported back to client as ERROR
       
-      # TODO use response delay to throttle messages
+      # Send response
       response = "OK\n" if isValid else "ERROR (cmd: {})\n".format(cmd)  # ACK
+      time.sleep(RESPONSE_DELAY)  # response delay to throttle messages
       self.wfile.write(response)
     
-    logger.info("[{}] Done.".format(myThread.name))
-    print "[{}] Done.".format(myThread.name)
+    # Clean-up when done serving client
+    if controlServer.driver.speed > 0: controlServer.driver.move(0, 0)  # stop bot, in case still moving
+    logger.info("[ControlRequestHandler/{}] Done.".format(myThread.name))
 
 
 class ControlServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
@@ -125,9 +124,6 @@ class TestControlServer(unittest.TestCase):
 def run():
   # Get a logger
   logger = lib.get_logger()
-  # TODO remove print statements by making logger output INFO messages to console
-  #logger.setLevel(logging.INFO)
-  print "run(): Got logger with level: {}".format(logger.level)
   
   # Create control server
   controlServer = ControlServer.getInstance()
@@ -139,7 +135,7 @@ def run():
   '''
   # Define an interrupt handler to stop the server, and register it
   def interruptHandler(signum, frame):
-    print "run().interruptHandler(): signum = {}".format(signum)
+    #print "run().interruptHandler(): signum = {}".format(signum)  # [debug]
     logger.info("Stopping ControlServer instance...")
     controlServer.shutdown()
     # Unregister this handler so that default behavior can take over
@@ -153,19 +149,17 @@ def run():
   # Now start the server thread, and wait for it to finish
   serverThread.start()
   serverHost, serverPort = controlServer.server_address
-  logger.info("ControlServer instance started on thread {}, listening at {}:{}".format(serverThread.name, serverHost, serverPort))
-  print "run(): ControlServer instance started on thread {}, listening at {}:{}".format(serverThread.name, serverHost, serverPort)
+  logger.info("ControlServer started on thread {}, listening at {}:{}".format(serverThread.name, serverHost, serverPort))
   
   try:
     while serverThread.isAlive():
-      time.sleep(1)  # or: serverThread.join(1)
+      time.sleep(1)  # or: serverThread.join(1), or: sys.stdin.readline() to wait for an Enter key (no while loop)
   except KeyboardInterrupt:
     logger.info("Stopping ControlServer instance...")
-    print "run(): Stopping ControlServer instance..."
     controlServer.shutdown()
   
   logger.info("Done.")
-  print "run(): Done."
+
 
 if __name__ == "__main__":
   run()  # NOTE this will run with driver connected to physical hardware pins!

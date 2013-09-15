@@ -76,25 +76,25 @@ class TestWriteConfig(unittest.TestCase):
 
         # Get initial config
         config = lib.load_config()
-        orig_log_file = config["log_file"]
+        orig_log_file = config["logging"]["log_file"]
 
         # Modify config
-        config["log_file"] = test_log_file
+        config["logging"]["log_file"] = test_log_file
         lib.write_config(config)
 
         # Get and check updated config
         updated_config = lib.load_config()
         assert updated_config == config
-        assert updated_config["log_file"] == test_log_file
+        assert updated_config["logging"]["log_file"] == test_log_file
 
         # Revert change
-        config["log_file"] = orig_log_file
+        config["logging"]["log_file"] = orig_log_file
         lib.write_config(config)
 
         # Test reverted change
         updated_config = lib.load_config()
         assert updated_config == config
-        assert updated_config["log_file"] == orig_log_file
+        assert updated_config["logging"]["log_file"] == orig_log_file
 
 
 class TestLoadStrategy(unittest.TestCase):

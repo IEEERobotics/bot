@@ -195,7 +195,7 @@ def get_logger(prefix=None):
 
     # Setup path to log output. Allows usage from any subpackage.
     if prefix is None:
-        qual_log_file = prepend_prefix(config["log_file"])
+        qual_log_file = prepend_prefix(config["logging"]["log_file"])
 
     # Build logger
     logger = logging.getLogger(__name__)
@@ -221,12 +221,14 @@ def get_logger(prefix=None):
                                                         mode="a",
                                                         backupCount=50,
                                                         delay=True)
-    file_handler.setLevel(logging.DEBUG)
+    file_handler_level = getattr(logging, config["logging"]["file_handler_level"].upper(), logging.DEBUG)
+    file_handler.setLevel(file_handler_level)
     file_handler.setFormatter(file_formatter)
 
     # Build stream handler (for output to stdout)
     stream_handler = logging.StreamHandler()
-    stream_handler.setLevel(logging.WARN)
+    stream_handler_level = getattr(logging, config["logging"]["stream_handler_level"].upper(), logging.INFO)
+    stream_handler.setLevel(stream_handler_level)
     stream_handler.setFormatter(stream_formatter)
 
     # Add handlers to logger

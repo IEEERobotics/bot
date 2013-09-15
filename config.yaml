@@ -7,7 +7,7 @@ gun_motors:
 - {GPIO: -1, PWM: 3}  # Gun motor 0: P9_14 (pwm3/ehr1A)
 - {GPIO: -1, PWM: 4}  # Gun motor 1: P9_16 (pwm4/ehr1B)
 gun_sol: {GPIO: 60}   # Gun solenoid/trigger: P9_12 (gpio60)
-log_file: logs/bot.log
+logging: {log_file: logs/bot.log, file_handler_level: DEBUG, stream_handler_level: INFO}  # Logging options
 sol_extend_delay: 0.5
 strategy: planner/strategies/strategy0.yaml
 targeting: gunner/targeting/targeting0.yaml

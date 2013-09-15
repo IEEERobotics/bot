@@ -55,7 +55,7 @@ class Motor(object):
         # Setup initial speed and direction
         self.speed = 0
         self.direction = FORWARD
-        self.logger.info("Setup {}".format(self))
+        self.logger.debug("Setup {}".format(self))
 
     def __str__(self):
         """Override string representation of this object for readability.

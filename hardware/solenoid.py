@@ -43,7 +43,7 @@ class Solenoid(object):
 
         # Set solenoid to be initially retracted
         self.retract()
-        self.logger.info("Setup {}".format(self))
+        self.logger.debug("Setup {}".format(self))
 
     def __str__(self):
         """Override string representation of this object for readability.

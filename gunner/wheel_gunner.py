@@ -22,7 +22,7 @@ class WheelGunner(gunner.Gunner):
         # Build motors for driving wheels
         self.motors = []
         for motor in self.config["gun_motors"]:
-            self.motors.append(m_mod.Motor(motor["PWM"], motor["GPIO"]))
+            self.motors.append(m_mod.Motor(motor["PWM"]))
 
     def fire(self, cmd):
         """Get location, aim the turret, accelerate wheels and advance dart.

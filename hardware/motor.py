@@ -11,14 +11,24 @@ REVERSE = 0
 
 class Motor(object):
 
-    """Class for abstracting motor settings."""
+    """Class for abstracting motor settings.
 
-    def __init__(self, pwm_num, gpio_num):
+    Note that motors without GPIO pins are assumed to not need to change
+    direction in-code. Their direction should be manually changed by 
+    switching the wires that drive them.
+
+    """
+
+    def __init__(self, pwm_num, gpio_num=None):
         """Setup logger and PWM interface.
+
+        Note that the default gpio_num=None param implies that the motor
+        has no direction. Its direction should be manually changed by
+        swapping the wires that drive it.
 
         :param pwm_num: PWM number for this motor.
         :type pwm_num: int
-        :param gpio_num: GPIO number for this motor.
+        :param gpio_num: Optional GPIO number for this motor.
         :type gpio_num: int
 
         """
@@ -35,26 +45,29 @@ class Motor(object):
         if config["testing"]:
             # Get dir of simulated hardware files from config
             pwm_test_dir = lib.prepend_prefix(config["test_pwm_base_dir"])
-            gpio_test_dir = lib.prepend_prefix(config["test_gpio_base_dir"])
 
             # Build PWM object for BBB interaction, provide test dir
             self.pwm = pwm_mod.PWM(self.pwm_num, pwm_test_dir)
 
-            # Build GPIO object for BBB interaction, provide test dir
-            self.gpio = gpio_mod.GPIO(self.gpio_num, gpio_test_dir)
+            if self.gpio_num is not None:
+                # Build GPIO object for BBB interaction, provide test dir
+                gpio_test_dir = lib.prepend_prefix(config["test_gpio_base_dir"])
+                self.gpio = gpio_mod.GPIO(self.gpio_num, gpio_test_dir)
         else:
             # Build PWM object for BBB interaction
             self.pwm = pwm_mod.PWM(self.pwm_num)
 
-            # Build GPIO object for BBB interaction
-            self.gpio = gpio_mod.GPIO(self.gpio_num)
+            if self.gpio_num is not None:
+                # Build GPIO object for BBB interaction
+                self.gpio = gpio_mod.GPIO(self.gpio_num)
 
         # Polarity should be 0 to get X% high at X PWM.
         self.pwm.polarity = 0
 
         # Setup initial speed and direction
         self.speed = 0
-        self.direction = FORWARD
+        if self.gpio_num is not None:
+            self.direction = FORWARD
         self.logger.debug("Setup {}".format(self))
 
     def __str__(self):
@@ -63,7 +76,11 @@ class Motor(object):
         :returns: Human readable representation of this object.
 
         """
-        return "Motor PWM:{} GPIO:{} speed:{} dir:{} vel:{}".format(self.pwm_num,
+        if self.gpio_num is None:
+            return "Motor PWM:{} GPIO:None speed:{}".format(self.pwm_num,
+                                                            self.speed)
+        return "Motor PWM:{} GPIO:{} speed:{} dir:{} vel:{}".format(
+                                                             self.pwm_num,
                                                              self.gpio_num,
                                                              self.speed,
                                                              self.direction,
@@ -100,9 +117,17 @@ class Motor(object):
     def direction(self):
         """Getter for motor's direction.
 
-        :returns: Direction of motor ("forward" or "reverse").
+        Motors that have no GPIO pin have no coded direction. This method
+        will return None in that case. Set motor direction by manually 
+        switching the motor's wires.
+
+        :returns: Direction of motor ("forward", "reverse" or None).
 
         """
+        if self.gpio_num is None:
+            self.logger.warn("{} doesn't own a GPIO".format(self))
+            return None
+
         if self.gpio.value == FORWARD:
             return "forward"
         elif self.gpio.value == REVERSE:
@@ -114,10 +139,18 @@ class Motor(object):
     def direction(self, direction):
         """Setter for motor's direction. Toggles a GPIO pin.
 
+        Motors that have no GPIO pin have no coded direction. This method
+        will return None in that case. Set motor direction by manually 
+        switching the motor's wires.
+
         :param direction: Dir to rotate motors (1="forward", 0="reverse").
         :type direction: int or string
 
         """
+        if self.gpio_num is None:
+            self.logger.warn("{} doesn't own a GPIO".format(self))
+            return None
+
         if direction == "forward":
             direction = FORWARD
         elif direction == "reverse":
@@ -133,7 +166,12 @@ class Motor(object):
     def velocity(self):
         """Getter for motor's velocity as % of max (same as duty cycle), with +ve being forward, -ve backward.
 
+        Note that directionless motors (no assigned GPIO pin) will return +.
+
         :returns: Current motor velocity as percent of max, signed based on direction.
 
         """
+        if self.gpio_num is None:
+            return self.speed
+
         return self.speed * (1 if self.gpio.value == FORWARD else -1)

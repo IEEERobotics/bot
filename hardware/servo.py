@@ -55,21 +55,21 @@ class Servo(object):
     def position(self):
         """Getter for servo's position as an angle.
 
-        position = ((duty - 1000000) / 1000000) * 180 where 
-        1000000 <= duty <= 2000000
+        position = ((duty - 10000000) / 10000000) * 180 where 
+        10000000 <= duty <= 20000000
 
         TODO(dfarrell07): This needs to be calibrated.
 
         :returns: Position of servo as an angle 0-180.
 
         """
-        return int(round(((self.pwm.duty - 1000000) / 1000000.) * 180))
+        return int(round(((self.pwm.duty - 10000000) / 10000000.) * 180))
 
     @position.setter
     def position(self, position):
         """Setter for servo's position as an angle.
 
-        duty = 1000000 + 1000000 * (position / 180)
+        duty = 10000000 + 10000000 * (position / 180)
 
         TODO(dfarrell07): This needs to be calibrated.
 
@@ -85,5 +85,5 @@ class Servo(object):
             position = 0
 
         # Set duty
-        self.pwm.duty = int(round(1000000 + 1000000 * (position / 180.)))
+        self.pwm.duty = int(round(10000000 + 10000000 * (position / 180.)))
         self.logger.debug("Updated {}".format(self))

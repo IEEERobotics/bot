@@ -44,11 +44,11 @@ class TestAngle(unittest.TestCase):
 
             # Set known values in all simulated hardware files
             with open(test_dir + "/run", "w") as f:
-                f.write("0\n")
+                f.write("1\n")
             with open(test_dir + "/duty_ns", "w") as f:
-                f.write("1500000\n")
+                f.write("15000000\n")
             with open(test_dir + "/period_ns", "w") as f:
-                f.write("2000000\n")
+                f.write("20000000\n")
             with open(test_dir + "/polarity", "w") as f:
                 f.write("0\n")
 
@@ -118,7 +118,7 @@ class TestAngle(unittest.TestCase):
                 # Duty is read like this by PWM getter
                 duty = int(f.read())
                 # Angle is derived this way in angle getter
-                read_angle = int(round(((duty - 1000000) / 1000000.) * 180))
+                read_angle = int(round(((duty - 10000000) / 10000000.) * 180))
                 assert read_angle == test_x_angle, "{} != {}".format(
                                                     read_angle,
                                                     test_x_angle)
@@ -128,7 +128,7 @@ class TestAngle(unittest.TestCase):
                 # Duty is read like this by PWM getter
                 duty = int(f.read())
                 # Angle is derived this way in angle getter
-                read_angle = int(round(((duty - 1000000) / 1000000.) * 180))
+                read_angle = int(round(((duty - 10000000) / 10000000.) * 180))
                 assert read_angle == test_y_angle, "{} != {}".format(
                                                     read_angle,
                                                     test_y_angle)

@@ -40,11 +40,11 @@ class TestPosition(unittest.TestCase):
 
         # Set known values in all simulated hardware files
         with open(self.test_dir + "/run", "w") as f:
-            f.write("0\n")
+            f.write("1\n")
         with open(self.test_dir + "/duty_ns", "w") as f:
-            f.write("1500000\n")
+            f.write("15000000\n")
         with open(self.test_dir + "/period_ns", "w") as f:
-            f.write("2000000\n")
+            f.write("20000000\n")
         with open(self.test_dir + "/polarity", "w") as f:
             f.write("0\n")
 
@@ -85,7 +85,7 @@ class TestPosition(unittest.TestCase):
                 # Duty is read like this by PWM getter
                 duty = int(f.read())
                 # Position is derived this way in position getter
-                read_position = int(round(((duty - 1000000) / 1000000.) * 180))
+                read_position = int(round(((duty - 10000000) / 10000000.) * 180))
                 assert read_position == test_position, "{} != {}".format(
                                                         read_position,
                                                         test_position)

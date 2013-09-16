@@ -47,9 +47,11 @@ class TestRotate(unittest.TestCase):
             with open(test_dir + "/run", "w") as f:
                 f.write("0\n")
             with open(test_dir + "/duty_ns", "w") as f:
-                f.write("0\n")
+                f.write("250000\n")
             with open(test_dir + "/period_ns", "w") as f:
                 f.write("1000000\n")
+            with open(test_dir + "/polarity", "w") as f:
+                f.write("0\n")
 
         # Build mec_driver
         self.md = MecDriver()

@@ -48,9 +48,9 @@ class TestUpdateRotateSpeed(unittest.TestCase):
             with open(m_test_dir + "/run", "w") as f:
                 f.write("0\n")
             with open(m_test_dir + "/duty_ns", "w") as f:
-                f.write("1500000\n")
+                f.write("250000\n")
             with open(m_test_dir + "/period_ns", "w") as f:
-                f.write("2000000\n")
+                f.write("1000000\n")
             with open(m_test_dir + "/polarity", "w") as f:
                 f.write("0\n")
 
@@ -144,9 +144,9 @@ class TestFire(unittest.TestCase):
             with open(m_test_dir + "/run", "w") as f:
                 f.write("0\n")
             with open(m_test_dir + "/duty_ns", "w") as f:
-                f.write("1500000\n")
+                f.write("250000\n")
             with open(m_test_dir + "/period_ns", "w") as f:
-                f.write("2000000\n")
+                f.write("1000000\n")
             with open(m_test_dir + "/polarity", "w") as f:
                 f.write("0\n")
 
@@ -201,9 +201,9 @@ class TestAdvanceDart(unittest.TestCase):
             with open(m_test_dir + "/run", "w") as f:
                 f.write("0\n")
             with open(m_test_dir + "/duty_ns", "w") as f:
-                f.write("1500000\n")
+                f.write("250000\n")
             with open(m_test_dir + "/period_ns", "w") as f:
-                f.write("2000000\n")
+                f.write("1000000\n")
             with open(m_test_dir + "/polarity", "w") as f:
                 f.write("0\n")
 

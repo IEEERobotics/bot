@@ -62,12 +62,30 @@ class TestExecStrategy(unittest.TestCase):
         # Collect simulated GPIO hardware test directories
         gpio_test_dirs = self.sol_test_dir + self.md_gpio_test_dirs.values()
 
-        # Collect simulated PWM hardware test directories
-        pwm_test_dirs = self.wg_pwm_test_dirs + self.ts_test_dirs.values() +\
-                                                self.md_pwm_test_dirs.values()
+        # Collect simulated motor hardware test directories
+        motr_test_dirs = self.wg_pwm_test_dirs + self.md_pwm_test_dirs.values()
 
-        # Set simulated PWM directories to known state
-        for test_dir in pwm_test_dirs:
+        # Collect simulated servo hardware test directories
+        servo_test_dirs = self.ts_test_dirs.values()
+
+        # Set simulated servo PWM directories to known state
+        for test_dir in servo_test_dirs:
+            # Create test directory if it doesn't exist
+            if not os.path.exists(test_dir):
+                os.makedirs(test_dir)
+
+            # Set known values in all simulated hardware files
+            with open(test_dir + "/run", "w") as f:
+                f.write("1\n")
+            with open(test_dir + "/duty_ns", "w") as f:
+                f.write("15000000\n")
+            with open(test_dir + "/period_ns", "w") as f:
+                f.write("20000000\n")
+            with open(test_dir + "/polarity", "w") as f:
+                f.write("0\n")
+
+        # Set simulated motor PWM directories to known state
+        for test_dir in motr_test_dirs:
             # Create test directory if it doesn't exist
             if not os.path.exists(test_dir):
                 os.makedirs(test_dir)
@@ -76,9 +94,9 @@ class TestExecStrategy(unittest.TestCase):
             with open(test_dir + "/run", "w") as f:
                 f.write("0\n")
             with open(test_dir + "/duty_ns", "w") as f:
-                f.write("1500000\n")
+                f.write("250000\n")
             with open(test_dir + "/period_ns", "w") as f:
-                f.write("2000000\n")
+                f.write("1000000\n")
             with open(test_dir + "/polarity", "w") as f:
                 f.write("0\n")
 

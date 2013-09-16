@@ -182,3 +182,65 @@ class TestDirection(unittest.TestCase):
         assert self.motor.direction == "forward"
         self.motor.direction = ""
         assert self.motor.direction == "forward"
+
+class TestNoDirection(unittest.TestCase):
+
+    """Test a motor with no GPIO pin, and therefore no in-code direction."""
+
+    def setUp(self):
+        """Setup test hardware files and build motor object."""
+        # ID number of motor
+        self.pwm_num = 0
+        self.gpio_num = 0
+
+        # Load config
+        config = lib.load_config()
+        self.pwm_test_dir = config["test_pwm_base_dir"] + str(self.pwm_num)
+
+        # Set testing flag in config
+        self.orig_test_state = config["testing"]
+        lib.set_testing(True)
+
+        # Create test directories if they don't exist
+        for test_dir in [self.pwm_test_dir]:
+            if not os.path.exists(test_dir):
+                os.makedirs(test_dir)
+
+        # Set known values in PWM simulated hardware files
+        with open(self.pwm_test_dir + "/run", "w") as f:
+            f.write("0\n")
+        with open(self.pwm_test_dir + "/duty_ns", "w") as f:
+            f.write("1500000\n")
+        with open(self.pwm_test_dir + "/period_ns", "w") as f:
+            f.write("2000000\n")
+        with open(self.pwm_test_dir + "/polarity", "w") as f:
+            f.write("0\n")
+
+        # Build motor in testing mode
+        self.motor = m_mod.Motor(self.pwm_num)
+
+    def tearDown(self):
+        """Restore testing flag state in config file."""
+        lib.set_testing(self.orig_test_state)
+
+    def test_set_dir(self):
+        """Test setting a direction for a motor that should have no direction.
+
+        As there should be no result from this call, we're just checking that
+        no exception is raised.
+
+        """
+        self.motor.direction = m_mod.FORWARD
+        self.motor.direction = "forward"
+        self.motor.direction = "reverse"
+
+    def test_get_dir(self):
+        """Get direction for a motor that should have no direction."""
+        assert self.motor.direction == None
+
+    def test_vol(self):
+        """Get velocity for a motor that has no direction."""
+        assert self.motor.velocity == self.motor.speed
+        self.motor.speed = 50
+        assert self.motor.speed == 50
+        assert self.motor.velocity == 50

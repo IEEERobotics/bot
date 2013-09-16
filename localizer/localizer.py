@@ -20,7 +20,7 @@ class Localizer(object):
     MIN_RANGE = .04
 
     #Differences between expected and found values shouldn't exceed this
-    MAX_ERROR = 2*.0254
+    MAX_ERROR = 2 * .0254
 
     #Firing position lists for each line.
     #Converting inches to meters
@@ -61,5 +61,5 @@ class Localizer(object):
             self.logger.warn('%s meters is too much error', diff[firingPos])
         """
 
-        firingPos = {'row': 0, 'slot':0}
+        firingPos = {'row': 0, 'slot': 0}
         return firingPos

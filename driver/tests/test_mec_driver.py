@@ -61,40 +61,56 @@ class TestRotate(unittest.TestCase):
         lib.set_testing(self.orig_test_state)
 
     def test_rotate(self):
-        rotate_speed_error_margin = (MecDriver.max_rotate_speed - MecDriver.min_rotate_speed) * 0.05
-        for test_rotate_speed in xrange(MecDriver.min_rotate_speed, MecDriver.max_rotate_speed + 1):
-          # Issue rotate command
-          logger.debug("Set rotate_speed: {}".format(test_rotate_speed))
-          self.md.rotate(test_rotate_speed)
-          logger.debug("Check rotate_speed: {}".format(self.md.rotate_speed))
+        rotate_speed_error_margin = (MecDriver.max_rotate_speed -
+                                     MecDriver.min_rotate_speed) * 0.05
+        for test_rotate_speed in xrange(MecDriver.min_rotate_speed,
+                                        MecDriver.max_rotate_speed + 1):
+            # Issue rotate command
+            logger.debug("Set rotate_speed: {}".format(test_rotate_speed))
+            self.md.rotate(test_rotate_speed)
+            logger.debug("Check rotate_speed: {}".format(self.md.rotate_speed))
+
+            # Check for approximate match, as float values will seldom be exact
+            assert fabs(self.md.rotate_speed - test_rotate_speed) <\
+                                               rotate_speed_error_margin
+            if fabs(test_rotate_speed) >= 10:  # Don't test dir if speed too low
+                assert self.md.motors["front_left"].direction == "forward" if\
+                    test_rotate_speed >= 0 else "reverse"
+                assert self.md.motors["front_right"].direction == "reverse" if\
+                    test_rotate_speed >= 0 else "forward"
+                assert self.md.motors["back_left"].direction == "forward" if\
+                    test_rotate_speed >= 0 else "reverse"
+                assert self.md.motors["back_right"].direction == "reverse" if\
+                    test_rotate_speed >= 0 else "forward"
           
-          # Check for approximate match, as float values will seldom be exact
-          assert fabs(self.md.rotate_speed - test_rotate_speed) < rotate_speed_error_margin
-          if fabs(test_rotate_speed) >= 10:   # no point testing direction if speed is too low
-              assert self.md.motors["front_left"].direction  == "forward" if test_rotate_speed >= 0 else "reverse"
-              assert self.md.motors["front_right"].direction == "reverse" if test_rotate_speed >= 0 else "forward"
-              assert self.md.motors["back_left"].direction   == "forward" if test_rotate_speed >= 0 else "reverse"
-              assert self.md.motors["back_right"].direction  == "reverse" if test_rotate_speed >= 0 else "forward"
-          
-          # Check for valid duty cycles (speeds)
-          for motor in self.md.motors.itervalues():
-              assert MecDriver.min_speed <= motor.speed <= MecDriver.max_speed
+            # Check for valid duty cycles (speeds)
+            for motor in self.md.motors.itervalues():
+                assert MecDriver.min_speed <= motor.speed <=\
+                                              MecDriver.max_speed
 
     def test_move(self):
-        speed_error_margin = (MecDriver.max_speed - MecDriver.min_speed) * 0.05
-        angle_error_margin = (MecDriver.max_angle - MecDriver.min_angle) * 0.05
-        for test_speed in xrange(MecDriver.min_speed, MecDriver.max_speed + 1, 10):
-            for test_angle in xrange(MecDriver.min_angle, MecDriver.max_angle + 1, 10):
+        speed_error_margin = (MecDriver.max_speed -
+                              MecDriver.min_speed) * 0.05
+        angle_error_margin = (MecDriver.max_angle -
+                              MecDriver.min_angle) * 0.05
+        for test_speed in xrange(MecDriver.min_speed,
+                                 MecDriver.max_speed + 1, 10):
+            for test_angle in xrange(MecDriver.min_angle,
+                                     MecDriver.max_angle + 1, 10):
                 # Issue move command
-                logger.debug("Set speed: {}, angle: {}".format(test_speed, test_angle))
+                logger.debug("Set speed: {}, angle: {}".format(test_speed,
+                                                               test_angle))
                 self.md.move(test_speed, test_angle)
-                logger.debug("Check speed: {}, angle: {}".format(self.md.speed, self.md.angle))
+                logger.debug("Check speed: {}, angle: {}".format(self.md.speed,
+                                                                self.md.angle))
                 
-                # Check for approximate match, as float values will seldom be exact
+                # Check for approximate match, floats will seldom be exact
                 assert fabs(self.md.speed - test_speed) < speed_error_margin
-                if fabs(test_speed) >= 10:  # no point testing angle if speed is too low
-                    assert fabs(self.md.angle - test_angle) % 360 < angle_error_margin
-                
+                if fabs(test_speed) >= 10:  # Don't angle if speed is too low
+                    assert fabs(self.md.angle - test_angle) % 360 <\
+                                                            angle_error_margin
+
                 # Check for valid duty cycles (speeds)
                 for motor in self.md.motors.itervalues():
-                    assert MecDriver.min_speed <= motor.speed <= MecDriver.max_speed
+                    assert MecDriver.min_speed <= motor.speed <=\
+                                                  MecDriver.max_speed

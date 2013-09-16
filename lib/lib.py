@@ -10,6 +10,8 @@ except ImportError, err:
     sys.stderr.write("ERROR: {}. Try installing python-yaml.\n".format(err))
     raise
 
+_config = None
+_config_file = None
 _logger = None
 
 
@@ -28,11 +30,19 @@ def prepend_prefix(path_from_proj_root):
 def load_config(config_file="config.yaml"):
     """Load and return configuration options.
 
+    Note that this config is only loaded once (it's a singleton).
+
     :param config_file: YAML file to load config from.
     :type config_file: string
     :returns: Dict description of configuration for this round.
 
     """
+    # Don't load config file if it is already loaded (and filename matches)
+    global _config, _config_file
+    if _config is not None and config_file == _config_file:
+        return _config
+    _config_file = config_file
+
     # Build valid path from CWD to config file
     qual_config_file = prepend_prefix(config_file)
 
@@ -41,21 +51,15 @@ def load_config(config_file="config.yaml"):
         return yaml.load(config_fd)
 
 
-def write_config(new_config, config_file="config.yaml"):
-    """Write an updated version of config back to the config file.
+def write_config(new_config):
+    """Write an updated version of config to global _config.
 
     :param new_config: Updated version of config to write.
     :type new_config: dict
-    :param config_file: YAML file to write config to.
-    :type config_file: string
 
     """
-    # Build valid path from CWD to config file
-    qual_config_file = prepend_prefix(config_file)
-
-    # Write new config
-    with open(qual_config_file, "w") as config_fd:
-        yaml.dump(new_config, config_fd)
+    global _config
+    _config = new_config
 
 
 def load_strategy(strat_file=None):

@@ -145,12 +145,6 @@ class TestSetTesting(unittest.TestCase):
         new_config = lib.load_config()
         assert new_config == self.orig_config
 
-    def test_flip(self):
-        """Test flipping the testing flag value."""
-        lib.set_testing(not self.orig_config["testing"])
-        new_config = lib.load_config()
-        assert self.orig_config["testing"] == (not new_config["testing"])
-
     def test_invalid_state(self):
         """Test passing a non-boolean value for state param."""
         with self.assertRaises(TypeError):

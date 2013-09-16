@@ -68,6 +68,32 @@ python -m unittest hardware.tests.test_motor.TestSpeed.test_accel
 
 Where `hardware.tests.test_motor.TestSpeed.test_accel` is of the form package.package.module.class.method. Modify that structure to fit your current working directory and/or the path to the test you want to run.
 
+## Hooks, or *How To Make Daniel's Life Eaiser*
+
+If you're going to be contributing much code, I suggest adding [Git Hooks] to automatically run `python -m unittest discover` and `./scripts/check_pep8.sh` before each commit.
+
+Put this in a new file called `pre-commit`, in the `.git/hooks/` directory (from the project's root). Also, make sure it's executable with `chmod ug+x /path/to/pre-commit`.
+
+```bash
+#!/bin/sh
+
+# Run all unit tests
+python -m unittest discover
+if [ $? -ne 0 ]
+then
+    echo "Not commiting because unit tests failed. Use --no-verify to ignore."
+    exit 1
+fi
+
+# Check style for conformace with PEP8
+./scripts/check_pep8.sh
+if [ $? -ne 0 ]
+then
+    echo "Not commiting because check_pep8 failed. Use --no-verify to ignore."
+    exit 1
+fi
+```
+
 [pybbb]: https://github.com/NCSUhardware/pybbb
 [git-scm section on submodules]: http://git-scm.com/book/en/Git-Tools-Submodules#Cloning-a-Project-with-Submodules
 [PEP8]: http://www.python.org/dev/peps/pep-0008/
@@ -77,3 +103,4 @@ Where `hardware.tests.test_motor.TestSpeed.test_accel` is of the form package.pa
 [3]: http://stackoverflow.com/questions/5334531/python-documentation-standard-for-docstring
 [PEP257]: http://www.python.org/dev/peps/pep-0257/
 [multi-OS guide]: https://help.github.com/articles/set-up-git#platform-windows
+[Git Hooks]: http://git-scm.com/book/en/Customizing-Git-Git-Hooks

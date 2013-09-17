@@ -16,10 +16,10 @@ class StateTable(object):
         self.redFound = False
         self.xFound = False
         self.centered = False
-        self.lastHeading = 180
+        self.lastHeading = 180  # tracks the last heading for navigation
         self.currentHeading = 180
         self.intersections = 0
-        self.positions = 0
+        self.positions = 0 # firing positions tracker
         self.shotsTaken = 0
 
     @classmethod
@@ -59,12 +59,12 @@ class StateMachine:
 
 class TestStates(State):
     """Read from a test file and modify the state table"""
-
+    # TODO: (PaladinEng) Move this string to config
     f = open("./tests/input/RobotNormalTest.txt")
 
     def __init__(self):
         super(TestStates, self).__init__()
-
+    #TODO: (avsmith5) Switch print statements to logging
     def run(self):
         input = self.f.readline()
         testCase = input.strip()
@@ -91,7 +91,7 @@ class WaitingForStart(State):
 
     def __init__(self):
         super(WaitingForStart, self).__init__()
-
+    #TODO: (avsmith5) Docstrongs on methods
     def run(self):
         if self.stateTable.start is False:
             print "Execute: Still waiting\n"
@@ -128,7 +128,7 @@ class FindLine(State):
         super(FindLine, self).__init__()
 
     def run(self):
-        if self.stateTable.start is False:
+        if self.stateTable.lineFound is False:
             #oscillate
             print "Execute: Looking for line.\n"
         else:

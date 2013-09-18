@@ -26,7 +26,11 @@ class MecDriver(driver.Driver):
         for motor in self.config["drive_motors"]:
             self.motors[motor["position"]] = m_mod.Motor(motor["PWM"],
                                                          motor["GPIO"])
-
+        
+        # Reconfigure motors to account for opposite mounting directions between left and right side
+        self.motors["front_right"].invert(True)
+        self.motors["back_right"].invert(True)
+    
     @property
     def speed(self):
         """Getter for bot's current overall speed as % of max
@@ -101,23 +105,25 @@ class MecDriver(driver.Driver):
 
         # Set motor directions, based on http://goo.gl/B1KEUV
         # Also see MecanumWheelDirection.png
+        # NOTE(napratin, 9/17): Only 2 wheels need to be turned on for each direction, as per diagram
+        # NOTE(napratin, 9/17): But using all 4 wheels in a conventional differential drive configuration for rotation works fine
         if rotate_speed >= 0:
             # Counter Clockwise
-            self.motors["front_left"].direction = "forward"
-            self.motors["front_right"].direction = "reverse"
-            self.motors["back_left"].direction = "forward"
-            self.motors["back_right"].direction = "reverse"
-        else:
-            # Clockwise
             self.motors["front_left"].direction = "reverse"
             self.motors["front_right"].direction = "forward"
             self.motors["back_left"].direction = "reverse"
             self.motors["back_right"].direction = "forward"
+        else:
+            # Clockwise
+            self.motors["front_left"].direction = "forward"
+            self.motors["front_right"].direction = "reverse"
+            self.motors["back_left"].direction = "forward"
+            self.motors["back_right"].direction = "reverse"
 
         # Set motor speeds
         abs_speed = fabs(rotate_speed)
         for motor in self.motors.itervalues():
-            motor.speed = abs_speed            
+            motor.speed = abs_speed
 
     def move(self, speed, angle):
         """Move holonomically without rotation.

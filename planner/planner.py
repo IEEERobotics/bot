@@ -4,9 +4,9 @@ import sys
 
 import lib.lib as lib
 import lib.exceptions as ex
-import driver.mec_driver as mdriver
-import gunner.wheel_gunner as wgunner
-import follower.follower as follower
+import driver.mec_driver as md_mod
+import gunner.wheel_gunner as wg_mod
+import follower.follower as f_mod
 
 
 class Planner(object):
@@ -30,13 +30,13 @@ class Planner(object):
         assert self.strat is not None, "Strategy seems to be empty"
 
         # Build MecDriver, which will accept and handle movement actions
-        self.driver = mdriver.MecDriver()
+        self.driver = md_mod.MecDriver()
 
         # Build WheelGunner, which will accept and handle fire actions
-        self.gunner = wgunner.WheelGunner()
+        self.gunner = wg_mod.WheelGunner()
 
         # Build follower, which will manage following line
-        self.follower = follower.Follower()
+        self.follower = f_mod.Follower()
 
         # Start executing the strategy
         self.exec_strategy()

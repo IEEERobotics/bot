@@ -1,4 +1,4 @@
-"""Test cases for IR abstraction class."""
+"""Test cases for IRHub abstraction class."""
 import sys
 import os
 import unittest
@@ -7,7 +7,7 @@ sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
 
 try:
     import lib.lib as lib
-    import hardware.ir as ir_mod
+    import hardware.ir_hub as ir_hub_mod
 except ImportError:
     print "ImportError: Use `python -m unittest discover` from project root."
     raise
@@ -17,10 +17,10 @@ logger = lib.get_logger()
 
 class TestReading(unittest.TestCase):
 
-    """Test reading IR sensor values using IR abstraction."""
+    """Test reading IR sensor values using IRHub abstraction."""
 
     def setUp(self):
-        """Get config and built IR object."""
+        """Get config and built IRHub object."""
         # Load config
         config = lib.load_config()
 
@@ -29,7 +29,7 @@ class TestReading(unittest.TestCase):
         lib.set_testing(True)
 
         # Built IR abstraction object
-        self.ir = ir_mod.IR()
+        self.ir_hub = ir_hub_mod.IRHub()
 
     def tearDown(self):
         """Restore testing flag state in config file."""
@@ -37,8 +37,11 @@ class TestReading(unittest.TestCase):
 
     def testStub(self):
         """Confirm that stub behavior is working as expected."""
-        reading = self.ir.get_reading()
+        reading = self.ir_hub.get_reading()
         assert type(reading) is dict, "type is {}".format(type(reading))
-        for ir_name, ir_val, in reading.iteritems():
-            assert ir_name[:3] == "ir_"
-            assert ir_val == 0
+        for name, array in reading.iteritems():
+            assert type(name) is str
+            assert type(array) is dict
+            for ir_name, ir_val, in array.iteritems():
+                assert ir_name[:3] == "ir_"
+                assert ir_val == 0

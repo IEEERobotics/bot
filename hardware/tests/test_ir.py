@@ -29,7 +29,7 @@ class TestReading(unittest.TestCase):
         lib.set_testing(True)
 
         # Built IR abstraction object
-        self.ir = ir_mod.IR()
+        self.ir = ir_mod.IR("test")
 
     def tearDown(self):
         """Restore testing flag state in config file."""

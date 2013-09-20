@@ -3,11 +3,11 @@
 import string
 import sys
 
-#import lib.lib as lib
-#import lib.exceptions as ex
-#import driver.mec_driver as md_mod
-#import gunner.wheel_gunner as wg_mod
-#import follower.follower as f_mod
+import lib.lib as lib
+import lib.exceptions as ex
+import driver.mec_driver as md_mod
+import gunner.wheel_gunner as wg_mod
+import follower.follower as f_mod
 #TODO: (avsmith5) Switch print statements to logging
 
 
@@ -59,7 +59,7 @@ class State(object):
 class TestStates(State):
     """Read from a test file and modify the state table"""
     # TODO: (PaladinEng) Move this string to config
-    f = open("./tests/input/RobotNormalTest.txt")
+    f = open(Robot.config["fsm_tests"])
 
     def __init__(self):
         """Initializes the Test State as a subclass of State,
@@ -124,6 +124,7 @@ class Jerk(State):
 
     def run(self):
         """Calls the jerk behavior"""
+        md_mod.jerk()
         print "Execute: Rote initial move.\n"
 
     def next(self):
@@ -142,7 +143,7 @@ class FindLine(State):
     def run(self):
         """Confirms the presence of a line or calls a rescue behavior"""
         if self.stateTable.lineFound is False:
-            #oscillate
+            md_mod.oscillate()
             print "Execute: Looking for line.\n"
         else:
             print "Line found!\n"
@@ -163,6 +164,7 @@ class Following(State):
 
     def run(self):
         """Calls a line following behavior """
+        f_mod.follow()
         print "Execute: Following line.\n"
 
     def next(self):
@@ -236,6 +238,7 @@ class Firing(State):
     def run(self):
         """Calls the firing behavior. Increments the shot counter."""
         #TODO (PaladinEng): Passing firing position index for firing solution?
+        wg_mod.fire()
         print "Execute: One shot = One kill.\n"
         self.stateTable.shotsTaken += 1
 
@@ -334,6 +337,12 @@ class Robot(StateMachine):
     chooseDir = ChooseDirection()
     finish = Finish()
     test = TestStates()
+
+    # Get and store logger object
+    logger = lib.get_logger()
+
+    # Load and store configuration
+    config = lib.load_config()
 
     def __init__(self):
         """Initializes Robot"""

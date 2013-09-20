@@ -2,7 +2,13 @@
 
 import string
 import sys
-    #TODO: (avsmith5) Switch print statements to logging
+
+#import lib.lib as lib
+#import lib.exceptions as ex
+#import driver.mec_driver as md_mod
+#import gunner.wheel_gunner as wg_mod
+#import follower.follower as f_mod
+#TODO: (avsmith5) Switch print statements to logging
 
 
 class StateTable(object):
@@ -48,25 +54,6 @@ class State(object):
 
     def next(self):
         assert 0, "next() not implemented"
-
-
-class StateMachine:
-    """Initializes and execute states, and manage transitions"""
-
-    def __init__(self, initialState):
-        """Initializes the current the current state to the initial state """
-        self.currentState = initialState
-
-    def runAll(self):
-        """Executes the current state's run behaviors and transitions to
-        the next state until the finish state occurs.
-        """
-        while (self.currentState != self.finish):
-            Robot.test.run()  # for testing only
-            self.currentState.run()
-            self.currentState = self.currentState.next()
-            if self.currentState is self.finish:
-                self.currentState.run()
 
 
 class TestStates(State):
@@ -317,26 +304,45 @@ class Finish(State):
         return Robot.finish
 
 
-class Robot(StateMachine):
-    """Robot is the wrapper for the state classes and the state machine"""
+class StateMachine:
+    """Initializes and execute states, and manage transitions"""
 
     def __init__(self):
-        """Initializes Robot into the waiting state and begins cycling for
-        state behaviors and transitions
-        """
-        StateMachine.__init__(self, Robot.waiting)
-        self.runAll()
+        pass
 
-#Static variable initialization:
-Robot.waiting = WaitingForStart()
-Robot.jerk = Jerk()
-Robot.findLine = FindLine()
-Robot.following = Following()
-Robot.firing = Firing()
-Robot.center = CenterAndAlign()
-Robot.chooseDir = ChooseDirection()
-Robot.finish = Finish()
-Robot.test = TestStates()
+    def runAll(self):
+        """Executes the current state's run behaviors and transitions to
+        the next state until the finish state occurs.
+        """
+        while (self.currentState != Robot.finish):
+            Robot.test.run()  # for testing only
+            self.currentState.run()
+            self.currentState = self.currentState.next()
+            if self.currentState is Robot.finish:
+                self.currentState.run()
+
+
+class Robot(StateMachine):
+    """Robot is the wrapper for the state classes and the state machine"""
+    #State initialization
+    waiting = WaitingForStart()
+    jerk = Jerk()
+    findLine = FindLine()
+    following = Following()
+    firing = Firing()
+    center = CenterAndAlign()
+    chooseDir = ChooseDirection()
+    finish = Finish()
+    test = TestStates()
+
+    def __init__(self):
+        """Initializes Robot"""
+        StateMachine.__init__(self)
+
+        """Initializes the current the current state to the initial state """
+        self.currentState = Robot.waiting
+
+        self.runAll()
 
 #Execute
 Robot()

@@ -24,3 +24,16 @@ class Driver(object):
         """
         self.logger.error("The move method must be overridden by a subclass.")
         raise NotImplementedError("Subclass must override this method.")
+
+    def jerk(self, desc):
+        """Execute a rote forward movement.
+
+        This method is not meant to be called, but instead is meant to show
+        that subclasses should override it in their implementation.
+
+        :param desc: Description of jerk command to handle.
+        :type desc: string
+
+        """
+        self.logger.error("The jerk method must be overridden by a subclass.")
+        raise NotImplementedError("Subclass must override this method.")

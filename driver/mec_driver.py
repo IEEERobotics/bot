@@ -64,11 +64,10 @@ class MecDriver(driver.Driver):
 
     def __str__(self):
         """Show status of motors."""
-        return "fr: {}, fl: {} br: {}, bl: {}".format(
-                                                self.motors["front_right"],
-                                                self.motors["front_left"],
-                                                self.motors["back_right"],
-                                                self.motors["back_left"])
+        return "fr: {}, fl: {} br: {}, bl: {}".format(self.motors["front_right"],
+                                                      self.motors["front_left"],
+                                                      self.motors["back_right"],
+                                                      self.motors["back_left"])
 
     def rotate(self, rotate_speed):
         """Pass rotation speed as -100 to +100 (positive is clockwise)."""
@@ -151,8 +150,10 @@ class MecDriver(driver.Driver):
 
     def move_forward_strafe(self, forward, strafe):
         speed = hypot(forward, strafe) / 1.414  # scale down speed by sqrt(2) to make sure we're in range
-        if speed < MecDriver.min_speed: speed = MecDriver.min_speed
-        elif speed > MecDriver.max_speed: speed = MecDriver.max_speed
+        if speed < MecDriver.min_speed:
+            speed = MecDriver.min_speed
+        elif speed > MecDriver.max_speed:
+            speed = MecDriver.max_speed
         angle = degrees(atan2(forward, strafe)) % 360  # note order of atan2() args to get forward = 0 deg
         self.move(speed, angle)
 

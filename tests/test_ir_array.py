@@ -3,6 +3,7 @@ import unittest
 import pybbb.bbb.gpio as gpio_mod
 import pybbb.bbb.adc as adc_mod
 
+
 class TestIRArray(unittest.TestCase):
     loop_delay = 0.5
     
@@ -27,22 +28,23 @@ class TestIRArray(unittest.TestCase):
         self.value = self.ir_adc.read()
     
     def do_selectLoop(self):
-        combos = [[ 0, 0, 0, 0 ],
-                  [ 0, 0, 0, 1 ],
-                  [ 0, 0, 1, 0 ],
-                  [ 0, 0, 1, 1 ],
-                  [ 0, 1, 0, 0 ],
-                  [ 0, 1, 0, 1 ],
-                  [ 0, 1, 1, 0 ],
-                  [ 0, 1, 1, 1 ],
-                  [ 1, 0, 0, 0 ],
-                  [ 1, 0, 0, 1 ],
-                  [ 1, 0, 1, 0 ],
-                  [ 1, 0, 1, 1 ],
-                  [ 1, 1, 0, 0 ],
-                  [ 1, 1, 0, 1 ],
-                  [ 1, 1, 1, 0 ],
-                  [ 1, 1, 1, 1 ]]
+        # TODO Generate select line combinations by converting ints 0..15 to binary
+        combos = [[0, 0, 0, 0],
+                  [0, 0, 0, 1],
+                  [0, 0, 1, 0],
+                  [0, 0, 1, 1],
+                  [0, 1, 0, 0],
+                  [0, 1, 0, 1],
+                  [0, 1, 1, 0],
+                  [0, 1, 1, 1],
+                  [1, 0, 0, 0],
+                  [1, 0, 0, 1],
+                  [1, 0, 1, 0],
+                  [1, 0, 1, 1],
+                  [1, 1, 0, 0],
+                  [1, 1, 0, 1],
+                  [1, 1, 1, 0],
+                  [1, 1, 1, 1]]
         
         for combo in combos:
             self.select(combo)

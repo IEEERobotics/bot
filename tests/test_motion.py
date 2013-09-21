@@ -73,11 +73,13 @@ class TestMotion(unittest.TestCase):
         # dirs and speeds must be the same length as self.drive_motors
         assert len(self.drive_motors) == len(directions) == len(speeds)
         for motor, direction, speed in zip(self.drive_motors, directions, speeds):
-            if motor is None: continue
+            if motor is None:
+                continue
             motor.direction = direction
             motor.speed = speed
     
     def stop(self):
         for motor in self.drive_motors:
-            if motor is None: continue
+            if motor is None:
+                continue
             motor.speed = 0

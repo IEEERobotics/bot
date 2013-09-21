@@ -23,13 +23,35 @@ class TestReading(unittest.TestCase):
         """Get config and built IR object."""
         # Load config
         config = lib.load_config()
+        gpio_test_dir_base = config["test_gpio_base_dir"]
+        adc_test_dir = config["test_adc_base_dir"]
 
         # Set testing flag in config
         self.orig_test_state = config["testing"]
         lib.set_testing(True)
 
-        # Built IR abstraction object
-        self.ir = ir_mod.IR("test")
+        # Create GPIO test directories if they don't exist
+        for gpio in config["ir_select_gpios"]:
+            gpio_test_dir = gpio_test_dir_base + str(gpio)
+            if not os.path.exists(gpio_test_dir):
+                os.makedirs(gpio_test_dir)
+            
+            # Set known values in GPIO simulated hardware files
+            with open(gpio_test_dir + "/value", "w") as f:
+                f.write("0\n")
+            with open(gpio_test_dir + "/direction", "w") as f:
+                f.write("out\n")
+        
+        # Create ADC test directory if it doesn't exist
+        if not os.path.exists(adc_test_dir):
+            os.makedirs(adc_test_dir)
+        
+        # Set known value in ADC simulated hardware file
+        with open(adc_test_dir + "/AIN" + str(config["ir_input_adc"]), "w") as f:
+            f.write("0\n")
+
+        # Build IR abstraction object
+        self.ir = ir_mod.IRArray("test")
 
     def tearDown(self):
         """Restore testing flag state in config file."""
@@ -37,8 +59,7 @@ class TestReading(unittest.TestCase):
 
     def testStub(self):
         """Confirm that stub behavior is working as expected."""
-        reading = self.ir.get_reading()
-        assert type(reading) is dict, "type is {}".format(type(reading))
-        for ir_name, ir_val, in reading.iteritems():
-            assert ir_name[:3] == "ir_"
-            assert ir_val == 0
+        reading = self.ir.read_all_units()
+        assert type(reading) is list, "type is {}".format(type(reading))
+        for ir_value in reading:
+            assert ir_value == 0

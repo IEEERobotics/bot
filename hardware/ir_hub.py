@@ -3,16 +3,16 @@
 import lib.lib as lib
 import hardware.ir as ir_mod
 
-class IRHub(object):
 
+class IRHub(object):
     """Class for abstracting all IR arrays and working with them as a unit.
 
-    ir.IR is currently a stub, waiting for working IR sensors to be built.
+    ir.IR is currently encapsulates one IR sensor array using a MUX select scheme.
 
     """
 
     def __init__(self):
-        """Build IR abstraction objects and logger."""
+        """Build IR array abstraction objects and logger."""
         # Get and store logger object
         self.logger = lib.get_logger()
 
@@ -20,32 +20,25 @@ class IRHub(object):
         array_names = ["front", "back", "left", "right"]
         self.arrays = {}
         for name in array_names:
-            self.arrays[name] = ir_mod.IR(name)
+            self.arrays[name] = ir_mod.IRArray(name)
+            # TODO: A second parameter (5th select line?) is needed to select a particular IR array
 
     def __str__(self):
         """Returns human-readable representation of IRHub.
 
-        The convoluted way this is implemented seems necessary, as
-        str(self.arrays) wouldn't propagate down to ir.IR.__str__.
-
-        :returns: Info about each IR array owned by IRHub.
+        :returns: Info about each IR array owned by this IRHub.
 
         """
-        rep = "IRHub: "
-        for name, array in self.arrays.iteritems():
-            rep += "\"{}\" : \"{}\"; ".format(name, str(array))
-        return rep[:len(rep) - 2]
+        return "IRHub:- {}".format("; ".join(str(array) for array in self.arrays.itervalues()))
 
-    def get_reading(self):
+    def read_all_arrays(self):
         """Get readings from all IR arrays.
 
-        Note that this is currently a stub.
-
-        :returns: Readings from IR arrays managed by this object.
+        :returns: Readings from all IR arrays managed by this object.
 
         """
-        reading = {}
+        readings = {}
         for name, array in self.arrays.iteritems():
-            reading[name] = array.get_reading()
-        self.logger.debug("IR arrays: {}".format(reading))
-        return reading
+            readings[name] = array.read_all_units()  # read_all_units() logs currently read values
+        #self.logger.debug("IR readings: {}".format(readings))  # no need to log again
+        return readings

@@ -1,11 +1,14 @@
 """Abstraction layer for line-following IR arrays."""
 
 import lib.lib as lib
+import pybbb.bbb.gpio as gpio_mod
+import pybbb.bbb.adc as adc_mod
 
-NUM_IRS = 16
+num_ir_units = 16  # number of IR sensor units in one array
+ord_zero = ord('0')  # cached ordinal value of zero, for efficiency
 
-class IR(object):
 
+class IRArray(object):
     """Class for abstracting IR sensors.
 
     The current plan is to use two 8 bit IR sensors on each side
@@ -16,43 +19,89 @@ class IR(object):
 
     """
 
-    def __init__(self, ID):
+    def __init__(self, name):
         """Setup required pins and get logger.
 
         The current required pins are not known, so this is a stub.
 
-        :param ID: Identifier for this IR array.
-        :type ID: string
+        :param name: Identifier for this IR array.
+        :type name: string
 
         """
-        # Store ID of this IR array
-        self.ID = ID
+        # Store name of this IR array
+        self.name = name
 
         # Get and store logger object
         self.logger = lib.get_logger()
 
-        # Warn user that this code is only a stub
-        self.logger.warn("IR abstraction not implemented, will return all 0s")
+        # Load system configuration
+        config = lib.load_config()
+
+        # Create GPIO and ADC objects
+        if config["testing"]:
+            # Get dir of simulated hardware files from config
+            gpio_test_dir_base = lib.prepend_prefix(config["test_gpio_base_dir"])
+            adc_test_dir = lib.prepend_prefix(config["test_adc_base_dir"])
+
+            # Build GPIO and ADC objects for testing
+            self.ir_select_gpios = [gpio_mod.GPIO(gpio, gpio_test_dir_base) for gpio in config["ir_select_gpios"]]
+            self.ir_input_adc = adc_mod.ADC(config["ir_input_adc"], adc_test_dir + '/AIN')
+        else:
+            try:
+                self.ir_select_gpios = [gpio_mod.GPIO(gpio) for gpio in config["ir_select_gpios"]]
+                self.ir_input_adc = adc_mod.ADC(config["ir_input_adc"])
+            except Exception as e:
+                self.logger.error("GPIOs & ADC could not be initialized. Not on the bone? Run unit test instead. Exception: {}".format(e))
+        
+        # Create buffer to store readings from all sensor units
+        self.reading = [0] * num_ir_units
 
     def __str__(self):
         """Returns human-readable representation.
 
-        :returns: String giving ID of IR array.
+        :returns: String giving name of IR array.
 
         """
-        return "IR ID: {}".format(self.ID)
+        return "{}: {}".format(self.name, self.reading)
 
-    def get_reading(self):
-        """Poll IR sensors and return sensed information.
+    def select_lines(self, values):
+        """Set select lines (GPIO pins) to given values.
+        
+        :param values: Binary iterable with length at least that of ir_select_gpios (ideally the same).
+        :type ID: iterable
+        
+        """
+        for gpio, value in zip(self.ir_select_gpios, values):
+            gpio.value = value
+    
+    def select_lines_str(self, values_str):
+        """Efficient version of select_lines() that directly uses a binary string representation."""
+        for gpio, value in zip(self.ir_select_gpios, values_str):
+            gpio.value = ord(value) - ord_zero
 
-        Note that this is currently a stub.
+    def select_unit(self, unit):
+        """Selects IR sensor unit (0-15)."""
+        #self.select_lines([int(x) for x in "{:04b}".format(unit)])  # convert unit number to array of 0s and 1s
+        self.select_lines_str("{:04b}".format(unit))  # use binary string directly; more efficient
+        # TODO Use bitarray instead: https://pypi.python.org/pypi/bitarray/
 
-        :returns: Readings from the 16 IR sensors managed by this object.
+    def read_adc(self):
+        """Read the currently selected IR unit on the input ADC line."""
+        return self.ir_input_adc.read()
+    
+    def read_unit(self, unit):
+        """Read a desired IR sensor unit."""
+        self.select_unit(unit)  # TODO do we need a short sleep to let ADC measure value correctly?
+        return self.read_adc()
+
+    def read_all_units(self):
+        """Poll IR sensor units and return sensed information.
+
+        :returns: Readings from all IR sensor units managed by this object.
 
         """
-        reading = {}
-        for i in range(NUM_IRS):
-            # TODO: Actually poll pins here, once IR arrays are built
-            reading["ir_" + str(i)] = 0
-        self.logger.debug("IR id={} reading: {}".format(self.ID, reading))
-        return reading
+        # TODO zero out self.reading?
+        for unit in xrange(num_ir_units):  # TODO more efficient loop using permutations?
+            self.reading[unit] = self.read_unit(unit)
+        self.logger.debug("IR reading:- ".format(self))
+        return self.reading  # NOTE caller should make a copy if a read_all() is executed while previous values are being used

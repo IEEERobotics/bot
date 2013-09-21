@@ -37,11 +37,10 @@ class TestReading(unittest.TestCase):
 
     def testStub(self):
         """Confirm that stub behavior is working as expected."""
-        reading = self.ir_hub.get_reading()
-        assert type(reading) is dict, "type is {}".format(type(reading))
-        for name, array in reading.iteritems():
+        readings = self.ir_hub.read_all_arrays()
+        assert type(readings) is dict, "type is {}".format(type(reading))
+        for name, reading in readings.iteritems():
             assert type(name) is str
-            assert type(array) is dict
-            for ir_name, ir_val, in array.iteritems():
-                assert ir_name[:3] == "ir_"
-                assert ir_val == 0
+            assert type(reading) is list
+            for ir_value in reading:
+                assert ir_value == 0

@@ -163,7 +163,7 @@ class TestFire(unittest.TestCase):
         TODO(dfarrell07): Flesh out this test.
 
         """
-        self.wg.fire({"summary": "Test fire"})
+        self.wg.fire()
 
 
 class TestAdvanceDart(unittest.TestCase):

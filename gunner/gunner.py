@@ -31,13 +31,11 @@ class Gunner(object):
         # Build turrent hardware abstraction
         self.turret = t_mod.Turret()
 
-    def fire(self, cmd):
+    def fire(self):
         """Accept and handle fire commands.
 
         This method is not meant to be called, but instead is meant to show
         that subclasses should override it in their implementation.
-
-        :param cmd: Command describing firing action to be executed.
 
         """
         self.logger.error("The fire method must be overridden by a subclass.")

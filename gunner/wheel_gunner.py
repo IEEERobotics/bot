@@ -24,14 +24,8 @@ class WheelGunner(gunner.Gunner):
         for motor in self.config["gun_motors"]:
             self.motors.append(m_mod.Motor(motor["PWM"]))
 
-    def fire(self, cmd):
-        """Get location, aim the turret, accelerate wheels and advance dart.
-
-        :param cmd: Description of fire command. Currently just text summary.
-
-        """
-        self.logger.debug("{}".format(cmd["summary"]))
-
+    def fire(self):
+        """Get location, aim turret, accelerate wheels and advance dart."""
         # Get the block we're over
         block = self.localizer.which_block()
         self.logger.debug("Location: {}".format(block))

@@ -167,4 +167,4 @@ class TestFire(unittest.TestCase):
 
         """
         with self.assertRaises(NotImplementedError):
-            self.gunner.fire({"summary": "Test fire"})
+            self.gunner.fire()

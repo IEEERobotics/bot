@@ -23,6 +23,7 @@ except ImportError:
 # Build logger
 logger = lib.get_logger()
 
+
 class TestServer(unittest.TestCase):
 
     """Basic tests for command server."""

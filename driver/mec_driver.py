@@ -9,7 +9,8 @@ import hardware.motor as m_mod
 
 class MecDriver(driver.Driver):
     """Subclass of Driver for movement with mecanum wheels."""
-    # TODO check angle convention across class - math functions might be using counterclockwise positive
+    # TODO: Check angle convention across class - math functions
+    #   might be using counterclockwise positive
 
     min_speed = 0
     max_speed = 100
@@ -28,51 +29,73 @@ class MecDriver(driver.Driver):
             self.motors[motor["position"]] = m_mod.Motor(motor["PWM"],
                                                          motor["GPIO"])
 
+    def __str__(self):
+        """Show status of motors."""
+        return "fr: {}, fl: {} br: {}, bl: {}".format(
+                                               self.motors["front_right"],
+                                               self.motors["front_left"],
+                                               self.motors["back_right"],
+                                               self.motors["back_left"])
+
     @property
     def speed(self):
-        """Getter for bot's current overall speed as % of max (same as duty cycle).
+        """Getter for bot's current overall speed as % of max.
+
         :returns: Current bot speed as percent of max real speed.
+
         """
         # Combine wheel velocity vectors, return magnitude
         # Note: Mecannum wheels must be oriented as per http://goo.gl/B1KEUV
-        v_forward_right = self.motors["front_left"].velocity + self.motors["back_right"].velocity
-        v_forward_left = self.motors["front_right"].velocity + self.motors["back_left"].velocity
-        return int(round(hypot(v_forward_right / 2, v_forward_left / 2)))  # TODO verify math; v/2 to take mean?
+        v_forward_right = self.motors["front_left"].velocity + \
+                          self.motors["back_right"].velocity
+        v_forward_left = self.motors["front_right"].velocity + \
+                         self.motors["back_left"].velocity
+        # TODO: Verify math; v/2 to take mean?
+        return int(round(hypot(v_forward_right / 2, v_forward_left / 2)))
 
     @property
     def angle(self):
         """Getter for bot's current overall direction of movement.
+
+        Combines wheel velocity vectors and returns angle (corrected
+        to use forward as zero).
+
         :returns: Current bot angle in degrees.
+
         """
-        # Combine wheel velocity vectors, return angle (corrected to use forward as zero)
         # Note: Mecannum wheels must be oriented as per http://goo.gl/B1KEUV
-        v_forward_right = self.motors["front_left"].velocity + self.motors["back_right"].velocity
-        v_forward_left = self.motors["front_right"].velocity + self.motors["back_left"].velocity
-        return int(round(degrees(atan2(v_forward_right, v_forward_left) - pi / 4))) % 360  # TODO verify math; -pi/4 is because hypot will compute direction along forward_right diagonal
-        # TODO correct this so that zero angle is returned (instead of -45) even when speed is near-zero
+        v_forward_right = self.motors["front_left"].velocity + \
+                          self.motors["back_right"].velocity
+        v_forward_left = self.motors["front_right"].velocity + \
+                         self.motors["back_left"].velocity
+        return int(round(degrees(atan2(v_forward_right, v_forward_left) - \
+                                                        pi / 4))) % 360
+        # TODO: Verify math; -pi/4 is because hypot will compute direction
+        #   along forward_right diagonal
+        # TODO: Correct this so that zero angle is returned
+        #   (instead of -45) even when speed is near-zero
 
     @property
     def rotate_speed(self):
         """Getter for bot's current overall speed of rotation.
-        :returns: Current bot rotation speed in range [min_rotate_speed, max_rotate_speed].
+
+        :returns: Rotation speed in range [min_rotate_speed, max_rotate_speed].
+
         """
         # Return difference between left and right velocities
         # Note: Mecannum wheels must be oriented as per http://goo.gl/B1KEUV
-        v_left = self.motors["front_left"].velocity + self.motors["back_left"].velocity
-        v_right = self.motors["front_right"].velocity + self.motors["back_right"].velocity
-        return int(round((v_left - v_right) / 4))  # TODO verify math; v/4 to take mean?
-
-    def __str__(self):
-        """Show status of motors."""
-        return "fr: {}, fl: {} br: {}, bl: {}".format(self.motors["front_right"],
-                                                      self.motors["front_left"],
-                                                      self.motors["back_right"],
-                                                      self.motors["back_left"])
+        v_left = self.motors["front_left"].velocity + \
+                 self.motors["back_left"].velocity
+        v_right = self.motors["front_right"].velocity + \
+                  self.motors["back_right"].velocity
+        # TODO: Verify math; v/4 to take mean?
+        return int(round((v_left - v_right) / 4))
 
     def rotate(self, rotate_speed):
         """Pass rotation speed as -100 to +100 (positive is clockwise)."""
         # Validate params
-        assert MecDriver.min_rotate_speed <= rotate_speed <= MecDriver.max_rotate_speed
+        assert MecDriver.min_rotate_speed <= rotate_speed <= \
+                                             MecDriver.max_rotate_speed
         self.logger.debug("rotate_speed: {}".format(rotate_speed))
 
         # Check for zero/near-zero speed
@@ -127,7 +150,8 @@ class MecDriver(driver.Driver):
 
         # Find largest motor speed,
         #   use that to normalize multipliers and maintain maximum efficiency
-        # TODO This needs to be debugged and re-enabled; currently speeds are being set much higher than expected (use test_mec_driver to verify)
+        # TODO: This needs to be debugged and re-enabled; currently speeds are
+        #   being set much higher than expected (use test_mec_driver to verify)
         '''
         max_wheel_speed = max([front_left, front_right, back_left, back_right])
         front_left = front_left * speed / max_wheel_speed
@@ -137,10 +161,14 @@ class MecDriver(driver.Driver):
         '''
 
         # Set motor directions
-        self.motors["front_left"].direction = "forward" if front_left > 0 else "reverse"
-        self.motors["front_right"].direction = "forward" if front_right > 0 else "reverse"
-        self.motors["back_left"].direction = "forward" if back_left > 0 else "reverse"
-        self.motors["back_right"].direction = "forward" if back_right > 0 else "reverse"
+        self.motors["front_left"].direction = "forward" if front_left > 0 \
+                                                        else "reverse"
+        self.motors["front_right"].direction = "forward" if front_right > 0 \
+                                                         else "reverse"
+        self.motors["back_left"].direction = "forward" if back_left > 0 \
+                                                       else "reverse"
+        self.motors["back_right"].direction = "forward" if back_right > 0 \
+                                                        else "reverse"
 
         # Set motor speeds
         self.motors["front_left"].speed = fabs(front_left)
@@ -149,31 +177,45 @@ class MecDriver(driver.Driver):
         self.motors["back_right"].speed = fabs(back_right)
 
     def move_forward_strafe(self, forward, strafe):
-        speed = hypot(forward, strafe) / 1.414  # scale down speed by sqrt(2) to make sure we're in range
+        # Scale down speed by sqrt(2) to make sure we're in range
+        speed = hypot(forward, strafe) / 1.414
         if speed < MecDriver.min_speed:
             speed = MecDriver.min_speed
         elif speed > MecDriver.max_speed:
             speed = MecDriver.max_speed
-        angle = degrees(atan2(forward, strafe)) % 360  # note order of atan2() args to get forward = 0 deg
+        # Note order of atan2() args to get forward = 0 deg
+        angle = degrees(atan2(forward, strafe)) % 360
         self.move(speed, angle)
 
     def compound_move(self, translate_speed, translate_angle, rotate_speed):
         """Translate and move at same time.
-            Note: I have no idea how to predict where the bot ends up
-            during compound movement.
-            speed, rotate_speed is number between 0, 100.
+
+        Note: I have no idea how to predict where the bot ends up
+        during compound movement.
+
+        speed, rotate_speed is number between 0, 100.
+
         """
 
         # Speeds should add up to max. speed (100)
-        total_speed = translate_speed + rotate_speed  # TODO should this be fabs(rotate_speed)?
+        # TODO: Should this be fabs(rotate_speed)?
+        total_speed = translate_speed + rotate_speed
         assert total_speed <= MecDriver.max_speed
-        self.logger.debug("translate_speed: {}, translate_angle: {}, rotate_speed: {}".format(translate_speed, translate_angle, rotate_speed))
+        self.logger.debug("translate_speed: {}, " + \
+                          "translate_angle: {}, " + \
+                          "rotate_speed: {}".format(translate_speed,
+                                                    translate_angle,
+                                                    rotate_speed))
 
         # Calculate overall voltage multiplier
-        front_left = translate_speed * sin(angle * pi / 180 + pi / 4) + rotate_speed
-        front_right = translate_speed * cos(angle * pi / 180 + pi / 4) - rotate_speed
-        back_left = translate_speed * cos(angle * pi / 180 + pi / 4) + rotate_speed
-        back_right = translate_speed * sin(angle * pi / 180 + pi / 4) - rotate_speed
+        front_left = translate_speed * sin(angle * pi / 180 + pi / 4) + \
+                                       rotate_speed
+        front_right = translate_speed * cos(angle * pi / 180 + pi / 4) - \
+                                        rotate_speed
+        back_left = translate_speed * cos(angle * pi / 180 + pi / 4) + \
+                                      rotate_speed
+        back_right = translate_speed * sin(angle * pi / 180 + pi / 4) - \
+                                       rotate_speed
 
         # Normalize so that at least one wheel_speed equals maximum wheel_speed
         max_wheel_speed = max([front_left, front_right, back_left, back_right])
@@ -183,10 +225,14 @@ class MecDriver(driver.Driver):
         back_right = back_right / max_wheel_speed * total_speed
 
         # Set motor directions
-        self.motors["front_left"].direction = "forward" if front_left > 0 else "reverse"
-        self.motors["front_right"].direction = "forward" if front_right > 0 else "reverse"
-        self.motors["back_left"].direction = "forward" if back_left > 0 else "reverse"
-        self.motors["back_right"].direction = "forward" if back_right > 0 else "reverse"
+        self.motors["front_left"].direction = "forward" if front_left > 0 \
+                                                        else "reverse"
+        self.motors["front_right"].direction = "forward" if front_right > 0 \
+                                                         else "reverse"
+        self.motors["back_left"].direction = "forward" if back_left > 0 \
+                                                       else "reverse"
+        self.motors["back_right"].direction = "forward" if back_right > 0 \
+                                                        else "reverse"
 
         # Set motor speeds
         self.motors["front_left"].speed = fabs(front_left)
@@ -196,6 +242,8 @@ class MecDriver(driver.Driver):
 
     def jerk(self, cmd):
         """Move forward for a certain amount of time or distance"""
+        pass
 
     def oscilate(self):
-        """Move oscillate sideways, increasing amplitude until a line is found"""
+        """Oscillate sideways, increasing amplitude until a line is found"""
+        pass

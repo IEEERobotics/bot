@@ -55,7 +55,7 @@ class Servo(object):
     def position(self):
         """Getter for servo's position as an angle.
 
-        position = ((duty - 10000000) / 10000000) * 180 where 
+        position = ((duty - 10000000) / 10000000) * 180 where
         10000000 <= duty <= 20000000
 
         TODO(dfarrell07): This needs to be calibrated.

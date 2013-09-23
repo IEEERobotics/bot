@@ -7,7 +7,8 @@ import hardware.ir as ir_mod
 class IRHub(object):
     """Class for abstracting all IR arrays and working with them as a unit.
 
-    ir.IR is currently encapsulates one IR sensor array using a MUX select scheme.
+    ir.IR is currently encapsulates one IR sensor array using a
+    MUX select scheme.
 
     """
 
@@ -21,7 +22,8 @@ class IRHub(object):
         self.arrays = {}
         for name in array_names:
             self.arrays[name] = ir_mod.IRArray(name)
-            # TODO: A second parameter (5th select line?) is needed to select a particular IR array
+            # TODO: A second parameter (5th select line?) is needed
+            # to select a particular IR array
 
     def __str__(self):
         """Returns human-readable representation of IRHub.
@@ -29,7 +31,8 @@ class IRHub(object):
         :returns: Info about each IR array owned by this IRHub.
 
         """
-        return "IRHub:- {}".format("; ".join(str(array) for array in self.arrays.itervalues()))
+        return "IRHub:- {}".format("; ".join(str(array)
+                                   for array in self.arrays.itervalues()))
 
     def read_all_arrays(self):
         """Get readings from all IR arrays.
@@ -39,6 +42,8 @@ class IRHub(object):
         """
         readings = {}
         for name, array in self.arrays.iteritems():
-            readings[name] = array.read_all_units()  # read_all_units() logs currently read values
-        #self.logger.debug("IR readings: {}".format(readings))  # no need to log again
+            # read_all_units() logs currently read values
+            readings[name] = array.read_all_units()
+        # No need to log again
+        #self.logger.debug("IR readings: {}".format(readings))
         return readings

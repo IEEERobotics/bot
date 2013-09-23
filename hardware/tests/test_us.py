@@ -15,6 +15,7 @@ except ImportError:
 # Build logger
 logger = lib.get_logger()
 
+
 class TestDistance(unittest.TestCase):
 
     """Test reading ultrasonic distance values."""

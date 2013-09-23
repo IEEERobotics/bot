@@ -4,6 +4,7 @@ import os
 import unittest
 from multiprocessing import Process
 from subprocess import Popen
+from time import sleep
 
 sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
 
@@ -37,8 +38,8 @@ class TestServer(unittest.TestCase):
         self.orig_test_state = config["testing"]
         lib.set_testing(True)
 
-        # Build server
-        self.server = Popen(["./server.py"])
+        # Build server. Arg is testing or not.
+        self.server = Popen(["./server.py", "True"])
 
         # Build socket and connect to server
         context = zmq.Context()
@@ -66,7 +67,6 @@ class TestServer(unittest.TestCase):
         """Test sending a message without a valid opts key."""
         self.socket.send("{cmd : move, opts_blah : {}}")
         reply = self.socket.recv()
-        print reply
         assert reply == "Error: No 'opts' key given"
 
     def testInvalidCmdValue(self):

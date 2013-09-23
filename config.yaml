@@ -22,3 +22,4 @@ test_adc_base_dir: simulator/pins/adc
 test_strat_base_dir: planner/tests/strategies/
 fsm_tests: tests/input/RobotNormalTest.txt
 testing: false
+server_port: tcp://*:60000

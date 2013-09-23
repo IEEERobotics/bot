@@ -32,11 +32,11 @@ class DesktopControlClient:
         #self.turn = 0  # TODO add turning
         self.imageOut = np.zeros((self.window_height, self.window_width, 3), dtype=np.uint8) # numpy convention: (height, width, depth)
         self.imageCenter = (self.window_width / 2, self.window_height / 2)  # OpenCV convention: (x, y)
-        
-        # TODO Add mouse callback
     
     def run(self):
         cv2.namedWindow(self.window_name)
+        cv.SetMouseCallback(self.window_name, self.onMouse, param=None)
+        
         while True:
             self.draw()
             key = cv2.waitKey(self.loop_delay)
@@ -69,6 +69,26 @@ class DesktopControlClient:
                         self.strafe = strafe_range.max
                 
                 # TODO Send commands to server
+    
+    def onMouse(self, event, x, y, flags, param=None):
+        #print "DesktopControlClient.onMouse(): {} @ ({}, {}) [flags = {}]".format(event, x, y, flags)  # [debug]
+        if event == cv.CV_EVENT_LBUTTONUP:  # stop when left button is released
+            #print "stop"  # [debug]
+            self.forward = 0
+            self.strafe = 0
+        elif event == cv.CV_EVENT_MOUSEMOVE and flags & cv.CV_EVENT_FLAG_LBUTTON:  # move when left button is held down
+            #print "move ({}, {})".format(x, y)  # [debug]
+            self.forward = y - self.imageCenter[1]
+            if self.forward < forward_range.min:
+                self.forward = forward_range.min
+            elif self.forward > forward_range.max:
+                self.forward = forward_range.max
+            
+            self.strafe = x - self.imageCenter[0]
+            if self.strafe < strafe_range.min:
+                self.strafe = strafe_range.min
+            elif self.strafe > strafe_range.max:
+                self.strafe = strafe_range.max
     
     def draw(self):
         # Clear entire image

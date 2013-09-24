@@ -58,6 +58,12 @@ class WheelGunner(gunner.Gunner):
         :type speed: int
 
         """
+        try:
+            assert 0 <= speed <= 100
+        except AssertionError:
+            self.logger.error("Speed {} is out of bounds".format(speed))
+            raise AssertionError("Speed is out of bounds")
+
         for motor in self.motors:
             motor.speed = speed
         self.logger.debug("New wheel speed: {}".format(speed))

@@ -96,8 +96,8 @@ class Server(object):
             return self.handle_rotate(opts)
         elif cmd == "fire":
             return self.handle_fire()
-        elif cmd == "aim_turret":
-            return self.handle_aim_turret(opts)
+        elif cmd == "aim":
+            return self.handle_aim(opts)
         elif cmd == "advance_dart":
             return self.handle_advance_dart()
         elif cmd == "fire_speed":
@@ -173,7 +173,7 @@ class Server(object):
 
         return "Success: Fired"
 
-    def handle_aim_turret(self, opts):
+    def handle_aim(self, opts):
         """Validate options and make call to gunner.
 
         :param opts: Dict with keys 'x' and 'y' (angles 0-180).
@@ -185,16 +185,16 @@ class Server(object):
             x_angle = int(round(opts["x"]))
         except KeyError:
             return "Error: No 'x' opt given"
-        except ValueError:
-            return "Error: Unable to convert x to int"
+        except TypeError:
+            return "Error: Could not convert x to int"
 
         # Validate y angle option
         try:
             y_angle = int(round(opts["y"]))
         except KeyError:
             return "Error: No 'y' opt given"
-        except ValueError:
-            return "Error: Unable to convert y to int"
+        except TypeError:
+            return "Error: Could not convert y to int"
 
         # Make call to gunner
         try:
@@ -211,7 +211,7 @@ class Server(object):
         except Exception as e:
             return "Error: {}".format(e)
 
-        return "Success: {}".format(opts)
+        return "Success: Advanced dart"
 
     def handle_fire_speed(self, opts):
         """Set rotation speed of firing wheels.
@@ -224,9 +224,9 @@ class Server(object):
         try:
             speed = int(round(opts["speed"]))
         except KeyError:
-            return "Error: No 'speed' key given"
-        except ValueError:
-            return "Error: Unable to convert speed to int"
+            return "Error: No 'speed' opt given"
+        except TypeError:
+            return "Error: Could not convert speed to int"
 
         # Make call to gunner
         try:

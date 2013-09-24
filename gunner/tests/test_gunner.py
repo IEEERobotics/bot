@@ -95,23 +95,23 @@ class TestAimTurret(unittest.TestCase):
 
     def test_x_over_max(self):
         """Test setting the X angle to greater than the max value."""
-        self.gunner.aim_turret(181, 90)
-        assert self.gunner.turret.x_angle == 180
+        with self.assertRaises(AssertionError):
+            self.gunner.aim_turret(181, 90)
 
     def test_x_under_min(self):
         """Test setting the X angle to less than the min value."""
-        self.gunner.aim_turret(-1, 90)
-        assert self.gunner.turret.x_angle == 0
+        with self.assertRaises(AssertionError):
+            self.gunner.aim_turret(-1, 90)
 
     def test_y_over_max(self):
         """Test setting the Y angle to greater than the max value."""
-        self.gunner.aim_turret(90, 181)
-        assert self.gunner.turret.y_angle == 180
+        with self.assertRaises(AssertionError):
+            self.gunner.aim_turret(90, 181)
 
     def test_y_under_min(self):
         """Test setting the Y angle to less than the min value."""
-        self.gunner.aim_turret(90, -1)
-        assert self.gunner.turret.y_angle == 0
+        with self.assertRaises(AssertionError):
+            self.gunner.aim_turret(90, -1)
 
 
 class TestFire(unittest.TestCase):

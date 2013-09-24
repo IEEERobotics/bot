@@ -98,13 +98,13 @@ class TestUpdateRotateSpeed(unittest.TestCase):
 
     def test_over_max(self):
         """Test speed over max speed. Should use maximum."""
-        self.wg.wheel_speed = 101
-        assert self.wg.wheel_speed == 100
+        with self.assertRaises(AssertionError):
+            self.wg.wheel_speed = 101
 
     def test_under_min(self):
         """Test speed under minimum speed. Should use minimum."""
-        self.wg.wheel_speed = -1
-        assert self.wg.wheel_speed == 0
+        with self.assertRaises(AssertionError):
+            self.wg.wheel_speed = -1
 
 
 class TestFire(unittest.TestCase):

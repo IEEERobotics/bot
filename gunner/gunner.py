@@ -48,6 +48,15 @@ class Gunner(object):
         :param y_angle: Angle on Y axis to set turret servo.
 
         """
+        try:
+            assert 0 <= x_angle <= 180
+        except AssertionError:
+            raise AssertionError("X angle is out of bounds")
+        try:
+            assert 0 <= y_angle <= 180
+        except AssertionError:
+            raise AssertionError("Y angle is out of bounds")
+
         self.logger.debug("Aiming turret to ({}, {})".format(x_angle, y_angle))
         self.turret.x_angle = x_angle
         self.turret.y_angle = y_angle

@@ -94,8 +94,11 @@ class MecDriver(driver.Driver):
     def rotate(self, rotate_speed):
         """Pass rotation speed as -100 to +100 (positive is clockwise)."""
         # Validate params
-        assert MecDriver.min_rotate_speed <= rotate_speed <= \
+        try:
+            assert MecDriver.min_rotate_speed <= rotate_speed <= \
                                              MecDriver.max_rotate_speed
+        except AssertionError:
+            raise AssertionError("Rotate speed is out of bounds")
         self.logger.debug("rotate_speed: {}".format(rotate_speed))
 
         # Check for zero/near-zero speed

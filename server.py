@@ -95,7 +95,7 @@ class Server(object):
         elif cmd == "rotate":
             return self.handle_rotate(opts)
         elif cmd == "fire":
-            return self.handle_fire(opts)
+            return self.handle_fire()
         elif cmd == "aim_turret":
             return self.handle_aim_turret(opts)
         elif cmd == "advance_dart":
@@ -171,7 +171,7 @@ class Server(object):
         except Exception as e:
             return "Error: {}".format(e)
 
-        return "Success: {}".format(opts)
+        return "Success: Fired"
 
     def handle_aim_turret(self, opts):
         """Validate options and make call to gunner.

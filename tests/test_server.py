@@ -30,7 +30,7 @@ class TestHandleMessage(unittest.TestCase):
     """Basic tests handle message method."""
 
     def setUp(self):
-        """Build server and set it to listen."""
+        """Build server and connect to it."""
         # Load config
         config = lib.load_config()
 
@@ -44,7 +44,7 @@ class TestHandleMessage(unittest.TestCase):
         # Build socket and connect to server
         context = zmq.Context()
         self.socket = context.socket(zmq.REQ)
-        self.socket.connect("tcp://*:60000")
+        self.socket.connect(config["server_port"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
@@ -89,10 +89,10 @@ class TestHandleMessage(unittest.TestCase):
 
 class TestHandleMove(unittest.TestCase):
 
-    """Basic tests for command server."""
+    """Test move commands."""
 
     def setUp(self):
-        """Build server and set it to listen."""
+        """Build server and connect to it."""
         # Load config
         config = lib.load_config()
 
@@ -106,7 +106,7 @@ class TestHandleMove(unittest.TestCase):
         # Build socket and connect to server
         context = zmq.Context()
         self.socket = context.socket(zmq.REQ)
-        self.socket.connect("tcp://*:60000")
+        self.socket.connect(config["server_port"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
@@ -154,3 +154,87 @@ class TestHandleMove(unittest.TestCase):
         self.socket.send("{cmd : move, opts : {speed : 50, angle : 361}}")
         reply = self.socket.recv()
         assert reply == "Error: Angle is out of bounds", reply
+
+
+class TestHandleRotate(unittest.TestCase):
+
+    """Test rotate commands."""
+
+    def setUp(self):
+        """Build server and connect to it."""
+        # Load config
+        config = lib.load_config()
+
+        # Set testing flag in config
+        self.orig_test_state = config["testing"]
+        lib.set_testing(True)
+
+        # Build server. Arg is testing or not.
+        self.server = Popen(["./server.py", "True"])
+
+        # Build socket and connect to server
+        context = zmq.Context()
+        self.socket = context.socket(zmq.REQ)
+        self.socket.connect(config["server_port"])
+
+    def tearDown(self):
+        """Kill server, restore testing flag state in config file."""
+        self.server.kill()
+        lib.set_testing(self.orig_test_state)
+
+    def testValid(self):
+        """Test rotate message that's perfectly valid."""
+        self.socket.send("{cmd : rotate, opts : {speed : 100}}")
+        reply = self.socket.recv()
+        assert reply == "Success: {'speed': 100}"
+
+    def testNoSpeedKey(self):
+        """Test rotate message that's missing a speed key."""
+        self.socket.send("{cmd : rotate, opts : {not_speed : 50}}")
+        reply = self.socket.recv()
+        assert reply == "Error: No 'speed' opt given"
+
+    def testInvalidSpeedType(self):
+        """Test rotate message with non-float speed key."""
+        self.socket.send("{cmd : rotate, opts : {speed : invalid}}")
+        reply = self.socket.recv()
+        assert reply == "Error: Could not convert speed to float"
+
+    def testInvalidSpeedValue(self):
+        """Test rotate message with non-float speed key."""
+        self.socket.send("{cmd : rotate, opts : {speed : 101}}")
+        reply = self.socket.recv()
+        assert reply == "Error: Rotate speed is out of bounds", reply
+
+
+class TestHandleFire(unittest.TestCase):
+
+    """Test fire command."""
+
+    def setUp(self):
+        """Build server and connect to it."""
+        # Load config
+        config = lib.load_config()
+
+        # Set testing flag in config
+        self.orig_test_state = config["testing"]
+        lib.set_testing(True)
+
+        # Build server. Arg is testing or not.
+        self.server = Popen(["./server.py", "True"])
+
+        # Build socket and connect to server
+        context = zmq.Context()
+        self.socket = context.socket(zmq.REQ)
+        self.socket.connect(config["server_port"])
+
+    def tearDown(self):
+        """Kill server, restore testing flag state in config file."""
+        self.server.kill()
+        lib.set_testing(self.orig_test_state)
+
+    def testValid(self):
+        """Test fire message that's perfectly valid."""
+        self.socket.send("{cmd : fire, opts : {}}")
+        reply = self.socket.recv()
+        assert reply == "Success: Fired"

@@ -1,6 +1,8 @@
 import sys
 import socket
+import threading
 from collections import namedtuple
+
 import numpy as np
 import cv2
 import cv2.cv as cv
@@ -37,9 +39,11 @@ class DesktopControlClient:
     def __init__(self):
         self.logger = lib.get_logger()
         self.sock = None
+        self.keepRunning = True
+        self.isProcessing = threading.BoundedSemaphore()  # exclusive semaphore to prevent asynchronous clashes
+        # NOTE This semaphore mechanism doesn't really work because only one thread ("MainThread") is actually executed
+        # TODO Spawn two separate threads, one for getting user input to set control values and one for sending commands based on those control values
         self.isMoving = False
-        self.isProcessing = False  # semaphore to prevent asynchronous clashes
-        # TODO use a better semaphore - this doesn't really work
         
         self.serverHost = sys.argv[1] if len(sys.argv) > 1 else server.CONTROL_SERVER_HOST
         self.serverPort = int(sys.argv[2]) if len(sys.argv) > 2 else server.CONTROL_SERVER_PORT
@@ -72,56 +76,56 @@ class DesktopControlClient:
         cv.SetMouseCallback(self.window_name, self.onMouse, param=None)
         
         try:
-            while True:
+            while self.keepRunning:
                 self.draw()
                 key = cv2.waitKey(self.loop_delay)
-                if key != -1 and not self.isProcessing:
-                    self.isProcessing = True  # lock
-                    
-                    keyCode = key & 0x00007f  # key code is in the last 8 bits, pick 7 bits for correct ASCII interpretation (8th bit indicates ?)
-                    keyChar = chr(keyCode) if not (key & 0x00ff00) else None  # if keyCode is normal (SPECIAL bits are zero), convert to char (str)
-                    
-                    if showKeys:
-                        print "DesktopControlClient.run(): key = {key:#06x}, keyCode = {keyCode}, keyChar = {keyChar}".format(key=key, keyCode=keyCode, keyChar=keyChar)  # [debug]
-                    
-                    if keyCode == 0x1b or keyChar == 'q' or keyChar == 'Q':  # quit
-                        break
-                    elif keyChar == ' ':  # stop/zero out
-                        self.forward = 0
-                        self.strafe = 0
-                    elif keyChar == 'w' or keyChar == 'W':  # forward
-                        self.forward -= 1
-                        if self.forward < forward_range.min:
-                            self.forward = forward_range.min
-                    elif keyChar == 's' or keyChar == 'S':  # backward
-                        self.forward += 1
-                        if self.forward > forward_range.max:
-                            self.forward = forward_range.max
-                    elif keyChar == 'a' or keyChar == 'A':  # left
-                        self.strafe -= 1
-                        if self.strafe < strafe_range.min:
-                            self.strafe = strafe_range.min
-                    elif keyChar == 'd' or keyChar == 'D':  # right
-                        self.strafe += 1
-                        if self.strafe > strafe_range.max:
-                            self.strafe = strafe_range.max
-                    else:
-                        print "DesktopControlClient.run(): [WARNING] Unknown key = {key:#06x}, keyCode = {keyCode}, keyChar = {keyChar}".format(key=key, keyCode=keyCode, keyChar=keyChar)  # [debug]
-                        self.isProcessing = False  # release
-                        continue
-                    
-                    self.sendCommand()
-                    self.isProcessing = False  # release
+                if key != -1:
+                    self.onKeyPress(key)
         except KeyboardInterrupt:
             self.logger.warn("Why kill me with a Ctrl+C, is something wrong? Try Esc next time.")
+            self.isProcessing.release()
         
         self.cleanUp()
     
-    def onMouse(self, event, x, y, flags, param=None):
-        if self.isProcessing:
-            return
-        self.isProcessing = True  # lock
+    def onKeyPress(self, key):
+        keyCode = key & 0x00007f  # key code is in the last 8 bits, pick 7 bits for correct ASCII interpretation (8th bit indicates ?)
+        keyChar = chr(keyCode) if not (key & 0x00ff00) else None  # if keyCode is normal (SPECIAL bits are zero), convert to char (str)
         
+        if showKeys:
+            print "DesktopControlClient.onKeyPress(): key = {key:#06x}, keyCode = {keyCode}, keyChar = {keyChar}".format(key=key, keyCode=keyCode, keyChar=keyChar)  # [debug]
+        
+        if keyCode == 0x1b or keyChar == 'q' or keyChar == 'Q':  # quit
+            self.keepRunning = False
+            self.forward = 0
+            self.strafe = 0
+            self.turn = 0
+        elif keyChar == ' ':  # stop/zero out
+            self.forward = 0
+            self.strafe = 0
+            self.turn = 0
+        elif keyChar == 'w' or keyChar == 'W':  # forward
+            self.forward -= 1
+            if self.forward < forward_range.min:
+                self.forward = forward_range.min
+        elif keyChar == 's' or keyChar == 'S':  # backward
+            self.forward += 1
+            if self.forward > forward_range.max:
+                self.forward = forward_range.max
+        elif keyChar == 'a' or keyChar == 'A':  # left
+            self.strafe -= 1
+            if self.strafe < strafe_range.min:
+                self.strafe = strafe_range.min
+        elif keyChar == 'd' or keyChar == 'D':  # right
+            self.strafe += 1
+            if self.strafe > strafe_range.max:
+                self.strafe = strafe_range.max
+        else:
+            print "DesktopControlClient.onKeyPress(): [WARNING] Unknown key = {key:#06x}, keyCode = {keyCode}, keyChar = {keyChar}".format(key=key, keyCode=keyCode, keyChar=keyChar)  # [debug]
+            return
+        
+        self.sendCommand()
+    
+    def onMouse(self, event, x, y, flags, param=None):
         #print "DesktopControlClient.onMouse(): {} @ ({}, {}) [flags = {}]".format(event, x, y, flags)  # [debug]
         if event == cv.CV_EVENT_LBUTTONUP:  # stop when left button is released
             #print "stop"  # [debug]
@@ -140,14 +144,21 @@ class DesktopControlClient:
                 self.strafe = strafe_range.min
             elif self.strafe > strafe_range.max:
                 self.strafe = strafe_range.max
+        else:
+            return
         
         self.sendCommand()
-        self.isProcessing = False  # release
     
     def sendCommand(self):
+        if not self.isProcessing.acquire(blocking=False):  # TODO check if this is actually not blocking
+            return
+        print "DesktopControlClient.sendCommand(): [{}] Acquired".format(threading.current_thread().name)  # [debug]
+        
+        # Take snapshot of current control values
         forward = 0 if forward_range.zero_min < self.forward < forward_range.zero_max else -self.forward  # NOTE Y-flip
         strafe = 0 if strafe_range.zero_min < self.strafe < strafe_range.zero_max else self.strafe
         turn = 0 if turn_range.zero_min < self.turn < turn_range.zero_max else self.turn
+        # TODO Decouple input resolution from output resolution by defining a scaling transformation
         
         cmdStr = None
         if forward == 0 and strafe == 0 and turn == 0:
@@ -166,6 +177,9 @@ class DesktopControlClient:
                 #print "Waiting for response..."  # [debug]
                 response = self.rfile.readline().strip()  # server can use response delay to throttle commands (TODO check for OK)
                 print response  # [info]
+        
+        print "DesktopControlClient.sendCommand(): [{}] Releasing".format(threading.current_thread().name)  # [debug]
+        self.isProcessing.release()
     
     def draw(self):
         # Clear entire image
@@ -186,9 +200,10 @@ class DesktopControlClient:
         # Add help text
         cv2.putText(self.imageOut, self.help_text, (12, self.window_height - 12), cv2.FONT_HERSHEY_SIMPLEX, 0.8, self.help_color, 2)
         
-        # TODO Cache drawing till this point as static image
+        # TODO Cache drawing till this point as static image and blit every frame
         
-        # Draw control knob
+        # Draw control knob and vector
+        cv2.line(self.imageOut, self.imageCenter, (self.imageCenter[0] + self.strafe, self.imageCenter[1] + self.forward), self.knob_color, 2)
         cv2.circle(self.imageOut, (self.imageCenter[0] + self.strafe, self.imageCenter[1] + self.forward), self.knob_radius, self.knob_fill_color, cv.CV_FILLED)
         cv2.circle(self.imageOut, (self.imageCenter[0] + self.strafe, self.imageCenter[1] + self.forward), self.knob_radius, self.knob_color, 3)
         

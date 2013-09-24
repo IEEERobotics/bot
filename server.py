@@ -79,6 +79,8 @@ class Server(object):
             return "Error: No 'cmd' key given"
         except AssertionError:
             return "Error: Key 'cmd' is not a string"
+        except yaml.parser.ParserError:
+            return "Error: Unable to parse message as YAML"
 
         try:
             opts = msg["opts"]
@@ -136,6 +138,8 @@ class Server(object):
         except Exception as e:
             return "Error: {}".format(e)
 
+        return "Success: {}".format(opts)
+
     def handle_rotate(self, opts):
         """Validate options and make rotate call to driver.
 
@@ -157,6 +161,8 @@ class Server(object):
         except Exception as e:
             return "Error: {}".format(e)
 
+        return "Success: {}".format(opts)
+
     def handle_fire(self):
         """Make fire call to gunner."""
         # Make call to gunner
@@ -164,6 +170,8 @@ class Server(object):
             self.gunner.fire()
         except Exception as e:
             return "Error: {}".format(e)
+
+        return "Success: {}".format(opts)
 
     def handle_aim_turret(self, opts):
         """Validate options and make call to gunner.
@@ -194,12 +202,16 @@ class Server(object):
         except Exception as e:
             return "Error: {}".format(e)
 
+        return "Success: {}".format(opts)
+
     def handle_advance_dart(self):
         """Make call to gunner to advance a dart."""
         try:
             self.gunner.advance_dart()
         except Exception as e:
             return "Error: {}".format(e)
+
+        return "Success: {}".format(opts)
 
     def handle_fire_speed(self, opts):
         """Set rotation speed of firing wheels.
@@ -221,6 +233,8 @@ class Server(object):
             self.gunner.wheel_speed = speed
         except Exception as e:
             return "Error: {}".format(e)
+
+        return "Success: {}".format(opts)
 
     def handle_die(self):
         """Accept poison pill and gracefully exit.

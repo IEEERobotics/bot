@@ -131,8 +131,14 @@ class MecDriver(driver.Driver):
         :type angle: float
         """
         # Validate params
-        assert MecDriver.min_speed <= speed <= MecDriver.max_speed
-        assert MecDriver.min_angle <= angle <= MecDriver.max_angle
+        try:
+            assert MecDriver.min_angle <= angle <= MecDriver.max_angle
+        except AssertionError:
+            raise AssertionError("Angle is out of bounds")
+        try:
+            assert MecDriver.min_speed <= speed <= MecDriver.max_speed
+        except AssertionError:
+            raise AssertionError("Speed is out of bounds")
         self.logger.debug("speed: {}, angle: {}".format(speed, angle))
 
         # Handle zero speed, prevent divide-by-zero error

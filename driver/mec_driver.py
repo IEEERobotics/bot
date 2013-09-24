@@ -119,14 +119,14 @@ class MecDriver(driver.Driver):
             return
 
         # Calculate motor speeds
-        # TODO Check math: why are all the phase offsets +pi/4?
+        # Formulae source found in http://goo.gl/rrxDex
         front_left = speed * sin(angle * pi / 180 + pi / 4)
         front_right = speed * cos(angle * pi / 180 + pi / 4)
         back_left = speed * cos(angle * pi / 180 + pi / 4)
         back_right = speed * sin(angle * pi / 180 + pi / 4)
 
         # Find largest motor speed,
-        #   use that to normalize multipliers and maintain maximum efficiency
+        # use that to normalize multipliers and maintain maximum efficiency
         # TODO This needs to be debugged and re-enabled; currently speeds are being set much higher than expected (use test_mec_driver to verify)
         '''
         max_wheel_speed = max([front_left, front_right, back_left, back_right])
@@ -165,7 +165,7 @@ class MecDriver(driver.Driver):
         """
 
         # Speeds should add up to max. speed (100)
-        total_speed = translate_speed + rotate_speed  # TODO should this be fabs(rotate_speed)?
+        total_speed = fabs(translate_speed) + fabs(rotate_speed)
         assert total_speed <= MecDriver.max_speed
         self.logger.debug("translate_speed: {}, translate_angle: {}, rotate_speed: {}".format(translate_speed, translate_angle, rotate_speed))
 

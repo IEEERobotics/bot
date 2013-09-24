@@ -6,6 +6,7 @@ import smbus
 # Adafruit_I2C Class
 # ===========================================================================
 
+
 class Adafruit_I2C:
 
     def __init__(self, address, busnum=-1, debug=False):
@@ -83,7 +84,8 @@ class Adafruit_I2C:
         "Reads a signed byte from the I2C device"
         try:
             result = self.bus.read_byte_data(self.address, reg)
-            if result > 127: result -= 256
+            if result > 127:
+                result -= 256
             if self.debug:
                 print ("I2C: Device 0x%02X returned 0x%02X from reg 0x%02X" %\
                     (self.address, result & 0xFF, reg))

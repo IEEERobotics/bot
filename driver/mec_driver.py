@@ -249,7 +249,7 @@ class MecDriver(driver.Driver):
         self.motors["back_left"].speed = fabs(back_left)
         self.motors["back_right"].speed = fabs(back_right)
 
-    def jerk(self, cmd):
+    def jerk(self):
         """Move forward for a certain amount of time or distance"""
         pass
 

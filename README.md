@@ -104,34 +104,29 @@ git submodule update
 
 The extra submodule-related steps are necessary to retrieve the [pybbb] library (an Open Source project we forked and contributed to) that we use for interaction with the BeagleBone Black. For more information, see the [git-scm section on submodules].
 
-When changes are made to our fork of the [pybbb] library, running `git status` in the root of the repo will show uncomitted changes in `pybbb` (even if you just pulled `bot`, and even if you didn't do anything in `pybbb/`). In short, you just need to navigate to the `pybbb/` directory (`cd pybbb`) and run `git pull`. Backing out to `bot/` and running `git status` should now show no unexpected chnages in `pybbb/`.
+When changes are made to our fork of the [pybbb] library, running `git status` in the root of the repo will show uncommitted changes in `pybbb` (even if you just pulled `bot`, and even if you didn't do anything in `pybbb/`). In short, you just need to navigate to the `pybbb/` directory (`cd pybbb`) and run `git pull`. Backing out to `bot/` and running `git status` should now show no unexpected changes in `pybbb/`.
 
 ## Dependencies
 
 ### Git
 
-#### Linux (Debian/Ubuntu)
+#### Installation
 
-Install with `sudo apt-get install git`.
+##### Linux (Debian/Ubuntu)
 
-Set user-specific info with:
+Install with `sudo apt-get install git`. Celebrate. :)
 
-```bash
-git config --global user.name "Your Name"
-git config --global user.email "youremail@blah.com"
-```
-
-If you need more help, see [this guide](https://help.github.com/articles/set-up-git#platform-linux).
-
-To generate and set git to use SSH keys (recommended), follow [this guide](https://help.github.com/articles/generating-ssh-keys).
-
-#### Windows / Mac
+##### Windows / Mac
 
 Download git ([Windows](http://git-scm.com/download/win) / [Mac](http://git-scm.com/download/mac)) and install.
 
 We're not going to use the GUI client, because it doesn't allow you to access the powerful guts of git, its liable to change (making you re-learn everything) and you'll see the same CLI interface on any OS you need to work with in the future.
 
-Search for `git` using your system's built-in search feature. You should find a result for `Git Shell` or `Git Bash`. Open that application.
+Search for `git` using your system's built-in search feature. You should find a result for `Git Shell` or `Git Bash`. Open that application and move on to the [configuration section](README.md#configuratoin).
+
+#### Configuration
+
+These instructions are not OS-specific.
 
 Set user-specific info with:
 
@@ -139,6 +134,8 @@ Set user-specific info with:
 git config --global user.name "Your Name"
 git config --global user.email "youremail@blah.com"
 ```
+
+If you need more help, see [this guide](https://help.github.com/articles/set-up-git).
 
 To generate and set git to use SSH keys (recommended), follow [this guide](https://help.github.com/articles/generating-ssh-keys).
 
@@ -188,7 +185,7 @@ TODO: How?
 
 ### PEP8 Checker
 
-This is a small tool for checking if your code conforms to [PEP8]. I strongly suggest using it, and setting it to run automitcally as a [pre-commit hook].
+This is a small tool for checking if your code conforms to [PEP8]. I strongly suggest using it, and setting it to run automatically as a [pre-commit hook].
 
 #### Linux
 

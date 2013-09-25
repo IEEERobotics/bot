@@ -94,7 +94,7 @@ Once you know where you're going to store the code, navigate there and then run:
 git clone --recursive git@github.com:NCSUhardware/bot.git
 ```
 
-If you already have the repo and simply need the [pybbb] submodule (bot/pybbb is empty), then run the following from the root of the repo:
+If you already have the repo and simply need the [pybbb] submodule (`bot/pybbb` is empty), then run the following from the root of the repo:
 
 ```bash
 git pull # Always a good idea
@@ -120,9 +120,9 @@ Install with `sudo apt-get install git`. Celebrate. :)
 
 Download git ([Windows](http://git-scm.com/download/win) / [Mac](http://git-scm.com/download/mac)) and install.
 
-We're not going to use the GUI client, because it doesn't allow you to access the powerful guts of git, its liable to change (making you re-learn everything) and you'll see the same CLI interface on any OS you need to work with in the future.
+We're not going to use the GUI client, because it doesn't allow you to access the powerful guts of git, it's liable to change (making you re-learn everything) and you'll see the same CLI interface on any OS you need to work with in the future.
 
-Search for `git` using your system's built-in search feature. You should find a result for `Git Shell` or `Git Bash`. Open that application and move on to the [configuration section](README.md#configuratoin).
+Search for "git" using your system's built-in search feature. You should find a result for `Git Shell` or `Git Bash`. Open that application and move on to the [configuration section](README.md#configuratoin).
 
 #### Configuration
 
@@ -141,7 +141,7 @@ To generate and set git to use SSH keys (recommended), follow [this guide](https
 
 ### Python
 
-We're using Python 2.7.X for this project. If you already have python configured, run `python --version` to check your version.
+We're using Python 2.7.x for this project. If you already have python configured, run `python --version` to check your version.
 
 #### Linux / Mac
 
@@ -197,6 +197,7 @@ TODO: Has anyone tried this?
 
 
 [pre-commit hooks]: README.md#hooks-or-how-to-make-daniels-life-easier
+[pre-commit hook]: README.md#hooks-or-how-to-make-daniels-life-easier
 [pybbb]: https://github.com/NCSUhardware/pybbb
 [git-scm section on submodules]: http://git-scm.com/book/en/Git-Tools-Submodules#Cloning-a-Project-with-Submodules
 [PEP8]: http://www.python.org/dev/peps/pep-0008/

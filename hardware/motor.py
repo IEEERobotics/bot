@@ -190,4 +190,4 @@ class Motor(object):
         if self.gpio_num is None:
             return self.speed
 
-        return self.speed * (1 if self.gpio.value == FORWARD else -1)
+        return self.speed * (1 if self.gpio.value == self.forward else -1)

@@ -70,19 +70,20 @@ class TestRotate(unittest.TestCase):
             self.md.rotate(test_rotate_speed)
             logger.debug("Check rotate_speed: {}".format(self.md.rotate_speed))
 
-            # Check for approximate match, as float values will seldom be exact
+            # Check for approximate speed, as float values will seldom be exact
             assert fabs(self.md.rotate_speed - test_rotate_speed) < \
                         rotate_speed_error_margin
-            # Don't test dir if speed too low
+
+            # Check directions (skip if speed is too low)
             if fabs(test_rotate_speed) >= 10:
-                assert self.md.motors["front_left"].direction == "forward" if\
-                    test_rotate_speed >= 0 else "reverse"
-                assert self.md.motors["front_right"].direction == "reverse" if\
+                assert self.md.motors["front_left"].direction == "reverse" if\
                     test_rotate_speed >= 0 else "forward"
-                assert self.md.motors["back_left"].direction == "forward" if\
+                assert self.md.motors["front_right"].direction == "forward" if\
                     test_rotate_speed >= 0 else "reverse"
-                assert self.md.motors["back_right"].direction == "reverse" if\
+                assert self.md.motors["back_left"].direction == "reverse" if\
                     test_rotate_speed >= 0 else "forward"
+                assert self.md.motors["back_right"].direction == "forward" if\
+                    test_rotate_speed >= 0 else "reverse"
 
             # Check for valid duty cycles (speeds)
             for motor in self.md.motors.itervalues():

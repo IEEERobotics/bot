@@ -29,6 +29,11 @@ class MecDriver(driver.Driver):
             self.motors[motor["position"]] = m_mod.Motor(motor["PWM"],
                                                          motor["GPIO"])
 
+        # Reconfigure motors to account for opposite mounting directions
+        #   between left and right side
+        self.motors["front_right"].invert(True)
+        self.motors["back_right"].invert(True)
+
     def __str__(self):
         """Show status of motors."""
         return "fr: {}, fl: {} br: {}, bl: {}".format(
@@ -39,7 +44,8 @@ class MecDriver(driver.Driver):
 
     @property
     def speed(self):
-        """Getter for bot's current overall speed as % of max.
+        """Getter for bot's current overall speed as % of max
+        (same as duty cycle).
 
         :returns: Current bot speed as percent of max real speed.
 
@@ -89,17 +95,19 @@ class MecDriver(driver.Driver):
         v_right = self.motors["front_right"].velocity + \
                   self.motors["back_right"].velocity
         # TODO: Verify math; v/4 to take mean?
-        return int(round((v_left - v_right) / 4))
+        return int(round((v_right - v_left) / 4))
 
     def rotate(self, rotate_speed):
-        """Pass rotation speed as -100 to +100 (positive is clockwise)."""
+        """Pass rotation speed as -100 to +100
+        (positive is counterclockwise)."""
+
         # Validate params
+        self.logger.debug("rotate_speed: {}".format(rotate_speed))
         try:
             assert MecDriver.min_rotate_speed <= rotate_speed <= \
                                              MecDriver.max_rotate_speed
         except AssertionError:
             raise AssertionError("Rotate speed is out of bounds")
-        self.logger.debug("rotate_speed: {}".format(rotate_speed))
 
         # Check for zero/near-zero speed
         if rotate_speed == 0:  # TODO deadband (epsilon) check?
@@ -109,16 +117,22 @@ class MecDriver(driver.Driver):
 
         # Set motor directions, based on http://goo.gl/B1KEUV
         # Also see MecanumWheelDirection.png
+        # NOTE(napratin, 9/17): Only 2 wheels need to be turned on for each
+        #   direction, as per diagram
+        # NOTE(napratin, 9/17): But using all 4 wheels in a conventional
+        #   differential drive configuration for rotation works fine
         if rotate_speed >= 0:
-            self.motors["front_left"].direction = "forward"
-            self.motors["front_right"].direction = "reverse"
-            self.motors["back_left"].direction = "forward"
-            self.motors["back_right"].direction = "reverse"
-        else:
+            # Counterclockwise
             self.motors["front_left"].direction = "reverse"
             self.motors["front_right"].direction = "forward"
             self.motors["back_left"].direction = "reverse"
             self.motors["back_right"].direction = "forward"
+        else:
+            # Clockwise
+            self.motors["front_left"].direction = "forward"
+            self.motors["front_right"].direction = "reverse"
+            self.motors["back_left"].direction = "forward"
+            self.motors["back_right"].direction = "reverse"
 
         # Set motor speeds
         abs_speed = fabs(rotate_speed)
@@ -133,16 +147,17 @@ class MecDriver(driver.Driver):
         :param angle: Angle of translation in degrees (90=left, 270=right).
         :type angle: float
         """
+
         # Validate params
-        try:
-            assert MecDriver.min_angle <= angle <= MecDriver.max_angle
-        except AssertionError:
-            raise AssertionError("Angle is out of bounds")
+        self.logger.debug("speed: {}, angle: {}".format(speed, angle))
         try:
             assert MecDriver.min_speed <= speed <= MecDriver.max_speed
         except AssertionError:
             raise AssertionError("Speed is out of bounds")
-        self.logger.debug("speed: {}, angle: {}".format(speed, angle))
+        try:
+            assert MecDriver.min_angle <= angle <= MecDriver.max_angle
+        except AssertionError:
+            raise AssertionError("Angle is out of bounds")
 
         # Handle zero speed, prevent divide-by-zero error
         if speed == 0:  # TODO deadband (epsilon) check?
@@ -151,15 +166,16 @@ class MecDriver(driver.Driver):
             return
 
         # Calculate motor speeds
+        # Formulae from Mecanumdrive.pdf in google drive.
         # TODO Check math: why are all the phase offsets +pi/4?
-        front_left = speed * sin(angle * pi / 180 + pi / 4)
+        front_left  = speed * sin(angle * pi / 180 + pi / 4)
         front_right = speed * cos(angle * pi / 180 + pi / 4)
-        back_left = speed * cos(angle * pi / 180 + pi / 4)
-        back_right = speed * sin(angle * pi / 180 + pi / 4)
+        back_left   = speed * cos(angle * pi / 180 + pi / 4)
+        back_right  = speed * sin(angle * pi / 180 + pi / 4)
 
         # Find largest motor speed,
         #   use that to normalize multipliers and maintain maximum efficiency
-        # TODO: This needs to be debugged and re-enabled; currently speeds are
+        # TODO This needs to be debugged and re-enabled; currently speeds are
         #   being set much higher than expected (use test_mec_driver to verify)
         '''
         max_wheel_speed = max([front_left, front_right, back_left, back_right])
@@ -187,7 +203,9 @@ class MecDriver(driver.Driver):
 
     def move_forward_strafe(self, forward, strafe):
         # Scale down speed by sqrt(2) to make sure we're in range
-        speed = hypot(forward, strafe) / 1.414
+        # NOTE(napratin, 9/27): Scaling down is not required since we clamp
+        #   speed to [min, max] anyways
+        speed = hypot(forward, strafe)  # / 1.414
         if speed < MecDriver.min_speed:
             speed = MecDriver.min_speed
         elif speed > MecDriver.max_speed:
@@ -203,7 +221,6 @@ class MecDriver(driver.Driver):
         during compound movement.
 
         speed, rotate_speed is number between 0, 100.
-
         """
 
         # Speeds should add up to max. speed (100)
@@ -251,8 +268,8 @@ class MecDriver(driver.Driver):
 
     def jerk(self):
         """Move forward for a certain amount of time or distance"""
-        pass
+        pass  # TODO: Implement this
 
-    def oscilate(self):
-        """Oscillate sideways, increasing amplitude until a line is found"""
-        pass
+    def oscillate(self):
+        """Oscillate sideways, increasing in amplitude until line is found"""
+        pass  # TODO: Implement this

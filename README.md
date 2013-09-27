@@ -212,7 +212,14 @@ TODO: Has anyone tried this?
 
 Same deal as pyzmq: `sudo pip install pep8`
 
-Verify installation by running `pep8` on your terminal. If it is not found even after a successful installation, it may be that pep8 has been installed correctly as a python package, but the script is not available on your path. One recommended solution is to soft-link the `pep8` executable script to a location on your path, for instance, on a Mac OS X 8, pip installed pep8 at `/Library/Frameworks/Python.framework/Versions/2.7/bin/pep8` and `/usr/local/bin/` is a location on my path, so a soft link can be created using the command: `ln -s /Library/Frameworks/Python.framework/Versions/2.7/bin/pep8 /usr/local/bin/` (again, verify by running pep8).
+Verify installation by running `pep8` on your terminal. If it is not found even after a successful installation, it may be that pep8 has been installed correctly as a python package, but the script is not available on your path. One recommended solution is to soft-link the `pep8` executable script to a location on your path.
+
+For instance, on a Mac OS X 10.8, pip installed pep8 at `/Library/Frameworks/Python.framework/Versions/2.7/bin/pep8` and `/usr/local/bin/` is a location on my path, so a soft link can be created using the command:
+
+`ln -s /Library/Frameworks/Python.framework/Versions/2.7/bin/pep8 /usr/local/bin/`
+
+Adapt according to paths on your system. Again, verify by running `pep8` from the terminal.
+
 
 [pre-commit hooks]: README.md#hooks-or-how-to-make-daniels-life-easier
 [pre-commit hook]: README.md#hooks-or-how-to-make-daniels-life-easier

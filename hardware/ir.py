@@ -114,7 +114,7 @@ class IRArray(object):
         # TODO more efficient loop using permutations?
         for unit in xrange(num_ir_units):
             self.reading[unit] = self.read_unit(unit)
-        self.logger.debug("IR reading:- ".format(self))
+        self.logger.debug("IR reading:- {}".format(self))
         # NOTE: Caller should make a copy if a read_all() is executed
         # while previous values are being used
         return self.reading

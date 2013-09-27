@@ -151,7 +151,14 @@ You already have Python. Celebrate. :)
 
 Download the Python 2.7.5 installer from [here](http://www.python.org/getit/). Select 32 or 64 bit as appropriate. Install via the typical method.
 
-You'll need to add Python to your path. This is a silly Windows-quirk that I'm not familiar with. TODO: @Arpan, please provide details.
+If you have selected default installation options, Python 2.7.x should be installed in `C:\Python27` (note down the exact path where you see `python.exe`).
+The installer would've created shortcuts to a light Python IDE called IDLE and a Python interpreter / command-line, but you'll need to add Python to your system path to run scripts the way we need to.
+
+To add Python to your path, right-click "My Computer" (or "Computer") icon wherever you see it (guaranteed to show up in Windows Explorer as the mother of your disk drives). Choose the Properties option at the bottom. Click Advanced System Settings > Environment Variables. In the list of variables, scroll down and double click on "Path" (or select it and hit Edit...). Add `C:\Python27;` (or whatever your python installation directory is) to the beginning of Path (the semi-colon is a separator between two directory entries, and there should be no spaces around it).
+
+Your Path value should now look like: `C:\Python27;C:\Windows\System32;C:\Program Files ... etc.` (exact directories will vary).
+
+Ok/Apply your way out, start a new `cmd` prompt, or better, a new Git Bash shell (this is needed to re-read Path), and run `python --version` to verify. Here is a [video tutorial](http://showmedo.com/videotutorials/video?name=960000&fromSeriesID=96) that walks you through this process (although it's slightly dated - Python 2.5 on Windows XP).
 
 ### YAML
 
@@ -179,9 +186,15 @@ If you don't have easy_install, I'm told you can install a Dev Tools package to 
 
 Run `sudo apt-get install libzmq-dev python-zmq`. Celebrate. :)
 
-#### Windows / Mac
+#### Windows
 
 TODO: How?
+
+#### Mac
+
+Run `sudo pip install pyzmq`. If pip is not found, run `sudo easy_install pip` first, and try again.
+
+Note that a direct `sudo easy_install pyzmq` might also work, however [pip is preferable for several reasons](http://stackoverflow.com/questions/3220404/why-use-pip-over-easy-install), including the fact that it allows you to uninstall packages (for real!).
 
 ### PEP8 Checker
 
@@ -191,10 +204,15 @@ This is a small tool for checking if your code conforms to [PEP8]. I strongly su
 
 Install with `sudo apt-get install pep8`. Celebrate. :)
 
-#### Windows / Mac
+#### Windows
 
 TODO: Has anyone tried this?
 
+#### Mac
+
+Same deal as pyzmq: `sudo pip install pep8`
+
+Verify installation by running `pep8` on your terminal. If it is not found even after a successful installation, it may be that pep8 has been installed correctly as a python package, but the script is not available on your path. One recommended solution is to soft-link the `pep8` executable script to a location on your path, for instance, on a Mac OS X 8, pip installed pep8 at `/Library/Frameworks/Python.framework/Versions/2.7/bin/pep8` and `/usr/local/bin/` is a location on my path, so a soft link can be created using the command: `ln -s /Library/Frameworks/Python.framework/Versions/2.7/bin/pep8 /usr/local/bin/` (again, verify by running pep8).
 
 [pre-commit hooks]: README.md#hooks-or-how-to-make-daniels-life-easier
 [pre-commit hook]: README.md#hooks-or-how-to-make-daniels-life-easier

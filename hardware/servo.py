@@ -27,7 +27,7 @@ class Servo(object):
 
         if config["testing"]:
             # Get dir of simulated hardware files from config
-            test_dir = lib.prepend_prefix(config["test_pwm_base_dir"])
+            test_dir = config["test_pwm_base_dir"]
 
             # Build PWM object for BBB interaction, provide test dir
             self.pwm = pwm_mod.PWM(self.num, test_dir)

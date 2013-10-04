@@ -15,18 +15,6 @@ _config_file = None
 _logger = None
 
 
-def prepend_prefix(path_from_proj_root):
-    """Return corrected absolute path from project root, accounting for CWD.
-
-    :param path_from_proj_root: Path from project's root directory to file.
-    :type path_from_proj_root: string
-    :returns: Path from CWD to file.
-
-    """
-    prefix = "../" * getcwd().split("/bot")[1].count("/")
-    return prefix + path_from_proj_root
-
-
 def load_config(config_file="config.yaml"):
     """Load and return configuration options.
 
@@ -44,7 +32,7 @@ def load_config(config_file="config.yaml"):
     _config_file = config_file
 
     # Build valid path from CWD to config file
-    qual_config_file = prepend_prefix(config_file)
+    qual_config_file = config_file
 
     # Open and read config file
     with open(qual_config_file) as config_fd:
@@ -74,7 +62,7 @@ def load_strategy(strat_file=None):
         strat_file = config["strategy"]
 
     # Build valid path from CWD to strategy file
-    qual_strat_file = prepend_prefix(strat_file)
+    qual_strat_file = strat_file
 
     # Open and read strategy file
     with open(qual_strat_file) as strat_fd:
@@ -93,7 +81,7 @@ def load_targeting(targ_file=None):
         targ_file = config["targeting"]
 
     # Build valid path from CWD to targeting file
-    qual_targ_file = prepend_prefix(targ_file)
+    qual_targ_file = targ_file
 
     # Open and read targeting file
     with open(qual_targ_file) as targ_fd:
@@ -199,7 +187,7 @@ def get_logger(prefix=None):
 
     # Setup path to log output. Allows usage from any subpackage.
     if prefix is None:
-        qual_log_file = prepend_prefix(config["logging"]["log_file"])
+        qual_log_file = config["logging"]["log_file"]
 
     # Build logger
     logger = logging.getLogger(__name__)

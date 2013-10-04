@@ -50,15 +50,14 @@ class Motor(object):
 
         if config["testing"]:
             # Get dir of simulated hardware files from config
-            pwm_test_dir = lib.prepend_prefix(config["test_pwm_base_dir"])
+            pwm_test_dir = config["test_pwm_base_dir"]
 
             # Build PWM object for BBB interaction, provide test dir
             self.pwm = pwm_mod.PWM(self.pwm_num, pwm_test_dir)
 
             if self.gpio_num is not None:
                 # Build GPIO object for BBB interaction, provide test dir
-                gpio_test_dir = lib.prepend_prefix(
-                                            config["test_gpio_base_dir"])
+                gpio_test_dir = config["test_gpio_base_dir"]
                 self.gpio = gpio_mod.GPIO(self.gpio_num, gpio_test_dir)
         else:
             # Build PWM object for BBB interaction

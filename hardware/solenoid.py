@@ -30,7 +30,7 @@ class Solenoid(object):
 
         if config["testing"]:
             # Get dir of simulated hardware files from config
-            test_dir = lib.prepend_prefix(config["test_gpio_base_dir"])
+            test_dir = config["test_gpio_base_dir"]
 
             # Build GPIO object for BBB interaction, provide test dir
             self.gpio = gpio_mod.GPIO(self.num, test_dir)

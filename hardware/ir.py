@@ -40,9 +40,8 @@ class IRArray(object):
         # Create GPIO and ADC objects
         if config["testing"]:
             # Get dir of simulated hardware files from config
-            gpio_test_dir_base = lib.prepend_prefix(
-                                            config["test_gpio_base_dir"])
-            adc_test_dir = lib.prepend_prefix(config["test_adc_base_dir"])
+            gpio_test_dir_base = config["test_gpio_base_dir"]
+            adc_test_dir = config["test_adc_base_dir"]
 
             # Build GPIO and ADC objects for testing
             self.ir_select_gpios = [gpio_mod.GPIO(gpio, gpio_test_dir_base)

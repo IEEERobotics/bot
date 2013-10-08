@@ -15,6 +15,7 @@ except ImportError:
 # Build logger
 logger = lib.get_logger()
 
+
 class TestReading(unittest.TestCase):
 
     """Test reading IR sensor values using IRHub abstraction."""

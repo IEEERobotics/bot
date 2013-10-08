@@ -15,6 +15,7 @@ except ImportError:
 # Build logger
 logger = lib.get_logger()
 
+
 class TestReading(unittest.TestCase):
 
     """Test reading IR sensor values using IR abstraction."""
@@ -35,19 +36,20 @@ class TestReading(unittest.TestCase):
             gpio_test_dir = gpio_test_dir_base + str(gpio)
             if not os.path.exists(gpio_test_dir):
                 os.makedirs(gpio_test_dir)
-            
+
             # Set known values in GPIO simulated hardware files
             with open(gpio_test_dir + "/value", "w") as f:
                 f.write("0\n")
             with open(gpio_test_dir + "/direction", "w") as f:
                 f.write("out\n")
-        
+
         # Create ADC test directory if it doesn't exist
         if not os.path.exists(adc_test_dir):
             os.makedirs(adc_test_dir)
-        
+
         # Set known value in ADC simulated hardware file
-        with open(adc_test_dir + "/AIN" + str(config["ir_input_adc"]), "w") as f:
+        sim_file = adc_test_dir + "/AIN" + str(config["ir_input_adc"])
+        with open(sim_file, "w") as f:
             f.write("0\n")
 
         # Build IR abstraction object

@@ -20,5 +20,7 @@ test_pwm_base_dir: simulator/pins/pwm/pwm
 test_gpio_base_dir: simulator/pins/gpio/gpio
 test_adc_base_dir: simulator/pins/adc
 test_strat_base_dir: planner/tests/strategies/
-fsm_tests: tests/input/RobotNormalTest.txt
+fsm_tests: ./planner/tests/input/RobotNormalTest.txt
 testing: false
+server_port: tcp://*:60000
+

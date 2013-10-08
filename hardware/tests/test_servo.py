@@ -79,16 +79,16 @@ class TestPosition(unittest.TestCase):
     def test_manually_confirm(self):
         """Test a series of random positions, read simulated HW to confirm."""
         for i in range(10):
-            test_position = randint(0, 180)
-            self.servo.position = test_position
+            test_pos = randint(0, 180)
+            self.servo.position = test_pos
             with open(self.test_dir + "/duty_ns", "r") as f:
                 # Duty is read like this by PWM getter
                 duty = int(f.read())
                 # Position is derived this way in position getter
-                read_position = int(round(((duty - 10000000) / 10000000.) * 180))
-                assert read_position == test_position, "{} != {}".format(
-                                                        read_position,
-                                                        test_position)
+                read_pos = int(round(((duty - 10000000) / 10000000.) * 180))
+                assert read_pos == test_pos, "{} != {}".format(
+                                                        read_pos,
+                                                        test_pos)
 
     def test_over_max(self):
         """Test position over max position. Should use maximum."""

@@ -70,7 +70,7 @@ class Planner(object):
                         self.logger.info("Expected: {}".format(e))
             elif act["type"] == "fire":
                 # Pass fire command to gunner
-                self.gunner.fire(act["description"])
+                self.gunner.fire()
             else:
                 # Skip unknown action types
                 self.logger.error("Unknown action type: {}".format(str(act)))

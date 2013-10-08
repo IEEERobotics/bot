@@ -2,6 +2,7 @@
 
 import lib.lib as lib
 
+
 class US(object):
 
     """Class for abstracting ultrasonic sensors.
@@ -40,7 +41,7 @@ class US(object):
     def distance(self):
         """Getter for ultrasonic sensor range.
 
-        This is a stub and will always return 0. Details of connecting 
+        This is a stub and will always return 0. Details of connecting
         to US sensor are needed before this can be fully implemented.
 
         :returns: Range reported by ultrasonic sensor in CM.

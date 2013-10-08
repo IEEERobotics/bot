@@ -14,36 +14,6 @@ except ImportError:
     raise
 
 
-@unittest.skipIf(not os.path.isfile("LICENSE.txt"), "CWD not repo root")
-class TestPrependPrefix(unittest.TestCase):
-
-    """Test prepending a prefix from project root."""
-
-    def test_cwd(self):
-        """Test prefix from project root."""
-        anything = "."
-        result = lib.prepend_prefix(anything)
-        assert anything == result
-
-    @unittest.skipIf(not os.path.isdir("lib"), "Expected lib dir in repo root")
-    def test_down_one_dir(self):
-        """Test prefix from one level below project root."""
-        os.chdir("lib")
-        anything = "."
-        result = lib.prepend_prefix(anything)
-        assert result == "../" + anything
-        os.chdir("..")
-
-    @unittest.skipIf(not os.path.isdir("lib/tests"), "Expected lib/test dir")
-    def test_down_two_dirs(self):
-        """Test prefix from two levels below project root."""
-        os.chdir("lib/tests")
-        anything = "."
-        result = lib.prepend_prefix(anything)
-        assert result == "../../" + anything
-        os.chdir("../..")
-
-
 class TestLoadConfig(unittest.TestCase):
 
     """Test loading configuration."""

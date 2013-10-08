@@ -5,8 +5,8 @@ from Adafruit_I2C import Adafruit_I2C
 slave = 0x90
 i2c = Adafruit_I2C(slave)
 
-P9_19: I2C2, SCL
-P9_20: I2C2, SDA
+#P9_19: I2C2, SCL
+#P9_20: I2C2, SDA
 
 count = 0
 recieved_byte = 0

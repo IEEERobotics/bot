@@ -13,6 +13,7 @@ except ImportError:
     print "ImportError: Use 'python -m unittest discover' from project root."
     raise
 
+
 class Localizer(object):
 
     #From SR04 documentation

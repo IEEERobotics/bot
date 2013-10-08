@@ -20,6 +20,7 @@ except ImportError:
 # Assing global logger object, if not already in memory
 logger = lib.get_logger()
 
+
 class TestLocalizer(unittest.TestCase):
     def setUp(self):
         """Setup for test"""

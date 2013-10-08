@@ -183,6 +183,7 @@ class TestDirection(unittest.TestCase):
         self.motor.direction = ""
         assert self.motor.direction == "forward"
 
+
 class TestNoDirection(unittest.TestCase):
 
     """Test a motor with no GPIO pin, and therefore no in-code direction."""

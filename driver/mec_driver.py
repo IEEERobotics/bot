@@ -167,6 +167,7 @@ class MecDriver(driver.Driver):
         # Speeds should add up to max. speed (100)
         total_speed = fabs(translate_speed) + fabs(rotate_speed)
         assert total_speed <= MecDriver.max_speed
+
         self.logger.debug("translate_speed: {}, translate_angle: {}, rotate_speed: {}".format(translate_speed, translate_angle, rotate_speed))
 
         # Calculate overall voltage multiplier

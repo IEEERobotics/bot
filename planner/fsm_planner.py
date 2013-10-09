@@ -177,11 +177,9 @@ class Following(State):
 
     def run(self):
         """Calls a line following behavior """
-        try:
-            self.logger.debug( "Execute: Following line.")
-            self.lineFollower.follow({"expected_result": "FollowerException"})
-        except ex.FollowerException as followerEx:
-            self.logger.debug( "Executed lineFollower.follow()")
+        self.logger.debug( "Execute: Following line.")
+        self.lineFollower.follow(self.stateTable)
+        self.logger.debug( "Executed lineFollower.follow()")
 
     def next(self):
         """Transitions to centering state or line finding"""

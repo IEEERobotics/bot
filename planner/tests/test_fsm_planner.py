@@ -31,10 +31,10 @@ class TestFSM(unittest.TestCase):
 
         # Build fsm_planner
         self.fsm = fsm_mod.Robot()
-        
+
     def testBaseCase(self):
         self.fsm.run()
-        
+
     def tearDown(self):
         """Restore testing flag state in config file."""
         lib.set_testing(self.orig_test_state)

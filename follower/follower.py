@@ -12,7 +12,7 @@ class Follower(object):
         """Build and store logger."""
         self.logger = lib.get_logger()
 
-    def follow(self, cmd):
+    def follow(self,cmd):
         """Accept and handle fire commands.
 
         TODO(dfarrell07): This is a stub

@@ -67,12 +67,13 @@ class TestStates(State):
         self.robot = robot
         self.config = lib.load_config()
         self.f = open(self.config["fsm_tests"])
+        self.logger = lib.get_logger()
 
     def run(self):
         """Modifies the state table based on text file inputs"""
         input = self.f.readline()
         testCase = input.strip()
-        print "Next Test Case: " + testCase
+        self.logger.debug( "Next Test Case: {}".format(testCase))
         if testCase == "start":
             self.stateTable.start = True
         elif testCase == "blue":
@@ -88,7 +89,7 @@ class TestStates(State):
 
     def next(self):
         """Does Nothing"""
-        print "Test Next"
+        self.logger.debug( "Test Next")
 
 
 class WaitingForStart(State):
@@ -98,22 +99,23 @@ class WaitingForStart(State):
         """Initializes WaitingforStart"""
         super(WaitingForStart, self).__init__()
         self.robot = robot
+        self.logger = lib.get_logger()
 
     def run(self):
         """Checks for the remote start signal
         by calling the monitor behavior"""
         if self.stateTable.start is False:
-            print "Execute: Still waiting\n"
+            self.logger.debug( "Execute: Still waiting\n")
         else:
-            print "Execute: Starting up!\n"
+            self.logger.debug( "Execute: Starting up!\n")
 
     def next(self):
         """Returns to the waiting state or transitions to the jerk state"""
         if self.stateTable.start is False:
-            print "Transition to next State: Waiting\n"
+            self.logger.debug( "Transition to next State: Waiting\n")
             return self.robot.waiting
         else:
-            print "Transition to next State: Jerk\n"
+            self.logger.debug( "Transition to next State: Jerk\n")
             return self.robot.jerk
 
 
@@ -124,16 +126,17 @@ class Jerk(State):
         """Initializes Jerk"""
         super(Jerk, self).__init__()
         self.robot = robot
+        self.logger = lib.get_logger()
         self.driver = md_mod.MecDriver()
 
     def run(self):
         """Calls the jerk behavior"""
         self.driver.jerk()
-        print "Execute: Rote initial move.\n"
+        self.logger.debug( "Execute: Rote initial move.\n")
 
     def next(self):
         """Transitions to line seeking"""
-        print "Transition to next State: FindLine\n"
+        self.logger.debug( "Transition to next State: FindLine\n")
         return self.robot.findLine
 
 
@@ -144,20 +147,21 @@ class FindLine(State):
         """Initializes FindLine"""
         super(FindLine, self).__init__()
         self.robot = robot
+        self.logger = lib.get_logger()
         self.driver = md_mod.MecDriver()
 
     def run(self):
         """Confirms the presence of a line or calls a rescue behavior"""
         if self.stateTable.lineFound is False:
             self.driver.oscillate()
-            print "Execute: Looking for line.\n"
+            self.logger.debug( "Execute: Looking for line.\n")
         else:
-            print "Line found!\n"
+            self.logger.debug( "Line found!\n")
             pass
 
     def next(self):
         """Transitions to line following"""
-        print "Transition to next State: Following\n"
+        self.logger.debug( "Transition to next State: Following\n")
         return self.robot.following
 
 
@@ -168,12 +172,16 @@ class Following(State):
         """Initializes Following"""
         super(Following, self).__init__()
         self.robot = robot
+        self.logger = lib.get_logger()
         self.lineFollower = f_mod.Follower()
 
     def run(self):
         """Calls a line following behavior """
-        self.lineFollower.follow()
-        print "Execute: Following line.\n"
+        try:
+            self.logger.debug( "Execute: Following line.")
+            self.lineFollower.follow({"expected_result": "FollowerException"})
+        except ex.FollowerException as followerEx:
+            self.logger.debug( "Executed lineFollower.follow()")
 
     def next(self):
         """Transitions to centering state or line finding"""
@@ -183,22 +191,22 @@ class Following(State):
 
         #FoundIntersection --> Intersection Center & Align
         if self.stateTable.xFound is True:
-            print "Intersection Found!"
-            print "Transition to next State: Center\n"
+            self.logger.debug( "Intersection Found!")
+            self.logger.debug( "Transition to next State: Center\n")
             self.stateTable.intersections += 1
             return self.robot.center
 
         #FoundBlueBlock --> Center & Align
         if self.stateTable.blueFound is True:
-            print "Blue block found!"
-            print "Transition to next State: Center\n"
+            self.logger.debug( "Blue block found!")
+            self.logger.debug( "Transition to next State: Center\n")
             self.stateTable.positions += 1
             return self.robot.center
 
         #FoundRedBlock --> Center & align
         if self.stateTable.redFound is True:
-            print "Red block found!"
-            print "Transition to next State: Center\n"
+            self.logger.debug( "Red block found!")
+            self.logger.debug( "Transition to next State: Center\n")
             return self.robot.center
 
         #In all other cases, keep following the line
@@ -213,27 +221,28 @@ class CenterAndAlign(State):
     def __init__(self, robot):
         """Initializes CenterAndAlign"""
         super(CenterAndAlign, self).__init__()
+        self.logger = lib.get_logger()
         self.robot = robot
 
     def run(self):
         """Calls a centering and alignment behavior
         to ensure correct course orientation
         """
-        print("Execute: Center on Block. Aligned to Course.\n")
+        self.logger.debug("Execute: Center on Block. Aligned to Course.\n")
 
     def next(self):
         """Transitions to choosing a new direction, firing, or finish """
         if self.stateTable.xFound is True:
-            print "Transition to next State: Choose Direction\n"
+            self.logger.debug( "Transition to next State: Choose Direction\n")
             return self.robot.chooseDir
         elif self.stateTable.blueFound is True:
-            print "Transition to next State: Firing\n"
+            self.logger.debug( "Transition to next State: Firing\n")
             return self.robot.firing
         elif self.stateTable.redFound is True:
-            print "Transition to next State: Finish\n"
+            self.logger.debug( "Transition to next State: Finish\n")
             return self.robot.finish
         else:
-            print "Default Transition from Center and Align \n"
+            self.logger.debug( "Default Transition from Center and Align \n")
             return self.robot.chooseDir
 
 
@@ -244,18 +253,19 @@ class Firing(State):
         """Initializes Firing"""
         super(Firing, self).__init__()
         self.robot = robot
+        self.logger = lib.get_logger()
         self.gunner = wg_mod.WheelGunner()
 
     def run(self):
         """Calls the firing behavior. Increments the shot counter."""
         #TODO (PaladinEng): Passing firing position index for firing solution?
         self.gunner.fire()
-        print "Execute: One shot = One kill.\n"
+        self.logger.debug( "Execute: One shot = One kill.\n")
         self.stateTable.shotsTaken += 1
 
     def next(self):
         """Transitions to choosing a new direction"""
-        print "Transition to next State: ChooseDirection\n"
+        self.logger.debug( "Transition to next State: ChooseDirection\n")
         return self.robot.chooseDir
 
 
@@ -266,6 +276,7 @@ class ChooseDirection(State):
         """Initializes ChooseDirection"""
         super(ChooseDirection, self).__init__()
         self.robot = robot
+        self.logger = lib.get_logger()
 
     def run(self):
         """Determines the correct direction to move next"""
@@ -290,15 +301,19 @@ class ChooseDirection(State):
         self.stateTable.xFound = False
         self.stateTable.centered = False
         # These are for testing
-        print "Intersections: " + str(self.stateTable.intersections)
-        print "Positions: " + str(self.stateTable.positions)
-        print "Shots Taken: " + str(self.stateTable.shotsTaken)
-        print "Direction: " + str(self.stateTable.currentDirection)
-        print "Execute: Direction Set\n"
+        self.logger.debug("Intersections:{}".format(
+            self.stateTable.intersections))
+        self.logger.debug( "Positions: {}".format(
+            self.stateTable.positions))
+        self.logger.debug( "Shots Taken: {}".format(
+        self.stateTable.shotsTaken))
+        self.logger.debug("Direction:{}".format(
+        self.stateTable.currentDirection))
+        self.logger.debug( "Execute: Direction Set\n")
 
     def next(self):
         """Transitions to line following"""
-        print "Transition to next State: Following\n"
+        self.logger.debug( "Transition to next State: Following\n")
         return self.robot.following
 
 
@@ -309,14 +324,15 @@ class Finish(State):
         """Initializes Finish"""
         super(Finish, self).__init__()
         self.robot = robot
+        self.logger = lib.get_logger()
 
     def run(self):
         """Executes shutdown tasks then performs busy waiting"""
-        print "All Done. Shut me off."
+        self.logger.debug( "All Done. Shut me off.")
 
     def next(self):
         """Stays in the finish state"""
-        print "Transition to next State: Finish"
+        self.logger.debug( "Transition to next State: Finish")
         return self.robot.finish
 
 

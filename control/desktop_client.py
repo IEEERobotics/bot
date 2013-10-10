@@ -7,6 +7,12 @@ import numpy as np
 import cv2
 import cv2.cv as cv
 
+try:
+    import zmq
+except ImportError:
+    sys.stderr.write("ERROR: Failed to import zmq. Is it installed?")
+    raise
+
 import lib.lib as lib
 import server
 
@@ -19,6 +25,7 @@ strafe_range = ControlRange(-100, -25, 25, 100)
 turn_range = ControlRange(-100, -25, 25, 100)
 
 
+# TODO(dfarrell07): Inherit from object
 class DesktopControlClient:
     """Desktop-based controller using mouse and/or keyboard input."""
 
@@ -39,6 +46,7 @@ class DesktopControlClient:
 
     def __init__(self):
         self.logger = lib.get_logger()
+        self.config = lib.load_config()
         self.sock = None
         self.keepRunning = True
         # Exclusive semaphore to prevent asynchronous clashes
@@ -50,25 +58,12 @@ class DesktopControlClient:
         #   commands based on those control values
         self.isMoving = False
 
-        self.serverHost = sys.argv[1] if len(sys.argv) > 1 \
-                                      else server.CONTROL_SERVER_HOST
-        self.serverPort = int(sys.argv[2]) if len(sys.argv) > 2 \
-                                           else server.CONTROL_SERVER_PORT
-        try:
-            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.sock.connect((self.serverHost, self.serverPort))
-            self.rfile = self.sock.makefile(mode="rb")
-            self.wfile = self.sock.makefile(mode="wb", bufsize=0)
-            self.logger.info("Connected to control server at {}:{}".format(
-                                                            self.serverHost,
-                                                            self.serverPort))
-        except socket.error:
-            err_msg = "Could not connect to control server at {}:{}".format(
-                                                            self.serverHost,
-                                                            self.serverPort)
-
-            self.logger.error(err_msg)
-            self.sock = None
+        # Build socket and connect to server
+        self.context = zmq.Context()
+        self.sock = self.context.socket(zmq.REQ)
+        self.sock.connect(self.config["server_port"])
+        self.logger.info("Connected to control server at {}".format(
+                                                            self.sock))
 
         self.forward = 0
         self.strafe = 0
@@ -82,9 +77,9 @@ class DesktopControlClient:
 
     def cleanUp(self):
         if self.sock is not None:
-            #self.wfile.write("\x04\n")  #self.sock.sendall("\x04\n")  # EOF
-            self.sock.shutdown(socket.SHUT_RDWR)
+            self.sock.close()
             self.sock = None
+            self.context.term()
             self.logger.info("Disconnected from control server")
 
     def run(self):
@@ -110,14 +105,11 @@ class DesktopControlClient:
         # If keyCode is normal (SPECIAL bits are zero), convert to char (str)
         keyChar = chr(keyCode) if not (key & 0x00ff00) else None
 
+        #TODO(dfarrell): Remove before commit
+        showKeys = True
         if showKeys:
-            # [debug]
-            print "DesktopControlClient.onKeyPress(): key = {key:#06x}, " + \
-                                                  "keyCode = {keyCode}, " + \
-                                                  "keyChar = {keyChar}".format(
-                                                  key=key,
-                                                  keyCode=keyCode,
-                                                  keyChar=keyChar)
+            self.logger.debug("key = {}, keyCode = {}, keyChar = {}".format(
+                                                       key, keyCode, keyChar))
 
         if keyCode == 0x1b or keyChar == 'q' or keyChar == 'Q':  # quit
             self.keepRunning = False
@@ -145,14 +137,11 @@ class DesktopControlClient:
             if self.strafe > strafe_range.max:
                 self.strafe = strafe_range.max
         else:
-            # [debug]
-            print "DesktopControlClient.onKeyPress(): [WARNING] " + \
-                                         "Unknown key = {key:#06x}, " + \
-                                         "keyCode = {keyCode}, " + \
-                                         "keyChar = {keyChar}".format(
-                                         key=key,
-                                         keyCode=keyCode,
-                                         keyChar=keyChar)
+            self.logger.warning("Unknown key = {}, keyCode = {}, " + \
+                                                   "keyChar = {}".format(
+                                                   key,
+                                                   keyCode,
+                                                   keyChar))
             return
 
         self.sendCommand()
@@ -189,12 +178,12 @@ class DesktopControlClient:
         # TODO: Check if this is actually not blocking
         if not self.isProcessing.acquire(blocking=False):
             return
-        # [debug]
-        print "DesktopControlClient.sendCommand(): [{}] Acquired".format(
-                                            threading.current_thread().name)
+        self.logger.debug("[{}] Acquired".format(
+                                          threading.current_thread().name))
 
         # Take snapshot of current control values
         # NOTE: Y-flip
+        # TODO(dfarrell07): Convert forward, strafe and turn to properties
         forward = 0 if forward_range.zero_min < self.forward < \
                                                 forward_range.zero_max \
                                                 else -self.forward
@@ -209,26 +198,40 @@ class DesktopControlClient:
         cmdStr = None
         if forward == 0 and strafe == 0 and turn == 0:
             if self.isMoving:
-                cmdStr = "stop\n"
+                cmdStr = "{cmd: fwd_strafe_turn, " + \
+                         "opts: {fwd: 0, strafe: 0, turn: 0}}"
                 self.isMoving = False
         else:
-            cmdStr = "move {:4d} {:4d} {:4d}\n".format(forward, strafe, turn)
+            # '{{' and '}}' give '{' and '}' after .format call
+            # NOTE: The reason there is an unballenced number of {} in the
+            #   following two lines is because format is being called on the
+            #   second line only, so it needs }} to get }, where the first
+            #   only needs the typical {.
+            cmdStr = "{cmd: fwd_strafe_turn, " + \
+                      "opts: {{fwd: {}, strafe: {}, turn: {}}}}}".format(
+                                                            forward,
+                                                            strafe,
+                                                            turn)
             self.isMoving = True
 
+        self.logger.debug("cmdStr: {}".format(cmdStr))
         if cmdStr is not None:
-            print cmdStr,  # [info]
             if self.sock is not None:
-                #print "Sending: {}".format(repr(cmdStr))  # [debug]
-                self.wfile.write(cmdStr)  # self.sock.sendall(cmdStr)
-                #print "Waiting for response..."  # [debug]
+                self.logger.debug("Sending: {}".format(repr(cmdStr)))
+                # TODO(dfarrell07): Convert to ZMQ call
+                self.sock.send(cmdStr)
                 # Server can use response delay to throttle commands
                 #   TODO check for OK
-                response = self.rfile.readline().strip()
-                print response  # [info]
+                # TODO(dfarrell07): Convert to ZMQ call
+                self.logger.debug("About to block for recv")
+                response = self.sock.recv()
+                self.logger.debug("Returned from block to recv")
+                #response = self.rfile.readline().strip()
+                self.logger.info("Response: {}".format(response))
 
         # [debug]
-        print "DesktopControlClient.sendCommand(): [{}] Releasing".format(
-                                            threading.current_thread().name)
+        self.logger.debug("[{}] Releasing".format(
+                                           threading.current_thread().name))
         self.isProcessing.release()
 
     def draw(self):

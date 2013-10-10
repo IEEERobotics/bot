@@ -4,7 +4,6 @@ import os
 import unittest
 from multiprocessing import Process
 from subprocess import Popen
-from time import sleep
 
 sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
 
@@ -42,12 +41,14 @@ class TestHandleMessage(unittest.TestCase):
         self.server = Popen(["./server.py", "True"])
 
         # Build socket and connect to server
-        context = zmq.Context()
-        self.socket = context.socket(zmq.REQ)
+        self.context = zmq.Context()
+        self.socket = self.context.socket(zmq.REQ)
         self.socket.connect(config["server_port"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
+        self.socket.close()
+        self.context.term()
         self.server.kill()
         lib.set_testing(self.orig_test_state)
 
@@ -85,6 +86,44 @@ class TestHandleMessage(unittest.TestCase):
         self.socket.send("{cmd: move, opts: {speed: 50, angle: 0}")
         reply = self.socket.recv()
         assert reply == "Error: Unable to parse message as YAML"
+
+
+class TestHandleFwdStrafeTurn(unittest.TestCase):
+
+    """Test fwd, strafe and turn commands.
+
+    TODO: More test cases.
+
+    """
+
+    def setUp(self):
+        """Build server and connect to it."""
+        # Load config
+        config = lib.load_config()
+
+        # Set testing flag in config
+        self.orig_test_state = config["testing"]
+        lib.set_testing(True)
+
+        # Build server. Arg is testing or not.
+        self.server = Popen(["./server.py", "True"])
+
+        # Build socket and connect to server
+        context = zmq.Context()
+        self.socket = context.socket(zmq.REQ)
+        self.socket.connect(config["server_port"])
+
+    def tearDown(self):
+        """Kill server, restore testing flag state in config file."""
+        self.server.kill()
+        lib.set_testing(self.orig_test_state)
+
+    def testValid(self):
+        """Test fwd_strafe_turn message that's perfectly valid."""
+        self.socket.send("{cmd: fwd_strafe_turn, " + \
+                         "opts: {fwd: 50, turn: 0, strafe: 0}}")
+        reply = self.socket.recv()
+        assert reply == "Success: {'fwd': 50, 'turn': 0, 'strafe': 0}", reply
 
 
 class TestHandleMove(unittest.TestCase):

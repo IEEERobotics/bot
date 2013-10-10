@@ -3,6 +3,8 @@
 
 import sys
 from time import sleep
+from math import fabs
+import traceback
 
 try:
     import zmq
@@ -29,6 +31,7 @@ class Server(object):
     def __init__(self, testing=False):
         """Build logger, set ZMQ to listen on server port."""
         # TODO(dfarrell07): Build server logger, don't reuse bot logger
+        self.logger = lib.get_logger()
 
         lib.set_testing(bool(testing))
 
@@ -39,7 +42,6 @@ class Server(object):
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REP)
         self.socket.bind(self.config["server_port"])
-        #print "Server bound to {}".format(self.config["server_port"])
 
         # Build MecDriver, which will accept and handle movement actions
         self.driver = md_mod.MecDriver()
@@ -52,13 +54,13 @@ class Server(object):
 
     def listen(self):
         """Listen for messages, pass them off to be handled and send reply."""
+        self.logger.info("Server listening on {}".format(self.socket))
         while True:
-            #print "Listening for message..."
             msg_raw = self.socket.recv()
-            #print "Received: {}".format(msg_raw)
+            self.logger.info("Recieved: {}".format(msg_raw))
 
             reply_msg = self.handle_msg(msg_raw)
-            #print "Replying: {}".format(reply_msg)
+            self.logger.info("Replying: {}".format(reply_msg))
             self.socket.send(reply_msg)
 
     def handle_msg(self, msg_raw):
@@ -90,6 +92,8 @@ class Server(object):
         except AssertionError:
             return "Error: Key 'opts' is not a dict"
 
+        if cmd == "fwd_strafe_turn":
+            return self.handle_fwd_strafe_turn(opts)
         if cmd == "move":
             return self.handle_move(opts)
         elif cmd == "rotate":
@@ -106,6 +110,52 @@ class Server(object):
             self.handle_die()
         else:
             return "Error: Unknown cmd {}".format(cmd)
+
+    def handle_fwd_strafe_turn(self, opts):
+        """Validate options and make move call to driver.
+
+        Speed should be between 0-100, angle between 0-360.
+
+        :param opts: Dict with keys 'speed' and 'angle' to move.
+        :type opts: dict
+
+        """
+        # Validate fwd option
+        try:
+            fwd = float(opts["fwd"])
+        except KeyError:
+            return "Error: No 'fwd' opt given"
+        except ValueError:
+            return "Error: Could not convert fwd to float"
+
+        # Validate strafe option
+        try:
+            strafe = float(opts["strafe"])
+        except KeyError:
+            return "Error: No 'strafe' opt given"
+        except ValueError:
+            return "Error: Could not convert strafe to float"
+
+        # Validate turn option
+        try:
+            turn = float(opts["turn"])
+        except KeyError:
+            return "Error: No 'turn' opt given"
+        except ValueError:
+            return "Error: Could not convert turn to float"
+
+        # Make call to driver
+        try:
+            # Rotate only when turn dominates
+            if fabs(turn) > fabs(fwd) and fabs(turn) > fabs(strafe):
+                self.driver.rotate(turn)
+            else:
+                self.driver.move_forward_strafe(fwd, strafe)
+        except Exception:
+            tb = traceback.format_exc()
+            return "Error from driver: {}".format(tb)
+
+        return "Success: {}".format(opts)
 
     def handle_move(self, opts):
         """Validate options and make move call to driver.
@@ -243,7 +293,7 @@ class Server(object):
         as it exits the process before listen() could take those actions.
 
         """
-        print "Success: Received message to die. Bye!"
+        self.logger.info("Success: Received message to die. Bye!")
         self.socket.send("Success: Received message to die. Bye!")
         sys.exit(0)
 

@@ -54,13 +54,14 @@ class Server(object):
 
     def listen(self):
         """Listen for messages, pass them off to be handled and send reply."""
-        self.logger.info("Server listening on {}".format(self.socket))
+        self.logger.info("Server listening on {}".format(
+                                                self.config["server_port"]))
         while True:
             msg_raw = self.socket.recv()
-            self.logger.info("Recieved: {}".format(msg_raw))
+            self.logger.debug("Received: {}".format(msg_raw))
 
             reply_msg = self.handle_msg(msg_raw)
-            self.logger.info("Replying: {}".format(reply_msg))
+            self.logger.debug("Replying: {}".format(reply_msg))
             self.socket.send(reply_msg)
 
     def handle_msg(self, msg_raw):

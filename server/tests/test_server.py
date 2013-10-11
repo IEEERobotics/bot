@@ -38,7 +38,7 @@ class TestHandleMessage(unittest.TestCase):
         lib.set_testing(True)
 
         # Build server. Arg is testing or not.
-        self.server = Popen(["./server.py", "True"])
+        self.server = Popen(["./server/server.py", "True"])
 
         # Build socket and connect to server
         self.context = zmq.Context()
@@ -106,15 +106,17 @@ class TestHandleFwdStrafeTurn(unittest.TestCase):
         lib.set_testing(True)
 
         # Build server. Arg is testing or not.
-        self.server = Popen(["./server.py", "True"])
+        self.server = Popen(["./server/server.py", "True"])
 
         # Build socket and connect to server
-        context = zmq.Context()
-        self.socket = context.socket(zmq.REQ)
+        self.context = zmq.Context()
+        self.socket = self.context.socket(zmq.REQ)
         self.socket.connect(config["server_port"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
+        self.socket.close()
+        self.context.term()
         self.server.kill()
         lib.set_testing(self.orig_test_state)
 
@@ -140,15 +142,17 @@ class TestHandleMove(unittest.TestCase):
         lib.set_testing(True)
 
         # Build server. Arg is testing or not.
-        self.server = Popen(["./server.py", "True"])
+        self.server = Popen(["./server/server.py", "True"])
 
         # Build socket and connect to server
-        context = zmq.Context()
-        self.socket = context.socket(zmq.REQ)
+        self.context = zmq.Context()
+        self.socket = self.context.socket(zmq.REQ)
         self.socket.connect(config["server_port"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
+        self.socket.close()
+        self.context.term()
         self.server.kill()
         lib.set_testing(self.orig_test_state)
 
@@ -209,15 +213,17 @@ class TestHandleRotate(unittest.TestCase):
         lib.set_testing(True)
 
         # Build server. Arg is testing or not.
-        self.server = Popen(["./server.py", "True"])
+        self.server = Popen(["./server/server.py", "True"])
 
         # Build socket and connect to server
-        context = zmq.Context()
-        self.socket = context.socket(zmq.REQ)
+        self.context = zmq.Context()
+        self.socket = self.context.socket(zmq.REQ)
         self.socket.connect(config["server_port"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
+        self.socket.close()
+        self.context.term()
         self.server.kill()
         lib.set_testing(self.orig_test_state)
 
@@ -260,15 +266,17 @@ class TestHandleFire(unittest.TestCase):
         lib.set_testing(True)
 
         # Build server. Arg is testing or not.
-        self.server = Popen(["./server.py", "True"])
+        self.server = Popen(["./server/server.py", "True"])
 
         # Build socket and connect to server
-        context = zmq.Context()
-        self.socket = context.socket(zmq.REQ)
+        self.context = zmq.Context()
+        self.socket = self.context.socket(zmq.REQ)
         self.socket.connect(config["server_port"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
+        self.socket.close()
+        self.context.term()
         self.server.kill()
         lib.set_testing(self.orig_test_state)
 
@@ -293,15 +301,17 @@ class TestHandleAim(unittest.TestCase):
         lib.set_testing(True)
 
         # Build server. Arg is testing or not.
-        self.server = Popen(["./server.py", "True"])
+        self.server = Popen(["./server/server.py", "True"])
 
         # Build socket and connect to server
-        context = zmq.Context()
-        self.socket = context.socket(zmq.REQ)
+        self.context = zmq.Context()
+        self.socket = self.context.socket(zmq.REQ)
         self.socket.connect(config["server_port"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
+        self.socket.close()
+        self.context.term()
         self.server.kill()
         lib.set_testing(self.orig_test_state)
 
@@ -362,15 +372,17 @@ class TestHandleAdvanceDart(unittest.TestCase):
         lib.set_testing(True)
 
         # Build server. Arg is testing or not.
-        self.server = Popen(["./server.py", "True"])
+        self.server = Popen(["./server/server.py", "True"])
 
         # Build socket and connect to server
-        context = zmq.Context()
-        self.socket = context.socket(zmq.REQ)
+        self.context = zmq.Context()
+        self.socket = self.context.socket(zmq.REQ)
         self.socket.connect(config["server_port"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
+        self.socket.close()
+        self.context.term()
         self.server.kill()
         lib.set_testing(self.orig_test_state)
 
@@ -395,15 +407,17 @@ class TestHandleFireSpeed(unittest.TestCase):
         lib.set_testing(True)
 
         # Build server. Arg is testing or not.
-        self.server = Popen(["./server.py", "True"])
+        self.server = Popen(["./server/server.py", "True"])
 
         # Build socket and connect to server
-        context = zmq.Context()
-        self.socket = context.socket(zmq.REQ)
+        self.context = zmq.Context()
+        self.socket = self.context.socket(zmq.REQ)
         self.socket.connect(config["server_port"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
+        self.socket.close()
+        self.context.term()
         self.server.kill()
         lib.set_testing(self.orig_test_state)
 

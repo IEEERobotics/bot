@@ -39,7 +39,7 @@ class TestBasic(unittest.TestCase):
         lib.set_testing(True)
 
         # Build server. Arg is testing or not.
-        self.server = Popen(["./server.py", "True"])
+        self.server = Popen(["./server/server.py", "True"])
 
         # Build socket and connect to server
         self.context = zmq.Context()

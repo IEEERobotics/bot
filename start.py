@@ -6,7 +6,8 @@ import getopt
 from subprocess import Popen
 import os
 
-import control.desktop_client as desktop_client_mod
+import lib.lib
+import client.desktop_client as desktop_client_mod
 import planner.fsm_planner as pfsm_mod
 
 
@@ -14,7 +15,7 @@ def main(argv):
     """Get arguments and handle them."""
     try:
         opts, args = getopt.getopt(argv, "hsdtp8x",
-                     ["help", "server", "desktop", "tests", "planner", 
+                     ["help", "server", "desktop", "tests", "planner",
                       "pep8", "exit-server"])
     except getopt.GetoptError:
         print_help()
@@ -39,7 +40,7 @@ def main(argv):
 
     if "-s" in opt_list or "--server" in opt_list:
         print "Starting server"
-        server = Popen(["./server.py", "True"])
+        server = Popen(["./server/server.py", "True"])
 
     if "-d" in opt_list or "--desktop" in opt_list:
         print "Starting desktop controller"
@@ -48,6 +49,9 @@ def main(argv):
     if "-x" in opt_list or "--exit-server" in opt_list:
         print "Closing server"
         server.kill()
+    elif "-s" in opt_list or "--server" in opt_list:
+        print "Server is still running, give -x to close next time."
+
 
 def print_help():
     """Print usage of script."""

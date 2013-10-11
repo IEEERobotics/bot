@@ -16,7 +16,7 @@ except ImportError:
 try:
     import lib.lib as lib
     import server as server_mod
-    import control.desktop_client as dclient_mod
+    import client.desktop_client as dclient_mod
 except ImportError:
     print "ImportError: Use `python -m unittest discover` from project root."
     raise
@@ -39,7 +39,7 @@ class TestBasic(unittest.TestCase):
         lib.set_testing(True)
 
         # Build server. Arg is testing or not.
-        self.server = Popen(["./server.py", "True"])
+        self.server = Popen(["./server/server.py", "True"])
 
         # Build socket and connect to server
         self.context = zmq.Context()

@@ -14,7 +14,7 @@ except:
     raise
 
 import lib.lib as lib
-import server
+import server.leap_server as server
 
 ControlRange = namedtuple('ControlRange',
                           ['min', 'zero_min', 'zero_max', 'max'])

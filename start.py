@@ -6,7 +6,8 @@ import getopt
 from subprocess import Popen
 import os
 
-import control.desktop_client as desktop_client_mod
+import lib.lib
+import client.desktop_client as desktop_client_mod
 import planner.fsm_planner as pfsm_mod
 
 

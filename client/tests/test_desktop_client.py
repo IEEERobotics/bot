@@ -16,7 +16,7 @@ except ImportError:
 try:
     import lib.lib as lib
     import server as server_mod
-    import control.desktop_client as dclient_mod
+    import client.desktop_client as dclient_mod
 except ImportError:
     print "ImportError: Use `python -m unittest discover` from project root."
     raise

@@ -55,7 +55,8 @@ def main(argv):
 
 def print_help():
     """Print usage of script."""
-    print "start.py [-h|--help] [-s|--server] [-d|--desktop]"
+    print "start.py [-h|--help] [-s|--server] [-d|--desktop] [-t|--tests]\n" +\
+          "         [-p|--planner] [-8|--pep8] [-x|--exit-server]"
 
 if __name__ == "__main__":
     main(sys.argv[1:])

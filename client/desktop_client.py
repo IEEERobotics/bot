@@ -7,6 +7,12 @@ import numpy as np
 import cv2
 import cv2.cv as cv
 
+try:
+    import zmq
+except ImportError:
+    sys.stderr.write("ERROR: Failed to import zmq. Is it installed?")
+    raise
+
 import lib.lib as lib
 import server
 
@@ -19,7 +25,8 @@ strafe_range = ControlRange(-100, -25, 25, 100)
 turn_range = ControlRange(-100, -25, 25, 100)
 
 
-class DesktopControlClient:
+class DesktopControlClient(object):
+
     """Desktop-based controller using mouse and/or keyboard input."""
 
     window_name = "Desktop Controller"
@@ -39,6 +46,7 @@ class DesktopControlClient:
 
     def __init__(self):
         self.logger = lib.get_logger()
+        self.config = lib.load_config()
         self.sock = None
         self.keepRunning = True
         # Exclusive semaphore to prevent asynchronous clashes
@@ -50,25 +58,12 @@ class DesktopControlClient:
         #   commands based on those control values
         self.isMoving = False
 
-        self.serverHost = sys.argv[1] if len(sys.argv) > 1 \
-                                      else server.CONTROL_SERVER_HOST
-        self.serverPort = int(sys.argv[2]) if len(sys.argv) > 2 \
-                                           else server.CONTROL_SERVER_PORT
-        try:
-            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.sock.connect((self.serverHost, self.serverPort))
-            self.rfile = self.sock.makefile(mode="rb")
-            self.wfile = self.sock.makefile(mode="wb", bufsize=0)
-            self.logger.info("Connected to control server at {}:{}".format(
-                                                            self.serverHost,
-                                                            self.serverPort))
-        except socket.error:
-            err_msg = "Could not connect to control server at {}:{}".format(
-                                                            self.serverHost,
-                                                            self.serverPort)
-
-            self.logger.error(err_msg)
-            self.sock = None
+        # Build socket and connect to server
+        self.context = zmq.Context()
+        self.sock = self.context.socket(zmq.REQ)
+        self.sock.connect(self.config["server_port"])
+        self.logger.info("Connected to control server at {}".format(
+                                                self.config["server_port"]))
 
         self.forward = 0
         self.strafe = 0
@@ -82,9 +77,9 @@ class DesktopControlClient:
 
     def cleanUp(self):
         if self.sock is not None:
-            #self.wfile.write("\x04\n")  #self.sock.sendall("\x04\n")  # EOF
-            self.sock.shutdown(socket.SHUT_RDWR)
+            self.sock.close()
             self.sock = None
+            self.context.term()
             self.logger.info("Disconnected from control server")
 
     def run(self):
@@ -111,75 +106,50 @@ class DesktopControlClient:
         keyChar = chr(keyCode) if not (key & 0x00ff00) else None
 
         if showKeys:
-            # [debug]
-            print "DesktopControlClient.onKeyPress(): key = {key:#06x}, " + \
-                                                  "keyCode = {keyCode}, " + \
-                                                  "keyChar = {keyChar}".format(
-                                                  key=key,
-                                                  keyCode=keyCode,
-                                                  keyChar=keyChar)
+            self.logger.debug("key = {}, keyCode = {}, keyChar = {}".format(
+                                                       key, keyCode, keyChar))
 
         if keyCode == 0x1b or keyChar == 'q' or keyChar == 'Q':  # quit
             self.keepRunning = False
             self.forward = 0
             self.strafe = 0
             self.turn = 0
-        elif keyChar == ' ':  # stop/zero out
+        elif keyChar == ' ':  # Stop/zero out
             self.forward = 0
             self.strafe = 0
             self.turn = 0
-        elif keyChar == 'w' or keyChar == 'W':  # forward
+        elif keyChar == 'w' or keyChar == 'W':  # Forward
             self.forward -= 1
-            if self.forward < forward_range.min:
-                self.forward = forward_range.min
-        elif keyChar == 's' or keyChar == 'S':  # backward
+        elif keyChar == 's' or keyChar == 'S':  # Backward
             self.forward += 1
-            if self.forward > forward_range.max:
-                self.forward = forward_range.max
-        elif keyChar == 'a' or keyChar == 'A':  # left
+        elif keyChar == 'a' or keyChar == 'A':  # Left
             self.strafe -= 1
-            if self.strafe < strafe_range.min:
-                self.strafe = strafe_range.min
-        elif keyChar == 'd' or keyChar == 'D':  # right
+        elif keyChar == 'd' or keyChar == 'D':  # Right
             self.strafe += 1
-            if self.strafe > strafe_range.max:
-                self.strafe = strafe_range.max
         else:
-            # [debug]
-            print "DesktopControlClient.onKeyPress(): [WARNING] " + \
-                                         "Unknown key = {key:#06x}, " + \
-                                         "keyCode = {keyCode}, " + \
-                                         "keyChar = {keyChar}".format(
-                                         key=key,
-                                         keyCode=keyCode,
-                                         keyChar=keyChar)
+            self.logger.warning("Unknown key = {}, keyCode = {}, " + \
+                                                   "keyChar = {}".format(
+                                                   key,
+                                                   keyCode,
+                                                   keyChar))
             return
 
         self.sendCommand()
 
     def onMouse(self, event, x, y, flags, param=None):
-        # [debug]
-        #print "DesktopControlClient.onMouse(): {} @ ({}, {}) " + \
-        #                            "[flags = {}]".format(event, x, y, flags)
-        if event == cv.CV_EVENT_LBUTTONUP:  # stop when left button is released
-            #print "stop"  # [debug]
+        self.logger.debug("{} @ ({}, {}) [flags = {}]".format(event, x, y,
+                                                                        flags))
+        # Stop when left button is released
+        if event == cv.CV_EVENT_LBUTTONUP:
+            self.logger.debug("Mouse released, stopping.")
             self.forward = 0
             self.strafe = 0
         # Move when left button is held down
         elif event == cv.CV_EVENT_MOUSEMOVE and \
                 flags & cv.CV_EVENT_FLAG_LBUTTON:
-            #print "move ({}, {})".format(x, y)  # [debug]
+            self.logger.debug("Mouse down, moving ({}, {})".format(x, y))
             self.forward = y - self.imageCenter[1]
-            if self.forward < forward_range.min:
-                self.forward = forward_range.min
-            elif self.forward > forward_range.max:
-                self.forward = forward_range.max
-
             self.strafe = x - self.imageCenter[0]
-            if self.strafe < strafe_range.min:
-                self.strafe = strafe_range.min
-            elif self.strafe > strafe_range.max:
-                self.strafe = strafe_range.max
         else:
             return
 
@@ -189,46 +159,56 @@ class DesktopControlClient:
         # TODO: Check if this is actually not blocking
         if not self.isProcessing.acquire(blocking=False):
             return
-        # [debug]
-        print "DesktopControlClient.sendCommand(): [{}] Acquired".format(
-                                            threading.current_thread().name)
+        self.logger.debug("[{}] Acquired".format(
+                                          threading.current_thread().name))
 
         # Take snapshot of current control values
         # NOTE: Y-flip
-        forward = 0 if forward_range.zero_min < self.forward < \
+        snap_forward = 0 if forward_range.zero_min < self.forward < \
                                                 forward_range.zero_max \
                                                 else -self.forward
-        strafe = 0 if strafe_range.zero_min < self.strafe < \
+        snap_strafe = 0 if strafe_range.zero_min < self.strafe < \
                                               strafe_range.zero_max \
                                               else self.strafe
-        turn = 0 if turn_range.zero_min < self.turn < turn_range.zero_max \
-                 else self.turn
+        snap_turn = 0 if turn_range.zero_min < self.turn < \
+                                               turn_range.zero_max \
+                                               else self.turn
+
         # TODO Decouple input resolution from output resolution by
         #   defining a scaling transformation
 
         cmdStr = None
-        if forward == 0 and strafe == 0 and turn == 0:
+        if snap_forward == 0 and snap_strafe == 0 and snap_turn == 0:
             if self.isMoving:
-                cmdStr = "stop\n"
+                cmdStr = "{cmd: fwd_strafe_turn, " + \
+                         "opts: {fwd: 0, strafe: 0, turn: 0}}"
                 self.isMoving = False
         else:
-            cmdStr = "move {:4d} {:4d} {:4d}\n".format(forward, strafe, turn)
+            # '{{' and '}}' give '{' and '}' after .format call
+            # NOTE: The reason there is an unbalanced number of {} in the
+            #   following two lines is because format is being called on the
+            #   second line only, so it needs }} to get }, where the first
+            #   only needs the typical {.
+            cmdStr = "{cmd: fwd_strafe_turn, " + \
+                      "opts: {{fwd: {}, strafe: {}, turn: {}}}}}".format(
+                                                            snap_forward,
+                                                            snap_strafe,
+                                                            snap_turn)
             self.isMoving = True
 
         if cmdStr is not None:
-            print cmdStr,  # [info]
-            if self.sock is not None:
-                #print "Sending: {}".format(repr(cmdStr))  # [debug]
-                self.wfile.write(cmdStr)  # self.sock.sendall(cmdStr)
-                #print "Waiting for response..."  # [debug]
+            try:
+                self.logger.debug("Sending: {}".format(repr(cmdStr)))
+                self.sock.send(cmdStr)
                 # Server can use response delay to throttle commands
-                #   TODO check for OK
-                response = self.rfile.readline().strip()
-                print response  # [info]
+                self.logger.debug("About to block for recv")
+                response = self.sock.recv()
+                self.logger.info("Response: {}".format(response))
+            except Exception:
+                self.logger.error("Failed to communicate with server.")
 
-        # [debug]
-        print "DesktopControlClient.sendCommand(): [{}] Releasing".format(
-                                            threading.current_thread().name)
+        self.logger.debug("[{}] Releasing".format(
+                                           threading.current_thread().name))
         self.isProcessing.release()
 
     def draw(self):
@@ -313,6 +293,96 @@ class DesktopControlClient:
 
         # Show image
         cv2.imshow(self.window_name, self.imageOut)
+
+    @property
+    def strafe(self):
+        """Getter for strafe value.
+
+        :returns: Current strafe speed.
+        :type strafe: float
+
+        """
+        return self._strafe
+
+    @strafe.setter
+    def strafe(self, val):
+        """Setter for strafe value.
+
+        Do all bounds checking here, to avoid duplicating that logic.
+
+        :param strafe: Current strafe speed.
+        :type strafe: float
+
+        """
+        if val < strafe_range.min:
+            # Below min possible strafe value, set to min
+            self._strafe = strafe_range.min
+        elif val > strafe_range.max:
+            # Above max possible strafe value, set to max
+            self._strafe = strafe_range.max
+        else:
+            # Not in special range, set to requested
+            self._strafe = val
+
+    @property
+    def forward(self):
+        """Getter for forward value.
+
+        :returns: Current forward speed.
+        :type forward: float
+
+        """
+        return self._forward
+
+    @forward.setter
+    def forward(self, val):
+        """Setter for forward value.
+
+        Do all bounds checking here, to avoid duplicating that logic.
+
+        :param forward: Current forward speed.
+        :type forward: float
+
+        """
+        if val < forward_range.min:
+            # Below min possible forward value, set to min
+            self._forward = forward_range.min
+        elif val > forward_range.max:
+            # Above max possible forward value, set to max
+            self._forward = forward_range.max
+        else:
+            # Not in special range, set to requested
+            self._forward = val
+
+    @property
+    def turn(self):
+        """Getter for turn value.
+
+        :returns: Current turn speed.
+        :type turn: float
+
+        """
+        return self._turn
+
+    @turn.setter
+    def turn(self, val):
+        """Setter for turn value.
+
+        Do all bounds checking here, to avoid duplicating that logic.
+
+        :param turn: Current turn speed.
+        :type turn: float
+
+        """
+        if val < turn_range.min:
+            # Below min possible turn value, set to min
+            self._turn = turn_range.min
+        elif val > turn_range.max:
+            # Above max possible turn value, set to max
+            self._turn = turn_range.max
+        else:
+            # Not in special range, set to requested
+            self._turn = val
 
 
 if __name__ == "__main__":

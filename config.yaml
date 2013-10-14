@@ -23,4 +23,6 @@ test_strat_base_dir: planner/tests/strategies/
 fsm_tests: ./planner/tests/input/RobotNormalTest.txt
 testing: false
 server_port: tcp://*:60000
+num_ir_arrays: 4
+irs_per_array: 16
 

@@ -2,7 +2,7 @@
 
 import hardware.ir_hub as ir_hub_mod
 import lib.lib as lib
-#import dirver.mec_driver as driver_mod
+import driver.mec_driver as driver_mod
 
 
 class SimpleFollower(object):

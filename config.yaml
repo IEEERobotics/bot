@@ -12,7 +12,7 @@ gun_motors:
 gun_sol: {GPIO: 60}  # Gun solenoid/trigger: P9_12 (gpio60)
 sol_extend_delay: 0.5
 ir_select_gpios: [44, 26, 46, 65]  # GPIOs to select IR sensor units: [P8_12 (gpio44), P8_14 (gpio26), P8_16 (gpio46), P8_18 (gpio65)]
-ir_input_adc: 0  # Input ADC to read selected IR sensor unit: P9_39 (AIN0)
+ir_input_adcs: {front: 0, back: 1, left: 2, right: 3}  # Input ADC pins to read selected IR sensor units: P9_39 (AIN0), P9_40 (AIN1), P9_37 (AIN2), P9_38 (AIN4)
 logging: {log_file: logs/bot.log, file_handler_level: DEBUG, stream_handler_level: INFO}  # Logging options
 strategy: planner/strategies/strategy0.yaml
 targeting: gunner/targeting/targeting0.yaml

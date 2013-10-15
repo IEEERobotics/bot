@@ -19,17 +19,19 @@ class IRArray(object):
 
     """
 
-    def __init__(self, name):
+    def __init__(self, name, input_adc_pin):
         """Setup required pins and get logger.
-
-        The current required pins are not known, so this is a stub.
 
         :param name: Identifier for this IR array.
         :type name: string
 
+        :param input_adc_pin: Input ADC pin number for this IR array.
+        :type input_adc_pin: int
+
         """
-        # Store name of this IR array
+        # Store name and input ADC pin for this IR array
         self.name = name
+        self.input_adc_pin = input_adc_pin
 
         # Get and store logger object
         self.logger = lib.get_logger()
@@ -46,13 +48,13 @@ class IRArray(object):
             # Build GPIO and ADC objects for testing
             self.ir_select_gpios = [gpio_mod.GPIO(gpio, gpio_test_dir_base)
                                     for gpio in config["ir_select_gpios"]]
-            self.ir_input_adc = adc_mod.ADC(config["ir_input_adc"],
+            self.ir_input_adc = adc_mod.ADC(self.input_adc_pin,
                                             adc_test_dir + '/AIN')
         else:
             try:
                 self.ir_select_gpios = [gpio_mod.GPIO(gpio)
                                         for gpio in config["ir_select_gpios"]]
-                self.ir_input_adc = adc_mod.ADC(config["ir_input_adc"])
+                self.ir_input_adc = adc_mod.ADC(self.input_adc_pin)
             except Exception as e:
                 self.logger.error("GPIOs & ADC could not be initialized. " +
                                   "Not on the bone? Run unit test instead. " +
@@ -67,7 +69,8 @@ class IRArray(object):
         :returns: String giving name of IR array.
 
         """
-        return "{}: {}".format(self.name, self.reading)
+        return "{} ({}): {}".format(
+            self.name, self.input_adc_pin, self.reading)
 
     def select_lines(self, values):
         """Set select lines (GPIO pins) to given values.
@@ -114,6 +117,6 @@ class IRArray(object):
         for unit in xrange(num_ir_units):
             self.reading[unit] = self.read_unit(unit)
         self.logger.debug("IR reading:- {}".format(self))
-        # NOTE: Caller should make a copy if a read_all() is executed
+        # NOTE: Caller should make a copy if a read_all_units() is executed
         # while previous values are being used
         return self.reading

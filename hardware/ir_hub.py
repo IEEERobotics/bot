@@ -17,13 +17,18 @@ class IRHub(object):
         # Get and store logger object
         self.logger = lib.get_logger()
 
-        # TODO: Array names and pins should be correlated and read from config
-        array_names = ["front", "back", "left", "right"]
+        # Load system configuration
+        config = lib.load_config()
+
+        # Read mapping (dict) of IR array names to input ADC pins from config
+        # NOTE: IR unit select lines are common
+        ir_input_adcs = config["ir_input_adcs"]
+        #array_names = ["front", "back", "left", "right"]
+
+        # Create IR array objects
         self.arrays = {}
-        for name in array_names:
-            self.arrays[name] = ir_mod.IRArray(name)
-            # TODO: A second parameter (5th select line?) is needed
-            # to select a particular IR array
+        for name, pin in ir_input_adcs.iteritems():
+            self.arrays[name] = ir_mod.IRArray(name, pin)
 
     def __str__(self):
         """Returns human-readable representation of IRHub.
@@ -44,6 +49,5 @@ class IRHub(object):
         for name, array in self.arrays.iteritems():
             # read_all_units() logs currently read values
             readings[name] = array.read_all_units()
-        # No need to log again
-        #self.logger.debug("IR readings: {}".format(readings))
+        #self.logger.debug("IR readings: {}".format(readings))  # [debug]
         return readings

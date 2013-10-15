@@ -47,13 +47,17 @@ class TestReading(unittest.TestCase):
         if not os.path.exists(adc_test_dir):
             os.makedirs(adc_test_dir)
 
-        # Set known value in ADC simulated hardware file
-        sim_file = adc_test_dir + "/AIN" + str(config["ir_input_adc"])
-        with open(sim_file, "w") as f:
-            f.write("0\n")
+        # Set known value in ADC simulated hardware files
+        ir_input_adcs = config["ir_input_adcs"]
+        for name, pin in ir_input_adcs.iteritems():
+            sim_file = adc_test_dir + "/AIN" + str(pin)
+            with open(sim_file, "w") as f:
+                f.write("0\n")
 
-        # Build IR abstraction object
-        self.ir = ir_mod.IRArray("test")
+        # Build IR array objects
+        self.arrays = {}
+        for name, pin in ir_input_adcs.iteritems():
+            self.arrays[name] = ir_mod.IRArray(name, pin)
 
     def tearDown(self):
         """Restore testing flag state in config file."""
@@ -61,7 +65,9 @@ class TestReading(unittest.TestCase):
 
     def testStub(self):
         """Confirm that stub behavior is working as expected."""
-        reading = self.ir.read_all_units()
-        assert type(reading) is list, "type is {}".format(type(reading))
-        for ir_value in reading:
-            assert ir_value == 0
+        for name, array in self.arrays.iteritems():
+            reading = array.read_all_units()
+            assert type(reading) is list, "IR array: {}, type: {}".format(
+                name, type(reading))
+            for ir_value in reading:
+                assert ir_value == 0

@@ -1,6 +1,10 @@
 """Logic for line following."""
 
+import sys
+
 import lib.lib as lib
+import hardware.ir_hub as ir_hub_mod
+import driver.mec_driver as mec_driver_mod
 import lib.exceptions as ex
 
 
@@ -9,32 +13,26 @@ class Follower(object):
     """Follow a line. Subclass for specific hardware/methods."""
 
     def __init__(self):
-        """Build and store logger."""
+        """Build and store logger.
+           Build ir arrays.
+           Build motors"""
         self.logger = lib.get_logger()
+        self.irs = ir_hub_mod.IRHub()
+        self.driver = mec_driver_mod.MecDriver()
+        
+    def follow(self, state_table):
+        """Accept and handle fire commands. """
 
-    def follow(self, cmd):
-        """Accept and handle fire commands.
 
-        TODO(dfarrell07): This is a stub
+        current_ir_reading = self.irs.read_all_arrays()
+        front_ir = current_ir_reading["front"]
+        back_ir = current_ir_reading["back"]
+        left_ir = current_ir_reading["left"]
+        right_ir = current_ir_reading["right"]
+        #self.always_work(cmd)
 
-        :param cmd: Description of fire action to execute.
 
-        """
-        self.always_work(cmd)
+    def center_cal(self, front, back):
+        """ calculate the angle off the line """
 
-    def always_work(self, cmd):
-        """Temp method to simulate successful results.
-
-        :param cmd: Command to successfully return from.
-        :raises: FollowerException, IntersectionException, BoxException
-
-        """
-        if cmd["expected_result"] == str(ex.FollowerException()):
-            raise ex.FollowerException()
-        elif cmd["expected_result"] == str(ex.IntersectionException()):
-            raise ex.IntersectionException()
-        elif cmd["expected_result"] == str(ex.BoxException()):
-            raise ex.BoxException()
-        else:
-            self.logger.error("Unknown follow expected_result: "
-                              "{}".format(cmd["expected_result"]))
+        print('hello')

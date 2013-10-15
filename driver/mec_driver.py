@@ -174,16 +174,14 @@ class MecDriver(driver.Driver):
         back_right  = speed * sin(angle * pi / 180 + pi / 4)
 
         # Find largest motor speed,
-        #   use that to normalize multipliers and maintain maximum efficiency
+        # use that to normalize multipliers and maintain maximum efficiency
         # TODO This needs to be debugged and re-enabled; currently speeds are
-        #   being set much higher than expected (use test_mec_driver to verify)
-        '''
+        # being set much higher than expected (use test_mec_driver to verify)
         max_wheel_speed = max([front_left, front_right, back_left, back_right])
         front_left = front_left * speed / max_wheel_speed
         front_right = front_right * speed / max_wheel_speed
         back_left = back_left * speed / max_wheel_speed
         back_right = back_right * speed / max_wheel_speed
-        '''
 
         # Set motor directions
         self.motors["front_left"].direction = "forward" if front_left > 0 \

@@ -220,6 +220,38 @@ For instance, on a Mac OS X 10.8, pip installed pep8 at `/Library/Frameworks/Pyt
 
 Adapt according to paths on your system. Again, verify by running `pep8` from the terminal.
 
+### NumPy
+
+This is currently only needed for running control/desktop_client.py.
+
+#### Linux
+
+Install with `sudo apt-get install python-numpy`. Celebrate. :)
+
+#### Windows
+
+TODO: How?
+
+#### Mac
+
+TODO: How?
+
+### OpenCV
+
+This is currently only needed for running control/desktop_client.py.
+
+#### Linux
+
+Install with `sudo apt-get install python-opencv`. Celebrate. :)
+
+#### Windows
+
+TODO: How?
+
+#### Mac
+
+TODO: How?
+
 
 [pre-commit hooks]: README.md#hooks-or-how-to-make-daniels-life-easier
 [pre-commit hook]: README.md#hooks-or-how-to-make-daniels-life-easier

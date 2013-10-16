@@ -139,6 +139,8 @@ If you need more help, see [this guide](https://help.github.com/articles/set-up-
 
 To generate and set git to use SSH keys (recommended), follow [this guide](https://help.github.com/articles/generating-ssh-keys).
 
+Once you get everything set up, I suggest going though [this quick, interactive tutorial](http://try.github.io/levels/1/challenges/1).
+
 ### Python
 
 We're using Python 2.7.x for this project. If you already have python configured, run `python --version` to check your version.

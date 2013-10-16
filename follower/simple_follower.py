@@ -13,7 +13,7 @@ class SimpleFollower(object):
         """Setup driver, logger, ir_hub, and config."""
         self.logger = lib.get_logger()
         self.ir_hub = ir_hub_mod.IRHub()
-#       self.driver = driver_mod.MecDriver()
+        self.driver = driver_mod.MecDriver()
         self.config = lib.load_config()
 
     def move_multi(self):
@@ -30,15 +30,15 @@ class SimpleFollower(object):
                                (half_length + mid_space) / 2)
         if f_mid > f_left or f_mid > f_right:
             # Go straight
-            # self.driver.move(100, 0)
+            self.driver.move(100, 0)
             self.logger.debug("IR in mid range: moves forward")
         elif f_left > f_right:
             # Move to the right
-            # self.driver.move(speed, angle)
+            self.driver.move(100, 270)
             self.logger.debug("front left IR > front right: move right")
         else:
             # Move to the left
-            # self.driver.move(speed, angle)
+            self.driver.move(100, 90)
             self.logger.debug("front right IR > front left: move left")
 
     def sum_array(self, array, start, end):

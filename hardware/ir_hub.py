@@ -51,3 +51,30 @@ class IRHub(object):
             readings[name] = array.read_all_units()
         #self.logger.debug("IR readings: {}".format(readings))  # [debug]
         return readings
+
+
+def read_loop(delay=1):
+    """Read IR array values using an IRHub object indefinitely.
+
+    To be used interactively on bot for testing IR arrays, not in other code.
+
+    """
+
+    print "Creating IRHub object..."
+    hubba = IRHub()
+    print "Starting read loop... [Ctrl+C to quit]"
+    while True:
+        try:
+            readings = hubba.read_all_arrays()
+            print "\nIR Readings:-"
+            print "\n".join("{}: {}".format(name, reading)
+                            for name, reading in readings.iteritems())
+            time.sleep(delay)
+        except KeyboardInterrupt:
+            print "Quitting..."
+            break
+    print "Done."
+
+
+if __name__ == "__main__":
+    read_loop()

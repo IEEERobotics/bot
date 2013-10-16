@@ -16,9 +16,9 @@ except ImportError:
 logger = lib.get_logger()
 
 
-class TestReading(unittest.TestCase):
+class TestIRArrays(unittest.TestCase):
 
-    """Test reading IR sensor values using IR abstraction."""
+    """Test reading IR sensor values using IR array abstractions."""
 
     def setUp(self):
         """Get config and built IR object."""
@@ -47,7 +47,7 @@ class TestReading(unittest.TestCase):
         if not os.path.exists(adc_test_dir):
             os.makedirs(adc_test_dir)
 
-        # Set known value in ADC simulated hardware files
+        # Set known values in ADC simulated hardware files
         ir_input_adcs = config["ir_input_adcs"]
         for name, pin in ir_input_adcs.iteritems():
             sim_file = adc_test_dir + "/AIN" + str(pin)
@@ -63,11 +63,11 @@ class TestReading(unittest.TestCase):
         """Restore testing flag state in config file."""
         lib.set_testing(self.orig_test_state)
 
-    def testStub(self):
-        """Confirm that stub behavior is working as expected."""
+    def testIRArrays(self):
+        """Confirm that IRArray behavior is as expected."""
         for name, array in self.arrays.iteritems():
             reading = array.read_all_units()
-            assert type(reading) is list, "IR array: {}, type: {}".format(
-                name, type(reading))
+            assert type(reading) is list, \
+                "IR array: {}, reading type: {}".format(name, type(reading))
             for ir_value in reading:
                 assert ir_value == 0

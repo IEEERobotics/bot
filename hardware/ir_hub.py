@@ -1,5 +1,6 @@
 """Abstraction of all line-following arrays as one unit."""
 
+import time
 import lib.lib as lib
 import hardware.ir as ir_mod
 

@@ -13,7 +13,7 @@ except ImportError:
     raise
 
 
-class TestIRArrays(unittest.TestCase):
+class TestBot(unittest.TestCase):
 
     """Test class that all bot unittets should subclass."""
 
@@ -119,6 +119,42 @@ class TestIRArrays(unittest.TestCase):
         # Set known values in ADC simulated hardware file
         with open(test_dir + "/AIN" + str(adc_num), "w") as f:
             f.write(value)
+
+    def get_pwm(self, pwm_num):
+        """Get current values in simulated PWM file."""
+        test_dir = self.config["test_pwm_base_dir"] + str(pwm_num)
+
+        # Get values in PWM simulated hardware files
+        results = {}
+        with open(test_dir + "/run", "r") as f:
+            results["run"] = f.read()
+        with open(test_dir + "/duty_ns", "r") as f:
+            results["duty_ns"] = f.read()
+        with open(test_dir + "/period_ns", "r") as f:
+            results["period_ns"] = f.read()
+        with open(test_dir + "/polarity", "r") as f:
+            results["polarity"] = f.read()
+        return results
+
+    def get_gpio(self, gpio_num):
+        """Get current values in simulated GPIO file."""
+        test_dir = self.config["test_gpio_base_dir"] + str(gpio_num)
+
+        # Get values in GPIO simulated hardware files
+        results = {}
+        with open(test_dir + "/value", "r") as f:
+            results["value"] = f.read()
+        with open(test_dir + "/direction", "r") as f:
+            results["direction"] = f.read()
+        return results
+
+    def get_adc(self, adc_num):
+        """Get current value in simulated ADC file."""
+        test_dir = self.config["test_adc_base_dir"]
+
+        # Get value in ADC simulated hardware file
+        with open(test_dir + "/AIN" + str(adc_num), "r") as f:
+            return f.read()
 
     def tearDown(self):
         """Restore testing flag state in config file."""

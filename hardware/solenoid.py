@@ -12,18 +12,18 @@ class Solenoid(object):
 
     """Class for abstracting solenoid settings."""
 
-    def __init__(self, num):
+    def __init__(self, gpio_num):
         """Setup logger and GPIO interface.
 
-        :param num: ID number of this solenoid. Also defines GPIO number.
-        :type num: int
+        :param gpio_num: GPIO number used by this solenoid.
+        :type gpio_num: int
 
         """
         # Get and store logger object
         self.logger = lib.get_logger()
 
         # Store ID number of solenoid
-        self.num = num
+        self.gpio_num = gpio_num
 
         # Load system configuration
         config = lib.load_config()
@@ -33,10 +33,10 @@ class Solenoid(object):
             test_dir = config["test_gpio_base_dir"]
 
             # Build GPIO object for BBB interaction, provide test dir
-            self.gpio = gpio_mod.GPIO(self.num, test_dir)
+            self.gpio = gpio_mod.GPIO(self.gpio_num, test_dir)
         else:
             # Build GPIO object for BBB interaction
-            self.gpio = gpio_mod.GPIO(self.num)
+            self.gpio = gpio_mod.GPIO(self.gpio_num)
 
         # Set GPIO to output signal
         self.gpio.output()
@@ -51,7 +51,7 @@ class Solenoid(object):
         :returns: Human readable representation of this object.
 
         """
-        return "Solenoid #{}: {}".format(self.num, self.state)
+        return "Solenoid #{}: {}".format(self.gpio_num, self.state)
 
     def extend(self):
         """Set solenoid to extended position."""

@@ -9,18 +9,18 @@ class Servo(object):
 
     """Class for abstracting servo settings."""
 
-    def __init__(self, num):
+    def __init__(self, pwm_num):
         """Setup logger and PWM interface.
 
-        :param num: ID number of this servo. Also defines PWM number.
-        :type num: int
+        :param pwm_num: PWM number used by this servo.
+        :type pwm_num: int
 
         """
         # Get and store logger object
         self.logger = lib.get_logger()
 
         # Store ID number of servo
-        self.num = num
+        self.pwm_num = pwm_num
 
         # Load config
         config = lib.load_config()
@@ -30,10 +30,10 @@ class Servo(object):
             test_dir = config["test_pwm_base_dir"]
 
             # Build PWM object for BBB interaction, provide test dir
-            self.pwm = pwm_mod.PWM(self.num, test_dir)
+            self.pwm = pwm_mod.PWM(self.pwm_num, test_dir)
         else:
             # Build PWM object for BBB interaction
-            self.pwm = pwm_mod.PWM(self.num)
+            self.pwm = pwm_mod.PWM(self.pwm_num)
 
         # Set servo to middle position
         self.pwm.duty = 1500000
@@ -45,7 +45,8 @@ class Servo(object):
         :returns: Human readable representation of this object.
 
         """
-        return "Servo #{}: pos:{} duty/period: {}/{} pol:{}".format(self.num,
+        return "Servo #{}: pos:{} duty/period: {}/{} pol:{}".format(
+                                                             self.pwm_num,
                                                              self.position,
                                                              self.pwm.duty,
                                                              self.pwm.period,

@@ -8,6 +8,7 @@ sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
 try:
     import lib.lib as lib
     import hardware.us as us_mod
+    import tests.test_bot as test_bot
 except ImportError:
     print "ImportError: Use `python -m unittest discover` from project root."
     raise
@@ -16,25 +17,22 @@ except ImportError:
 logger = lib.get_logger()
 
 
-class TestDistance(unittest.TestCase):
+class TestDistance(test_bot.TestBot):
 
     """Test reading ultrasonic distance values."""
 
     def setUp(self):
         """Get config and built US object."""
-        # Load config
-        config = lib.load_config()
-
-        # Set testing flag in config
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
+        # Run general bot test setup
+        super(TestDistance, self).setUp()
 
         # Built ultrasonic abstraction object
         self.us = us_mod.US("test")
 
     def tearDown(self):
         """Restore testing flag state in config file."""
-        lib.set_testing(self.orig_test_state)
+        # Run general bot test tear down
+        super(TestDistance, self).tearDown()
 
     def testStub(self):
         """Confirm that stub behavior is working as expected."""

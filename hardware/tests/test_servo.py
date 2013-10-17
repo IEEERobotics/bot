@@ -9,6 +9,7 @@ sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
 try:
     import lib.lib as lib
     import hardware.servo as s_mod
+    import tests.test_bot as test_bot
 except ImportError:
     print "ImportError: Use `python -m unittest discover` from project root."
     raise
@@ -17,43 +18,23 @@ except ImportError:
 logger = lib.get_logger()
 
 
-class TestPosition(unittest.TestCase):
+class TestPosition(test_bot.TestBot):
 
     """Test setting and checking the position of a servo."""
 
     def setUp(self):
         """Setup test hardware files and build servo object."""
-        # ID number of servo
-        self.s_num = 0
-
-        # Load config
-        config = lib.load_config()
-        self.test_dir = config["test_pwm_base_dir"] + str(self.s_num)
-
-        # Set testing flag in config
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
-
-        # Create test directory if it doesn't exist
-        if not os.path.exists(self.test_dir):
-            os.makedirs(self.test_dir)
-
-        # Set known values in all simulated hardware files
-        with open(self.test_dir + "/run", "w") as f:
-            f.write("1\n")
-        with open(self.test_dir + "/duty_ns", "w") as f:
-            f.write("15000000\n")
-        with open(self.test_dir + "/period_ns", "w") as f:
-            f.write("20000000\n")
-        with open(self.test_dir + "/polarity", "w") as f:
-            f.write("0\n")
+        # Run general bot test setup
+        super(TestPosition, self).setUp()
 
         # Build servo in testing mode
-        self.servo = s_mod.Servo(self.s_num)
+        self.pwm_num = self.config["turret_servos"][0]["PWM"]
+        self.servo = s_mod.Servo(self.pwm_num)
 
     def tearDown(self):
         """Restore testing flag state in config file."""
-        lib.set_testing(self.orig_test_state)
+        # Run general bot test tear down
+        super(TestPosition, self).tearDown()
 
     def test_0(self):
         """Test setting servo position to max in zero direction."""
@@ -79,16 +60,15 @@ class TestPosition(unittest.TestCase):
     def test_manually_confirm(self):
         """Test a series of random positions, read simulated HW to confirm."""
         for i in range(10):
+            # Generate random position and set servo to that position
             test_pos = randint(0, 180)
             self.servo.position = test_pos
-            with open(self.test_dir + "/duty_ns", "r") as f:
-                # Duty is read like this by PWM getter
-                duty = int(f.read())
-                # Position is derived this way in position getter
-                read_pos = int(round(((duty - 10000000) / 10000000.) * 180))
-                assert read_pos == test_pos, "{} != {}".format(
-                                                        read_pos,
-                                                        test_pos)
+
+            # Confirm that motor was set correctly
+            cur_pwm = self.get_pwm(self.pwm_num)
+            duty = int(cur_pwm["duty_ns"])
+            read_pos = int(round(((duty - 10000000) / 10000000.) * 180))
+            assert read_pos == test_pos, "{} != {}".format(read_pos, test_pos)
 
     def test_over_max(self):
         """Test position over max position. Should use maximum."""

@@ -9,6 +9,7 @@ sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
 try:
     import lib.lib as lib
     import hardware.turret as t_mod
+    import tests.test_bot as test_bot
 except ImportError:
     print "ImportError: Use `python -m unittest discover` from project root."
     raise
@@ -17,47 +18,22 @@ except ImportError:
 logger = lib.get_logger()
 
 
-class TestAngle(unittest.TestCase):
+class TestAngle(test_bot.TestBot):
 
     """Test setting and checking the X and Y angles of the turret."""
 
     def setUp(self):
         """Setup test hardware files and build turret object."""
-        # Load config
-        config = lib.load_config()
-
-        # Set testing flag in config
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
-
-        # Collect simulated hardware test directories
-        self.test_dirs = {}
-        for servo in config["turret_servos"]:
-            test_dir = config["test_pwm_base_dir"] + str(servo["PWM"])
-            self.test_dirs[servo["axis"]] = test_dir
-
-        # Set simulated directories to known state
-        for test_dir in self.test_dirs.values():
-            # Create test directory if it doesn't exist
-            if not os.path.exists(test_dir):
-                os.makedirs(test_dir)
-
-            # Set known values in all simulated hardware files
-            with open(test_dir + "/run", "w") as f:
-                f.write("1\n")
-            with open(test_dir + "/duty_ns", "w") as f:
-                f.write("15000000\n")
-            with open(test_dir + "/period_ns", "w") as f:
-                f.write("20000000\n")
-            with open(test_dir + "/polarity", "w") as f:
-                f.write("0\n")
+        # Run general bot test setup
+        super(TestAngle, self).setUp()
 
         # Build turret in testing mode
         self.turret = t_mod.Turret()
 
     def tearDown(self):
         """Restore testing flag state in config file."""
-        lib.set_testing(self.orig_test_state)
+        # Run general bot test tear down
+        super(TestAngle, self).tearDown()
 
     def test_x_0(self):
         """Test setting the X angle to min value."""
@@ -112,26 +88,22 @@ class TestAngle(unittest.TestCase):
     def test_manually_confirm(self):
         """Test a series of random angles, read the simulated HW to confirm."""
         for i in range(10):
-            test_x_angle = randint(0, 180)
-            self.turret.x_angle = test_x_angle
-            with open(self.test_dirs["servo_x"] + '/duty_ns', 'r') as f:
-                # Duty is read like this by PWM getter
-                duty = int(f.read())
-                # Angle is derived this way in angle getter
-                read_angle = int(round(((duty - 10000000) / 10000000.) * 180))
-                assert read_angle == test_x_angle, "{} != {}".format(
-                                                    read_angle,
-                                                    test_x_angle)
-            test_y_angle = randint(0, 180)
-            self.turret.y_angle = test_y_angle
-            with open(self.test_dirs["servo_y"] + '/duty_ns', 'r') as f:
-                # Duty is read like this by PWM getter
-                duty = int(f.read())
-                # Angle is derived this way in angle getter
-                read_angle = int(round(((duty - 10000000) / 10000000.) * 180))
-                assert read_angle == test_y_angle, "{} != {}".format(
-                                                    read_angle,
-                                                    test_y_angle)
+            # Generate random x and y angles
+            test_val = {}
+            for servo in self.config["turret_servos"]:
+                test_val[servo["axis"]] = randint(0, 180)
+
+            # Set x and y angles
+            self.turret.x_angle = test_val["servo_x"]
+            self.turret.y_angle = test_val["servo_y"]
+
+            # Check x and y angles
+            for servo in self.config["turret_servos"]:
+                duty = int(self.get_pwm(servo["PWM"])["duty_ns"])
+                angle = int(round(((duty - 10000000) / 10000000.) * 180))
+                assert test_val[servo["axis"]] == angle, "{} != {}".format(
+                                                          read_angle,
+                                                          test_y_angle)
 
     def test_x_over_max(self):
         """Test setting the X angle to greater than the max value."""

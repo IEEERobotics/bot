@@ -9,6 +9,7 @@ sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
 try:
     import lib.lib as lib
     import hardware.solenoid as s_mod
+    import tests.test_bot as test_bot
 except ImportError:
     print "ImportError: Use `python -m unittest discover` from project root."
     raise
@@ -17,39 +18,23 @@ except ImportError:
 logger = lib.get_logger()
 
 
-class TestState(unittest.TestCase):
+class TestState(test_bot.TestBot):
 
     """Test extending and retracting a solenoid"""
 
     def setUp(self):
         """Setup test hardware files and build solenoid object."""
-        # Load config
-        config = lib.load_config()
+        # Run general bot test setup
+        super(TestState, self).setUp()
 
-        # Set testing flag in config
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
-
-        # Get ID of solenoid, define test directory
-        self.s_num = config["gun_sol"]["GPIO"]
-        self.test_dir = config["test_gpio_base_dir"] + str(self.s_num)
-
-        # Create test directory if it doesn't exist
-        if not os.path.exists(self.test_dir):
-            os.makedirs(self.test_dir)
-
-        # Set known values in all simulated hardware files
-        with open(self.test_dir + "/value", "w") as f:
-            f.write("0\n")
-        with open(self.test_dir + "/direction", "w") as f:
-            f.write("out\n")
-
-        # Build solenoid in testing mode
-        self.solenoid = s_mod.Solenoid(self.s_num)
+        # Get ID of solenoid, build solenoid in testing mode
+        self.gpio_num = self.config["gun_sol"]["GPIO"]
+        self.solenoid = s_mod.Solenoid(self.gpio_num)
 
     def tearDown(self):
         """Restore testing flag state in config file."""
-        lib.set_testing(self.orig_test_state)
+        # Run general bot test tear down
+        super(TestState, self).tearDown()
 
     def test_extended(self):
         """Test extending solenoid."""
@@ -78,49 +63,33 @@ class TestState(unittest.TestCase):
             state = random.choice(["extended", "retracted"])
             if state == "extended":
                 self.solenoid.extend()
-                with open(self.test_dir + '/value', 'r') as f:
-                    assert int(f.read()) == 0
+                cur_gpio = self.get_gpio(self.gpio_num)
+                assert int(cur_gpio["value"]) == 0
             else:
                 self.solenoid.retract()
-                with open(self.test_dir + '/value', 'r') as f:
-                    assert int(f.read()) == 1
+                cur_gpio = self.get_gpio(self.gpio_num)
+                assert int(cur_gpio["value"]) == 1
 
 
-class TestDirection(unittest.TestCase):
+class TestDirection(test_bot.TestBot):
 
     """Test the direction setting of the solenoid's GPIO pin."""
 
     def setUp(self):
         """Setup test hardware files and build solenoid object."""
-        # Load config
-        config = lib.load_config()
+        # Run general bot test setup
+        super(TestDirection, self).setUp()
 
-        # Set testing flag in config
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
-
-        # Get ID of solenoid, define test directory
-        self.s_num = config["gun_sol"]["GPIO"]
-        self.test_dir = config["test_gpio_base_dir"] + str(self.s_num)
-
-        # Create test directory if it doesn't exist
-        if not os.path.exists(self.test_dir):
-            os.makedirs(self.test_dir)
-
-        # Set known values in all simulated hardware files
-        with open(self.test_dir + "/value", "w") as f:
-            f.write("0\n")
-        with open(self.test_dir + "/direction", "w") as f:
-            f.write("out\n")
-
-        # Build solenoid in testing mode
-        self.solenoid = s_mod.Solenoid(self.s_num)
+        # Get ID of solenoid, build solenoid in testing mode
+        self.gpio_num = self.config["gun_sol"]["GPIO"]
+        self.solenoid = s_mod.Solenoid(self.gpio_num)
 
     def tearDown(self):
         """Restore testing flag state in config file."""
-        lib.set_testing(self.orig_test_state)
+        # Run general bot test tear down
+        super(TestDirection, self).tearDown()
 
     def test_direction(self):
         """Confirm that the solenoid's GPIO is set to output."""
-        with open(self.test_dir + '/direction', 'r') as f:
-            assert f.read() == "out\n"
+        cur_gpio = self.get_gpio(self.gpio_num)
+        assert cur_gpio["direction"] == "out\n"

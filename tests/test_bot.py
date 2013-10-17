@@ -21,12 +21,9 @@ class TestIRArrays(unittest.TestCase):
         """Get config, set simulation pins to known state, set test flag."""
         # Load config
         self.config = lib.load_config()
-        self.gpio_test_dir_base = config["test_gpio_base_dir"]
-        self.adc_test_dir = config["test_adc_base_dir"]
-        self.pwm_test_dir = config["test_pwm_base_dir"] + str(self.pwm_num)
 
         # Set testing flag in config
-        self.orig_test_state = config["testing"]
+        self.orig_test_state = self.config["testing"]
         lib.set_testing(True)
 
         # Write known values to all simulated hardware files
@@ -64,7 +61,6 @@ class TestIRArrays(unittest.TestCase):
         polarity = "0\n"
         for motor in self.config["gun_motors"]:
             self.setup_pwm(motor["PWM"], run, duty_ns, period_ns, polarity)
-            self.setup_gpio(motor["GPIO"])
 
     def setup_gun_sol(self):
         """Set gun solenoid simulation files to known state."""
@@ -72,12 +68,12 @@ class TestIRArrays(unittest.TestCase):
 
     def setup_ir_select_gpios(self):
         """Set IR GPIO simulation files to known state."""
-        for gpio_num in config["ir_select_gpios"]:
+        for gpio_num in self.config["ir_select_gpios"]:
             self.setup_gpio(gpio_num)
 
     def setup_ir_input_adcs(self):
         """Set IR ADC simulation files to known state."""
-        for adc_name, adc_num in config["ir_input_adcs"].iteritems():
+        for adc_name, adc_num in self.config["ir_input_adcs"].iteritems():
             self.setup_adc(adc_num)
 
     def setup_pwm(self, pwm_num, run, duty_ns, period_ns, polarity):
@@ -114,7 +110,7 @@ class TestIRArrays(unittest.TestCase):
 
     def setup_adc(self, adc_num, value="0\n"):
         """Set files that simulate BBB ADCs to known state."""
-        test_dir = config["test_adc_base_dir"]
+        test_dir = self.config["test_adc_base_dir"]
 
         # Create ADC test directory if it doesn't exist
         if not os.path.exists(test_dir):
@@ -127,3 +123,6 @@ class TestIRArrays(unittest.TestCase):
     def tearDown(self):
         """Restore testing flag state in config file."""
         lib.set_testing(self.orig_test_state)
+
+    def test_dummy(self):
+        pass

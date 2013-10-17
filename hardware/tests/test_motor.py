@@ -9,6 +9,7 @@ sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
 try:
     import lib.lib as lib
     import hardware.motor as m_mod
+    import tests.test_bot as test_bot
 except ImportError:
     print "ImportError: Use `python -m unittest discover` from project root."
     raise
@@ -17,52 +18,24 @@ except ImportError:
 logger = lib.get_logger()
 
 
-class TestSpeed(unittest.TestCase):
+class TestSpeed(test_bot.TestBot):
 
     """Test setting and checking the speed of a motor."""
 
     def setUp(self):
         """Setup test hardware files and build motor object."""
-        # ID number of motor
-        self.pwm_num = 0
-        self.gpio_num = 0
-
-        # Load config
-        config = lib.load_config()
-        self.pwm_test_dir = config["test_pwm_base_dir"] + str(self.pwm_num)
-        self.gpio_test_dir = config["test_gpio_base_dir"] + str(self.gpio_num)
-
-        # Set testing flag in config
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
-
-        # Create test directories if they don't exist
-        for test_dir in [self.pwm_test_dir, self.gpio_test_dir]:
-            if not os.path.exists(test_dir):
-                os.makedirs(test_dir)
-
-        # Set known values in PWM simulated hardware files
-        with open(self.pwm_test_dir + "/run", "w") as f:
-            f.write("0\n")
-        with open(self.pwm_test_dir + "/duty_ns", "w") as f:
-            f.write("250000\n")
-        with open(self.pwm_test_dir + "/period_ns", "w") as f:
-            f.write("1000000\n")
-        with open(self.pwm_test_dir + "/polarity", "w") as f:
-            f.write("0\n")
-
-        # Set known values in GPIO simulated hardware files
-        with open(self.gpio_test_dir + "/value", "w") as f:
-            f.write("0\n")
-        with open(self.gpio_test_dir + "/direction", "w") as f:
-            f.write("out\n")
+        # Run general bot test setup
+        super(TestSpeed, self).setUp()
 
         # Build motor in testing mode
+        self.pwm_num = self.config["drive_motors"][0]["PWM"]
+        self.gpio_num = self.config["drive_motors"][0]["GPIO"]
         self.motor = m_mod.Motor(self.pwm_num, self.gpio_num)
 
     def tearDown(self):
         """Restore testing flag state in config file."""
-        lib.set_testing(self.orig_test_state)
+        # Run general bot test tear down
+        super(TestSpeed, self).tearDown()
 
     def test_off(self):
         """Test turning the motor off."""
@@ -88,15 +61,16 @@ class TestSpeed(unittest.TestCase):
     def test_manually_confirm(self):
         """Test a series of random speeds, read the simulated HW to confirm."""
         for i in range(10):
+            # Generate random speed and set motor to that speed
             test_speed = randint(0, 100)
             self.motor.speed = test_speed
-            with open(self.pwm_test_dir + '/duty_ns', 'r') as f:
-                # Duty is read like this by PWM getter
-                duty = int(f.read())
-                # Speed is derived this way in position getter
-                speed = int(round((duty / float(self.motor.pwm.period)) * 100))
-                assert speed == test_speed, "{} != {}".format(speed,
-                                                              test_speed)
+
+            # Confirm that motor was set correctly
+            cur_pwm = self.get_pwm(self.pwm_num)
+            duty = int(cur_pwm["duty_ns"])
+            period = int(cur_pwm["period_ns"])
+            speed = int(round((duty / float(period)) * 100))
+            assert speed == test_speed, "{} != {}".format(speed, test_speed)
 
     def test_over_max(self):
         """Test speed over max speed. Should use maximum."""
@@ -109,52 +83,24 @@ class TestSpeed(unittest.TestCase):
         assert self.motor.speed == 0
 
 
-class TestDirection(unittest.TestCase):
+class TestDirection(test_bot.TestBot):
 
     """Test setting and checking the direction of a motor."""
 
     def setUp(self):
         """Setup test hardware files and build motor object."""
-        # ID number of motor
-        self.pwm_num = 0
-        self.gpio_num = 0
-
-        # Load config
-        config = lib.load_config()
-        self.pwm_test_dir = config["test_pwm_base_dir"] + str(self.pwm_num)
-        self.gpio_test_dir = config["test_gpio_base_dir"] + str(self.gpio_num)
-
-        # Set testing flag in config
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
-
-        # Create test directories if they don't exist
-        for test_dir in [self.pwm_test_dir, self.gpio_test_dir]:
-            if not os.path.exists(test_dir):
-                os.makedirs(test_dir)
-
-        # Set known values in PWM simulated hardware files
-        with open(self.pwm_test_dir + "/run", "w") as f:
-            f.write("0\n")
-        with open(self.pwm_test_dir + "/duty_ns", "w") as f:
-            f.write("250000\n")
-        with open(self.pwm_test_dir + "/period_ns", "w") as f:
-            f.write("1000000\n")
-        with open(self.pwm_test_dir + "/polarity", "w") as f:
-            f.write("0\n")
-
-        # Set known values in GPIO simulated hardware files
-        with open(self.gpio_test_dir + "/value", "w") as f:
-            f.write("0\n")
-        with open(self.gpio_test_dir + "/direction", "w") as f:
-            f.write("out\n")
+        # Run general bot test setup
+        super(TestDirection, self).setUp()
 
         # Build motor in testing mode
+        self.pwm_num = self.config["drive_motors"][0]["PWM"]
+        self.gpio_num = self.config["drive_motors"][0]["GPIO"]
         self.motor = m_mod.Motor(self.pwm_num, self.gpio_num)
 
     def tearDown(self):
         """Restore testing flag state in config file."""
-        lib.set_testing(self.orig_test_state)
+        # Run general bot test tear down
+        super(TestDirection, self).tearDown()
 
     def test_forward(self):
         """Test motor in forward direction using text and int syntax."""
@@ -184,45 +130,23 @@ class TestDirection(unittest.TestCase):
         assert self.motor.direction == "forward"
 
 
-class TestNoDirection(unittest.TestCase):
+class TestNoDirection(test_bot.TestBot):
 
     """Test a motor with no GPIO pin, and therefore no in-code direction."""
 
     def setUp(self):
         """Setup test hardware files and build motor object."""
-        # ID number of motor
-        self.pwm_num = 0
-        self.gpio_num = 0
-
-        # Load config
-        config = lib.load_config()
-        self.pwm_test_dir = config["test_pwm_base_dir"] + str(self.pwm_num)
-
-        # Set testing flag in config
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
-
-        # Create test directories if they don't exist
-        for test_dir in [self.pwm_test_dir]:
-            if not os.path.exists(test_dir):
-                os.makedirs(test_dir)
-
-        # Set known values in PWM simulated hardware files
-        with open(self.pwm_test_dir + "/run", "w") as f:
-            f.write("0\n")
-        with open(self.pwm_test_dir + "/duty_ns", "w") as f:
-            f.write("250000\n")
-        with open(self.pwm_test_dir + "/period_ns", "w") as f:
-            f.write("1000000\n")
-        with open(self.pwm_test_dir + "/polarity", "w") as f:
-            f.write("0\n")
+        # Run general bot test setup
+        super(TestNoDirection, self).setUp()
 
         # Build motor in testing mode
+        self.pwm_num = self.config["drive_motors"][0]["PWM"]
         self.motor = m_mod.Motor(self.pwm_num)
 
     def tearDown(self):
         """Restore testing flag state in config file."""
-        lib.set_testing(self.orig_test_state)
+        # Run general bot test tear down
+        super(TestNoDirection, self).tearDown()
 
     def test_set_dir(self):
         """Test setting a direction for a motor that should have no direction.

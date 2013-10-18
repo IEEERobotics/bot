@@ -19,8 +19,7 @@ except ImportError, err:
     sys.stderr.write("ERROR: {}. Try installing python-yaml.\n".format(err))
     raise
 
-#new_path = [os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")]
-new_path = ["/home/daniel/robot/current/bot"]
+new_path = [os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")]
 sys.path = new_path + sys.path
 
 import lib.lib as lib

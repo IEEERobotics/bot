@@ -10,6 +10,7 @@ try:
     import lib.lib as lib
     import driver.mec_driver as md_mod
     from driver.mec_driver import MecDriver  # for convenience
+    import tests.test_bot as test_bot
 except ImportError:
     print "ImportError: Use 'python -m unittest discover' from project root."
     raise
@@ -18,47 +19,21 @@ except ImportError:
 logger = lib.get_logger()
 
 
-class TestRotate(unittest.TestCase):
+class TestRotate(test_bot.TestBot):
     """Test rotation of mec wheels"""
 
     def setUp(self):
         """Setup test hardware files and create mec_driver object"""
-        config = lib.load_config()
-
-        # Store original test flag, set to true
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
-
-        # List of directories simulating beaglebone
-        self.test_dirs = []
-
-        # Collect simulated hardware test directories
-        for motor in config["drive_motors"]:
-            self.test_dirs.append(config["test_pwm_base_dir"] + \
-                                  str(motor["PWM"]))
-
-        # Reset simulated directories to default
-        for test_dir in self.test_dirs:
-            # Create test directory
-            if not os.path.exists(test_dir):
-                os.makedirs(test_dir)
-
-            # Set known value in all simulated hardware
-            with open(test_dir + "/run", "w") as f:
-                f.write("0\n")
-            with open(test_dir + "/duty_ns", "w") as f:
-                f.write("250000\n")
-            with open(test_dir + "/period_ns", "w") as f:
-                f.write("1000000\n")
-            with open(test_dir + "/polarity", "w") as f:
-                f.write("0\n")
+        # Run general bot test setup
+        super(TestRotate, self).setUp()
 
         # Build mec_driver
         self.md = MecDriver()
 
     def tearDown(self):
         """Restore testing flag state in config file."""
-        lib.set_testing(self.orig_test_state)
+        # Run general bot test tear down
+        super(TestRotate, self).tearDown()
 
     def test_rotate(self):
         rotate_speed_error_margin = (MecDriver.max_rotate_speed -

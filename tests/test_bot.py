@@ -159,6 +159,3 @@ class TestBot(unittest.TestCase):
     def tearDown(self):
         """Restore testing flag state in config file."""
         lib.set_testing(self.orig_test_state)
-
-    def test_dummy(self):
-        pass

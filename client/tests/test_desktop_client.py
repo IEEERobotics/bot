@@ -17,6 +17,7 @@ try:
     import lib.lib as lib
     import server as server_mod
     import client.desktop_client as dclient_mod
+    import tests.test_bot as test_bot
 except ImportError:
     print "ImportError: Use `python -m unittest discover` from project root."
     raise
@@ -25,18 +26,14 @@ except ImportError:
 logger = lib.get_logger()
 
 
-class TestBasic(unittest.TestCase):
+class TestBasic(test_bot.TestBot):
 
     """Basic test, just get things running."""
 
     def setUp(self):
         """Build desktop_client"""
-        # Load config
-        config = lib.load_config()
-
-        # Set testing flag in config
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
+        # Run general bot test setup
+        super(TestBasic, self).setUp()
 
         # Build server. Arg is testing or not.
         self.server = Popen(["./server/server.py", "True"])
@@ -44,7 +41,7 @@ class TestBasic(unittest.TestCase):
         # Build socket and connect to server
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
-        self.socket.connect(config["server_port"])
+        self.socket.connect(self.config["server_port"])
 
         # Build desktop client and tell it to run
         self.dclient = dclient_mod.DesktopControlClient()
@@ -56,7 +53,9 @@ class TestBasic(unittest.TestCase):
         self.socket.close()
         self.context.term()
         self.server.kill()
-        lib.set_testing(self.orig_test_state)
+
+        # Run general bot test tear down
+        super(TestBasic, self).tearDown()
 
     def testBasic(self):
         """Test sending a basic command."""

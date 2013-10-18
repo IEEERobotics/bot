@@ -9,6 +9,7 @@ sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
 try:
     import lib.lib as lib
     import gunner.wheel_gunner as wg_mod
+    import tests.test_bot as test_bot
 except ImportError:
     print "ImportError: Use `python -m unittest discover` from project root."
     raise
@@ -17,49 +18,22 @@ except ImportError:
 logger = lib.get_logger()
 
 
-class TestUpdateRotateSpeed(unittest.TestCase):
+class TestUpdateRotateSpeed(test_bot.TestBot):
 
     """Test updating wheel rotation speed."""
 
     def setUp(self):
         """Setup test hardware files and build wheel gunner object."""
-        # Load config
-        config = lib.load_config()
-
-        # Store original test flag and then set it to True
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
-
-        # TODO(dfarrell07): Clear gun_sol hardware dirs
-
-        # Collect simulated hardware test directories
-        self.m_test_dirs = []
-        for motor in config["gun_motors"]:
-            self.m_test_dirs.append(config["test_pwm_base_dir"]
-                                  + str(motor["PWM"]))
-
-        # Set simulated directories to known state
-        for m_test_dir in self.m_test_dirs:
-            # Create test directory if it doesn't exist
-            if not os.path.exists(m_test_dir):
-                os.makedirs(m_test_dir)
-
-            # Set known values in all simulated hardware files
-            with open(m_test_dir + "/run", "w") as f:
-                f.write("0\n")
-            with open(m_test_dir + "/duty_ns", "w") as f:
-                f.write("250000\n")
-            with open(m_test_dir + "/period_ns", "w") as f:
-                f.write("1000000\n")
-            with open(m_test_dir + "/polarity", "w") as f:
-                f.write("0\n")
+        # Run general bot test setup
+        super(TestUpdateRotateSpeed, self).setUp()
 
         # Build wheel gunner
         self.wg = wg_mod.WheelGunner()
 
     def tearDown(self):
         """Restore testing flag state in config file."""
-        lib.set_testing(self.orig_test_state)
+        # Run general bot test tear down
+        super(TestUpdateRotateSpeed, self).tearDown()
 
     def test_off(self):
         """Test zero wheel rotation."""
@@ -87,14 +61,13 @@ class TestUpdateRotateSpeed(unittest.TestCase):
         for i in range(10):
             test_speed = randint(0, 100)
             self.wg.wheel_speed = test_speed
-            for m_test_dir, motor in zip(self.m_test_dirs, self.wg.motors):
-                with open(m_test_dir + '/duty_ns', 'r') as f:
-                    # Duty is read like this by PWM getter
-                    duty = int(f.read())
-                    # Speed is derived this way in position getter
-                    speed = int(round((duty / float(motor.pwm.period)) * 100))
-                    assert speed == test_speed, "{} != {}".format(speed,
-                                                                  test_speed)
+
+            for motor in self.config["gun_motors"]:
+                cur_pwm = self.get_pwm(motor["PWM"])
+                duty = int(cur_pwm["duty_ns"])
+                period = int(cur_pwm["period_ns"])
+                speed = int(round((duty / float(period)) * 100))
+                assert speed == test_speed, "{} != {}".format(speed, test_speed)
 
     def test_over_max(self):
         """Test speed over max speed. Should use maximum."""
@@ -107,7 +80,7 @@ class TestUpdateRotateSpeed(unittest.TestCase):
             self.wg.wheel_speed = -1
 
 
-class TestFire(unittest.TestCase):
+class TestFire(test_bot.TestBot):
 
     """Test firing a dart.
 
@@ -117,45 +90,16 @@ class TestFire(unittest.TestCase):
 
     def setUp(self):
         """Setup test hardware files and build wheel gunner object."""
-        # Load config
-        config = lib.load_config()
-
-        # Store original test flag and then set it to True
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
-
-        # List of directories containing simulated hardware
-        self.m_test_dirs = []
-
-        # TODO(dfarrell07): Clear gun_sol hardware dirs
-
-        # Collect simulated hardware test directories
-        for motor in config["gun_motors"]:
-            self.m_test_dirs.append(config["test_pwm_base_dir"] +
-                                  str(motor["PWM"]))
-
-        # Set simulated directories to known state
-        for m_test_dir in self.m_test_dirs:
-            # Create test directory if it doesn't exist
-            if not os.path.exists(m_test_dir):
-                os.makedirs(m_test_dir)
-
-            # Set known values in all simulated hardware files
-            with open(m_test_dir + "/run", "w") as f:
-                f.write("0\n")
-            with open(m_test_dir + "/duty_ns", "w") as f:
-                f.write("250000\n")
-            with open(m_test_dir + "/period_ns", "w") as f:
-                f.write("1000000\n")
-            with open(m_test_dir + "/polarity", "w") as f:
-                f.write("0\n")
+        # Run general bot test setup
+        super(TestFire, self).setUp()
 
         # Build wheel gunner
         self.wg = wg_mod.WheelGunner()
 
     def tearDown(self):
         """Restore testing flag state in config file."""
-        lib.set_testing(self.orig_test_state)
+        # Run general bot test tear down
+        super(TestFire, self).tearDown()
 
     def test_fire(self):
         """Simply execute the fire method.
@@ -166,7 +110,7 @@ class TestFire(unittest.TestCase):
         self.wg.fire()
 
 
-class TestAdvanceDart(unittest.TestCase):
+class TestAdvanceDart(test_bot.TestBot):
 
     """Test firing a dart.
 
@@ -176,43 +120,16 @@ class TestAdvanceDart(unittest.TestCase):
 
     def setUp(self):
         """Setup test hardware files and build wheel_gunner object."""
-        # Load config
-        config = lib.load_config()
-
-        # Store original test flag and then set it to True
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
-
-        # TODO(dfarrell07): Clear gun_sol hardware dirs
-
-        # Collect simulated hardware test directories
-        self.m_test_dirs = []
-        for motor in config["gun_motors"]:
-            self.m_test_dirs.append(config["test_pwm_base_dir"] +
-                                  str(motor["PWM"]))
-
-        # Set simulated directories to known state
-        for m_test_dir in self.m_test_dirs:
-            # Create test directory if it doesn't exist
-            if not os.path.exists(m_test_dir):
-                os.makedirs(m_test_dir)
-
-            # Set known values in all simulated hardware files
-            with open(m_test_dir + "/run", "w") as f:
-                f.write("0\n")
-            with open(m_test_dir + "/duty_ns", "w") as f:
-                f.write("250000\n")
-            with open(m_test_dir + "/period_ns", "w") as f:
-                f.write("1000000\n")
-            with open(m_test_dir + "/polarity", "w") as f:
-                f.write("0\n")
+        # Run general bot test setup
+        super(TestAdvanceDart, self).setUp()
 
         # Build wheel gunner
         self.wg = wg_mod.WheelGunner()
 
     def tearDown(self):
         """Restore testing flag state in config file."""
-        lib.set_testing(self.orig_test_state)
+        # Run general bot test tear down
+        super(TestAdvanceDart, self).tearDown()
 
     def test_advance_dart(self):
         self.wg.advance_dart()

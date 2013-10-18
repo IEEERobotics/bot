@@ -16,6 +16,7 @@ except ImportError:
 try:
     import lib.lib as lib
     import server
+    import tests.test_bot as test_bot
 except ImportError:
     print "ImportError: Use `python -m unittest discover` from project root."
     raise
@@ -24,18 +25,14 @@ except ImportError:
 logger = lib.get_logger()
 
 
-class TestHandleMessage(unittest.TestCase):
+class TestHandleMessage(test_bot.TestBot):
 
     """Basic tests handle message method."""
 
     def setUp(self):
         """Build server and connect to it."""
-        # Load config
-        config = lib.load_config()
-
-        # Set testing flag in config
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
+        # Run general bot test setup
+        super(TestHandleMessage, self).setUp()
 
         # Build server. Arg is testing or not.
         self.server = Popen(["./server/server.py", "True"])
@@ -43,14 +40,16 @@ class TestHandleMessage(unittest.TestCase):
         # Build socket and connect to server
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
-        self.socket.connect(config["server_port"])
+        self.socket.connect(self.config["server_port"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
         self.socket.close()
         self.context.term()
         self.server.kill()
-        lib.set_testing(self.orig_test_state)
+
+        # Run general bot test tear down
+        super(TestHandleMessage, self).tearDown()
 
     def testInvalidMsgType(self):
         """Test sending a non-dict message."""
@@ -88,7 +87,7 @@ class TestHandleMessage(unittest.TestCase):
         assert reply == "Error: Unable to parse message as YAML"
 
 
-class TestHandleFwdStrafeTurn(unittest.TestCase):
+class TestHandleFwdStrafeTurn(test_bot.TestBot):
 
     """Test fwd, strafe and turn commands.
 
@@ -98,12 +97,8 @@ class TestHandleFwdStrafeTurn(unittest.TestCase):
 
     def setUp(self):
         """Build server and connect to it."""
-        # Load config
-        config = lib.load_config()
-
-        # Set testing flag in config
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
+        # Run general bot test setup
+        super(TestHandleFwdStrafeTurn, self).setUp()
 
         # Build server. Arg is testing or not.
         self.server = Popen(["./server/server.py", "True"])
@@ -111,14 +106,16 @@ class TestHandleFwdStrafeTurn(unittest.TestCase):
         # Build socket and connect to server
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
-        self.socket.connect(config["server_port"])
+        self.socket.connect(self.config["server_port"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
         self.socket.close()
         self.context.term()
         self.server.kill()
-        lib.set_testing(self.orig_test_state)
+
+        # Run general bot test tear down
+        super(TestHandleFwdStrafeTurn, self).tearDown()
 
     def testValid(self):
         """Test fwd_strafe_turn message that's perfectly valid."""
@@ -128,18 +125,14 @@ class TestHandleFwdStrafeTurn(unittest.TestCase):
         assert reply == "Success: {'fwd': 50, 'turn': 0, 'strafe': 0}", reply
 
 
-class TestHandleMove(unittest.TestCase):
+class TestHandleMove(test_bot.TestBot):
 
     """Test move commands."""
 
     def setUp(self):
         """Build server and connect to it."""
-        # Load config
-        config = lib.load_config()
-
-        # Set testing flag in config
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
+        # Run general bot test setup
+        super(TestHandleMove, self).setUp()
 
         # Build server. Arg is testing or not.
         self.server = Popen(["./server/server.py", "True"])
@@ -147,14 +140,16 @@ class TestHandleMove(unittest.TestCase):
         # Build socket and connect to server
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
-        self.socket.connect(config["server_port"])
+        self.socket.connect(self.config["server_port"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
         self.socket.close()
         self.context.term()
         self.server.kill()
-        lib.set_testing(self.orig_test_state)
+
+        # Run general bot test tear down
+        super(TestHandleMove, self).tearDown()
 
     def testValid(self):
         """Test move message that's perfectly valid."""
@@ -199,18 +194,14 @@ class TestHandleMove(unittest.TestCase):
         assert reply == "Error: Angle is out of bounds", reply
 
 
-class TestHandleRotate(unittest.TestCase):
+class TestHandleRotate(test_bot.TestBot):
 
     """Test rotate commands."""
 
     def setUp(self):
         """Build server and connect to it."""
-        # Load config
-        config = lib.load_config()
-
-        # Set testing flag in config
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
+        # Run general bot test setup
+        super(TestHandleRotate, self).setUp()
 
         # Build server. Arg is testing or not.
         self.server = Popen(["./server/server.py", "True"])
@@ -218,14 +209,16 @@ class TestHandleRotate(unittest.TestCase):
         # Build socket and connect to server
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
-        self.socket.connect(config["server_port"])
+        self.socket.connect(self.config["server_port"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
         self.socket.close()
         self.context.term()
         self.server.kill()
-        lib.set_testing(self.orig_test_state)
+
+        # Run general bot test tear down
+        super(TestHandleRotate, self).tearDown()
 
     def testValid(self):
         """Test rotate message that's perfectly valid."""
@@ -252,18 +245,14 @@ class TestHandleRotate(unittest.TestCase):
         assert reply == "Error: Rotate speed is out of bounds", reply
 
 
-class TestHandleFire(unittest.TestCase):
+class TestHandleFire(test_bot.TestBot):
 
     """Test fire command."""
 
     def setUp(self):
         """Build server and connect to it."""
-        # Load config
-        config = lib.load_config()
-
-        # Set testing flag in config
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
+        # Run general bot test setup
+        super(TestHandleFire, self).setUp()
 
         # Build server. Arg is testing or not.
         self.server = Popen(["./server/server.py", "True"])
@@ -271,14 +260,16 @@ class TestHandleFire(unittest.TestCase):
         # Build socket and connect to server
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
-        self.socket.connect(config["server_port"])
+        self.socket.connect(self.config["server_port"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
         self.socket.close()
         self.context.term()
         self.server.kill()
-        lib.set_testing(self.orig_test_state)
+
+        # Run general bot test tear down
+        super(TestHandleFire, self).tearDown()
 
     def testValid(self):
         """Test fire message that's perfectly valid."""
@@ -287,18 +278,14 @@ class TestHandleFire(unittest.TestCase):
         assert reply == "Success: Fired"
 
 
-class TestHandleAim(unittest.TestCase):
+class TestHandleAim(test_bot.TestBot):
 
     """Test turrent aiming commands."""
 
     def setUp(self):
         """Build server and connect to it."""
-        # Load config
-        config = lib.load_config()
-
-        # Set testing flag in config
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
+        # Run general bot test setup
+        super(TestHandleAim, self).setUp()
 
         # Build server. Arg is testing or not.
         self.server = Popen(["./server/server.py", "True"])
@@ -306,14 +293,16 @@ class TestHandleAim(unittest.TestCase):
         # Build socket and connect to server
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
-        self.socket.connect(config["server_port"])
+        self.socket.connect(self.config["server_port"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
         self.socket.close()
         self.context.term()
         self.server.kill()
-        lib.set_testing(self.orig_test_state)
+
+        # Run general bot test tear down
+        super(TestHandleAim, self).tearDown()
 
     def testValid(self):
         """Test aim message that's perfectly valid."""
@@ -358,18 +347,14 @@ class TestHandleAim(unittest.TestCase):
         assert reply == "Error: Y angle is out of bounds", reply
 
 
-class TestHandleAdvanceDart(unittest.TestCase):
+class TestHandleAdvanceDart(test_bot.TestBot):
 
     """Test advance dart command."""
 
     def setUp(self):
         """Build server and connect to it."""
-        # Load config
-        config = lib.load_config()
-
-        # Set testing flag in config
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
+        # Run general bot test setup
+        super(TestHandleAdvanceDart, self).setUp()
 
         # Build server. Arg is testing or not.
         self.server = Popen(["./server/server.py", "True"])
@@ -377,14 +362,16 @@ class TestHandleAdvanceDart(unittest.TestCase):
         # Build socket and connect to server
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
-        self.socket.connect(config["server_port"])
+        self.socket.connect(self.config["server_port"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
         self.socket.close()
         self.context.term()
         self.server.kill()
-        lib.set_testing(self.orig_test_state)
+
+        # Run general bot test tear down
+        super(TestHandleAdvanceDart, self).tearDown()
 
     def testValid(self):
         """Test fire message that's perfectly valid."""
@@ -393,18 +380,14 @@ class TestHandleAdvanceDart(unittest.TestCase):
         assert reply == "Success: Advanced dart"
 
 
-class TestHandleFireSpeed(unittest.TestCase):
+class TestHandleFireSpeed(test_bot.TestBot):
 
     """Test rotate commands."""
 
     def setUp(self):
         """Build server and connect to it."""
-        # Load config
-        config = lib.load_config()
-
-        # Set testing flag in config
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
+        # Run general bot test setup
+        super(TestHandleFireSpeed, self).setUp()
 
         # Build server. Arg is testing or not.
         self.server = Popen(["./server/server.py", "True"])
@@ -412,14 +395,16 @@ class TestHandleFireSpeed(unittest.TestCase):
         # Build socket and connect to server
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
-        self.socket.connect(config["server_port"])
+        self.socket.connect(self.config["server_port"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
         self.socket.close()
         self.context.term()
         self.server.kill()
-        lib.set_testing(self.orig_test_state)
+
+        # Run general bot test tear down
+        super(TestHandleFireSpeed, self).tearDown()
 
     def testValid(self):
         """Test fire speed message that's perfectly valid."""

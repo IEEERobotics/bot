@@ -9,12 +9,13 @@ sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
 
 try:
     import lib.lib as lib
+    import tests.test_bot as test_bot
 except ImportError:
     print "ImportError: Use `python -m unittest discover` from project root."
     raise
 
 
-class TestLoadConfig(unittest.TestCase):
+class TestLoadConfig(test_bot.TestBot):
 
     """Test loading configuration."""
 
@@ -29,7 +30,7 @@ class TestLoadConfig(unittest.TestCase):
             config = lib.load_config("fake.yaml")
 
 
-class TestWriteConfig(unittest.TestCase):
+class TestWriteConfig(test_bot.TestBot):
 
     """Test writing changes to configuration."""
 
@@ -67,7 +68,7 @@ class TestWriteConfig(unittest.TestCase):
         assert updated_config["logging"]["log_file"] == orig_log_file
 
 
-class TestLoadStrategy(unittest.TestCase):
+class TestLoadStrategy(test_bot.TestBot):
 
     """Test loading the strategy file defined in config.yaml"""
 
@@ -82,7 +83,7 @@ class TestLoadStrategy(unittest.TestCase):
             strat = lib.load_strategy("fake_strat.yaml")
 
 
-class TestLoadTargeting(unittest.TestCase):
+class TestLoadTargeting(test_bot.TestBot):
 
     """Test loading the targeting file defined in config.yaml"""
 
@@ -97,7 +98,7 @@ class TestLoadTargeting(unittest.TestCase):
             targ = lib.load_targeting("fake_targ.yaml")
 
 
-class TestSetTesting(unittest.TestCase):
+class TestSetTesting(test_bot.TestBot):
 
     """Test setting the testing flag in config.yaml"""
 
@@ -128,7 +129,7 @@ class TestSetTesting(unittest.TestCase):
             lib.set_testing(False, config_file="fake.yaml")
 
 
-class TestSetStrat(unittest.TestCase):
+class TestSetStrat(test_bot.TestBot):
 
     """Test setting the strategy file in config."""
 
@@ -154,7 +155,7 @@ class TestSetStrat(unittest.TestCase):
         assert new_config["strategy"] == new_strat
 
 
-class TestSetStratQual(unittest.TestCase):
+class TestSetStratQual(test_bot.TestBot):
 
     """Test setting a qualified strategy file in config."""
 
@@ -185,7 +186,7 @@ class TestSetStratQual(unittest.TestCase):
         assert new_config["strategy"] == fake_strat
 
 
-class TestGetLogger(unittest.TestCase):
+class TestGetLogger(test_bot.TestBot):
 
     """Test getting a logger object."""
 

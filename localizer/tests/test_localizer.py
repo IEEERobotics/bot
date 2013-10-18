@@ -1,18 +1,16 @@
-"""
-Localizer Unit Tests
-"""
+"""Localizer unit tests"""
 
 import sys
 import os
 import unittest
-from random import randint
-from localizer.localizer import Localizer
 
 # Prepend this module's directory to the python path
 sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
 
 try:
     import lib.lib as lib
+    from localizer.localizer import Localizer
+    import tests.test_bot as test_bot
 except ImportError:
     print "ImportError: Use 'python -m unittest discover' from project root."
     raise
@@ -21,18 +19,18 @@ except ImportError:
 logger = lib.get_logger()
 
 
-class TestLocalizer(unittest.TestCase):
+class TestLocalizer(test_bot.TestBot):
     def setUp(self):
         """Setup for test"""
-        config = lib.load_config()
+        # Run general bot test setup
+        super(TestLocalizer, self).setUp()
 
-        # Store the original test flag, and set current to true
-        self.orig_test_state = config["testing"]
-        lib.set_testing(True)
+        # Built localizer
         self.testLoc = Localizer()
 
     def tearDown(self):
-        del self.testLoc
+        # Run general bot test tear down
+        super(TestLocalizer, self).tearDown()
 
     """
     def testWhichBlock(self):

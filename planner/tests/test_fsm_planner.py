@@ -1,4 +1,4 @@
-"""Test cases for fsm planner."""
+"""Test cases for FSM planner."""
 import sys
 import os
 import unittest
@@ -8,6 +8,7 @@ sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
 try:
     import lib.lib as lib
     import planner.fsm_planner as fsm_mod
+    import tests.test_bot as test_bot
 except ImportError:
     print "ImportError: Use 'python -m unittest discover' from project root."
     raise
@@ -16,27 +17,24 @@ except ImportError:
 logger = lib.get_logger()
 
 
-class TestFSM(unittest.TestCase):
-    """Test rotation of mec wheels"""
+class TestFSM(test_bot.TestBot):
+
+    """"""
 
     def setUp(self):
         """Setup test hardware files and create mec_driver object"""
-        config = lib.load_config()
-
-        # Store original test flag, set to true
-        self.orig_test_state = config["testing"]
-        #print config["testing"]
-        lib.set_testing(True)
-        #print config["testing"]
+        # Run general bot test setup
+        super(TestFSM, self).setUp()
 
         # Build fsm_planner
         self.fsm = fsm_mod.Robot()
 
-    # This will fail until Josh pushes changes to follower
-    @unittest.expectedFailure
-    def testBaseCase(self):
-        self.fsm.run()
-
     def tearDown(self):
         """Restore testing flag state in config file."""
+        # Run general bot test tear down
+        super(TestFSM, self).tearDown()
         lib.set_testing(self.orig_test_state)
+
+    def testBaseCase(self):
+        """"""
+        self.fsm.run()

@@ -224,7 +224,7 @@ Adapt according to paths on your system. Again, verify by running `pep8` from th
 
 ### NumPy
 
-This is currently only needed for running control/desktop_client.py.
+This is currently only needed for running client/desktop_client.py.
 
 #### Linux
 
@@ -240,7 +240,7 @@ TODO: How?
 
 ### OpenCV
 
-This is currently only needed for running control/desktop_client.py.
+This is currently only needed for running client/desktop_client.py.
 
 #### Linux
 

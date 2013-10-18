@@ -15,6 +15,18 @@ class SimpleFollower(object):
         self.ir_hub = ir_hub_mod.IRHub()
         self.driver = driver_mod.MecDriver()
         self.config = lib.load_config()
+        
+    def move(self, array_dictionary):
+        """ receives the dictionary of IR arrays of 
+        returns a (speed, angle) tuple.
+        
+        :param array_dictionary: a dictionary containg 4 arrays
+        which hold the ir sensor informatoin.
+        :returns: a speed and angle. 
+        
+        """
+        
+        return(speed,angle)
 
     def move_multi(self):
         """Determines the direction to move the bot."""

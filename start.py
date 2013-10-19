@@ -8,15 +8,16 @@ import os
 
 import lib.lib
 import client.desktop_client as desktop_client_mod
+import client.cli_client as cli_client_mod
 import planner.fsm_planner as pfsm_mod
 
 
 def main(argv):
     """Get arguments and handle them."""
     try:
-        opts, args = getopt.getopt(argv, "hsdtp8x",
+        opts, args = getopt.getopt(argv, "hsdtp8xc",
                      ["help", "server", "desktop", "tests", "planner",
-                      "pep8", "exit-server"])
+                      "pep8", "exit-server", "cli"])
     except getopt.GetoptError:
         print_help()
         sys.exit(2)
@@ -43,8 +44,12 @@ def main(argv):
         server = Popen(["./server/server.py", "True"])
 
     if "-d" in opt_list or "--desktop" in opt_list:
-        print "Starting desktop controller"
+        print "Starting desktop client."
         desktop_client_mod.DesktopControlClient().run()
+
+    if "-c" in opt_list or "--cli" in opt_list:
+        print "Starting CLI client."
+        cli_client_mod.CLIClient().cmdloop()
 
     if "-x" in opt_list or "--exit-server" in opt_list:
         print "Closing server"

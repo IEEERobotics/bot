@@ -5,6 +5,7 @@ import sys
 import getopt
 from subprocess import Popen
 import os
+from time import sleep
 
 import lib.lib
 import client.desktop_client as desktop_client_mod
@@ -42,6 +43,7 @@ def main(argv):
     if "-s" in opt_list or "--server" in opt_list:
         print "Starting server"
         server = Popen(["./server/server.py", "True"])
+        sleep(.1)
 
     if "-d" in opt_list or "--desktop" in opt_list:
         print "Starting desktop client."

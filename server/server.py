@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Lightweight server to start/stop controllers."""
+"""Server for handling interaction between clients and bot."""
 
 import sys
 import os
@@ -30,17 +30,18 @@ import follower.follower as f_mod
 
 class Server(object):
 
-    """Start/stop controllers when instructed via server port."""
+    """Listen for client commands and make them happen on the bot."""
 
     def __init__(self, testing=False):
-        """Build logger, set ZMQ to listen on server port."""
-        # TODO(dfarrell07): Build server logger, don't reuse bot logger
+        """Build all main bot objects, set ZMQ to listen."""
+        # Load configuration and logger
+        self.config = lib.load_config()
         self.logger = lib.get_logger()
 
+        # Testing flag will cause objects to run on simulated hardware
+        if testing:
+            self.logger.info("Server will build bot objects in test mode")
         lib.set_testing(bool(testing))
-
-        # Load and store configuration
-        self.config = lib.load_config()
 
         # Listen for incoming requests
         self.context = zmq.Context()
@@ -73,7 +74,7 @@ class Server(object):
 
         :param msg_raw: Raw message string received by ZMQ.
         :type msg_raw: string
-        :returns: Success or failure message, plus description.
+        :returns: Success or error message with description.
 
         """
         try:
@@ -87,7 +88,7 @@ class Server(object):
         except AssertionError:
             return "Error: Key 'cmd' is not a string"
         except yaml.parser.ParserError:
-            return "Error: Unable to parse message as YAML"
+            return "Error: Unable to parse msg as YAML: {}".format(msg_raw)
 
         try:
             opts = msg["opts"]
@@ -123,6 +124,7 @@ class Server(object):
 
         :param opts: Dict with keys 'speed' and 'angle' to move.
         :type opts: dict
+        :returns: Success or error message with description.
 
         """
         # Validate fwd option
@@ -169,6 +171,7 @@ class Server(object):
 
         :param opts: Dict with keys 'speed' and 'angle' to move.
         :type opts: dict
+        :returns: Success or error message with description.
 
         """
         # Validate speed option
@@ -200,6 +203,7 @@ class Server(object):
 
         :param opts: Dict with key 'speed' to rotate, -100 to 100.
         :type opts: dict
+        :returns: Success or error message with description.
 
         """
         # Validate speed option
@@ -219,7 +223,11 @@ class Server(object):
         return "Success: {}".format(opts)
 
     def handle_fire(self):
-        """Make fire call to gunner."""
+        """Make fire call to gunner.
+
+        :returns: success or error message with description.
+
+        """
         # Make call to gunner
         try:
             self.gunner.fire()
@@ -233,6 +241,7 @@ class Server(object):
 
         :param opts: Dict with keys 'x' and 'y' (angles 0-180).
         :type opts: dict
+        :returns: Success or error message with description.
 
         """
         # Validate x angle option
@@ -260,7 +269,11 @@ class Server(object):
         return "Success: {}".format(opts)
 
     def handle_advance_dart(self):
-        """Make call to gunner to advance a dart."""
+        """Make call to gunner to advance a dart.
+
+        :returns: Success or error message with description.
+
+        """
         try:
             self.gunner.advance_dart()
         except Exception as e:
@@ -273,6 +286,7 @@ class Server(object):
 
         :param opts: Dict with key 'speed' (0-100).
         :type opts: dict
+        :returns: Success or error message with description.
 
         """
         # Validate speed option

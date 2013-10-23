@@ -67,7 +67,7 @@ class TestPosition(test_bot.TestBot):
             # Confirm that motor was set correctly
             cur_pwm = self.get_pwm(self.pwm_num)
             duty = int(cur_pwm["duty_ns"])
-            read_pos = int(round(((duty - 10000000) / 10000000.) * 180))
+            read_pos = int(round(((duty - 1000000) / 1000000.) * 180))
             assert read_pos == test_pos, "{} != {}".format(read_pos, test_pos)
 
     def test_over_max(self):

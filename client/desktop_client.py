@@ -10,13 +10,6 @@ except ImportError:
     sys.stderr.write("ERROR: Failed to import numpy. Is it installed?")
     raise
 
-try:
-    import zmq
-except ImportError:
-    sys.stderr.write("ERROR: Failed to import zmq. Is it installed?")
-    raise
-
-import lib.lib as lib
 import server
 import client
 
@@ -49,6 +42,7 @@ class DesktopClient(client.Client):
     help_text = "Move: WSAD/drag; Stop: SPACE; Quit: ESC"
 
     def __init__(self):
+        """Build logger, setup defaults, connect to ZMQ server."""
         super(DesktopClient, self).__init__()
         self.keepRunning = True
         # Exclusive semaphore to prevent asynchronous clashes
@@ -71,6 +65,7 @@ class DesktopClient(client.Client):
         self.imageCenter = (self.window_width / 2, self.window_height / 2)
 
     def run(self):
+        """Create client window and pass off mouse/key events."""
         cv2.namedWindow(self.window_name)
         cv.SetMouseCallback(self.window_name, self.onMouse, param=None)
 
@@ -87,6 +82,11 @@ class DesktopClient(client.Client):
         self.cleanUp()
 
     def onKeyPress(self, key):
+        """Handle key event, update forward/strafe/turn, send server update.
+
+        :param key: Code of key pressed.
+
+        """
         # Key code is in the last 8 bits, pick 7 bits for correct
         #   ASCII interpretation (8th bit indicates ?)
         keyCode = key & 0x00007f
@@ -144,6 +144,7 @@ class DesktopClient(client.Client):
         self.sendCommand()
 
     def sendCommand(self):
+        """Send motion update to ZMQ server."""
         # TODO: Check if this is actually not blocking
         if not self.isProcessing.acquire(blocking=False):
             return
@@ -169,6 +170,7 @@ class DesktopClient(client.Client):
         self.isProcessing.release()
 
     def draw(self):
+        """Render DesktopClient display."""
         # Clear entire image
         self.imageOut.fill(255)
 
@@ -256,7 +258,6 @@ class DesktopClient(client.Client):
         """Getter for strafe value.
 
         :returns: Current strafe speed.
-        :type strafe: float
 
         """
         return self._strafe
@@ -267,7 +268,7 @@ class DesktopClient(client.Client):
 
         Do all bounds checking here, to avoid duplicating that logic.
 
-        :param strafe: Current strafe speed.
+        :param strafe: Value to set strafe speed to.
         :type strafe: float
 
         """
@@ -286,7 +287,6 @@ class DesktopClient(client.Client):
         """Getter for forward value.
 
         :returns: Current forward speed.
-        :type forward: float
 
         """
         return self._forward
@@ -297,7 +297,7 @@ class DesktopClient(client.Client):
 
         Do all bounds checking here, to avoid duplicating that logic.
 
-        :param forward: Current forward speed.
+        :param forward: Value to set forward speed to.
         :type forward: float
 
         """
@@ -316,7 +316,6 @@ class DesktopClient(client.Client):
         """Getter for turn value.
 
         :returns: Current turn speed.
-        :type turn: float
 
         """
         return self._turn
@@ -327,7 +326,7 @@ class DesktopClient(client.Client):
 
         Do all bounds checking here, to avoid duplicating that logic.
 
-        :param turn: Current turn speed.
+        :param turn: Value to set turn speed to.
         :type turn: float
 
         """

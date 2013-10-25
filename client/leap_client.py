@@ -3,18 +3,17 @@
 
 import sys
 import time
-import socket
 from collections import namedtuple
 
 try:
     import Leap
     # NOTE Gestures are currently disabled; we could use a tap gesture to fire?
 except:
-    print "Error: This module cannot be run without the Leap SDK"
+    sys.stderr.write("ERROR: This module cannot be run without the Leap SDK")
     raise
 
 import lib.lib as lib
-import server.leap_server as server
+import client
 
 ControlRange = namedtuple('ControlRange',
                           ['min', 'zero_min', 'zero_max', 'max'])
@@ -23,50 +22,54 @@ rollRange = ControlRange(-30.0, -10.0, 10.0, 30.0)  # -ve is to the right
 yawRange = ControlRange(-30.0, -10.0, 10.0, 30.0)  # -ve is to the left
 
 
-class LeapControlClient(Leap.Listener):
-    """Translates Leap Motion input to commands, sends to a control server."""
+class LeapClient(Leap.Listener, client.Client):
+
+    """Translates Leap Motion input to commands, sends to a control server.
+
+    TODO: Maintain state using on_connect(), on_disconnect()?
+
+    """
 
     def on_init(self, controller):
-        self.logger = lib.get_logger()
-        self.sock = None
-        self.isMoving = False
+        """Build logger, connect to ZMQ server.
+
+        :param controller: Leap controller object.
+
+        """
+        client.Client.__init__()
         self.isProcessing = False  # Semaphore to prevent asynchronous clashes
 
-        self.serverHost = sys.argv[1] if len(sys.argv) > 1 \
-                                      else server.CONTROL_SERVER_HOST
-        self.serverPort = int(sys.argv[2]) if len(sys.argv) > 2 \
-                                           else server.CONTROL_SERVER_PORT
-        try:
-            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.sock.connect((self.serverHost, self.serverPort))
-            self.rfile = self.sock.makefile(mode="rb")
-            self.wfile = self.sock.makefile(mode="wb", bufsize=0)
-            self.logger.info("Connected to control server at {}:{}".format(
-                                                            self.serverHost,
-                                                            self.serverPort))
-        except socket.error:
-            err_msg = "Could not connect to control server at {}:{}".format(
-                                                            self.serverHost,
-                                                            self.serverPort)
-            self.logger.error(err_msg)
-            self.sock = None
-
     def on_connect(self, controller):
+        """Not much going on, just log that we're connected.
+
+        :param controller: Leap controller object.
+
+        """
         self.logger.info("Connected to Leap device")
 
-    # TODO: Maintain state using on_connect(), on_disconnect()?
     def on_disconnect(self, controller):
+        """Not much going on, just log that we're disconnected.
+
+        :param controller: Leap controller object.
+
+        """
         # NOTE: not dispatched when running in a debugger.
         self.logger.info("Disconnected from Leap device")
 
     def on_exit(self, controller):
-        if self.sock is not None:
-            #self.wfile.write("\x04\n")  #self.sock.sendall("\x04\n")  # EOF
-            self.sock.shutdown(socket.SHUT_RDWR)
-            self.sock = None
-            self.logger.info("Disconnected from control server")
+        """Close connection to ZMQ server.
+
+        :param controller: Leap controller object.
+
+        """
+        self.cleanUp()
 
     def on_frame(self, controller):
+        """Process Leap update, send control message to bot.
+
+        :param controller: Leap controller object.
+
+        """
         if self.isProcessing:
             return
         self.isProcessing = True  # Lock
@@ -96,115 +99,109 @@ class LeapControlClient(Leap.Listener):
                 pitch = hand.direction.pitch * Leap.RAD_TO_DEG
                 roll = hand.palm_normal.roll * Leap.RAD_TO_DEG
                 yaw = hand.direction.yaw * Leap.RAD_TO_DEG
-                # [debug]
-                #print "Pos: {}, pitch: {:+6.2f} deg, roll: {:+6.2f} deg," + \
-                #                                " yaw: {:+6.2f} deg".format(
-                #                                position, pitch, roll, yaw)
-                # [debug]
-                #print "Pos: ({:+7.2f}, {:+7.2f}, {:+7.2f}), " + \
-                #         "pitch: {:+6.2f} deg, roll: {:+6.2f} deg, " + \
-                #         "yaw: {:+6.2f} deg".format(x, y, z, pitch, roll, yaw)
 
                 # Compute control values based on position and orientation
                 # * Scheme 1: pitch = forward/backward vel.,
                 #   roll = left/right strafe vel., yaw = left/right turn vel.
-                # ** Convert pitch => forward velocity
-                # If pitch is outside deadband (zero span)
-                if pitch <= pitchRange.zero_min \
-                        or pitchRange.zero_max <= pitch:
-                    # Clamp pitch to [min, max] range
-                    if pitch < pitchRange.min:
-                        pitch = pitchRange.min
-                    elif pitch > pitchRange.max:
-                        pitch = pitchRange.max
-
-                    # Compute forward velocity as ratio of current
-                    #   pitch to pitch range
-                    if pitch < 0:
-                        # forward: +ve
-                        forward = (pitch - pitchRange.zero_min) / \
-                                  (pitchRange.min - pitchRange.zero_min)
-                    else:
-                        # backward: -ve
-                        forward = -(pitch - pitchRange.zero_max) / \
-                                   (pitchRange.max - pitchRange.zero_max)
-
-                # ** Convert roll => strafe velocity
-                # If roll is outside deadband (zero span)
-                if roll <= rollRange.zero_min or rollRange.zero_max <= roll:
-                    # Clamp roll to [min, max] range
-                    if roll < rollRange.min:
-                        roll = rollRange.min
-                    elif roll > rollRange.max:
-                        roll = rollRange.max
-
-                    # Compute strafe velocity as ratio of current
-                    #   roll to roll range
-                    if roll < 0:
-                        # Strafe left: -ve
-                        strafe = (roll - rollRange.zero_min) / \
-                                 (rollRange.min - rollRange.zero_min)
-                    else:
-                        # Strafe right: +ve
-                        strafe = -(roll - rollRange.zero_max) / \
-                                  (rollRange.max - rollRange.zero_max)
-
-                # ** Convert yaw => turn velocity
-                # If yaw is outside deadband (zero span)
-                if yaw <= yawRange.zero_min or yawRange.zero_max <= yaw:
-                    # Clamp yaw to [min, max] range
-                    if yaw < yawRange.min:
-                        yaw = yawRange.min
-                    elif yaw > yawRange.max:
-                        yaw = yawRange.max
-
-                    # Compute turn velocity as ratio of current yaw to
-                    #   yaw range (TODO check sign convention)
-                    if yaw < 0:
-                        # Turn left: +ve
-                        turn = (yaw - yawRange.zero_min) / \
-                               (yawRange.min - yawRange.zero_min)
-                    else:
-                        # Turn right: -ve
-                        turn = -(yaw - yawRange.zero_max) / \
-                                (yawRange.max - yawRange.zero_max)
+                forward = self.pitch_to_fwd(pitch)
+                strafe = self.roll_to_strafe(roll)
+                turn = self.yaw_to_turn(yaw)
 
         # Send control values as command to server (TODO perhaps at a
-        #   reduced frequency? use GCode-like conventions? JSON?)
+        #   reduced frequency? use GCode-like conventions?)
         # TODO move this to a different thread
-        cmdStr = None
-        if forward == 0. and strafe == 0. and turn == 0.:
-            if self.isMoving:
-                cmdStr = "stop\n"
-                self.isMoving = False
-        else:
-            cmdStr = "move {:7.2f} {:7.2f} {:7.2f}\n".format(forward * 100,
-                                                             strafe * 100,
-                                                             turn * 100)
-            self.isMoving = True
-
-        if cmdStr is not None:
-            print cmdStr,  # [info]
-            if self.sock is not None:
-                #print "Sending: {}".format(repr(cmdStr))  # [debug]
-                self.wfile.write(cmdStr)  # self.sock.sendall(cmdStr)
-                #print "Waiting for response..."  # [debug]
-                # Server can use response delay to throttle commands
-                # TODO check for OK
-                response = self.rfile.readline().strip()
-                print response  # [info]
-
+        if forward != 0 or strafe != 0 or turn != 0:
+            self.send_fwd_strafe_turn(forward, strafe, turn)
         self.isProcessing = False  # release
+
+    def pitch_to_fwd(self, pitch):
+        """Convert sensed pitch value to a forward speed.
+
+        :param pitch: Sensed pitch of hand, used to get forward speed.
+        :type pitch: float
+        :returns: Forward speed of robot corresponding to given pitch.
+
+        """
+        # If pitch is outside deadband (zero span)
+        if pitch <= pitchRange.zero_min or pitchRange.zero_max <= pitch:
+            # Clamp pitch to [min, max] range
+            if pitch < pitchRange.min:
+                pitch = pitchRange.min
+            elif pitch > pitchRange.max:
+                pitch = pitchRange.max
+
+            # Compute forward velocity as ratio of current pitch to pitch range
+            if pitch < 0:
+                # forward: +ve
+                return (pitch - pitchRange.zero_min) / \
+                       (pitchRange.min - pitchRange.zero_min)
+            else:
+                # backward: -ve
+                return -(pitch - pitchRange.zero_max) / \
+                        (pitchRange.max - pitchRange.zero_max)
+
+    def roll_to_strafe(self, roll):
+        """Convert sensed roll value to a strafe speed.
+
+        :param roll: Sensed roll of hand, used to get strafe speed.
+        :type roll: float
+        :returns: Strafe speed of robot corresponding to given roll.
+
+        """
+        # If roll is outside deadband (zero span)
+        if roll <= rollRange.zero_min or rollRange.zero_max <= roll:
+            # Clamp roll to [min, max] range
+            if roll < rollRange.min:
+                roll = rollRange.min
+            elif roll > rollRange.max:
+                roll = rollRange.max
+
+            # Compute strafe velocity as ratio of current roll to roll range
+            if roll < 0:
+                # Strafe left: -ve
+                return (roll - rollRange.zero_min) / \
+                       (rollRange.min - rollRange.zero_min)
+            else:
+                # Strafe right: +ve
+                return -(roll - rollRange.zero_max) / \
+                        (rollRange.max - rollRange.zero_max)
+
+    def yaw_to_turn(self, yaw):
+        """Convert sensed yaw value to a turn speed.
+
+        :param yaw: Sensed yaw of hand, used to get turn speed.
+        :type yaw: float
+        :returns: Turn speed of robot corresponding to given yaw.
+
+        """
+        # If yaw is outside deadband (zero span)
+        if yaw <= yawRange.zero_min or yawRange.zero_max <= yaw:
+            # Clamp yaw to [min, max] range
+            if yaw < yawRange.min:
+                yaw = yawRange.min
+            elif yaw > yawRange.max:
+                yaw = yawRange.max
+
+            # Compute turn velocity as ratio of current yaw to
+            #   yaw range (TODO check sign convention)
+            if yaw < 0:
+                # Turn left: +ve
+                return (yaw - yawRange.zero_min) / \
+                       (yawRange.min - yawRange.zero_min)
+            else:
+                # Turn right: -ve
+                return -(yaw - yawRange.zero_max) / \
+                        (yawRange.max - yawRange.zero_max)
 
 
 def main():
+    """Build/start our Leap client and general Leap controller."""
     # Create a custom listener and Leap Motion controller
-    leapControlClient = LeapControlClient()
+    leapClient = LeapClient()
     leapController = Leap.Controller()
 
     # Have the listener receive events from the controller
-    # Yep, these names are too confusing!
-    leapController.add_listener(leapControlClient)
+    leapController.add_listener(leapClient)
     time.sleep(0.5)  # Yield so that on_connect() can happen first
 
     # Keep this process running until Enter is pressed
@@ -212,7 +209,7 @@ def main():
     sys.stdin.readline()
 
     # Remove the sample listener when done
-    leapController.remove_listener(leapControlClient)
+    leapController.remove_listener(leapClient)
 
 
 if __name__ == "__main__":

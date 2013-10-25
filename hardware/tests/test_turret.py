@@ -100,10 +100,8 @@ class TestAngle(test_bot.TestBot):
             # Check x and y angles
             for servo in self.config["turret_servos"]:
                 duty = int(self.get_pwm(servo["PWM"])["duty_ns"])
-                angle = int(round(((duty - 10000000) / 10000000.) * 180))
-                assert test_val[servo["axis"]] == angle, "{} != {}".format(
-                                                          read_angle,
-                                                          test_y_angle)
+                angle = int(round(((duty - 1000000) / 1000000.) * 180))
+                assert test_val[servo["axis"]] == angle
 
     def test_x_over_max(self):
         """Test setting the X angle to greater than the max value."""

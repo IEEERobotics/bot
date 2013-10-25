@@ -84,7 +84,7 @@ class TestHandleMessage(test_bot.TestBot):
         """
         self.socket.send("{cmd: move, opts: {speed: 50, angle: 0}")
         reply = self.socket.recv()
-        assert reply == "Error: Unable to parse message as YAML"
+        assert "Error" in reply
 
 
 class TestHandleFwdStrafeTurn(test_bot.TestBot):

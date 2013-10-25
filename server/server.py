@@ -41,7 +41,7 @@ class Server(object):
         # Testing flag will cause objects to run on simulated hardware
         if testing:
             self.logger.info("Server will build bot objects in test mode")
-        lib.set_testing(bool(testing))
+            lib.set_testing(bool(testing))
 
         # Listen for incoming requests
         self.context = zmq.Context()

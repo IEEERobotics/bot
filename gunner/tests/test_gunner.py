@@ -21,7 +21,7 @@ logger = lib.get_logger()
 
 class TestAimTurret(test_bot.TestBot):
 
-    """Test changing the X and Y angles of the turret."""
+    """Test changing the yaw and pitch angles of the turret."""
 
     def setUp(self):
         """Setup test hardware files and build gunner object."""
@@ -36,49 +36,49 @@ class TestAimTurret(test_bot.TestBot):
         # Run general bot test tear down
         super(TestAimTurret, self).tearDown()
 
-    def test_series_xy(self):
-        """Test a series of X and Y angles."""
+    def test_series_yaw_pitch(self):
+        """Test a series of yaw and pitch angles."""
         for angle in range(0, 180, 18):
             self.gunner.aim_turret(angle, angle)
-            assert self.gunner.turret.x_angle == angle, "{} != {}".format(
-                                                    self.gunner.turret.x_angle,
+            assert self.gunner.turret.yaw == angle, "{} != {}".format(
+                                                    self.gunner.turret.yaw,
                                                     angle)
-            assert self.gunner.turret.y_angle == angle
+            assert self.gunner.turret.pitch == angle
 
     def test_manually_confirm(self):
         """Test a series of random angles, read the simulated HW to confirm."""
         for i in range(10):
-            # Generate random x and y angles
+            # Generate random yaw and pitch angles
             test_val = {}
             for servo in self.config["turret_servos"]:
                 test_val[servo["axis"]] = randint(0, 180)
 
-            # Set x and y angles
-            self.gunner.aim_turret(test_val["servo_x"], test_val["servo_y"])
+            # Set yaw and pitch angles
+            self.gunner.aim_turret(test_val["yaw"], test_val["pitch"])
 
-            # Check x and y angles
+            # Check yaw and pitch angles
             for servo in self.config["turret_servos"]:
                 duty = int(self.get_pwm(servo["PWM"])["duty_ns"])
                 angle = int(round(((duty - 1000000) / 1000000.) * 180))
                 assert test_val[servo["axis"]] == angle
 
-    def test_x_over_max(self):
-        """Test setting the X angle to greater than the max value."""
+    def test_yaw_over_max(self):
+        """Test setting the yaw angle to greater than the max value."""
         with self.assertRaises(AssertionError):
             self.gunner.aim_turret(181, 90)
 
-    def test_x_under_min(self):
-        """Test setting the X angle to less than the min value."""
+    def test_yaw_under_min(self):
+        """Test setting the yaw angle to less than the min value."""
         with self.assertRaises(AssertionError):
             self.gunner.aim_turret(-1, 90)
 
-    def test_y_over_max(self):
-        """Test setting the Y angle to greater than the max value."""
+    def test_pitch_over_max(self):
+        """Test setting the pitch angle to greater than the max value."""
         with self.assertRaises(AssertionError):
             self.gunner.aim_turret(90, 181)
 
-    def test_y_under_min(self):
-        """Test setting the Y angle to less than the min value."""
+    def test_pitch_under_min(self):
+        """Test setting the pitch angle to less than the min value."""
         with self.assertRaises(AssertionError):
             self.gunner.aim_turret(90, -1)
 

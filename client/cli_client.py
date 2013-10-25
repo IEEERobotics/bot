@@ -96,10 +96,10 @@ class CLIClient(client.Client, cmd.Cmd):
                                                                        strafe,
                                                                        turn))
         self.send_fwd_strafe_turn(fwd, strafe, turn)
-        
+
     def do_move(self, raw_args):
         """move <speed> <angle>
-        Translate the bot. Speed is percent of max (0-100), angle 
+        Translate the bot. Speed is percent of max (0-100), angle
         is in degrees (0-360, 90=left, 270=right)."""
         # Get and validate arguments
         try:

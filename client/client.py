@@ -31,7 +31,6 @@ class Client(object):
         self.logger.info("Connected to control server at {}".format(
                                             self.config["server_addr"]))
 
-
     def __str__(self):
         """Build human-readable representation of client.
 

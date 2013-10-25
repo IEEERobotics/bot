@@ -306,45 +306,45 @@ class TestHandleAim(test_bot.TestBot):
 
     def testValid(self):
         """Test aim message that's perfectly valid."""
-        self.socket.send("{cmd: aim, opts: {y: 90, x: 90}}")
+        self.socket.send("{cmd: aim, opts: {pitch: 90, yaw: 90}}")
         reply = self.socket.recv()
-        assert reply == "Success: {'y': 90, 'x': 90}"
+        assert reply == "Success: {'yaw': 90, 'pitch': 90}", reply
 
-    def testNoXKey(self):
-        """Test aim message that's missing an x angle key."""
-        self.socket.send("{cmd: aim, opts: {y: 90, not_x: 90}}")
+    def testNoYawKey(self):
+        """Test aim message that's missing an yaw angle key."""
+        self.socket.send("{cmd: aim, opts: {pitch: 90, not_yaw: 90}}")
         reply = self.socket.recv()
-        assert reply == "Error: No 'x' opt given"
+        assert reply == "Error: No 'yaw' opt given"
 
-    def testNoYKey(self):
+    def testNoPitchKey(self):
         """Test aim message that's missing a y angle key."""
-        self.socket.send("{cmd: aim, opts: {not_y: 90, x: 90}}")
+        self.socket.send("{cmd: aim, opts: {not_pitch: 90, yaw: 90}}")
         reply = self.socket.recv()
-        assert reply == "Error: No 'y' opt given"
+        assert reply == "Error: No 'pitch' opt given"
 
-    def testInvalidXType(self):
-        """Test aim message with non-int x ange key."""
-        self.socket.send("{cmd: aim, opts: {y: 90, x: invalid}}")
+    def testInvalidYawType(self):
+        """Test aim message with non-int yaw ange key."""
+        self.socket.send("{cmd: aim, opts: {pitch: 90, yaw: invalid}}")
         reply = self.socket.recv()
-        assert reply == "Error: Could not convert x to int"
+        assert reply == "Error: Could not convert yaw to int"
 
-    def testInvalidYType(self):
-        """Test aim message with non-int y angle key."""
-        self.socket.send("{cmd: aim, opts: {y: invalid, x: 90}}")
+    def testInvalidPitchType(self):
+        """Test aim message with non-int pitch angle key."""
+        self.socket.send("{cmd: aim, opts: {pitch: invalid, yaw: 90}}")
         reply = self.socket.recv()
-        assert reply == "Error: Could not convert y to int"
+        assert reply == "Error: Could not convert pitch to int"
 
-    def testInvalidXValue(self):
-        """Test aim message with out of bounds x value."""
-        self.socket.send("{cmd: aim, opts: {y: 90, x: 181}}")
+    def testInvalidYawValue(self):
+        """Test aim message with out of bounds yaw value."""
+        self.socket.send("{cmd: aim, opts: {pitch: 90, yaw: 181}}")
         reply = self.socket.recv()
-        assert reply == "Error: X angle is out of bounds", reply
+        assert reply == "Error: Yaw angle is out of bounds", reply
 
-    def testInvalidYValue(self):
-        """Test aim message with out of bounds y value."""
-        self.socket.send("{cmd: aim, opts: {y: 181, x: 90}}")
+    def testInvalidPitchValue(self):
+        """Test aim message with out of bounds pitch value."""
+        self.socket.send("{cmd: aim, opts: {pitch: 181, yaw: 90}}")
         reply = self.socket.recv()
-        assert reply == "Error: Y angle is out of bounds", reply
+        assert reply == "Error: Pitch angle is out of bounds", reply
 
 
 class TestHandleAdvanceDart(test_bot.TestBot):

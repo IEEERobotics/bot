@@ -223,7 +223,7 @@ class Server(object):
         return "Success: {}".format(opts)
 
     def handle_fire(self):
-        """Make fire call to gunner.
+        """Make fire call to gunner. Normally used in autonomous mode.
 
         :returns: success or error message with description.
 
@@ -246,23 +246,23 @@ class Server(object):
         """
         # Validate x angle option
         try:
-            x_angle = int(round(opts["x"]))
+            yaw = int(round(opts["yaw"]))
         except KeyError:
-            return "Error: No 'x' opt given"
+            return "Error: No 'yaw' opt given"
         except TypeError:
-            return "Error: Could not convert x to int"
+            return "Error: Could not convert yaw to int"
 
         # Validate y angle option
         try:
-            y_angle = int(round(opts["y"]))
+            pitch = int(round(opts["pitch"]))
         except KeyError:
-            return "Error: No 'y' opt given"
+            return "Error: No 'pitch' opt given"
         except TypeError:
-            return "Error: Could not convert y to int"
+            return "Error: Could not convert pitch to int"
 
         # Make call to gunner
         try:
-            self.gunner.aim_turret(x_angle=x_angle, y_angle=y_angle)
+            self.gunner.aim_turret(yaw, pitch)
         except Exception as e:
             return "Error: {}".format(e)
 

@@ -31,12 +31,12 @@ class WheelGunner(gunner.Gunner):
         self.logger.debug("Location: {}".format(block))
 
         # Get targeting information for the block we're over
-        x = self.targ["rows"][block["row"]]["slots"][block["slot"]]["x_angle"]
-        y = self.targ["rows"][block["row"]]["slots"][block["slot"]]["y_angle"]
+        yaw = self.targ["rows"][block["row"]]["slots"][block["slot"]]["yaw"]
+        ptch = self.targ["rows"][block["row"]]["slots"][block["slot"]]["pitch"]
         spd = self.targ["rows"][block["row"]]["slots"][block["slot"]]["speed"]
 
         # Aim turret and fire dart
-        self.aim_turret(x, y)
+        self.aim_turret(yaw, ptch)
         # TODO(dfarrell07): Wait until turret has moved
         self.wheel_speed = spd
         # TODO(dfarrell07): Confirm speed via encoders

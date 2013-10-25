@@ -67,7 +67,8 @@ class TestUpdateRotateSpeed(test_bot.TestBot):
                 duty = int(cur_pwm["duty_ns"])
                 period = int(cur_pwm["period_ns"])
                 speed = int(round((duty / float(period)) * 100))
-                assert speed == test_speed, "{} != {}".format(speed, test_speed)
+                assert speed == test_speed, "{} != {}".format(speed, 
+                                                              test_speed)
 
     def test_over_max(self):
         """Test speed over max speed. Should use maximum."""

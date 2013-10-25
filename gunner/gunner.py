@@ -41,22 +41,22 @@ class Gunner(object):
         self.logger.error("The fire method must be overridden by a subclass.")
         raise NotImplementedError("Subclass must override this method.")
 
-    def aim_turret(self, x_angle, y_angle):
+    def aim_turret(self, yaw, pitch):
         """Aim the robot's turret such that firing will be successful.
 
-        :param x_angle: Angle on X axis to set turret servo.
-        :param y_angle: Angle on Y axis to set turret servo.
+        :param yaw: Angle on yaw axis to set turret servo.
+        :param pitch: Angle on pitch axis to set turret servo.
 
         """
         try:
-            assert 0 <= x_angle <= 180
+            assert 0 <= yaw <= 180
         except AssertionError:
-            raise AssertionError("X angle is out of bounds")
+            raise AssertionError("Yaw angle is out of bounds")
         try:
-            assert 0 <= y_angle <= 180
+            assert 0 <= pitch <= 180
         except AssertionError:
-            raise AssertionError("Y angle is out of bounds")
+            raise AssertionError("Pitch angle is out of bounds")
 
-        self.logger.debug("Aiming turret to ({}, {})".format(x_angle, y_angle))
-        self.turret.x_angle = x_angle
-        self.turret.y_angle = y_angle
+        self.logger.debug("Aiming turret to ({}, {})".format(yaw, pitch))
+        self.turret.yaw = yaw
+        self.turret.pitch = pitch

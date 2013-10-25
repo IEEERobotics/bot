@@ -62,16 +62,16 @@ class Client(object):
             self.logger.warn("Server reply: {}".format(reply))
             return False
 
-    def send_aim(self, x, y):
-        """Aim turret to given X and Y angles.
+    def send_aim(self, pitch, yaw):
+        """Aim turret to given pitch and yaw angles.
 
-        :param x: X angle to aim turret (0-180).
-        :param y: Y angle to aim turret (0-180).
+        :param pitch: Yaw angle to aim turret (0-180).
+        :param yaw: Yaw angle to aim turret (0-180).
         :returns: True for success, False for failure.
 
         """
         cmd = "aim"
-        opts = "{{y: {}, x: {}}}".format(x, y)
+        opts = "{{pitch: {}, yaw: {}}}".format(pitch, yaw)
         return self.send_cmd(cmd, opts)
 
     def send_fire_speed(self, speed):
@@ -84,6 +84,10 @@ class Client(object):
         cmd = "fire_speed"
         opts = "{{speed: {}}}".format(speed)
         return self.send_cmd(cmd, opts)
+
+    def send_advance_dart(self):
+        """"""
+        self.logger.warn("Stub")
 
     def send_fire(self):
         """Send command to fire dart.

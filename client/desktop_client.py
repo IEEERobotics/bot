@@ -1,3 +1,4 @@
+"""Module for controlling the bot using mouse/keyboard."""
 import sys
 import threading
 from collections import namedtuple
@@ -125,6 +126,15 @@ class DesktopClient(client.Client):
         self.sendCommand()
 
     def onMouse(self, event, x, y, flags, param=None):
+        """Handle mouse events, update forward/strafe/turn, send server update.
+
+        :param event: Exact mouse event that took place (ex. button up).
+        :param x:  X position of mouse event in image coordinates.
+        :param y: Y position of mouse event in image coordinates.
+        :param flags: Other event info.
+        :param param: User-defined data callback option.
+
+        """
         self.logger.debug("{} @ ({}, {}) [flags = {}]".format(event, x, y,
                                                                         flags))
         # Stop when left button is released

@@ -61,9 +61,9 @@ class DesktopControlClient(object):
         # Build socket and connect to server
         self.context = zmq.Context()
         self.sock = self.context.socket(zmq.REQ)
-        self.sock.connect(self.config["server_port"])
+        self.sock.connect(self.config["server_addr"])
         self.logger.info("Connected to control server at {}".format(
-                                                self.config["server_port"]))
+                                                self.config["server_addr"]))
 
         self.forward = 0
         self.strafe = 0

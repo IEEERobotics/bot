@@ -40,7 +40,7 @@ class TestHandleMessage(test_bot.TestBot):
         # Build socket and connect to server
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
-        self.socket.connect(self.config["server_port"])
+        self.socket.connect(self.config["server_addr"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
@@ -106,7 +106,7 @@ class TestHandleFwdStrafeTurn(test_bot.TestBot):
         # Build socket and connect to server
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
-        self.socket.connect(self.config["server_port"])
+        self.socket.connect(self.config["server_addr"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
@@ -140,7 +140,7 @@ class TestHandleMove(test_bot.TestBot):
         # Build socket and connect to server
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
-        self.socket.connect(self.config["server_port"])
+        self.socket.connect(self.config["server_addr"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
@@ -209,7 +209,7 @@ class TestHandleRotate(test_bot.TestBot):
         # Build socket and connect to server
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
-        self.socket.connect(self.config["server_port"])
+        self.socket.connect(self.config["server_addr"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
@@ -260,7 +260,7 @@ class TestHandleFire(test_bot.TestBot):
         # Build socket and connect to server
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
-        self.socket.connect(self.config["server_port"])
+        self.socket.connect(self.config["server_addr"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
@@ -293,7 +293,7 @@ class TestHandleAim(test_bot.TestBot):
         # Build socket and connect to server
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
-        self.socket.connect(self.config["server_port"])
+        self.socket.connect(self.config["server_addr"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
@@ -362,7 +362,7 @@ class TestHandleAdvanceDart(test_bot.TestBot):
         # Build socket and connect to server
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
-        self.socket.connect(self.config["server_port"])
+        self.socket.connect(self.config["server_addr"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""
@@ -395,7 +395,7 @@ class TestHandleFireSpeed(test_bot.TestBot):
         # Build socket and connect to server
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
-        self.socket.connect(self.config["server_port"])
+        self.socket.connect(self.config["server_addr"])
 
     def tearDown(self):
         """Kill server, restore testing flag state in config file."""

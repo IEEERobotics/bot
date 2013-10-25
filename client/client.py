@@ -86,8 +86,10 @@ class Client(object):
         return self.send_cmd(cmd, opts)
 
     def send_advance_dart(self):
-        """"""
-        self.logger.warn("Stub")
+        """Send command to push dart into firing wheels."""
+        cmd = "advance_dart"
+        opts = "{}"
+        return self.send_cmd(cmd, opts)
 
     def send_fire(self):
         """Send command to fire dart.

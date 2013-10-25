@@ -68,19 +68,34 @@ class CLIClient(client.Client, cmd.Cmd):
             print "Invalid command, see help [cmd]."
             return
 
-        # Issue commands to server
         self.logger.info("Firing pitch: {}, yaw: {}, speed: {}".format(pitch,
                                                                        yaw,
                                                                        speed))
+        # Issue commands to server
         self.send_aim(pitch, yaw)
         self.send_fire_speed(speed)
-        self.advance_dart()
+        self.send_advance_dart()
 
     def help_fire(self):
         """Provide help message for fire command."""
         print "fire <pitch> <yaw> <speed>"
         print "\tSet turret pitch (vertical) and yaw (horizontal) angle"
         print "\t(0-180), gun wheel speed (0-100) and fire dart."
+
+    def do_auto_fire(self, raw_args):
+        """Poll localizer for block, lookup targeting info, aim and fire.
+
+        :param raw_args: Command string, unused.
+        :type raw_args: string
+
+        """
+        self.send_fire()
+
+    def help_auto_fire(self):
+        """Provide help message for auto_fire command."""
+        print "Autonomous firing routine. Asks localizer to use ultrasonic"
+        print "\tsensors to find the block we're over, look up targeting"
+        print "\tinformation, aim turret, set gun wheel speed and fire"
 
     def do_gun_speed(self, raw_args):
         """Set speed of gun motors as percent of max (0-100).
@@ -96,8 +111,8 @@ class CLIClient(client.Client, cmd.Cmd):
             print "Invalid command, see help [cmd]."
             return
 
-        # Issue commands to server
         self.logger.info("Gun speed: {}".format(speed))
+        # Issue commands to server
         self.send_fire_speed(speed)
 
     def help_gun_speed(self):
@@ -119,8 +134,8 @@ class CLIClient(client.Client, cmd.Cmd):
             print "Invalid command, see help [cmd]."
             return
 
-        # Issue commands to server
         self.logger.info("Aiming pitch: {}, yaw: {}".format(pitch, yaw))
+        # Issue commands to server
         self.send_aim(pitch, yaw)
 
     def help_aim(self):
@@ -136,8 +151,8 @@ class CLIClient(client.Client, cmd.Cmd):
         :type raw_args: string
 
         """
-        # Issue commands to server
         self.logger.info("Advancing dart")
+        # Issue commands to server
         self.send_fire()
 
     def help_push_dart(self):
@@ -159,10 +174,10 @@ class CLIClient(client.Client, cmd.Cmd):
             print "Invalid command, see help [cmd]."
             return
 
-        # Issue commands to server
         self.logger.info("Moving fwd: {}, strafe: {}, turn: {}".format(fwd,
                                                                        strafe,
                                                                        turn))
+        # Issue commands to server
         self.send_fwd_strafe_turn(fwd, strafe, turn)
 
     def help_fst(self):
@@ -184,8 +199,8 @@ class CLIClient(client.Client, cmd.Cmd):
             print "Invalid command, see help [cmd]."
             return
 
-        # Issue commands to server
         self.logger.info("Moving speed: {}, angle: {}".format(speed, angle))
+        # Issue commands to server
         self.send_move(speed, angle)
 
     def help_move(self):
@@ -208,8 +223,8 @@ class CLIClient(client.Client, cmd.Cmd):
             print "Invalid command, see help [cmd]."
             return
 
-        # Issue commands to server
         self.logger.info("Rotate speed: {}".format(speed))
+        # Issue commands to server
         self.send_rotate(speed)
 
     def help_rotate(self):
@@ -229,6 +244,7 @@ class CLIClient(client.Client, cmd.Cmd):
 
     def do_kill(self, raw_args):
         """Kill the server. Doesn't close client."""
+        # Issue commands to server
         self.send_die()
 
     def help_kill(self):

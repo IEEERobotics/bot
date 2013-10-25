@@ -47,7 +47,7 @@ def main(argv):
 
     if "-d" in opt_list or "--desktop" in opt_list:
         print "Starting desktop client."
-        desktop_client_mod.DesktopControlClient().run()
+        desktop_client_mod.DesktopClient().run()
 
     if "-c" in opt_list or "--cli" in opt_list:
         print "Starting CLI client."

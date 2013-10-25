@@ -44,7 +44,7 @@ class TestBasic(test_bot.TestBot):
         self.socket.connect(self.config["server_addr"])
 
         # Build desktop client and tell it to run
-        self.dclient = dclient_mod.DesktopControlClient()
+        self.dclient = dclient_mod.DesktopClient()
         #self.dclient.run()
 
     def tearDown(self):

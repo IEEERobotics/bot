@@ -1,11 +1,14 @@
 import sys
-import socket
 import threading
 from collections import namedtuple
 
-import numpy as np
-import cv2
-import cv2.cv as cv
+try:
+    import numpy as np
+    import cv2
+    import cv2.cv as cv
+except ImportError:
+    sys.stderr.write("ERROR: Failed to import numpy. Is it installed?")
+    raise
 
 try:
     import zmq
@@ -15,6 +18,7 @@ except ImportError:
 
 import lib.lib as lib
 import server
+import client
 
 showKeys = False  # True  # [debug]
 
@@ -25,11 +29,11 @@ strafe_range = ControlRange(-100, -25, 25, 100)
 turn_range = ControlRange(-100, -25, 25, 100)
 
 
-class DesktopControlClient(object):
+class DesktopClient(client.Client):
 
     """Desktop-based controller using mouse and/or keyboard input."""
 
-    window_name = "Desktop Controller"
+    window_name = "Desktop Client"
     window_width = 640
     window_height = 480
     loop_delay = 20
@@ -45,9 +49,7 @@ class DesktopControlClient(object):
     help_text = "Move: WSAD/drag; Stop: SPACE; Quit: ESC"
 
     def __init__(self):
-        self.logger = lib.get_logger()
-        self.config = lib.load_config()
-        self.sock = None
+        super(DesktopClient, self).__init__()
         self.keepRunning = True
         # Exclusive semaphore to prevent asynchronous clashes
         self.isProcessing = threading.BoundedSemaphore()
@@ -58,13 +60,6 @@ class DesktopControlClient(object):
         #   commands based on those control values
         self.isMoving = False
 
-        # Build socket and connect to server
-        self.context = zmq.Context()
-        self.sock = self.context.socket(zmq.REQ)
-        self.sock.connect(self.config["server_addr"])
-        self.logger.info("Connected to control server at {}".format(
-                                                self.config["server_addr"]))
-
         self.forward = 0
         self.strafe = 0
         self.turn = 0  # TODO: Add turning
@@ -74,13 +69,6 @@ class DesktopControlClient(object):
                                   dtype=np.uint8)
         # OpenCV convention: (x, y)
         self.imageCenter = (self.window_width / 2, self.window_height / 2)
-
-    def cleanUp(self):
-        if self.sock is not None:
-            self.sock.close()
-            self.sock = None
-            self.context.term()
-            self.logger.info("Disconnected from control server")
 
     def run(self):
         cv2.namedWindow(self.window_name)
@@ -162,7 +150,7 @@ class DesktopControlClient(object):
         self.logger.debug("[{}] Acquired".format(
                                           threading.current_thread().name))
 
-        # Take snapshot of current control values
+        # Send zero for any val in its deadband.
         # NOTE: Y-flip
         snap_forward = 0 if forward_range.zero_min < self.forward < \
                                                 forward_range.zero_max \
@@ -174,38 +162,7 @@ class DesktopControlClient(object):
                                                turn_range.zero_max \
                                                else self.turn
 
-        # TODO Decouple input resolution from output resolution by
-        #   defining a scaling transformation
-
-        cmdStr = None
-        if snap_forward == 0 and snap_strafe == 0 and snap_turn == 0:
-            if self.isMoving:
-                cmdStr = "{cmd: fwd_strafe_turn, " + \
-                         "opts: {fwd: 0, strafe: 0, turn: 0}}"
-                self.isMoving = False
-        else:
-            # '{{' and '}}' give '{' and '}' after .format call
-            # NOTE: The reason there is an unbalanced number of {} in the
-            #   following two lines is because format is being called on the
-            #   second line only, so it needs }} to get }, where the first
-            #   only needs the typical {.
-            cmdStr = "{cmd: fwd_strafe_turn, " + \
-                      "opts: {{fwd: {}, strafe: {}, turn: {}}}}}".format(
-                                                            snap_forward,
-                                                            snap_strafe,
-                                                            snap_turn)
-            self.isMoving = True
-
-        if cmdStr is not None:
-            try:
-                self.logger.debug("Sending: {}".format(repr(cmdStr)))
-                self.sock.send(cmdStr)
-                # Server can use response delay to throttle commands
-                self.logger.debug("About to block for recv")
-                response = self.sock.recv()
-                self.logger.info("Response: {}".format(response))
-            except Exception:
-                self.logger.error("Failed to communicate with server.")
+        self.send_fwd_strafe_turn(snap_forward, snap_strafe, snap_turn)
 
         self.logger.debug("[{}] Releasing".format(
                                            threading.current_thread().name))
@@ -386,4 +343,4 @@ class DesktopControlClient(object):
 
 
 if __name__ == "__main__":
-    DesktopControlClient().run()
+    DesktopClient().run()

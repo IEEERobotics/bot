@@ -235,7 +235,7 @@ class CLIClient(client.Client, cmd.Cmd):
     def do_die(self, raw_args):
         """Disconnect from server and close client."""
         self.cleanUp()
-        sys.exit(0)
+        return True
 
     def help_die(self):
         """Provide help message for die command."""

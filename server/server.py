@@ -32,16 +32,23 @@ class Server(object):
 
     """Listen for client commands and make them happen on the bot."""
 
-    def __init__(self, testing=False):
+    def __init__(self, testing=None):
         """Build all main bot objects, set ZMQ to listen."""
         # Load configuration and logger
         self.config = lib.load_config()
         self.logger = lib.get_logger()
 
         # Testing flag will cause objects to run on simulated hardware
-        if testing:
+        if testing == "True":
             self.logger.info("Server will build bot objects in test mode")
             lib.set_testing(bool(testing))
+        elif testing == "False":
+            self.logger.info("Server will build bot objects in non-test mode")
+            lib.set_testing(bool(testing))
+        else:
+            self.logger.info("Defaulting to config testing flag: {}".format(
+                                                    self.config["testing"]))
+            lib.set_testing(self.config["testing"])
 
         # Listen for incoming requests
         self.context = zmq.Context()
@@ -100,7 +107,7 @@ class Server(object):
 
         if cmd == "fwd_strafe_turn":
             return self.handle_fwd_strafe_turn(opts)
-        if cmd == "move":
+        elif cmd == "move":
             return self.handle_move(opts)
         elif cmd == "rotate":
             return self.handle_rotate(opts)
@@ -317,5 +324,8 @@ class Server(object):
         sys.exit(0)
 
 if __name__ == "__main__":
-    server = Server(testing=sys.argv[1])
+    if len(sys.argv) == 2:
+        server = Server(sys.argv[1])
+    else:
+        server = Server()
     server.listen()

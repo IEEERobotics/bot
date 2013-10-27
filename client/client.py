@@ -46,7 +46,7 @@ class Client(object):
         self.logger.info("Disconnected from server")
 
     def send_cmd(self, cmd, opts):
-        """Send genetic commands to server.
+        """Send generic commands to server.
 
         :param cmd: Value of 'cmd' key to send.
         :param opts: Value of 'opts' key to send.

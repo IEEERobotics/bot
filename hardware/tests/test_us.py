@@ -27,7 +27,8 @@ class TestDistance(test_bot.TestBot):
         super(TestDistance, self).setUp()
 
         # Built ultrasonic abstraction object
-        self.us = us_mod.US("test")
+        us = self.config["ultrasonics"][0]
+        self.us = us_mod.US(us["position"], us["GPIO"])
 
     def tearDown(self):
         """Restore testing flag state in config file."""

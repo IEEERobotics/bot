@@ -9,6 +9,11 @@ turret_servos:
 gun_motors:
 - {PWM: 3}  # Gun motor 0: P9_14 (pwm3/ehr1A)
 - {PWM: 4}  # Gun motor 1: P9_16 (pwm4/ehr1B)
+ultrasonics:
+- {GPIO: -1, position: front}
+- {GPIO: -1, position: left}
+- {GPIO: -1, position: back}
+- {GPIO: -1, position: right}
 gun_sol: {GPIO: 60}  # Gun solenoid/trigger: P9_12 (gpio60)
 sol_extend_delay: 0.5
 ir_select_gpios: [44, 26, 46, 65]  # GPIOs to select IR sensor units: [P8_12 (gpio44), P8_14 (gpio26), P8_16 (gpio46), P8_18 (gpio65)]
@@ -25,4 +30,3 @@ testing: false
 server_addr: tcp://*:60000
 num_ir_arrays: 4
 irs_per_array: 16
-

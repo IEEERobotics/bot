@@ -1,7 +1,7 @@
 """Handle aiming and firing darts."""
 
 import lib.lib as lib
-import localizer.localizer as l_mod
+import localizer.us_localizer as l_mod
 import hardware.turret as t_mod
 
 
@@ -25,8 +25,8 @@ class Gunner(object):
         # Load and store targeting dict
         self.targ = lib.load_targeting(self.config["targeting"])
 
-        # Load and store localizer
-        self.localizer = l_mod.Localizer()
+        # Load and store ultrasonic localizer
+        self.localizer = l_mod.USLocalizer()
 
         # Build turrent hardware abstraction
         self.turret = t_mod.Turret()

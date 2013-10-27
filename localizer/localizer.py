@@ -1,66 +1,28 @@
-"""
-Localizer - Determine which discrete firing 'block' the bot is on.
+"""Determine which discrete firing block the bot is on."""
 
-Requisites:
-    - Four SR04 Ultrasonic transmitter/receiver pairs
-    - Two GPIO pins on our microcontroller per sensor/receiver
-    - A guranteed orientation for the robot at firing time
-"""
-
-try:
-    import lib.lib as lib
-except ImportError:
-    print "ImportError: Use 'python -m unittest discover' from project root."
-    raise
+import lib.lib as lib
 
 
 class Localizer(object):
 
-    #From SR04 documentation
-    MAX_RANGE = 4
-    MIN_RANGE = .04
-
-    #Differences between expected and found values shouldn't exceed this
-    MAX_ERROR = 2 * .0254
-
-    #Firing position lists for each line.
-    #Converting inches to meters
-    LINE_1 = []
-    #Coming soon
-    LINE_2 = []
-    #Distance from firing position to the right wall will be the same as first
-    LINE_3 = LINE_1
+    """Determine which discrete firing block the bot is on."""
 
     def __init__(self):
-        """
-        Setup and store a global logger,if not already in memory.
-        """
+        """Build logger."""
+        # Build and store logger
         self.logger = lib.get_logger()
 
     def which_block(self):
-        """
-        Returns: A dictionary containing a row and a slot
-        """
+        """Use ultrasonic sensors to find the block we're over.
+
+        This method is not meant to be called, but instead is meant to show
+        that subclasses should override it in their implementation.
+
+        Implementations should return a dict with two key/value pairs.
+        One key should be 'row', and should contain the number of the row 
+        the bot's over. The other should be 'slot', and should contain 
+        the number of the block position on that row the bot's over.
 
         """
-        if distance > self.MAX_RANGE or distance < self.MIN_RANGE:
-            self.logger.warn(
-                %s meters is not within the sensor\'s
-                advertised range
-                , distance
-            )
-
-        diff = {}
-        i = 0
-        for item in lineList:
-            diff[i] = (abs(item - distance))
-            i += 1
-
-        firingPos = min(diff, key=diff.get)
-
-        if diff[firingPos] > self.MAX_ERROR:
-            self.logger.warn('%s meters is too much error', diff[firingPos])
-        """
-
-        firingPos = {'row': 0, 'slot': 0}
-        return firingPos
+        self.logger.error("Method must be overridden by a subclass.")
+        raise NotImplementedError("Subclass must override this method.")

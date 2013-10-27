@@ -20,11 +20,10 @@ class IRArray(object):
     """
 
     def __init__(self, name, input_adc_pin):
-        """Setup required pins and get logger.
+        """Setup required pins and get logger/config.
 
         :param name: Identifier for this IR array.
         :type name: string
-
         :param input_adc_pin: Input ADC pin number for this IR array.
         :type input_adc_pin: int
 
@@ -66,7 +65,7 @@ class IRArray(object):
     def __str__(self):
         """Returns human-readable representation.
 
-        :returns: String giving name of IR array.
+        :returns: String giving info about IR array.
 
         """
         return "{} ({}): {}".format(
@@ -77,7 +76,7 @@ class IRArray(object):
 
         :param values: Binary iterable with length at least that
             of ir_select_gpios (ideally the same).
-        :type ID: iterable
+        :type values: iterable
 
         """
         for gpio, value in zip(self.ir_select_gpios, values):

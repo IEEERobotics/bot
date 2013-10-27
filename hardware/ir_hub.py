@@ -6,6 +6,7 @@ import hardware.ir as ir_mod
 
 
 class IRHub(object):
+
     """Class for abstracting all IR arrays and working with them as a unit.
 
     ir.IR is currently encapsulates one IR sensor array using a
@@ -59,14 +60,15 @@ def read_loop(delay=1):
 
     To be used interactively on bot for testing IR arrays, not in other code.
 
-    """
+    :param delay: Time in seconds to wait between IR reads
+    :type delay: float
 
-    print "Creating IRHub object..."
-    hubba = IRHub()
+    """
+    hub = IRHub()
     print "Starting read loop... [Ctrl+C to quit]"
     while True:
         try:
-            readings = hubba.read_all_arrays()
+            readings = hub.read_all_arrays()
             print "\nIR Readings:-"
             print "\n".join("{}: {}".format(name, reading)
                             for name, reading in readings.iteritems())

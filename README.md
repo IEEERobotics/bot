@@ -145,13 +145,13 @@ Once you get everything set up, I suggest going though [this quick, interactive 
 
 We're using Python 2.7.x for this project. If you already have python configured, run `python --version` to check your version.
 
-#### Linux / Mac
+#### Linux (Debian/Ubuntu) / Mac
 
 You already have Python. Celebrate. :)
 
 ### YAML
 
-If running `which python-yaml` from a shell (likely doesn't work on Windows) returns no results, or if you see `ImportError: No module named yaml` while running code, you're missing YAML.
+If running `which python-yaml` from a shell returns no results, or if you see `ImportError: No module named yaml` while running code, you're missing YAML.
 
 #### Linux (Debian/Ubuntu)
 
@@ -167,7 +167,7 @@ If you don't have easy_install, I'm told you can install a Dev Tools package to 
 
 ### ZMQ
 
-#### Linux
+#### Linux (Debian/Ubuntu)
 
 Run `sudo apt-get install libzmq-dev python-zmq`. Celebrate. :)
 
@@ -181,7 +181,7 @@ Note that a direct `sudo easy_install pyzmq` might also work, however [pip is pr
 
 This is a small tool for checking if your code conforms to [PEP8]. I strongly suggest using it, and setting it to run automatically as a [pre-commit hook].
 
-#### Linux
+#### Linux (Debian/Ubuntu)
 
 Install with `sudo apt-get install pep8`. Celebrate. :)
 
@@ -201,7 +201,7 @@ Adapt according to paths on your system. Again, verify by running `pep8` from th
 
 This is currently only needed for running client/desktop_client.py.
 
-#### Linux
+#### Linux (Debian/Ubuntu)
 
 Install with `sudo apt-get install python-numpy`. Celebrate. :)
 
@@ -213,7 +213,7 @@ TODO: How?
 
 This is currently only needed for running client/desktop_client.py.
 
-#### Linux
+#### Linux (Debian/Ubuntu)
 
 Install with `sudo apt-get install python-opencv`. Celebrate. :)
 

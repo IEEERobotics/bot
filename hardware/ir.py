@@ -48,7 +48,7 @@ class IRArray(object):
             self.ir_select_gpios = [gpio_mod.GPIO(gpio, gpio_test_dir_base)
                                     for gpio in config["ir_select_gpios"]]
             self.ir_input_adc = adc_mod.ADC(self.input_adc_pin,
-                                            adc_test_dir + '/AIN')
+                                    base_filename=(adc_test_dir + '/AIN'))
         else:
             try:
                 self.ir_select_gpios = [gpio_mod.GPIO(gpio)

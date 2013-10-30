@@ -116,9 +116,9 @@ When changes are made to our fork of the [pybbb] library, running `git status` i
 
 Install with `sudo apt-get install git`. Celebrate. :)
 
-##### Windows / Mac
+##### Mac
 
-Download git ([Windows](http://git-scm.com/download/win) / [Mac](http://git-scm.com/download/mac)) and install.
+Download [git](http://git-scm.com/download/mac) and install.
 
 We're not going to use the GUI client, because it doesn't allow you to access the powerful guts of git, it's liable to change (making you re-learn everything) and you'll see the same CLI interface on any OS you need to work with in the future.
 
@@ -149,19 +149,6 @@ We're using Python 2.7.x for this project. If you already have python configured
 
 You already have Python. Celebrate. :)
 
-#### Windows
-
-Download the Python 2.7.5 installer from [here](http://www.python.org/getit/). Select 32 or 64 bit as appropriate. Install via the typical method.
-
-If you have selected default installation options, Python 2.7.x should be installed in `C:\Python27` (note down the exact path where you see `python.exe`).
-The installer would've created shortcuts to a light Python IDE called IDLE and a Python interpreter / command-line, but you'll need to add Python to your system path to run scripts the way we need to.
-
-To add Python to your path, right-click "My Computer" (or "Computer") icon wherever you see it (guaranteed to show up in Windows Explorer as the mother of your disk drives). Choose the Properties option at the bottom. Click Advanced System Settings > Environment Variables. In the list of variables, scroll down and double click on "Path" (or select it and hit Edit...). Add `C:\Python27;` (or whatever your python installation directory is) to the beginning of Path (the semi-colon is a separator between two directory entries, and there should be no spaces around it).
-
-Your Path value should now look like: `C:\Python27;C:\Windows\System32;C:\Program Files ... etc.` (exact directories will vary).
-
-Ok/Apply your way out, start a new `cmd` prompt, or better, a new Git Bash shell (this is needed to re-read Path), and run `python --version` to verify. Here is a [video tutorial](http://showmedo.com/videotutorials/video?name=960000&fromSeriesID=96) that walks you through this process (although it's slightly dated - Python 2.5 on Windows XP).
-
 ### YAML
 
 If running `which python-yaml` from a shell (likely doesn't work on Windows) returns no results, or if you see `ImportError: No module named yaml` while running code, you're missing YAML.
@@ -169,10 +156,6 @@ If running `which python-yaml` from a shell (likely doesn't work on Windows) ret
 #### Linux (Debian/Ubuntu)
 
 Run `sudo apt-get install python-yaml`. Celebrate. :)
-
-#### Windows
-
-Try installing via [this](http://pyyaml.org/download/pyyaml/PyYAML-3.10.win32-py2.7.exe) executable (untested).
 
 #### Mac
 
@@ -188,10 +171,6 @@ If you don't have easy_install, I'm told you can install a Dev Tools package to 
 
 Run `sudo apt-get install libzmq-dev python-zmq`. Celebrate. :)
 
-#### Windows
-
-TODO: How?
-
 #### Mac
 
 Run `sudo pip install pyzmq`. If pip is not found, run `sudo easy_install pip` first, and try again.
@@ -205,10 +184,6 @@ This is a small tool for checking if your code conforms to [PEP8]. I strongly su
 #### Linux
 
 Install with `sudo apt-get install pep8`. Celebrate. :)
-
-#### Windows
-
-TODO: Has anyone tried this?
 
 #### Mac
 
@@ -230,10 +205,6 @@ This is currently only needed for running client/desktop_client.py.
 
 Install with `sudo apt-get install python-numpy`. Celebrate. :)
 
-#### Windows
-
-TODO: How?
-
 #### Mac
 
 TODO: How?
@@ -245,10 +216,6 @@ This is currently only needed for running client/desktop_client.py.
 #### Linux
 
 Install with `sudo apt-get install python-opencv`. Celebrate. :)
-
-#### Windows
-
-TODO: How?
 
 #### Mac
 

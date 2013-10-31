@@ -69,5 +69,13 @@ class PubServer(object):
 
         while True:
             # Send motor info
-            socket.send("motors {}".format(self.driver))
-            time.sleep(.5)
+            self.socket.send("motors {}".format(self.driver))
+            sleep(.5)
+
+
+if __name__ == "__main__":
+    if len(sys.argv) == 2:
+        pub_server = PubServer(sys.argv[1])
+    else:
+        pub_server = PubServer()
+    pub_server.publish()

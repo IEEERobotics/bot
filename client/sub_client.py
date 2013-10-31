@@ -1,5 +1,13 @@
 """Subscribe to data published by the bot."""
 
+import sys
+
+try:
+    import zmq
+except ImportError:
+    sys.stderr.write("ERROR: Failed to import zmq. Is it installed?")
+    raise
+
 import client
 
 class SubClient(client.Client):
@@ -10,7 +18,6 @@ class SubClient(client.Client):
         """Get logger and config, build subscribe socket and set topics."""
         super(SubClient, self).__init__("subscribe")
         self.set_topics()
-        self.print_msgs()
 
     def set_topics(self):
         """"""

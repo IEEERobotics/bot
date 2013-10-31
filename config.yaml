@@ -28,5 +28,6 @@ test_strat_base_dir: planner/tests/strategies/
 fsm_tests: ./planner/tests/input/RobotNormalTest.txt
 testing: false
 server_addr: tcp://*:60000
+pub_server_addr: tcp://*:60001
 num_ir_arrays: 4
 irs_per_array: 16

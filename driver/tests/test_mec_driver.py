@@ -70,7 +70,7 @@ class TestRotate(test_bot.TestBot):
                               MecDriver.min_speed) * 0.05
         angle_error_margin = (MecDriver.max_angle -
                               MecDriver.min_angle) * 0.05
-        for test_speed in xrange(MecDriver.min_speed,
+        for test_speed in xrange(MecDriver.min_speed+1,
                                  MecDriver.max_speed + 1, 10):
             for test_angle in xrange(MecDriver.min_angle,
                                      MecDriver.max_angle + 1, 10):
@@ -82,12 +82,29 @@ class TestRotate(test_bot.TestBot):
                                                           self.md.speed,
                                                           self.md.angle))
 
+                """
+                Commented out due to normalizing ruining proportions.
+                Re-activate if we ever remove that.
                 # Check for approximate match, floats will seldom be exact
                 assert fabs(self.md.speed - test_speed) < speed_error_margin
+                """
+
                 # Don't angle if speed is too low
                 if fabs(test_speed) >= 10:
                     assert fabs(self.md.angle - test_angle) % 360 < \
                             angle_error_margin
+
+                # Check for positive values when bot moving forward.
+                if test_angle == 0:
+                    for position, motor in self.md.motors.iteritems():
+                        logger.debug("Motor: {}, Speed: {}, Motor_speed: {}, Angle: {}, Direction: {}".format(
+                                                                position,
+                                                                test_speed,
+                                                                motor.speed,
+                                                                test_angle,
+                                                                motor.direction))
+                        assert motor.direction == "forward"
+                        
 
                 # Check for valid duty cycles (speeds)
                 for motor in self.md.motors.itervalues():

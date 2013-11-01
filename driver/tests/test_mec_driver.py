@@ -2,7 +2,7 @@
 import sys
 import os
 import unittest
-from math import fabs
+from math import fabs, hypot, atan2, degrees
 
 sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
 
@@ -75,16 +75,64 @@ class TestRotate(test_bot.TestBot):
             for test_angle in xrange(MecDriver.min_angle,
                                      MecDriver.max_angle + 1, 10):
                 # Issue move command
-                logger.debug("Set speed: {}, angle: {}".format(test_speed,
-                                                               test_angle))
+                logger.debug("Set speed  : {:3d}, angle: {:3d}".format(
+                                                          test_speed,
+                                                          test_angle))
                 self.md.move(test_speed, test_angle)
-                logger.debug("Check speed: {}, angle: {}".format(
+                logger.debug("Check speed: {:3d}, angle: {:3d}".format(
                                                           self.md.speed,
                                                           self.md.angle))
 
                 # Check for approximate match, floats will seldom be exact
                 assert fabs(self.md.speed - test_speed) < speed_error_margin
-                # Don't angle if speed is too low
+                # NOTE(napratin, 11/1): speed will mismatch if there's scaling
+                # Don't check angle if speed is too low
+                if fabs(test_speed) >= 10:
+                    assert fabs(self.md.angle - test_angle) % 360 < \
+                            angle_error_margin
+
+                # Check for valid duty cycles (speeds)
+                for motor in self.md.motors.itervalues():
+                    assert MecDriver.min_speed <= motor.speed <= \
+                                                  MecDriver.max_speed
+
+    def test_move_forward_strafe(self):
+        speed_error_margin = (MecDriver.max_speed -
+                              MecDriver.min_speed) * 0.05
+        angle_error_margin = (MecDriver.max_angle -
+                              MecDriver.min_angle) * 0.05
+
+        for test_forward in xrange(MecDriver.min_speed,
+                                 MecDriver.max_speed + 1, 10):
+            for test_strafe in xrange(MecDriver.min_speed,
+                                     MecDriver.max_speed + 1, 10):
+                # Issue move_forward_strafe command
+                logger.debug("Set forward: {:3d}, strafe: {:3d}".format(
+                                                          test_forward,
+                                                          test_strafe))
+                self.md.move_forward_strafe(test_forward, test_strafe)
+
+                # Compute expected speed and angle
+                test_speed = int(hypot(test_forward, test_strafe))
+                if test_speed < MecDriver.min_speed:
+                    test_speed = MecDriver.min_speed
+                elif test_speed > MecDriver.max_speed:
+                    test_speed = MecDriver.max_speed
+                # Note order of atan2() args to get forward = 0 deg
+                test_angle = int(degrees(atan2(test_strafe, test_forward))) \
+                                % 360
+                logger.debug("Exp. speed : {:3d}, angle: {:3d}".format(
+                                                          test_speed,
+                                                          test_angle))
+
+                logger.debug("Check speed: {:3d}, angle: {:3d}".format(
+                                                          self.md.speed,
+                                                          self.md.angle))
+
+                # Check for approximate match, floats will seldom be exact
+                assert fabs(self.md.speed - test_speed) < speed_error_margin
+                # NOTE(napratin, 11/1): speed will mismatch if there's scaling
+                # Don't check angle if speed is too low
                 if fabs(test_speed) >= 10:
                     assert fabs(self.md.angle - test_angle) % 360 < \
                             angle_error_margin

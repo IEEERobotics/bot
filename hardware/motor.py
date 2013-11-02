@@ -115,14 +115,15 @@ class Motor(object):
         """Setter for motor's speed as % of max (same as duty cycle).
 
         :param speed: Speed to set motor to in % of maximum.
-        :type speed: int
+        :type speed: float
 
         """
+        speed = int(round(speed))
         if speed > 100:
-            self.logger.warn("Invalid speed {}, using 100.".format(speed))
+            self.logger.warn("Invalid speed {}, using 100".format(speed))
             speed = 100
         elif speed < 0:
-            self.logger.warn("Invalid speed {}, using 0.".format(speed))
+            self.logger.warn("Invalid speed {}, using 0".format(speed))
             speed = 0
 
         self.pwm.duty = int(round((speed / 100.) * self.pwm.period))

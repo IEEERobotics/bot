@@ -10,15 +10,17 @@ from time import sleep
 import lib.lib as lib
 import client.desktop_client as desktop_client_mod
 import client.cli_client as cli_client_mod
+import client.sub_client as sub_client_mod
 import planner.fsm_planner as pfsm_mod
 
 
 def main(argv):
     """Get arguments and handle them."""
     try:
-        opts, args = getopt.getopt(argv, "hsdtp8xcT",
-                     ["help", "server", "desktop", "tests", "planner",
-                      "pep8", "exit-server", "cli", "test-mode"])
+        opts, args = getopt.getopt(argv, "hsdtp8xcTfu",
+                     ["help", "server", "desktop", "tests", "fsm-planner",
+                      "pep8", "exit-server", "cli", "test-mode", "pub-server",
+                      "sub"])
     except getopt.GetoptError:
         print_help()
         sys.exit(2)
@@ -42,13 +44,19 @@ def main(argv):
         print "Running unit tests"
         os.system("python -m unittest discover")
 
-    if "-p" in opt_list or "--planner" in opt_list:
+    if "-f" in opt_list or "--planner" in opt_list:
         print "Starting planner"
         planner = pfsm_mod.Robot()
 
     if "-s" in opt_list or "--server" in opt_list:
         print "Starting server"
         server = Popen(["./server/server.py", test_mode])
+        # Give server a chance to get up and running
+        sleep(.2)
+
+    if "-p" in opt_list or "--pub-server" in opt_list:
+        print "Starting PubServer"
+        pub_server = Popen(["./server/pub_server.py", test_mode])
         # Give server a chance to get up and running
         sleep(.2)
 
@@ -59,6 +67,10 @@ def main(argv):
     if "-c" in opt_list or "--cli" in opt_list:
         print "Starting CLI client."
         cli_client_mod.CLIClient().cmdloop()
+
+    if "-u" in opt_list or "--sub" in opt_list:
+        print "Starting subscriber client"
+        sub_client_mod.SubClient().print_msgs()
 
     if "-x" in opt_list or "--exit-server" in opt_list:
         try:

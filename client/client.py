@@ -16,8 +16,18 @@ class Client(object):
 
     """Parent class for clients that control the bot."""
 
-    def __init__(self):
-        """Get logger and config, connect to server."""
+    def __init__(self, client_type="request"):
+        """Get logger and config, connect to server.
+
+        Note that this constructor supports building request or subscribe
+        type clients, and will build the appropriate socket type and
+        connect to the appropriate server addressed based on that param.
+        The default behavior is to build a request client.
+
+        :param client_type: Type of client to built ("request" or "subscribe").
+        :type client_type: string
+
+        """
         # Get logger
         self.logger = lib.get_logger()
 
@@ -26,10 +36,16 @@ class Client(object):
 
         # Build ZMQ socket and connect to server
         self.context = zmq.Context()
-        self.sock = self.context.socket(zmq.REQ)
-        self.sock.connect(self.config["server_addr"])
-        self.logger.info("Connected to control server at {}".format(
-                                            self.config["server_addr"]))
+        if client_type == "request":
+            self.logger.debug("Building request type client.")
+            self.sock = self.context.socket(zmq.REQ)
+            server_addr = self.config["server_addr"]
+        elif client_type == "subscribe":
+            self.logger.debug("Building subscribe type client.")
+            self.sock = self.context.socket(zmq.SUB)
+            server_addr = self.config["pub_server_addr"]
+        self.sock.connect(server_addr)
+        self.logger.info("Connected to server at {}".format(server_addr))
 
     def __str__(self):
         """Build human-readable representation of client.

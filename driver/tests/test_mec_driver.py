@@ -70,7 +70,7 @@ class TestRotate(test_bot.TestBot):
                               MecDriver.min_speed) * 0.05
         angle_error_margin = (MecDriver.max_angle -
                               MecDriver.min_angle) * 0.05
-        for test_speed in xrange(MecDriver.min_speed+1,
+        for test_speed in xrange(MecDriver.min_speed + 1,
                                  MecDriver.max_speed + 1, 10):
             for test_angle in xrange(MecDriver.min_angle,
                                      MecDriver.max_angle + 1, 10):

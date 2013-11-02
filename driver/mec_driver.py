@@ -193,13 +193,13 @@ class MecDriver(driver.Driver):
             front_left, front_right, back_left, back_right))
 
         # Set motor directions
-        self.motors["front_left"].direction = "forward" if front_left > 0 \
+        self.motors["front_left"].direction = "forward" if front_left >= 0 \
                                                         else "reverse"
-        self.motors["front_right"].direction = "forward" if front_right > 0 \
+        self.motors["front_right"].direction = "forward" if front_right >= 0 \
                                                          else "reverse"
-        self.motors["back_left"].direction = "forward" if back_left > 0 \
+        self.motors["back_left"].direction = "forward" if back_left >= 0 \
                                                        else "reverse"
-        self.motors["back_right"].direction = "forward" if back_right > 0 \
+        self.motors["back_right"].direction = "forward" if back_right >= 0 \
                                                         else "reverse"
 
         # Set motor speeds

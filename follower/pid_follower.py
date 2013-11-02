@@ -6,6 +6,7 @@ import lib.lib as lib
 import hardware.ir_hub as ir_hub_mod
 import driver.mec_driver as mec_driver_mod
 import lib.exceptions as ex
+from time import time
 
 
 class PIDFollower(object):
@@ -26,12 +27,15 @@ class PIDFollower(object):
         self.left_position = [0, 0, 0, 0]       
         self.right_position = [0, 0, 0, 0]        
         self.current_heading = 0;
-        self.front_ke = 1
+        self.front_kp = 1
         self.front_kd = 1
         self.front_ki = 1
         self.back_ke = 1
         self.back_kd = 1
         self.back_ki = 1
+        self.heading = 2.8125
+        self.previous_front_i_error = 0
+        self.previous_back_i_error = 0
         
     def follow(self, state_table):
         """Accept and handle fire commands.
@@ -41,31 +45,61 @@ class PIDFollower(object):
         :param cmd: Description of fire action to execute.
         
         """
+       
         self.state_table = state_table
+        # get the intial condetion
+        previous_time = time()
+        #while(1)
         # assign the arrays to the correct heading
         self.assign_arrays()
+        # get the current time of the cpu
+        if((self.front_reading < 0)or(self.back_reading < 0)):
+            print "Found X"
+        current_time = time()
         # calculate the postion of the forward and back sensers
-        self.calculate_postion()
+        self.calculate_position()
         # call front PID
-        self.front_pid()
+        self.sampling_time = current_time - previous_time
+        # call front PID
+        front_error = self.front_pid()
         # call back PID
-        self.back_pid() 
+        back_error = self.back_pid() 
+        # update motors
+        self.motors(front_error, back_error)
+        # take the current time set it equal to the privious time
+        previous_time = current_time
         
+    def motors(self, front_error, back_error): 
+       """ used to update the motors speed and angler moation"""
+       pass 
+       
     def front_pid(self):
         """ calculate the k value for the forward pid"""
-        pass
-        #p_error = self.front_ke*(heading - self.front_positon[1])
-        #d_error = self.front_kd*(self.front_positon[1] - self.front_positon[2])/sampleing_time
-        #intergration_error = (self.front_postion[1] + self.front_postion[2])/2*sampling_time + last_intergration_error
-        #last_intergration_error = inter
-        #I_error = self.front_ki*((self.front_positon[1] + self.front_positon[2])/2*sampling_time + last )
-        #return p_error + d_error + I_error  
+        # calculate the papration error
+        p_error = (self.heading - self.front_position[0])
+        # calculate the derivation error
+        d_error = (self.front_position[0] - self.front_position[1])/self.sampling_time
+        # calulate the intergration error
+        i_error = (self.front_position[0] + self.front_position[1])/2*self.sampling_time + self.previous_front_i_error
+        # update the previous intergration error to the new error
+        self.previous_front_i_error = i_error
+        # return the total error for the front of the bot
+        return self.front_kp*p_error + self.front_kd*d_error + self.front_ki*i_error  
 
     def back_pid(self):
         """ calculate the k value for the back pid"""
-        pass
+        # caculate the papration error
+        p_error = (self.heading - self.back_position[0])
+        # calculate the derivation error
+        d_error = (self.back_position[0] - self.back_position[1])/self.sampling_time
+        # calculate the intergration error
+        i_error = (self.back_position[0] + self.back_position[1])/2*self.sampling_time + self.previous_back_i_error
+        # update the previous intergration error with the new error
+        self.previous_back_i_error = i_error
+        # return the total error fot the back of the bot
+        return self.front_kp*p_error + self.front_kd*d_error + self.front_ki*i_error 
                 
-    def calculate_postion(self):
+    def calculate_position(self):
         """ calculate the postion of the line as it is on the bot"""
         # get rid of the last entry
         self.front_position = self.front_position[:len(self.front_position)-1]
@@ -134,7 +168,7 @@ class PIDFollower(object):
                 # count the number of hits
                 postion_count  = postion_count + 1  
                 # add the postion to the last postion  
-                postion = postion + v*(15.-n)*12/15
+                postion = postion + v*(15.-n)*(5.625)/15
         # if there ate more than 3 hits than stop line following
         if(postion_count > 3):
             # return error condition

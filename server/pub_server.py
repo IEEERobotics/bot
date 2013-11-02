@@ -68,9 +68,138 @@ class PubServer(object):
                                             self.config["pub_server_addr"]))
 
         while True:
-            # Send motor info
-            self.socket.send("motors {}".format(self.driver))
-            sleep(.5)
+            self.pub_drive_motor_br_detail()
+            self.pub_drive_motor_fr_detail()
+            self.pub_drive_motor_bl_detail()
+            self.pub_drive_motor_fl_detail()
+            self.pub_gun_motor_detail()
+            self.pub_turret_detail()
+            self.pub_gun_speed()
+            self.pub_turret_yaw()
+            self.pub_turret_pitch()
+            self.pub_drive_motor_br_speed()
+            self.pub_drive_motor_fr_speed()
+            self.pub_drive_motor_bl_speed()
+            self.pub_drive_motor_fl_speed()
+            self.pub_drive_motor_br_dir()
+            self.pub_drive_motor_fr_dir()
+            self.pub_drive_motor_bl_dir()
+            self.pub_drive_motor_fl_dir()
+            self.pub_drive_motor_br_vel()
+            self.pub_drive_motor_fr_vel()
+            self.pub_drive_motor_bl_vel()
+            self.pub_drive_motor_fl_vel()
+            self.pub_irs()
+            sleep(1)
+
+    def pub_drive_motor_br_detail(self):
+        """Publish all info about back right drive motor."""
+        br_motor = self.driver.motors["back_right"]
+        self.socket.send("drive_motor_br_detail {}".format(br_motor))
+
+    def pub_drive_motor_fr_detail(self):
+        """Publish all info about front right drive motor."""
+        fr_motor = self.driver.motors["front_right"]
+        self.socket.send("drive_motor_fr_detail {}".format(fr_motor))
+
+    def pub_drive_motor_bl_detail(self):
+        """Publish all info about back left drive motor."""
+        bl_motor = self.driver.motors["back_left"]
+        self.socket.send("drive_motor_bl_detail {}".format(bl_motor))
+
+    def pub_drive_motor_fl_detail(self):
+        """Publish all info about front left drive motor."""
+        fl_motor = self.driver.motors["front_left"]
+        self.socket.send("drive_motor_fl_detail {}".format(fl_motor))
+
+    def pub_gun_motor_detail(self):
+        """Publish all info about gun motors"""
+        for motor in self.gunner.motors:
+            self.socket.send("gun_motor_detail {}".format(motor))
+
+    def pub_turret_detail(self):
+        """Publish all info about turret servos."""
+        self.socket.send("turret_detail {}".format(self.gunner.turret))
+
+    def pub_gun_speed(self):
+        """Publish speed of gun motors."""
+        self.socket.send("gun_speed {}".format(self.gunner.wheel_speed))
+
+    def pub_turret_yaw(self):
+        """Publish yaw angle of turret."""
+        self.socket.send("turret_yaw {}".format(self.gunner.turret.yaw))
+
+    def pub_turret_pitch(self):
+        """Publish pitch angle of turret."""
+        self.socket.send("turret_pitch {}".format(self.gunner.turret.pitch))
+
+    def pub_drive_motor_br_speed(self):
+        """Publish speed of back right drive motor."""
+        speed = self.driver.motors["back_right"].speed
+        self.socket.send("drive_motor_br_speed {}".format(speed))
+
+    def pub_drive_motor_fr_speed(self):
+        """Publish speed of front right drive motor."""
+        speed = self.driver.motors["front_right"].speed
+        self.socket.send("drive_motor_fr_speed {}".format(speed))
+
+    def pub_drive_motor_bl_speed(self):
+        """Publish speed of back left drive motor."""
+        speed = self.driver.motors["back_left"].speed
+        self.socket.send("drive_motor_bl_speed {}".format(speed))
+
+    def pub_drive_motor_fl_speed(self):
+        """Publish speed of front left drive motor."""
+        speed = self.driver.motors["front_left"].speed
+        self.socket.send("drive_motor_fl_speed {}".format(speed))
+
+    def pub_drive_motor_br_dir(self):
+        """Publish direction of back right drive motor."""
+        direction = self.driver.motors["back_right"].direction
+        self.socket.send("drive_motor_br_dir {}".format(direction))
+
+    def pub_drive_motor_fr_dir(self):
+        """Publish direction of front right drive motor."""
+        direction = self.driver.motors["front_right"].direction
+        self.socket.send("drive_motor_fr_dir {}".format(direction))
+
+    def pub_drive_motor_bl_dir(self):
+        """Publish direction of back left drive motor."""
+        direction = self.driver.motors["back_left"].direction
+        self.socket.send("drive_motor_bl_dir {}".format(direction))
+
+    def pub_drive_motor_fl_dir(self):
+        """Publish direction of front left drive motor."""
+        direction = self.driver.motors["front_left"].direction
+        self.socket.send("drive_motor_fl_dir {}".format(direction))
+
+    def pub_drive_motor_br_vel(self):
+        """Publish velocity of back right drive motor."""
+        velocity = self.driver.motors["back_right"].velocity
+        self.socket.send("drive_motor_br_vel {}".format(velocity))
+
+    def pub_drive_motor_fr_vel(self):
+        """Publish velocity of front right drive motor."""
+        velocity = self.driver.motors["front_right"].velocity
+        self.socket.send("drive_motor_fr_vel {}".format(velocity))
+
+    def pub_drive_motor_bl_vel(self):
+        """Publish velocity of back left drive motor."""
+        velocity = self.driver.motors["back_left"].velocity
+        self.socket.send("drive_motor_bl_vel {}".format(velocity))
+
+    def pub_drive_motor_fl_vel(self):
+        """Publish velocity of front left drive motor."""
+        velocity = self.driver.motors["front_left"].velocity
+        self.socket.send("drive_motor_fl_vel {}".format(velocity))
+
+    def pub_irs(self):
+        """Publish IR readings from all sensors."""
+        reading = self.follower.irs.read_all_arrays()
+        self.socket.send("ir_front {}".format(reading["front"]))
+        self.socket.send("ir_back {}".format(reading["back"]))
+        self.socket.send("ir_left {}".format(reading["left"]))
+        self.socket.send("ir_right {}".format(reading["right"]))
 
 
 if __name__ == "__main__":

@@ -36,7 +36,7 @@ class LeapClient(Leap.Listener, client.Client):
         :param controller: Leap controller object.
 
         """
-        client.Client.__init__()
+        client.Client.__init__(self)
         self.isProcessing = False  # Semaphore to prevent asynchronous clashes
 
     def on_connect(self, controller):

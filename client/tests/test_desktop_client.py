@@ -41,7 +41,11 @@ class TestBasic(test_bot.TestBot):
         # Build socket and connect to server
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
-        self.socket.connect(self.config["server_addr"])
+        self.server_connect_addr = "{protocol}://{host}:{port}".format(
+                                    protocol=self.config["server_protocol"],
+                                    host=self.config["server_host"],
+                                    port=self.config["server_port"])
+        self.socket.connect(self.server_connect_addr)
 
         # Build desktop client and tell it to run
         self.dclient = dclient_mod.DesktopClient()

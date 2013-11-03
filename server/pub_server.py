@@ -51,7 +51,11 @@ class PubServer(object):
         # Build ZMQ publisher socket
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.PUB)
-        self.socket.bind(self.config["pub_server_addr"])
+        self.server_bind_addr = "{protocol}://{host}:{port}".format(
+            protocol=self.config["server_protocol"],
+            host=self.config["server_bind_host"],
+            port=self.config["pub_server_port"])
+        self.socket.bind(self.server_bind_addr)
 
         # Build MecDriver, which owns movement-related data
         self.driver = md_mod.MecDriver()
@@ -65,7 +69,7 @@ class PubServer(object):
     def publish(self):
         """Publish information about bot."""
         self.logger.info("PubServer publishing on {}".format(
-                                            self.config["pub_server_addr"]))
+                                            self.server_bind_addr))
 
         while True:
             self.pub_drive_motor_br_detail()

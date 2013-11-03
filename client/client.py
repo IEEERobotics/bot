@@ -39,13 +39,20 @@ class Client(object):
         if client_type == "request":
             self.logger.debug("Building request type client.")
             self.sock = self.context.socket(zmq.REQ)
-            server_addr = self.config["server_addr"]
+            self.server_connect_addr = "{protocol}://{host}:{port}".format(
+                protocol=self.config["server_protocol"],
+                host=self.config["server_host"],
+                port=self.config["server_port"])
         elif client_type == "subscribe":
             self.logger.debug("Building subscribe type client.")
             self.sock = self.context.socket(zmq.SUB)
-            server_addr = self.config["pub_server_addr"]
-        self.sock.connect(server_addr)
-        self.logger.info("Connected to server at {}".format(server_addr))
+            self.server_connect_addr = "{protocol}://{host}:{port}".format(
+                protocol=self.config["server_protocol"],
+                host=self.config["server_host"],
+                port=self.config["pub_server_port"])
+        self.sock.connect(self.server_connect_addr)
+        self.logger.info("Connected to server at {}".format(
+                                                self.server_connect_addr))
 
     def __str__(self):
         """Build human-readable representation of client.

@@ -53,7 +53,11 @@ class Server(object):
         # Listen for incoming requests
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REP)
-        self.socket.bind(self.config["server_addr"])
+        self.server_bind_addr = "{protocol}://{host}:{port}".format(
+            protocol=self.config["server_protocol"],
+            host=self.config["server_bind_host"],
+            port=self.config["server_port"])
+        self.socket.bind(self.server_bind_addr)
 
         # Build MecDriver, which will accept and handle movement actions
         self.driver = md_mod.MecDriver()
@@ -67,7 +71,7 @@ class Server(object):
     def listen(self):
         """Listen for messages, pass them off to be handled and send reply."""
         self.logger.info("Server listening on {}".format(
-                                                self.config["server_addr"]))
+                                                self.server_bind_addr))
         while True:
             msg_raw = self.socket.recv()
             self.logger.debug("Received: {}".format(msg_raw))

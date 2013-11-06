@@ -257,7 +257,7 @@ class Firing(State):
     def run(self):
         """Calls the firing behavior. Increments the shot counter."""
         #TODO (PaladinEng): Passing firing position index for firing solution?
-        self.gunner.fire()
+        self.gunner.auto_fire()
         self.logger.debug( "Execute: One shot = One kill.\n")
         self.stateTable.shotsTaken += 1
 

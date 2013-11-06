@@ -24,7 +24,7 @@ class WheelGunner(gunner.Gunner):
         for motor in self.config["gun_motors"]:
             self.motors.append(m_mod.Motor(motor["PWM"]))
 
-    def fire(self):
+    def auto_fire(self):
         """Get location, aim turret, accelerate wheels and advance dart."""
         # Get the block we're over
         block = self.localizer.which_block()
@@ -39,7 +39,6 @@ class WheelGunner(gunner.Gunner):
         self.aim_turret(yaw, ptch)
         # TODO(dfarrell07): Wait until turret has moved
         self.wheel_speed = spd
-        # TODO(dfarrell07): Confirm speed via encoders
         self.advance_dart()
         self.logger.info("Fired dart")
 

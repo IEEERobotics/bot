@@ -89,7 +89,7 @@ class CLIClient(client.Client, cmd.Cmd):
         :type raw_args: string
 
         """
-        self.send_fire()
+        self.send_auto_fire()
 
     def help_auto_fire(self):
         """Provide help message for auto_fire command."""

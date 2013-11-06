@@ -261,14 +261,14 @@ class TestHandleRotate(test_bot.TestBot):
         assert reply == "Error: Rotate speed is out of bounds", reply
 
 
-class TestHandleFire(test_bot.TestBot):
+class TestHandleAutoFire(test_bot.TestBot):
 
     """Test fire command."""
 
     def setUp(self):
         """Build server and connect to it."""
         # Run general bot test setup
-        super(TestHandleFire, self).setUp()
+        super(TestHandleAutoFire, self).setUp()
 
         # Build server. Arg is testing or not.
         self.server = Popen(["./server/server.py", "True"])
@@ -289,13 +289,13 @@ class TestHandleFire(test_bot.TestBot):
         self.server.kill()
 
         # Run general bot test tear down
-        super(TestHandleFire, self).tearDown()
+        super(TestHandleAutoFire, self).tearDown()
 
     def testValid(self):
         """Test fire message that's perfectly valid."""
-        self.socket.send("{cmd: fire, opts: {}}")
+        self.socket.send("{cmd: auto_fire, opts: {}}")
         reply = self.socket.recv()
-        assert reply == "Success: Fired"
+        assert reply == "Success: Fired", reply
 
 
 class TestHandleAim(test_bot.TestBot):

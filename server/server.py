@@ -115,8 +115,8 @@ class Server(object):
             return self.handle_move(opts)
         elif cmd == "rotate":
             return self.handle_rotate(opts)
-        elif cmd == "fire":
-            return self.handle_fire()
+        elif cmd == "auto_fire":
+            return self.handle_auto_fire()
         elif cmd == "aim":
             return self.handle_aim(opts)
         elif cmd == "advance_dart":
@@ -233,7 +233,7 @@ class Server(object):
 
         return "Success: {}".format(opts)
 
-    def handle_fire(self):
+    def handle_auto_fire(self):
         """Make fire call to gunner. Normally used in autonomous mode.
 
         :returns: success or error message with description.
@@ -241,7 +241,7 @@ class Server(object):
         """
         # Make call to gunner
         try:
-            self.gunner.fire()
+            self.gunner.auto_fire()
         except Exception as e:
             return "Error: {}".format(e)
 

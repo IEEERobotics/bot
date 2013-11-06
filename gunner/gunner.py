@@ -31,14 +31,14 @@ class Gunner(object):
         # Build turrent hardware abstraction
         self.turret = t_mod.Turret()
 
-    def fire(self):
+    def auto_fire(self):
         """Accept and handle fire commands.
 
         This method is not meant to be called, but instead is meant to show
         that subclasses should override it in their implementation.
 
         """
-        self.logger.error("The fire method must be overridden by a subclass.")
+        self.logger.error("auto_fire method must be overridden by a subclass.")
         raise NotImplementedError("Subclass must override this method.")
 
     def aim_turret(self, yaw, pitch):

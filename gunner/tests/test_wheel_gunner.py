@@ -81,7 +81,7 @@ class TestUpdateRotateSpeed(test_bot.TestBot):
             self.wg.wheel_speed = -1
 
 
-class TestFire(test_bot.TestBot):
+class TestAutoFire(test_bot.TestBot):
 
     """Test firing a dart.
 
@@ -92,7 +92,7 @@ class TestFire(test_bot.TestBot):
     def setUp(self):
         """Setup test hardware files and build wheel gunner object."""
         # Run general bot test setup
-        super(TestFire, self).setUp()
+        super(TestAutoFire, self).setUp()
 
         # Build wheel gunner
         self.wg = wg_mod.WheelGunner()
@@ -100,15 +100,15 @@ class TestFire(test_bot.TestBot):
     def tearDown(self):
         """Restore testing flag state in config file."""
         # Run general bot test tear down
-        super(TestFire, self).tearDown()
+        super(TestAutoFire, self).tearDown()
 
-    def test_fire(self):
+    def test_auto_fire(self):
         """Simply execute the fire method.
 
         TODO(dfarrell07): Flesh out this test.
 
         """
-        self.wg.fire()
+        self.wg.auto_fire()
 
 
 class TestAdvanceDart(test_bot.TestBot):

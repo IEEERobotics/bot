@@ -114,13 +114,13 @@ class Client(object):
         opts = "{}"
         return self.send_cmd(cmd, opts)
 
-    def send_fire(self):
-        """Send command to fire dart.
+    def send_auto_fire(self):
+        """Send command to fire dart using autonomous methods.
 
         :returns: True for success, False for failure.
 
         """
-        cmd = "fire"
+        cmd = "auto_fire"
         opts = "{}"
         return self.send_cmd(cmd, opts)
 

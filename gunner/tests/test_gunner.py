@@ -83,7 +83,7 @@ class TestAimTurret(test_bot.TestBot):
             self.gunner.aim_turret(90, -1)
 
 
-class TestFire(test_bot.TestBot):
+class TestAutoFire(test_bot.TestBot):
 
     """Test firing a dart.
 
@@ -94,7 +94,7 @@ class TestFire(test_bot.TestBot):
     def setUp(self):
         """Setup test hardware files and build wheel gunner object."""
         # Run general bot test setup
-        super(TestFire, self).setUp()
+        super(TestAutoFire, self).setUp()
 
         # Build wheel gunner
         self.gunner = g_mod.Gunner()
@@ -102,13 +102,13 @@ class TestFire(test_bot.TestBot):
     def tearDown(self):
         """Restore testing flag state in config file."""
         # Run general bot test tear down
-        super(TestFire, self).tearDown()
+        super(TestAutoFire, self).tearDown()
 
-    def test_fire(self):
+    def test_auto_fire(self):
         """Simply execute the fire method.
 
         TODO(dfarrell07): Flesh out this test.
 
         """
         with self.assertRaises(NotImplementedError):
-            self.gunner.fire()
+            self.gunner.auto_fire()

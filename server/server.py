@@ -24,6 +24,7 @@ sys.path = new_path + sys.path
 
 import lib.lib as lib
 import driver.mec_driver as md_mod
+import hardware.wheel_gun as wgun_mod
 import gunner.wheel_gunner as wg_mod
 import follower.follower as f_mod
 
@@ -62,6 +63,9 @@ class Server(object):
         # Build MecDriver, which will accept and handle movement actions
         self.driver = md_mod.MecDriver()
 
+        # Build WheelGun (TODO: incorporate into gunner)
+        self.gun = wgun_mod.WheelGun()
+
         # Build WheelGunner, which will accept and handle fire actions
         self.gunner = wg_mod.WheelGunner()
 
@@ -73,9 +77,12 @@ class Server(object):
         self.logger.info("Server listening on {}".format(
                                                 self.server_bind_addr))
         while True:
+            # TODO: Use recv_json to avoid having to parse input separately?
             msg_raw = self.socket.recv()
             self.logger.debug("Received: {}".format(msg_raw))
 
+            # TODO: Send JSON object directly using send_json?
+            #       All handle_*() methods must then return a dict.
             reply_msg = self.handle_msg(msg_raw)
             self.logger.debug("Replying: {}".format(reply_msg))
             self.socket.send(reply_msg)
@@ -102,6 +109,7 @@ class Server(object):
             return "Error: Unable to parse msg as YAML: {}".format(msg_raw)
 
         try:
+            # TODO: Not all handle_*()s require opts; standardize this?
             opts = msg["opts"]
             assert type(opts) is dict
         except KeyError:
@@ -109,6 +117,7 @@ class Server(object):
         except AssertionError:
             return "Error: Key 'opts' is not a dict"
 
+        # TODO: Switch from if..else to a string -> function map (dict)
         if cmd == "fwd_strafe_turn":
             return self.handle_fwd_strafe_turn(opts)
         elif cmd == "move":
@@ -123,6 +132,12 @@ class Server(object):
             return self.handle_advance_dart()
         elif cmd == "fire_speed":
             return self.handle_fire_speed(opts)
+        elif cmd == "laser":
+            return self.handle_laser(opts)
+        elif cmd == "spin":
+            return self.handle_spin(opts)
+        elif cmd == "fire":
+            return self.handle_fire()
         elif cmd == "die":
             self.handle_die()
         else:
@@ -315,6 +330,68 @@ class Server(object):
             return "Error: {}".format(e)
 
         return "Success: {}".format(opts)
+
+    def handle_laser(self, opts):
+        """Turn laser ON or OFF.
+
+        :param opts: Dict with key 'state' (0/1).
+        :type opts: dict
+        :returns: Success or error message with description.
+
+        """
+        # Validate state option
+        try:
+            state = int(round(opts["state"]))
+        except KeyError:
+            return "Error: No 'state' opt given"
+        except TypeError:
+            return "Error: Could not convert state to int"
+
+        # Make call to gun
+        try:
+            result = self.gun.laser(state)
+            return "Success: {{result: {}}}".format(result)
+            # TODO: Return JSON object / dict, with status, result [, msg]
+        except Exception as e:
+            return "Error: {}".format(e)
+
+    def handle_spin(self, opts):
+        """Turn gun motor spin ON or OFF.
+
+        :param opts: Dict with key 'state' (0/1).
+        :type opts: dict
+        :returns: Success or error message with description.
+
+        """
+        # Validate state option
+        try:
+            state = int(round(opts["state"]))
+        except KeyError:
+            return "Error: No 'state' opt given"
+        except TypeError:
+            return "Error: Could not convert state to int"
+
+        # Make call to gun
+        try:
+            result = self.gun.spin(state)
+            return "Success: {{result: {}}}".format(result)
+            # TODO: Return JSON object / dict, with status, result [, msg]
+        except Exception as e:
+            return "Error: {}".format(e)
+
+    def handle_fire(self):
+        """Make fire call to gun, using default parameters.
+
+        :returns: Success or error message with description.
+
+        """
+        # Make call to gun
+        try:
+            result = self.gun.fire()
+            return "Success: {{result: {}}}".format(result)
+            # TODO: Return JSON object / dict, with status, result [, msg]
+        except Exception as e:
+            return "Error: {}".format(e)
 
     def handle_die(self):
         """Accept poison pill and gracefully exit.

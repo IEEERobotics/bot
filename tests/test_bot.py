@@ -29,8 +29,9 @@ class TestBot(unittest.TestCase):
         # Write known values to all simulated hardware files
         self.setup_drive_motors()
         self.setup_turret_servos()
+        self.setup_lasor()
         self.setup_gun_motors()
-        self.setup_gun_sol()
+        self.setup_gun_trigger()
         self.setup_ir_select_gpios()
         self.setup_ir_input_adcs()
 
@@ -53,18 +54,19 @@ class TestBot(unittest.TestCase):
         for servo in self.config["turret_servos"]:
             self.setup_pwm(servo["PWM"], run, duty_ns, period_ns, polarity)
 
-    def setup_gun_motors(self):
-        """Set gun motor simulation files to known state."""
-        run = "0\n"
-        duty_ns = "250000\n"
-        period_ns = "1000000\n"
-        polarity = "0\n"
-        for motor in self.config["gun_motors"]:
-            self.setup_pwm(motor["PWM"], run, duty_ns, period_ns, polarity)
+    def setup_lasor(self):
+        """Set gun lasor simulation files to known state."""
+        self.setup_gpio(self.config["gun"]["laser_gpio"])
 
-    def setup_gun_sol(self):
-        """Set gun solenoid simulation files to known state."""
-        self.setup_gpio(self.config["gun_sol"]["GPIO"])
+    def setup_gun_motors(self):
+        """Set gun motor GPIO simulation files to known state."""
+        for gpio_num in self.config["gun"]["motor_gpios"].itervalues():
+            self.setup_gpio(gpio_num)
+
+    def setup_gun_trigger(self):
+        """Set gun trigger GPIO simulation files to known state."""
+        for gpio_num in self.config["gun"]["trigger_gpios"].itervalues():
+            self.setup_gpio(gpio_num)
 
     def setup_ir_select_gpios(self):
         """Set IR GPIO simulation files to known state."""

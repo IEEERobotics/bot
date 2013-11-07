@@ -18,6 +18,7 @@ except ImportError:
 logger = lib.get_logger()
 
 
+@unittest.skip("No solenoids configured (not being used on bot)")
 class TestState(test_bot.TestBot):
 
     """Test extending and retracting a solenoid"""
@@ -71,6 +72,7 @@ class TestState(test_bot.TestBot):
                 assert int(cur_gpio["value"]) == 1
 
 
+@unittest.skip("No solenoids configured (not being used on bot)")
 class TestDirection(test_bot.TestBot):
 
     """Test the direction setting of the solenoid's GPIO pin."""

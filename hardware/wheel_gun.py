@@ -127,7 +127,7 @@ class WheelGun:
         self._pulse_gpio(self.trigger_gpios['retract'], retract_duration)
         return True
 
-    def fire_auto(self, count=3, delay=2):
+    def fire_burst(self, count=3, delay=2):
         """Fire a number of darts consecutively."""
         if count <= 0:
             self.logger.warning("Invalid count: {}".format(count))

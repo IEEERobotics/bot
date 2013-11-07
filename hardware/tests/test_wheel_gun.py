@@ -125,13 +125,13 @@ class TestWheelGun(test_bot.TestBot):
         assert result is False
         check_trigger_gpios(0)
 
-    def test_fire_auto(self):
-        """Test automatic-mode firing function."""
-        # Test normal auto-fire
-        result = self.gun.fire_auto()
+    def test_fire_burst(self):
+        """Test burstmatic-mode firing function."""
+        # Test normal burst-fire
+        result = self.gun.fire_burst()
         assert result is True
         # Test invalid count (negative)
-        result = self.gun.fire_auto(count=-2)
+        result = self.gun.fire_burst(count=-2)
         assert result is False
         # Test invalid delay (negative)
         result = self.gun.fire(delay=-1.0)

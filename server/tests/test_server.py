@@ -15,7 +15,7 @@ except ImportError:
 
 try:
     import lib.lib as lib
-    import server
+    import server as server_mod
     import tests.test_bot as test_bot
 except ImportError:
     print "ImportError: Use `python -m unittest discover` from project root."
@@ -25,7 +25,6 @@ except ImportError:
 logger = lib.get_logger()
 
 
-@unittest.skip("Not yet updated to work with JSON server")
 class TestHandleMessage(test_bot.TestBot):
 
     """Basic tests handle message method."""
@@ -57,39 +56,39 @@ class TestHandleMessage(test_bot.TestBot):
         super(TestHandleMessage, self).tearDown()
 
     def testInvalidMsgType(self):
-        """Test sending a non-dict message."""
-        self.socket.send("not_a_dict")
-        reply = self.socket.recv()
-        assert reply == "Error: Unable to convert message to dict"
+        """Test sending a non-JSON message."""
+        self.socket.send("not_json")
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Error"
+        assert reply["msg"] == "Non-JSON message"
 
     def testInvalidCmdKey(self):
         """Test sending a message without a valid cmd key."""
-        self.socket.send("{cmd_blah: move, opts: {}}")
-        reply = self.socket.recv()
-        assert reply == "Error: No 'cmd' key given"
+        msg = {}
+        msg["not_cmd"] = "move"
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Error"
+        assert reply["msg"] == "No 'cmd' key given"
 
     def testInvalidOptsKey(self):
         """Test sending a message without a valid opts key."""
-        self.socket.send("{cmd: move, opts_blah: {}}")
-        reply = self.socket.recv()
-        assert reply == "Error: No 'opts' key given"
+        msg = {}
+        msg["cmd"] = "move"
+        msg["not_opts"] = {}
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Error"
+        assert reply["msg"] == "opts key required for this cmd"
 
     def testInvalidCmdValue(self):
         """Test sending a message with an invalid cmd value."""
-        self.socket.send("{cmd: wrong_cmd, opts: {}}")
-        reply = self.socket.recv()
-        assert reply == "Error: Unknown cmd wrong_cmd"
-
-    def testInvalidYAML(self):
-        """Test sending a message that's invalid YAML.
-
-        Note that the problem with the sent message is that it's
-        missing a closing bracket.
-
-        """
-        self.socket.send("{cmd: move, opts: {speed: 50, angle: 0}")
-        reply = self.socket.recv()
-        assert "Error" in reply
+        msg = {}
+        msg["cmd"] = "wrong_cmd"
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Error"
+        assert reply["msg"] == "Unknown cmd: wrong_cmd"
 
 
 @unittest.skip("Not yet updated to work with JSON server")
@@ -306,7 +305,7 @@ class TestHandleAutoFire(test_bot.TestBot):
 @unittest.skip("Not yet updated to work with JSON server")
 class TestHandleAim(test_bot.TestBot):
 
-    """Test turrent aiming commands."""
+    """Test turret aiming commands."""
 
     def setUp(self):
         """Build server and connect to it."""
@@ -353,7 +352,7 @@ class TestHandleAim(test_bot.TestBot):
         assert reply == "Error: No 'pitch' opt given"
 
     def testInvalidYawType(self):
-        """Test aim message with non-int yaw ange key."""
+        """Test aim message with non-int yaw angle key."""
         self.socket.send("{cmd: aim, opts: {pitch: 90, yaw: invalid}}")
         reply = self.socket.recv()
         assert reply == "Error: Could not convert yaw to int"

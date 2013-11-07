@@ -6,6 +6,7 @@ import os
 from time import sleep
 from math import fabs
 import traceback
+from simplejson.decoder import JSONDecodeError
 
 try:
     import zmq
@@ -74,12 +75,16 @@ class Server(object):
         self.logger.info("Server listening on {}".format(
                                                 self.server_bind_addr))
         while True:
-            # TODO: Use recv_json to avoid having to parse input separately?
-            msg = self.socket.recv_json()
+            # Receive JSON-formated message
+            try:
+                msg = self.socket.recv_json()
+            except JSONDecodeError:
+                error_msg = "Non-JSON message"
+                self.logger.error(error_msg)
+                self.socket.send_json(self.build_reply("Error", msg=error_msg))
             self.logger.debug("Received: {}".format(msg))
 
-            # TODO: Send JSON object directly using send_json?
-            #       All handle_*() methods must then return a dict.
+            # Handle message, send reply
             reply_msg = self.handle_msg(msg)
             self.logger.debug("Replying: {}".format(reply_msg))
             self.socket.send_json(reply_msg)
@@ -96,28 +101,21 @@ class Server(object):
             cmd = msg["cmd"]
             assert type(cmd) is str
         except ValueError:
-            return self.build_reply("Error", msg="")
-            return "Error: Unable to convert message to dict"
+            return self.build_reply("Error", 
+                                    msg="Unable to convert message to dict")
         except KeyError:
-            return self.build_reply("Error", msg="")
-            return "Error: No 'cmd' key given"
+            return self.build_reply("Error", msg="No 'cmd' key given")
         except AssertionError:
-            return self.build_reply("Error", msg="")
-            return "Error: Key 'cmd' is not a string"
-        except yaml.parser.ParserError:
-            return self.build_reply("Error", msg="")
-            return "Error: Unable to parse msg as YAML: {}".format(msg_raw)
+            return self.build_reply("Error", msg="Key 'cmd' is not a string")
 
-        try:
-            # TODO: Not all handle_*()s require opts; standardize this?
+        if "opts" in msg.keys():
             opts = msg["opts"]
-            assert type(opts) is dict
-        except KeyError:
-            return self.build_reply("Error", msg="")
-            return "Error: No 'opts' key given"
-        except AssertionError:
-            return self.build_reply("Error", msg="")
-            return "Error: Key 'opts' is not a dict"
+            try:
+                assert type(opts) is dict
+            except AssertionError:
+                return self.build_reply("Error", msg="Key 'opts' not a dict")
+        else:
+            opts = None
 
         # TODO: Switch from if..else to a string -> function map (dict)
         if cmd == "fwd_strafe_turn":
@@ -141,7 +139,8 @@ class Server(object):
         elif cmd == "die":
             self.handle_die()
         else:
-            return "Error: Unknown cmd {}".format(cmd)
+            error_msg = "Unknown cmd: {}".format(cmd)
+            return self.build_reply("Error", msg=error_msg)
 
     def build_reply(self, status, result=None, msg=None):
         """Helper function for building standard replies.
@@ -172,6 +171,11 @@ class Server(object):
         :returns: Success or error message with description.
 
         """
+        # Validate that opts key was given
+        if opts is None:
+            return self.build_reply("Error",
+                                    msg="opts key required for this cmd")
+
         # Validate fwd option
         try:
             fwd = float(opts["fwd"])
@@ -223,6 +227,11 @@ class Server(object):
         :returns: Success or error message with description.
 
         """
+        # Validate that opts key was given
+        if opts is None:
+            return self.build_reply("Error",
+                                    msg="opts key required for this cmd")
+
         # Validate speed option
         try:
             speed = float(opts["speed"])
@@ -257,6 +266,11 @@ class Server(object):
         :returns: Success or error message with description.
 
         """
+        # Validate that opts key was given
+        if opts is None:
+            return self.build_reply("Error", 
+                                    msg="opts key required for this cmd")
+
         # Validate speed option
         try:
             rotate_speed = float(opts["speed"])
@@ -296,6 +310,11 @@ class Server(object):
         :returns: Success or error message with description.
 
         """
+        # Validate that opts key was given
+        if opts is None:
+            return self.build_reply("Error",
+                                    msg="opts key required for this cmd")
+
         # Validate x angle option
         try:
             yaw = int(round(float(opts["yaw"])))
@@ -330,6 +349,11 @@ class Server(object):
         :returns: Success or error message with description.
 
         """
+        # Validate that opts key was given
+        if opts is None:
+            return self.build_reply("Error", 
+                                    msg="opts key required for this cmd")
+
         # TODO: Add once capes are installed
         return self.build_reply("Error", msg="Not yet implemented")
 
@@ -358,6 +382,11 @@ class Server(object):
         :returns: Success or error message with description.
 
         """
+        # Validate that opts key was given
+        if opts is None:
+            return self.build_reply("Error", 
+                                    msg="opts key required for this cmd")
+
         # Validate state option
         try:
             state = int(round(float(opts["state"])))
@@ -382,6 +411,11 @@ class Server(object):
         :returns: Success or error message with description.
 
         """
+        # Validate that opts key was given
+        if opts is None:
+            return self.build_reply("Error", 
+                                    msg="opts key required for this cmd")
+
         # Validate state option
         try:
             state = int(round(float(opts["state"])))

@@ -68,7 +68,7 @@ class Client(object):
         self.context.term()
         self.logger.info("Disconnected from server")
 
-    def send_cmd(self, cmd, opts):
+    def send_cmd(self, cmd, opts=None):
         """Send generic commands to server.
 
         :param cmd: Value of 'cmd' key to send.
@@ -76,9 +76,19 @@ class Client(object):
         :returns: True for success, False for failure.
 
         """
-        self.sock.send("{{cmd: {}, opts: {}}}".format(cmd, opts))
-        reply = self.sock.recv()
-        if "Success" in reply:
+        # Build message
+        msg = {}
+        msg["cmd"] = cmd
+        if opts is not None:
+            msg["opts"] = opts
+        else:
+            msg["opts"] = {}
+
+        # Send message, handle reply
+        self.logger.info("Sending: {}".format(msg))
+        self.sock.send_json(msg)
+        reply = self.sock.recv_json()
+        if reply["status"] == "Success":
             self.logger.info("Server reply: {}".format(reply))
             return True
         else:
@@ -94,7 +104,9 @@ class Client(object):
 
         """
         cmd = "aim"
-        opts = "{{pitch: {}, yaw: {}}}".format(pitch, yaw)
+        opts = {}
+        opts["pitch"] = pitch
+        opts["yaw"] = yaw
         return self.send_cmd(cmd, opts)
 
     def send_fire_speed(self, speed):
@@ -105,14 +117,14 @@ class Client(object):
 
         """
         cmd = "fire_speed"
-        opts = "{{speed: {}}}".format(speed)
+        opts = {}
+        opts["speed"] = speed
         return self.send_cmd(cmd, opts)
 
-    def send_advance_dart(self):
+    def send_fire(self):
         """Send command to push dart into firing wheels."""
-        cmd = "advance_dart"
-        opts = "{}"
-        return self.send_cmd(cmd, opts)
+        cmd = "fire"
+        return self.send_cmd(cmd)
 
     def send_auto_fire(self):
         """Send command to fire dart using autonomous methods.
@@ -121,8 +133,7 @@ class Client(object):
 
         """
         cmd = "auto_fire"
-        opts = "{}"
-        return self.send_cmd(cmd, opts)
+        return self.send_cmd(cmd)
 
     def send_fwd_strafe_turn(self, fwd, strafe, turn):
         """Send move command with fwd, strafe and turn speeds to server.
@@ -134,7 +145,10 @@ class Client(object):
 
         """
         cmd = "fwd_strafe_turn"
-        opts = "{{fwd: {}, strafe: {}, turn: {}}}".format(fwd, strafe, turn)
+        opts = {}
+        opts["fwd"] = fwd
+        opts["strafe"] = strafe
+        opts["turn"] = turn
         return self.send_cmd(cmd, opts)
 
     def send_move(self, speed, angle):
@@ -146,7 +160,9 @@ class Client(object):
 
         """
         cmd = "move"
-        opts = "{{speed: {}, angle: {}}}".format(speed, angle)
+        opts = {}
+        opts["speed"] = speed
+        opts["angle"] = angle
         return self.send_cmd(cmd, opts)
 
     def send_rotate(self, speed):
@@ -157,7 +173,8 @@ class Client(object):
 
         """
         cmd = "rotate"
-        opts = "{{speed: {}}}".format(speed)
+        opts = {}
+        opts["speed"] = speed
         return self.send_cmd(cmd, opts)
 
     def send_die(self):
@@ -167,5 +184,4 @@ class Client(object):
 
         """
         cmd = "die"
-        opts = "{}"
-        return self.send_cmd(cmd, opts)
+        return self.send_cmd(cmd)

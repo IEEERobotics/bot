@@ -54,7 +54,7 @@ class CLIClient(client.Client, cmd.Cmd):
         """Provide help message for EOF (ctrl+d) command."""
         print "Exit the program with ctrl+d."
 
-    def do_fire(self, raw_args):
+    def do_aim_fire(self, raw_args):
         """Aim turret, set gun wheel speed, advance dart.
 
         :param raw_args: Command string with pitch, yaw and gun speed.
@@ -74,11 +74,11 @@ class CLIClient(client.Client, cmd.Cmd):
         # Issue commands to server
         self.send_aim(pitch, yaw)
         self.send_fire_speed(speed)
-        self.send_advance_dart()
+        self.send_fire()
 
-    def help_fire(self):
-        """Provide help message for fire command."""
-        print "fire <pitch> <yaw> <speed>"
+    def help_aim_fire(self):
+        """Provide help message for aim_fire command."""
+        print "aim_fire <pitch> <yaw> <speed>"
         print "\tSet turret pitch (vertical) and yaw (horizontal) angle"
         print "\t(0-180), gun wheel speed (0-100) and fire dart."
 
@@ -144,7 +144,7 @@ class CLIClient(client.Client, cmd.Cmd):
         print "\tSet turret to given pitch (vertical) and"
         print "\tyaw (horizontal) angles (0-180)."
 
-    def do_push_dart(self, raw_args):
+    def do_fire(self, raw_args):
         """Push dart into gun wheels, making it fire.
 
         :param raw_args: Command string, unused.
@@ -155,9 +155,9 @@ class CLIClient(client.Client, cmd.Cmd):
         # Issue commands to server
         self.send_fire()
 
-    def help_push_dart(self):
-        """Provide help message for push_dart command."""
-        print "push_dart"
+    def help_fire(self):
+        """Provide help message for fire command."""
+        print "fire"
         print "\tAdvance dart into gun wheels."
 
     def do_fst(self, raw_args):

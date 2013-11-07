@@ -75,16 +75,16 @@ class Server(object):
                                                 self.server_bind_addr))
         while True:
             # TODO: Use recv_json to avoid having to parse input separately?
-            msg_raw = self.socket.recv()
-            self.logger.debug("Received: {}".format(msg_raw))
+            msg = self.socket.recv_json()
+            self.logger.debug("Received: {}".format(msg))
 
             # TODO: Send JSON object directly using send_json?
             #       All handle_*() methods must then return a dict.
-            reply_msg = self.handle_msg(msg_raw)
+            reply_msg = self.handle_msg(msg)
             self.logger.debug("Replying: {}".format(reply_msg))
-            self.socket.send(reply_msg)
+            self.socket.send_json(reply_msg)
 
-    def handle_msg(self, msg_raw):
+    def handle_msg(self, msg):
         """Confirm message format and take appropriate action.
 
         :param msg_raw: Raw message string received by ZMQ.
@@ -93,16 +93,19 @@ class Server(object):
 
         """
         try:
-            msg = dict(yaml.safe_load(msg_raw))
             cmd = msg["cmd"]
             assert type(cmd) is str
         except ValueError:
+            return self.build_reply("Error", msg="")
             return "Error: Unable to convert message to dict"
         except KeyError:
+            return self.build_reply("Error", msg="")
             return "Error: No 'cmd' key given"
         except AssertionError:
+            return self.build_reply("Error", msg="")
             return "Error: Key 'cmd' is not a string"
         except yaml.parser.ParserError:
+            return self.build_reply("Error", msg="")
             return "Error: Unable to parse msg as YAML: {}".format(msg_raw)
 
         try:
@@ -110,8 +113,10 @@ class Server(object):
             opts = msg["opts"]
             assert type(opts) is dict
         except KeyError:
+            return self.build_reply("Error", msg="")
             return "Error: No 'opts' key given"
         except AssertionError:
+            return self.build_reply("Error", msg="")
             return "Error: Key 'opts' is not a dict"
 
         # TODO: Switch from if..else to a string -> function map (dict)
@@ -125,8 +130,6 @@ class Server(object):
             return self.handle_auto_fire()
         elif cmd == "aim":
             return self.handle_aim(opts)
-        elif cmd == "advance_dart":
-            return self.handle_advance_dart()
         elif cmd == "fire_speed":
             return self.handle_fire_speed(opts)
         elif cmd == "laser":
@@ -139,6 +142,25 @@ class Server(object):
             self.handle_die()
         else:
             return "Error: Unknown cmd {}".format(cmd)
+
+    def build_reply(self, status, result=None, msg=None):
+        """Helper function for building standard replies.
+
+        :param status: Exit status code ("Error"/"Success").
+        :param result: Optional details of result (eg current speed).
+        :param msg: Optional message (eg "Not implemented").
+
+        """
+        if status != "Success" and status != "Error":
+            self.logger.warn("Status is typically 'Success' or 'Error'")
+
+        reply_msg = {}
+        reply_msg["status"] = status
+        if result is not None:
+            reply_msg["result"] = result
+        if msg is not None:
+            reply_msg["msg"] = msg
+        return reply_msg
 
     def handle_fwd_strafe_turn(self, opts):
         """Validate options and make move call to driver.
@@ -154,25 +176,29 @@ class Server(object):
         try:
             fwd = float(opts["fwd"])
         except KeyError:
-            return "Error: No 'fwd' opt given"
+            return self.build_reply("Error", msg="No 'fwd' opt given")
         except ValueError:
-            return "Error: Could not convert fwd to float"
+            return self.build_reply("Error", 
+                                    msg="Could not convert fwd to float")
 
         # Validate strafe option
         try:
             strafe = float(opts["strafe"])
         except KeyError:
             return "Error: No 'strafe' opt given"
+            return self.build_reply("Error", msg="No 'strafe' opt given")
         except ValueError:
-            return "Error: Could not convert strafe to float"
+            return self.build_reply("Error", 
+                                    msg="Could not convert strafe to float")
 
         # Validate turn option
         try:
             turn = float(opts["turn"])
         except KeyError:
-            return "Error: No 'turn' opt given"
+            return self.build_reply("Error", msg="No 'turn' opt given")
         except ValueError:
-            return "Error: Could not convert turn to float"
+            return self.build_reply("Error", 
+                                    msg="Could not convert turn to float")
 
         # Make call to driver
         try:
@@ -183,9 +209,9 @@ class Server(object):
                 self.driver.move_forward_strafe(fwd, strafe)
         except Exception:
             tb = traceback.format_exc()
-            return "Error from driver: {}".format(tb)
+            return self.build_reply("Error", msg=tb)
 
-        return "Success: {}".format(opts)
+        return self.build_reply("Success", result=opts)
 
     def handle_move(self, opts):
         """Validate options and make move call to driver.
@@ -201,25 +227,27 @@ class Server(object):
         try:
             speed = float(opts["speed"])
         except KeyError:
-            return "Error: No 'speed' opt given"
+            return self.build_reply("Error", msg="No 'speed' opt given")
         except ValueError:
-            return "Error: Could not convert speed to float"
+            return self.build_reply("Error",
+                                    msg="Could not convert speed to float")
 
         # Validate angle option
         try:
             angle = float(opts["angle"])
         except KeyError:
-            return "Error: No 'angle' opt given"
+            return self.build_reply("Error", msg="No 'angle' opt given")
         except ValueError:
-            return "Error: Could not convert angle to float"
+            return self.build_reply("Error",
+                                    msg="Could not convert angle to float")
 
         # Make call to driver
         try:
             self.driver.move(speed=speed, angle=angle)
         except Exception as e:
-            return "Error: {}".format(e)
+            return self.build_reply("Error", msg=e)
 
-        return "Success: {}".format(opts)
+        return self.build_reply("Success", msg=opts)
 
     def handle_rotate(self, opts):
         """Validate options and make rotate call to driver.
@@ -233,17 +261,18 @@ class Server(object):
         try:
             rotate_speed = float(opts["speed"])
         except KeyError:
-            return "Error: No 'speed' opt given"
+            return self.build_reply("Error", msg="No 'speed' opt given")
         except ValueError:
-            return "Error: Could not convert speed to float"
+            return self.build_reply("Error",
+                                    msg="Could not convert speed to float")
 
         # Make call to driver
         try:
             self.driver.rotate(rotate_speed=rotate_speed)
         except Exception as e:
-            return "Error: {}".format(e)
+            return self.build_reply("Error", msg=e)
 
-        return "Success: {}".format(opts)
+        return self.build_reply("Success", result=opts)
 
     def handle_auto_fire(self):
         """Make fire call to gunner. Normally used in autonomous mode.
@@ -255,9 +284,9 @@ class Server(object):
         try:
             self.gunner.auto_fire()
         except Exception as e:
-            return "Error: {}".format(e)
+            return self.build_reply("Error", msg=e)
 
-        return "Success: Fired"
+        return self.build_reply("Success", result="Fired")
 
     def handle_aim(self, opts):
         """Validate options and make call to gunner.
@@ -269,27 +298,29 @@ class Server(object):
         """
         # Validate x angle option
         try:
-            yaw = int(round(opts["yaw"]))
+            yaw = int(round(float(opts["yaw"])))
         except KeyError:
-            return "Error: No 'yaw' opt given"
+            return self.build_reply("Error", msg="No 'yaw' opt given")
         except TypeError:
-            return "Error: Could not convert yaw to int"
+            return self.build_reply("Error",
+                                    msg="Could not convert yaw to int")
 
         # Validate y angle option
         try:
-            pitch = int(round(opts["pitch"]))
+            pitch = int(round(float(opts["pitch"])))
         except KeyError:
-            return "Error: No 'pitch' opt given"
+            return self.build_reply("Error", msg="No 'pitch' opt given")
         except TypeError:
-            return "Error: Could not convert pitch to int"
+            return self.build_reply("Error",
+                                    msg="Could not convert pitch to int")
 
         # Make call to gunner
         try:
             self.gunner.aim_turret(yaw, pitch)
         except Exception as e:
-            return "Error: {}".format(e)
+            return self.build_reply("Error", msg=e)
 
-        return "Success: {}".format(opts)
+        return self.build_reply("Success", result=opts)
 
     def handle_fire_speed(self, opts):
         """Set rotation speed of firing wheels.
@@ -300,22 +331,24 @@ class Server(object):
 
         """
         # TODO: Add once capes are installed
-        return "Error: Not yet implemented"
+        return self.build_reply("Error", msg="Not yet implemented")
+
         # Validate speed option
         try:
-            speed = int(round(opts["speed"]))
+            speed = int(round(float(opts["speed"])))
         except KeyError:
-            return "Error: No 'speed' opt given"
+            return self.build_reply("Error", msg="No 'speed' opt given")
         except TypeError:
-            return "Error: Could not convert speed to int"
+            return self.build_reply("Error",
+                                    msg="Could not convert speed to int")
 
         # Make call to gunner
         try:
             self.gunner.gun.wheel_speed = speed
         except Exception as e:
-            return "Error: {}".format(e)
+            return self.build_reply("Error", msg=e)
 
-        return "Success: {}".format(opts)
+        return self.build_reply("Success", result=opts)
 
     def handle_laser(self, opts):
         """Turn laser ON or OFF.
@@ -327,19 +360,19 @@ class Server(object):
         """
         # Validate state option
         try:
-            state = int(round(opts["state"]))
+            state = int(round(float(opts["state"])))
         except KeyError:
-            return "Error: No 'state' opt given"
+            return self.build_reply("Error", msg="No 'state' opt given")
         except TypeError:
-            return "Error: Could not convert state to int"
+            return self.build_reply("Error",
+                                    msg="Could not convert state to int")
 
         # Make call to gun
         try:
             result = self.gunner.gun.laser(state)
-            return "Success: {{result: {}}}".format(result)
-            # TODO: Return JSON object / dict, with status, result [, msg]
+            return self.build_reply("Success", result=result)
         except Exception as e:
-            return "Error: {}".format(e)
+            return self.build_reply("Error", msg=e)
 
     def handle_spin(self, opts):
         """Turn gun motor spin ON or OFF.
@@ -351,19 +384,19 @@ class Server(object):
         """
         # Validate state option
         try:
-            state = int(round(opts["state"]))
+            state = int(round(float(opts["state"])))
         except KeyError:
-            return "Error: No 'state' opt given"
+            return self.build_reply("Error", msg="No 'state' opt given")
         except TypeError:
-            return "Error: Could not convert state to int"
+            return self.build_reply("Error",
+                                    msg="Could not convert state to int")
 
         # Make call to gun
         try:
             result = self.gunner.gun.spin(state)
-            return "Success: {{result: {}}}".format(result)
-            # TODO: Return JSON object / dict, with status, result [, msg]
+            return self.build_reply("Success", result=result)
         except Exception as e:
-            return "Error: {}".format(e)
+            return self.build_reply("Error", msg=e)
 
     def handle_fire(self):
         """Make fire call to gun, using default parameters.
@@ -374,10 +407,9 @@ class Server(object):
         # Make call to gun
         try:
             result = self.gunner.gun.fire()
-            return "Success: {{result: {}}}".format(result)
-            # TODO: Return JSON object / dict, with status, result [, msg]
+            return self.build_reply("Success", result=result)
         except Exception as e:
-            return "Error: {}".format(e)
+            return self.build_reply("Error", msg=e)
 
     def handle_die(self):
         """Accept poison pill and gracefully exit.
@@ -387,7 +419,9 @@ class Server(object):
 
         """
         self.logger.info("Success: Received message to die. Bye!")
-        self.socket.send("Success: Received message to die. Bye!")
+        reply = self.build_reply("Success",
+                                 msg="Received message to die. Bye!")
+        self.socket.send_json(reply)
         sys.exit(0)
 
 if __name__ == "__main__":

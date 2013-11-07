@@ -74,6 +74,28 @@ class WheelGun:
         self.motor_gpios['right'].value = state
         return state
 
+    @property
+    def wheel_speed(self):
+        """Getter for wheel rotation speed. Speed is % of max."""
+        # TODO: Implement once capes are installed
+        return
+
+    @wheel_speed.setter
+    def wheel_speed(self, speed=100):
+        """Setter for updates to wheel rotation speed.
+
+        :param speed: Desired speed of wheel rotation (% of max).
+        :type speed: int
+
+        """
+        try:
+            assert 0 <= speed <= 100
+        except AssertionError:
+            self.logger.error("Speed {} is out of bounds".format(speed))
+            raise AssertionError("Speed is out of bounds")
+        # TODO: Implement once capes are installed
+        return
+
     def fire(self, advance_duration=0.1, delay=0.25, retract_duration=0.11):
         """Fire a single dart by advancing it, and then reload."""
         if advance_duration <= 0.0:

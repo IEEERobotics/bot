@@ -63,9 +63,6 @@ class Server(object):
         # Build MecDriver, which will accept and handle movement actions
         self.driver = md_mod.MecDriver()
 
-        # Build WheelGun (TODO: incorporate into gunner)
-        self.gun = wgun_mod.WheelGun()
-
         # Build WheelGunner, which will accept and handle fire actions
         self.gunner = wg_mod.WheelGunner()
 
@@ -294,19 +291,6 @@ class Server(object):
 
         return "Success: {}".format(opts)
 
-    def handle_advance_dart(self):
-        """Make call to gunner to advance a dart.
-
-        :returns: Success or error message with description.
-
-        """
-        try:
-            self.gunner.advance_dart()
-        except Exception as e:
-            return "Error: {}".format(e)
-
-        return "Success: Advanced dart"
-
     def handle_fire_speed(self, opts):
         """Set rotation speed of firing wheels.
 
@@ -315,6 +299,8 @@ class Server(object):
         :returns: Success or error message with description.
 
         """
+        # TODO: Add once capes are installed
+        return "Error: Not yet implemented"
         # Validate speed option
         try:
             speed = int(round(opts["speed"]))
@@ -325,7 +311,7 @@ class Server(object):
 
         # Make call to gunner
         try:
-            self.gunner.wheel_speed = speed
+            self.gunner.gun.wheel_speed = speed
         except Exception as e:
             return "Error: {}".format(e)
 
@@ -349,7 +335,7 @@ class Server(object):
 
         # Make call to gun
         try:
-            result = self.gun.laser(state)
+            result = self.gunner.gun.laser(state)
             return "Success: {{result: {}}}".format(result)
             # TODO: Return JSON object / dict, with status, result [, msg]
         except Exception as e:
@@ -373,7 +359,7 @@ class Server(object):
 
         # Make call to gun
         try:
-            result = self.gun.spin(state)
+            result = self.gunner.gun.spin(state)
             return "Success: {{result: {}}}".format(result)
             # TODO: Return JSON object / dict, with status, result [, msg]
         except Exception as e:
@@ -387,7 +373,7 @@ class Server(object):
         """
         # Make call to gun
         try:
-            result = self.gun.fire()
+            result = self.gunner.gun.fire()
             return "Success: {{result: {}}}".format(result)
             # TODO: Return JSON object / dict, with status, result [, msg]
         except Exception as e:

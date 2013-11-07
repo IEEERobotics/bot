@@ -263,7 +263,7 @@ class TestHandleRotate(test_bot.TestBot):
 
 class TestHandleAutoFire(test_bot.TestBot):
 
-    """Test fire command."""
+    """Test auto_fire command."""
 
     def setUp(self):
         """Build server and connect to it."""
@@ -292,7 +292,7 @@ class TestHandleAutoFire(test_bot.TestBot):
         super(TestHandleAutoFire, self).tearDown()
 
     def testValid(self):
-        """Test fire message that's perfectly valid."""
+        """Test auto_fire message that's perfectly valid."""
         self.socket.send("{cmd: auto_fire, opts: {}}")
         reply = self.socket.recv()
         assert reply == "Success: Fired", reply
@@ -370,44 +370,7 @@ class TestHandleAim(test_bot.TestBot):
         reply = self.socket.recv()
         assert reply == "Error: Pitch angle is out of bounds", reply
 
-
-class TestHandleAdvanceDart(test_bot.TestBot):
-
-    """Test advance dart command."""
-
-    def setUp(self):
-        """Build server and connect to it."""
-        # Run general bot test setup
-        super(TestHandleAdvanceDart, self).setUp()
-
-        # Build server. Arg is testing or not.
-        self.server = Popen(["./server/server.py", "True"])
-
-        # Build socket and connect to server
-        self.context = zmq.Context()
-        self.socket = self.context.socket(zmq.REQ)
-        self.server_connect_addr = "{protocol}://{host}:{port}".format(
-                                    protocol=self.config["server_protocol"],
-                                    host=self.config["server_host"],
-                                    port=self.config["server_port"])
-        self.socket.connect(self.server_connect_addr)
-
-    def tearDown(self):
-        """Kill server, restore testing flag state in config file."""
-        self.socket.close()
-        self.context.term()
-        self.server.kill()
-
-        # Run general bot test tear down
-        super(TestHandleAdvanceDart, self).tearDown()
-
-    def testValid(self):
-        """Test fire message that's perfectly valid."""
-        self.socket.send("{cmd: advance_dart, opts: {}}")
-        reply = self.socket.recv()
-        assert reply == "Success: Advanced dart"
-
-
+@unittest.skip("Not yet implemented")
 class TestHandleFireSpeed(test_bot.TestBot):
 
     """Test rotate commands."""

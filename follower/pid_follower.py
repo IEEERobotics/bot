@@ -169,7 +169,7 @@ class PIDFollower(object):
                 postion_count  = postion_count + 1  
                 # add the postion to the last postion  
                 postion = postion + v*(15.-n)*(5.625)/15
-        # if there ate more than 3 hits than stop line following
+        # if there ate more than 4 hits than stop line following
         if(postion_count > 3):
             # return error condition
             return -1
@@ -183,8 +183,33 @@ class PIDFollower(object):
             return 0
         # if there at more than one and less than 3 hits find the avarge
         else:
-            # return the avarge
-            return postion/postion_count
+            # as long as hits are side by side
+            if(side_by_side(array) == 1):
+                # return the avarge
+                return postion/postion_count
+            else:
+                # return -2
+                return -2
+            
+    def side_by_side(self, array):
+        """determines if array hits are beside one another"""
+        # the index of the frist hit
+        first_hit = array.index(1)
+        # the max of the 2 (or one negbhors )
+        if(first_hit != 0 or first_hit != len(array)):
+            # max neigbor equals the max value of either neighbor
+            max_neighbor = max(array.index(first_hit + 1) , array.index(frist_hit - 1) )
+        elif(first_hit == 0):
+            max_neighbor = array.index(first_hit + 1)
+        else:
+            max_neighbor = array.index(first_hit - 1)
+        # if the max neighbor does not equal 1 
+        if(max_neighbor != 1):
+            # return -1 (fail case)
+            return -1
+        else:
+            # return 1 (pass case)
+            return 1
 
     def get_postion_rl(self, array):
         """ returns a postion in bits from right to left"""
@@ -212,8 +237,10 @@ class PIDFollower(object):
             return 0
         # if there are less than 4 hits and more than one hit
         else:
-            # return the average postion
-            return postion/postion_count
-
-
-
+            # as long as hits are side by side
+            if(side_by_side(array) == 1):
+                # return the avarge
+                return postion/postion_count
+            else:
+                # return -2
+                return -2

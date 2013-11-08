@@ -16,6 +16,15 @@ class SimpleFollower(object):
         self.driver = driver_mod.MecDriver()
         self.config = lib.load_config()
         
+    def overall_move(self):
+        """constant loop for the movement informatinon."""
+        while(True):
+            dic = self.ir_hub.read_all_arrays()
+            if( on_line(dic["front"], dic["back"] ):
+                rotate_correct()
+            else:
+                move()
+        
     def move(self, array_dictionary):
         """ receives the dictionary of IR arrays of 
         returns a (speed, angle) tuple.
@@ -25,6 +34,49 @@ class SimpleFollower(object):
         :returns: a speed and angle. 
         
         """
+	
+	front = array_dictionary()["front"]
+        switch: 
+            case 0: # mid and centered
+                return(100, 0)
+            case 1: # right and centered
+                return(80, 30)
+            case 2: # left and centered 
+                return(80, -30)
+            default:
+                # case not covered stop 
+     
+     
+                
+    def slope_between(self, point_a, point_b):
+        """ determines the slope between the two points
+        the mesaurement should come from off the physical bot. 
+        
+        :point_a:
+        :point_b:
+        """
+        array_space = 1 # needs to vary somewhat as the goes further away
+        
+        return (ya - yb)/(xa - xb)
+	# make a method to determine if the bot is off center
+
+
+    def weigh_array(self, A, parts):
+        """ seperates an array into parts and ranks them from high to
+        low.
+        
+        :parts: the number of sections the list is to be split into
+        
+        """
+        
+        for x in range(0 list.max):
+            step = len(A) % parts 
+            which_part = -1             #default part chose for the high
+            for x in range(0, parts):
+                if((a=max(A[0:len(A):step]), old_max): # for each part of the of the list find the max 
+                    old_max = a 
+                return() # the old max
+        
         
         return(speed,angle)
 

@@ -91,7 +91,6 @@ class TestHandleMessage(test_bot.TestBot):
         assert reply["msg"] == "Unknown cmd: wrong_cmd"
 
 
-@unittest.skip("Not yet updated to work with JSON server")
 class TestHandleFwdStrafeTurn(test_bot.TestBot):
 
     """Test fwd, strafe and turn commands.
@@ -128,13 +127,15 @@ class TestHandleFwdStrafeTurn(test_bot.TestBot):
 
     def testValid(self):
         """Test fwd_strafe_turn message that's perfectly valid."""
-        self.socket.send("{cmd: fwd_strafe_turn, " + \
-                         "opts: {fwd: 50, turn: 0, strafe: 0}}")
-        reply = self.socket.recv()
-        assert reply == "Success: {'fwd': 50, 'turn': 0, 'strafe': 0}", reply
+        msg = {}
+        msg["cmd"] = "fwd_strafe_turn"
+        msg["opts"] = {"fwd": 50, "turn": 0, "strafe": 0}
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Success"
+        assert reply["result"] == msg["opts"]
 
 
-@unittest.skip("Not yet updated to work with JSON server")
 class TestHandleMove(test_bot.TestBot):
 
     """Test move commands."""
@@ -167,48 +168,75 @@ class TestHandleMove(test_bot.TestBot):
 
     def testValid(self):
         """Test move message that's perfectly valid."""
-        self.socket.send("{cmd: move, opts: {speed: 50, angle: 0}}")
-        reply = self.socket.recv()
-        assert reply == "Success: {'speed': 50, 'angle': 0}"
+        msg = {}
+        msg["cmd"] = "move"
+        msg["opts"] = {"speed": 50, "angle": 0}
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Success"
+        assert reply["result"] == msg["opts"]
 
     def testNoSpeedKey(self):
         """Test move message that's missing a speed key."""
-        self.socket.send("{cmd: move, opts: {not_speed: 50, angle: 0}}")
-        reply = self.socket.recv()
-        assert reply == "Error: No 'speed' opt given"
+        msg = {}
+        msg["cmd"] = "move"
+        msg["opts"] = {"not_speed": 50, "angle": 0}
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Error"
+        assert reply["msg"] == "No 'speed' opt given"
 
     def testNoAngleKey(self):
         """Test move message that's missing an angle key."""
-        self.socket.send("{cmd: move, opts: {speed: 50, not_angle: 0}}")
-        reply = self.socket.recv()
-        assert reply == "Error: No 'angle' opt given"
+        msg = {}
+        msg["cmd"] = "move"
+        msg["opts"] = {"speed": 50, "not_angle": 0}
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Error"
+        assert reply["msg"] == "No 'angle' opt given"
 
     def testInvalidSpeedType(self):
         """Test move message with non-float speed key."""
-        self.socket.send("{cmd: move, opts: {speed: invalid, angle: 0}}")
-        reply = self.socket.recv()
-        assert reply == "Error: Could not convert speed to float"
+        msg = {}
+        msg["cmd"] = "move"
+        msg["opts"] = {"speed": "invalid", "angle": 0}
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Error"
+        assert reply["msg"] == "Could not convert speed to float"
 
     def testInvalidAngleType(self):
         """Test move message with non-float angle key."""
-        self.socket.send("{cmd: move, opts: {speed: 50, angle: invalid}}")
-        reply = self.socket.recv()
-        assert reply == "Error: Could not convert angle to float"
+        msg = {}
+        msg["cmd"] = "move"
+        msg["opts"] = {"speed": 0, "angle": "invalid"}
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Error"
+        assert reply["msg"] == "Could not convert angle to float"
 
     def testInvalidSpeedValue(self):
         """Test move message with out of bounds speed value."""
-        self.socket.send("{cmd: move, opts: {speed: 101, angle: 0}}")
-        reply = self.socket.recv()
-        assert reply == "Error: Speed is out of bounds", reply
+        msg = {}
+        msg["cmd"] = "move"
+        msg["opts"] = {"speed": 101, "angle": 0}
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Error"
+        assert reply["msg"] == "Speed is out of bounds"
 
     def testInvalidAngleValue(self):
         """Test move message with out of bounds angle value."""
-        self.socket.send("{cmd: move, opts: {speed: 50, angle: 361}}")
-        reply = self.socket.recv()
-        assert reply == "Error: Angle is out of bounds", reply
+        msg = {}
+        msg["cmd"] = "move"
+        msg["opts"] = {"speed": 50, "angle": 361}
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Error"
+        assert reply["msg"] == "Angle is out of bounds"
 
 
-@unittest.skip("Not yet updated to work with JSON server")
 class TestHandleRotate(test_bot.TestBot):
 
     """Test rotate commands."""
@@ -241,30 +269,45 @@ class TestHandleRotate(test_bot.TestBot):
 
     def testValid(self):
         """Test rotate message that's perfectly valid."""
-        self.socket.send("{cmd: rotate, opts: {speed: 100}}")
-        reply = self.socket.recv()
-        assert reply == "Success: {'speed': 100}"
+        msg = {}
+        msg["cmd"] = "rotate"
+        msg["opts"] = {"speed": 100}
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Success"
+        assert reply["result"] == msg["opts"]
 
     def testNoSpeedKey(self):
         """Test rotate message that's missing a speed key."""
-        self.socket.send("{cmd: rotate, opts: {not_speed: 50}}")
-        reply = self.socket.recv()
-        assert reply == "Error: No 'speed' opt given"
+        msg = {}
+        msg["cmd"] = "rotate"
+        msg["opts"] = {"not_speed": 100}
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Error"
+        assert reply["msg"] == "No 'speed' opt given"
 
     def testInvalidSpeedType(self):
         """Test rotate message with non-float speed key."""
-        self.socket.send("{cmd: rotate, opts: {speed: invalid}}")
-        reply = self.socket.recv()
-        assert reply == "Error: Could not convert speed to float"
+        msg = {}
+        msg["cmd"] = "rotate"
+        msg["opts"] = {"speed": "invalid"}
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Error"
+        assert reply["msg"] == "Could not convert speed to float"
 
     def testInvalidSpeedValue(self):
         """Test rotate message with out of bounds speed value."""
-        self.socket.send("{cmd: rotate, opts: {speed: 101}}")
-        reply = self.socket.recv()
-        assert reply == "Error: Rotate speed is out of bounds", reply
+        msg = {}
+        msg["cmd"] = "rotate"
+        msg["opts"] = {"speed": 101}
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Error"
+        assert reply["msg"] == "Rotate speed is out of bounds"
 
 
-@unittest.skip("Not yet updated to work with JSON server")
 class TestHandleAutoFire(test_bot.TestBot):
 
     """Test auto_fire command."""
@@ -297,12 +340,14 @@ class TestHandleAutoFire(test_bot.TestBot):
 
     def testValid(self):
         """Test auto_fire message that's perfectly valid."""
-        self.socket.send("{cmd: auto_fire, opts: {}}")
-        reply = self.socket.recv()
-        assert reply == "Success: Fired", reply
+        msg = {}
+        msg["cmd"] = "auto_fire"
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Success"
+        assert reply["result"] == "Fired"
 
 
-@unittest.skip("Not yet updated to work with JSON server")
 class TestHandleAim(test_bot.TestBot):
 
     """Test turret aiming commands."""
@@ -335,45 +380,74 @@ class TestHandleAim(test_bot.TestBot):
 
     def testValid(self):
         """Test aim message that's perfectly valid."""
-        self.socket.send("{cmd: aim, opts: {pitch: 90, yaw: 90}}")
-        reply = self.socket.recv()
-        assert reply == "Success: {'yaw': 90, 'pitch': 90}", reply
+        msg = {}
+        msg["cmd"] = "aim"
+        msg["opts"] = {"pitch": 90, "yaw": 90}
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Success"
+        assert reply["result"] == msg["opts"]
 
     def testNoYawKey(self):
         """Test aim message that's missing an yaw angle key."""
-        self.socket.send("{cmd: aim, opts: {pitch: 90, not_yaw: 90}}")
-        reply = self.socket.recv()
-        assert reply == "Error: No 'yaw' opt given"
+        msg = {}
+        msg["cmd"] = "aim"
+        msg["opts"] = {"pitch": 90, "not_yaw": 90}
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Error"
+        assert reply["msg"] == "No 'yaw' opt given"
 
     def testNoPitchKey(self):
         """Test aim message that's missing a y angle key."""
-        self.socket.send("{cmd: aim, opts: {not_pitch: 90, yaw: 90}}")
-        reply = self.socket.recv()
-        assert reply == "Error: No 'pitch' opt given"
+        msg = {}
+        msg["cmd"] = "aim"
+        msg["opts"] = {"not_pitch": 90, "yaw": 90}
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Error"
+        assert reply["msg"] == "No 'pitch' opt given"
 
     def testInvalidYawType(self):
         """Test aim message with non-int yaw angle key."""
-        self.socket.send("{cmd: aim, opts: {pitch: 90, yaw: invalid}}")
-        reply = self.socket.recv()
-        assert reply == "Error: Could not convert yaw to int"
+        msg = {}
+        msg["cmd"] = "aim"
+        msg["opts"] = {"pitch": 90, "yaw": "invalid"}
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Error"
+        assert reply["msg"] == "Could not convert yaw to int"
 
     def testInvalidPitchType(self):
         """Test aim message with non-int pitch angle key."""
-        self.socket.send("{cmd: aim, opts: {pitch: invalid, yaw: 90}}")
-        reply = self.socket.recv()
-        assert reply == "Error: Could not convert pitch to int"
+        msg = {}
+        msg["cmd"] = "aim"
+        msg["opts"] = {"pitch": "invalid", "yaw": 90}
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Error"
+        assert reply["msg"] == "Could not convert pitch to int"
 
     def testInvalidYawValue(self):
         """Test aim message with out of bounds yaw value."""
-        self.socket.send("{cmd: aim, opts: {pitch: 90, yaw: 181}}")
-        reply = self.socket.recv()
-        assert reply == "Error: Yaw angle is out of bounds", reply
+        msg = {}
+        msg["cmd"] = "aim"
+        msg["opts"] = {"pitch": 90, "yaw": 181}
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Error"
+        assert reply["msg"] == "Yaw angle is out of bounds"
 
     def testInvalidPitchValue(self):
         """Test aim message with out of bounds pitch value."""
-        self.socket.send("{cmd: aim, opts: {pitch: 181, yaw: 90}}")
-        reply = self.socket.recv()
-        assert reply == "Error: Pitch angle is out of bounds", reply
+        msg = {}
+        msg["cmd"] = "aim"
+        msg["opts"] = {"pitch": 181, "yaw": 90}
+        self.socket.send_json(msg)
+        reply = self.socket.recv_json()
+        assert reply["status"] == "Error"
+        assert reply["msg"] == "Pitch angle is out of bounds"
+
 
 @unittest.skip("Not yet implemented")
 class TestHandleFireSpeed(test_bot.TestBot):

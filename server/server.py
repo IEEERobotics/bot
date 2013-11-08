@@ -254,9 +254,9 @@ class Server(object):
         try:
             self.driver.move(speed=speed, angle=angle)
         except Exception as e:
-            return self.build_reply("Error", msg=e)
+            return self.build_reply("Error", msg=str(e))
 
-        return self.build_reply("Success", msg=opts)
+        return self.build_reply("Success", result=opts)
 
     def handle_rotate(self, opts):
         """Validate options and make rotate call to driver.
@@ -284,7 +284,7 @@ class Server(object):
         try:
             self.driver.rotate(rotate_speed=rotate_speed)
         except Exception as e:
-            return self.build_reply("Error", msg=e)
+            return self.build_reply("Error", msg=str(e))
 
         return self.build_reply("Success", result=opts)
 
@@ -298,7 +298,7 @@ class Server(object):
         try:
             self.gunner.auto_fire()
         except Exception as e:
-            return self.build_reply("Error", msg=e)
+            return self.build_reply("Error", msg=str(e))
 
         return self.build_reply("Success", result="Fired")
 
@@ -315,21 +315,21 @@ class Server(object):
             return self.build_reply("Error",
                                     msg="opts key required for this cmd")
 
-        # Validate x angle option
+        # Validate yaw angle option
         try:
             yaw = int(round(float(opts["yaw"])))
         except KeyError:
             return self.build_reply("Error", msg="No 'yaw' opt given")
-        except TypeError:
+        except ValueError:
             return self.build_reply("Error",
                                     msg="Could not convert yaw to int")
 
-        # Validate y angle option
+        # Validate pitch angle option
         try:
             pitch = int(round(float(opts["pitch"])))
         except KeyError:
             return self.build_reply("Error", msg="No 'pitch' opt given")
-        except TypeError:
+        except ValueError:
             return self.build_reply("Error",
                                     msg="Could not convert pitch to int")
 
@@ -337,7 +337,7 @@ class Server(object):
         try:
             self.gunner.aim_turret(yaw, pitch)
         except Exception as e:
-            return self.build_reply("Error", msg=e)
+            return self.build_reply("Error", msg=str(e))
 
         return self.build_reply("Success", result=opts)
 
@@ -370,7 +370,7 @@ class Server(object):
         try:
             self.gunner.gun.wheel_speed = speed
         except Exception as e:
-            return self.build_reply("Error", msg=e)
+            return self.build_reply("Error", msg=str(e))
 
         return self.build_reply("Success", result=opts)
 
@@ -401,7 +401,7 @@ class Server(object):
             result = self.gunner.gun.laser(state)
             return self.build_reply("Success", result=result)
         except Exception as e:
-            return self.build_reply("Error", msg=e)
+            return self.build_reply("Error", msg=str(e))
 
     def handle_spin(self, opts):
         """Turn gun motor spin ON or OFF.
@@ -430,7 +430,7 @@ class Server(object):
             result = self.gunner.gun.spin(state)
             return self.build_reply("Success", result=result)
         except Exception as e:
-            return self.build_reply("Error", msg=e)
+            return self.build_reply("Error", msg=str(e))
 
     def handle_fire(self):
         """Make fire call to gun, using default parameters.
@@ -443,7 +443,7 @@ class Server(object):
             result = self.gunner.gun.fire()
             return self.build_reply("Success", result=result)
         except Exception as e:
-            return self.build_reply("Error", msg=e)
+            return self.build_reply("Error", msg=str(e))
 
     def handle_die(self):
         """Accept poison pill and gracefully exit.

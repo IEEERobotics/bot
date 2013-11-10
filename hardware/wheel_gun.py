@@ -100,8 +100,9 @@ class WheelGun(object):
         """
         if not (state == 0 or state == 1):
             self.logger.warning("Invalid spin state: {}".format(state))
-        self.motor_gpios['left'].value = state
-        self.motor_gpios['right'].value = state
+        else:
+            self.motor_gpios['left'].value = state
+            self.motor_gpios['right'].value = state
 
     @property
     def wheel_speed(self):

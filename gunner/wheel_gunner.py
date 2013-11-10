@@ -33,6 +33,6 @@ class WheelGunner(gunner.Gunner):
         self.aim_turret(yaw, ptch)
         # TODO(dfarrell07): Wait until turret has moved
         # TODO: Update to use variable speed once capes are installed
-        self.gun.spin()
+        self.gun.spin = 1
         self.gun.fire()
         self.logger.info("Fired dart")

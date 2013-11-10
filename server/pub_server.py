@@ -76,9 +76,9 @@ class PubServer(object):
             self.pub_drive_motor_fr_detail()
             self.pub_drive_motor_bl_detail()
             self.pub_drive_motor_fl_detail()
-            self.pub_gun_motor_detail()
+            #self.pub_gun_motor_detail()
             self.pub_turret_detail()
-            self.pub_gun_speed()
+            #self.pub_gun_speed()
             self.pub_turret_yaw()
             self.pub_turret_pitch()
             self.pub_drive_motor_br_speed()
@@ -116,18 +116,20 @@ class PubServer(object):
         fl_motor = self.driver.motors["front_left"]
         self.socket.send("drive_motor_fl_detail {}".format(fl_motor))
 
-    def pub_gun_motor_detail(self):
-        """Publish all info about gun motors"""
-        for motor in self.gunner.motors:
-            self.socket.send("gun_motor_detail {}".format(motor))
+    # TODO: Add back once capes are installed
+    #def pub_gun_motor_detail(self):
+    #    """Publish all info about gun motors"""
+    #    for motor in self.gunner.motors:
+    #        self.socket.send("gun_motor_detail {}".format(motor))
 
     def pub_turret_detail(self):
         """Publish all info about turret servos."""
         self.socket.send("turret_detail {}".format(self.gunner.turret))
 
-    def pub_gun_speed(self):
-        """Publish speed of gun motors."""
-        self.socket.send("gun_speed {}".format(self.gunner.wheel_speed))
+    # TODO: Add back once capes are installed
+    #def pub_gun_speed(self):
+    #    """Publish speed of gun motors."""
+    #    self.socket.send("gun_speed {}".format(self.gunner.wheel_speed))
 
     def pub_turret_yaw(self):
         """Publish yaw angle of turret."""

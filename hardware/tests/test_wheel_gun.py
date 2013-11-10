@@ -22,8 +22,13 @@ class TestWheelGun(test_bot.TestBot):
 
     """
 
+    def dummy_sleep(self, duration):
+        """This will replace time.sleep to make tests run quickly."""
+        # Call actual sleep, in case test depends on it
+        self.real_sleep(0.001)
+
     def setUp(self):
-        """Setup test hardware files and create WheelGun instance"""
+        """Setup test hardware files and create WheelGun instance."""
         # Run general bot test setup
         super(TestWheelGun, self).setUp()
 
@@ -32,16 +37,13 @@ class TestWheelGun(test_bot.TestBot):
 
         # Remap time.sleep to a dummy sleep function so that tests run fast
         self.real_sleep = time.sleep
-        def dummy_sleep(duration):
-            #print "[Dummy sleep: {} secs]".format(duration)  # [debug]
-            self.real_sleep(0.001)  # call actual sleep, in case test depends on it
-        time.sleep = dummy_sleep
+        time.sleep = self.dummy_sleep
 
         # Build WheelGun
         self.gun = wgun_mod.WheelGun()
 
     def tearDown(self):
-        """Restore testing flag state in config file, restore sleep function."""
+        """Restore testing flag in config, restore sleep function."""
         # Restore real time.sleep function
         time.sleep = self.real_sleep
 
@@ -112,11 +114,11 @@ class TestSpin(TestWheelGun):
     """Test setting the gun wheels spin/not spin using a GPIO."""
 
     def setUp(self):
-        """Call parent's setUp to make simulated hardware and build WheelGun."""
+        """Call parent setUp to make simulated hardware and build WheelGun."""
         super(TestSpin, self).setUp()
 
     def tearDown(self):
-        """Call parent's tearDown to restore testing flag in config."""
+        """Call parent tearDown to restore testing flag in config."""
         super(TestSpin, self).tearDown()
 
     def check_motor_gpios(self, value):
@@ -165,7 +167,7 @@ class TestSpin(TestWheelGun):
 
         assert self.gun.spin == orig_value
 
-        
+
 class TestFire(TestWheelGun):
 
     """Test function for firing the WheelGun."""

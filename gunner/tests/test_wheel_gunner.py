@@ -18,8 +18,6 @@ except ImportError:
 logger = lib.get_logger()
 
 
-
-
 class TestAutoFire(test_bot.TestBot):
 
     """Test firing a dart.

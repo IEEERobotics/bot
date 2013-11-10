@@ -101,7 +101,7 @@ class Server(object):
             cmd = msg["cmd"]
             assert type(cmd) is str
         except ValueError:
-            return self.build_reply("Error", 
+            return self.build_reply("Error",
                                     msg="Unable to convert message to dict")
         except KeyError:
             return self.build_reply("Error", msg="No 'cmd' key given")
@@ -182,7 +182,7 @@ class Server(object):
         except KeyError:
             return self.build_reply("Error", msg="No 'fwd' opt given")
         except ValueError:
-            return self.build_reply("Error", 
+            return self.build_reply("Error",
                                     msg="Could not convert fwd to float")
 
         # Validate strafe option
@@ -192,7 +192,7 @@ class Server(object):
             return "Error: No 'strafe' opt given"
             return self.build_reply("Error", msg="No 'strafe' opt given")
         except ValueError:
-            return self.build_reply("Error", 
+            return self.build_reply("Error",
                                     msg="Could not convert strafe to float")
 
         # Validate turn option
@@ -201,7 +201,7 @@ class Server(object):
         except KeyError:
             return self.build_reply("Error", msg="No 'turn' opt given")
         except ValueError:
-            return self.build_reply("Error", 
+            return self.build_reply("Error",
                                     msg="Could not convert turn to float")
 
         # Make call to driver
@@ -268,7 +268,7 @@ class Server(object):
         """
         # Validate that opts key was given
         if opts is None:
-            return self.build_reply("Error", 
+            return self.build_reply("Error",
                                     msg="opts key required for this cmd")
 
         # Validate speed option
@@ -351,7 +351,7 @@ class Server(object):
         """
         # Validate that opts key was given
         if opts is None:
-            return self.build_reply("Error", 
+            return self.build_reply("Error",
                                     msg="opts key required for this cmd")
 
         # TODO: Add once capes are installed
@@ -384,7 +384,7 @@ class Server(object):
         """
         # Validate that opts key was given
         if opts is None:
-            return self.build_reply("Error", 
+            return self.build_reply("Error",
                                     msg="opts key required for this cmd")
 
         # Validate state option
@@ -413,7 +413,7 @@ class Server(object):
         """
         # Validate that opts key was given
         if opts is None:
-            return self.build_reply("Error", 
+            return self.build_reply("Error",
                                     msg="opts key required for this cmd")
 
         # Validate state option

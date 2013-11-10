@@ -11,6 +11,7 @@ except ImportError:
 
 import client
 
+
 class SubClient(client.Client):
 
     """Use ZMQ SUB socket to get information about the bot."""
@@ -21,7 +22,11 @@ class SubClient(client.Client):
         self.set_topics()
 
     def set_topics(self):
-        """"""
+        """Subscribe to a set of topics.
+
+        Note that this will be updated to be smarter.
+
+        """
         self.sock.setsockopt(zmq.SUBSCRIBE, "drive_motor_br_detail")
         self.sock.setsockopt(zmq.SUBSCRIBE, "drive_motor_fr_detail")
         self.sock.setsockopt(zmq.SUBSCRIBE, "drive_motor_bl_detail")

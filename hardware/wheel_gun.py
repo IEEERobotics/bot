@@ -11,6 +11,7 @@ class WheelGun(object):
     """A wheel-based gun with a laser pointer."""
 
     def __init__(self):
+        """Build logger, get config, build motor, laser and trigger pins."""
         # Load and store logger
         self.logger = lib.get_logger()
 
@@ -133,7 +134,16 @@ class WheelGun(object):
         return
 
     def fire(self, advance_duration=0.1, delay=0.25, retract_duration=0.11):
-        """Fire a single dart by advancing it, and then reload."""
+        """Fire a single dart by advancing it, and then reload.
+
+        :param advance_duration: Time in seconds to push the trigger forwards.
+        :type advance_duration: float
+        :param delay: Time in seconds between trigger advance/retract.
+        :type delay: float
+        :param retract_duration: Time in seconds to pull the trigger back.
+        :type retract_duration: float
+
+        """
         if advance_duration <= 0.0:
             self.logger.warning(
                 "Invalid advance_duration: {}".format(advance_duration))
@@ -164,7 +174,14 @@ class WheelGun(object):
         return True
 
     def fire_burst(self, count=3, delay=2):
-        """Fire a number of darts consecutively."""
+        """Fire a number of darts consecutively.
+
+        :param count: Number of darts to fire.
+        :type count: int
+        :param delay: Delay in seconds between firing each dart.
+        :type delay: float
+
+        """
         if count <= 0:
             self.logger.warning("Invalid count: {}".format(count))
             return False

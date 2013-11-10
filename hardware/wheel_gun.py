@@ -158,9 +158,9 @@ class WheelGun(object):
             self.logger.warning("Invalid delay: {}".format(delay))
             return False
 
-        self._pulse_gpio(self.trigger_gpios['advance'], advance_duration)
+        self.trigger_gpios['advance'].pulse(advance_duration)
         time.sleep(delay)
-        self._pulse_gpio(self.trigger_gpios['retract'], retract_duration)
+        self.trigger_gpios['retract'].pulse(retract_duration)
         return True
 
     def fire_burst(self, count=3, delay=2):
@@ -176,22 +176,4 @@ class WheelGun(object):
         for i in xrange(count):
             self.fire()
             time.sleep(delay)
-        return True
-
-    def _pulse_gpio(self, pin, duration=0.1):
-        """Actuate a GPIO pin for a given duration.
-
-        :param pin: Which GPIO pin to pulse.
-        :type pin: GPIO
-        :param duration: How long to keep the pin on (secs.).
-        :type duration: float
-
-        """
-        # TODO: Move this method into GPIO?
-        # Use try-finally in case we are interrupted in sleep
-        try:
-            pin.value = 1
-            time.sleep(duration)
-        finally:
-            pin.value = 0
         return True

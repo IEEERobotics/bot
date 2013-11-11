@@ -6,6 +6,7 @@ import os
 from time import sleep
 from math import fabs
 import traceback
+from inspect import getmembers, ismethod
 from simplejson.decoder import JSONDecodeError
 
 try:
@@ -33,6 +34,8 @@ import follower.follower as f_mod
 class Server(object):
 
     """Listen for client commands and make them happen on the bot."""
+
+    handler_prefix = "handle_"
 
     def __init__(self, testing=None):
         """Build all main bot objects, set ZMQ to listen."""
@@ -70,26 +73,38 @@ class Server(object):
         # Build follower, which will manage following line
         self.follower = f_mod.Follower()
 
+        # Create command handlers mapping
+        self.handlers = dict()
+        for name, method in getmembers(self, ismethod):
+            if name.startswith(self.handler_prefix):
+                cmd = name.replace(self.handler_prefix, "", 1)
+                self.handlers[cmd] = method
+        self.logger.info("{} handlers registered".format(len(self.handlers)))
+
     def listen(self):
         """Listen for messages, pass them off to be handled and send reply."""
         self.logger.info("Server listening on {}".format(
                                                 self.server_bind_addr))
         while True:
-            # Receive JSON-formated message
             try:
+                # Receive JSON-formated message
                 msg = self.socket.recv_json()
+                self.logger.debug("Received: {}".format(msg))
+                
+                # Handle message, send reply
+                reply_msg = self.on_message(msg)
+                self.logger.debug("Replying: {}".format(reply_msg))
+                self.socket.send_json(reply_msg)
             except JSONDecodeError:
                 error_msg = "Non-JSON message"
                 self.logger.error(error_msg)
                 self.socket.send_json(self.build_reply("Error", msg=error_msg))
-            self.logger.debug("Received: {}".format(msg))
+            except Exception as e:
+                error_msg = str(e)
+                self.logger.error(error_msg)
+                self.socket.send_json(self.build_reply("Error", msg=error_msg))
 
-            # Handle message, send reply
-            reply_msg = self.handle_msg(msg)
-            self.logger.debug("Replying: {}".format(reply_msg))
-            self.socket.send_json(reply_msg)
-
-    def handle_msg(self, msg):
+    def on_message(self, msg):
         """Confirm message format and take appropriate action.
 
         :param msg_raw: Raw message string received by ZMQ.
@@ -118,27 +133,9 @@ class Server(object):
             opts = None
 
         # TODO: Switch from if..else to a string -> function map (dict)
-        if cmd == "fwd_strafe_turn":
-            return self.handle_fwd_strafe_turn(opts)
-        elif cmd == "move":
-            return self.handle_move(opts)
-        elif cmd == "rotate":
-            return self.handle_rotate(opts)
-        elif cmd == "auto_fire":
-            return self.handle_auto_fire()
-        elif cmd == "aim":
-            return self.handle_aim(opts)
-        elif cmd == "fire_speed":
-            return self.handle_fire_speed(opts)
-        elif cmd == "laser":
-            return self.handle_laser(opts)
-        elif cmd == "spin":
-            return self.handle_spin(opts)
-        elif cmd == "fire":
-            return self.handle_fire()
-        elif cmd == "die":
-            self.handle_die()
-        else:
+        try:
+            return self.handlers[cmd](opts)
+        except KeyError as e:
             error_msg = "Unknown cmd: {}".format(cmd)
             return self.build_reply("Error", msg=error_msg)
 
@@ -288,7 +285,7 @@ class Server(object):
 
         return self.build_reply("Success", result=opts)
 
-    def handle_auto_fire(self):
+    def handle_auto_fire(self, opts):
         """Make fire call to gunner. Normally used in autonomous mode.
 
         :returns: success or error message with description.
@@ -398,7 +395,7 @@ class Server(object):
 
         # Make call to gun
         try:
-            result = self.gunner.gun.laser(state)
+            result = self.gunner.gun.laser = state
             return self.build_reply("Success", result=result)
         except Exception as e:
             return self.build_reply("Error", msg=str(e))
@@ -427,12 +424,12 @@ class Server(object):
 
         # Make call to gun
         try:
-            result = self.gunner.gun.spin(state)
+            result = self.gunner.gun.spin = state
             return self.build_reply("Success", result=result)
         except Exception as e:
             return self.build_reply("Error", msg=str(e))
 
-    def handle_fire(self):
+    def handle_fire(self, opts):
         """Make fire call to gun, using default parameters.
 
         :returns: Success or error message with description.
@@ -445,7 +442,7 @@ class Server(object):
         except Exception as e:
             return self.build_reply("Error", msg=str(e))
 
-    def handle_die(self):
+    def handle_die(self, opts):
         """Accept poison pill and gracefully exit.
 
         Note that this method needs to print and send the reply itself,

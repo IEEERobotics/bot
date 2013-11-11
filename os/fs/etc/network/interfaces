@@ -1,0 +1,36 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+auto eth0
+iface eth0 inet dhcp
+# Example to keep MAC address between reboots
+#hwaddress ether DE:AD:BE:EF:CA:FE
+
+# WiFi - static
+#auto wlan0
+#iface wlan0 inet static
+#    #wpa-ssid "essid"
+#    #wpa-psk  "password"
+#    address 192.168.1.2
+#    netmask 255.255.255.0
+#    network 192.168.1.0
+#    gateway 192.168.1.1
+
+# WiFi - DHCP
+auto wlan0
+iface wlan0 inet dhcp
+    wpa-ssid skynet
+    wpa-psk whenisjudgementday
+
+# Ethernet/RNDIS gadget (g_ether)
+# ... or on host side, usbnet and random hwaddr
+iface usb0 inet static
+    address 192.168.7.2
+    netmask 255.255.255.0
+    network 192.168.7.0
+    gateway 192.168.7.1

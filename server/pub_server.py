@@ -4,6 +4,7 @@
 import sys
 import os
 from time import sleep
+import threading
 
 try:
     import zmq
@@ -26,27 +27,23 @@ import gunner.wheel_gunner as wg_mod
 import follower.follower as f_mod
 
 
-class PubServer(object):
+class PubServer(threading.Thread):
 
     """Publish information about the status of the bot."""
 
-    def __init__(self, testing=None):
-        """Build all main bot objects, build ZMQ PUB socket."""
+    def __init__(self, context):
+        """Override Thread.__init__, build ZMQ PUB socket."""
+        # Call superclass __init__
+        threading.Thread.__init__(self)
+
+        self.gunner = context["gunner"]
+        self.follower = context["follower"]
+        self.driver = context["driver"]
+        self.ir_hub = context["ir_hub"]
+
         # Load configuration and logger
         self.config = lib.load_config()
         self.logger = lib.get_logger()
-
-        # Testing flag will cause objects to run on simulated hardware
-        if testing == "True":
-            self.logger.info("PubServer will build bot objects in test mode")
-            lib.set_testing(bool(testing))
-        elif testing == "False":
-            self.logger.info("PubServer will build objects in non-test mode")
-            lib.set_testing(bool(testing))
-        else:
-            self.logger.info("Defaulting to config testing flag: {}".format(
-                                                    self.config["testing"]))
-            lib.set_testing(self.config["testing"])
 
         # Build ZMQ publisher socket
         self.context = zmq.Context()
@@ -57,14 +54,9 @@ class PubServer(object):
             port=self.config["pub_server_port"])
         self.socket.bind(self.server_bind_addr)
 
-        # Build MecDriver, which owns movement-related data
-        self.driver = md_mod.MecDriver()
-
-        # Build WheelGunner, which owns firing-related data
-        self.gunner = wg_mod.WheelGunner()
-
-        # Build follower, which owns line following-related data
-        self.follower = f_mod.Follower()
+    def run(self):
+        """Override Thread.run. Execution starts here when thread is started."""
+        self.publish()
 
     def publish(self):
         """Publish information about bot."""
@@ -201,7 +193,7 @@ class PubServer(object):
 
     def pub_irs(self):
         """Publish IR readings from all sensors."""
-        reading = self.follower.irs.read_all_arrays()
+        reading = self.ir_hub.read_all_arrays()
         self.socket.send("ir_front {}".format(reading["front"]))
         self.socket.send("ir_back {}".format(reading["back"]))
         self.socket.send("ir_left {}".format(reading["left"]))

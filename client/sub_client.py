@@ -56,4 +56,8 @@ class SubClient(client.Client):
     def print_msgs(self):
         """Print all messages from server."""
         while True:
-            pprint(self.sock.recv())
+            try:
+                pprint(self.sock.recv())
+            except KeyboardInterrupt:
+                print "Closing SubClient"
+                sys.exit(0)

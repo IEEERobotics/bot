@@ -73,7 +73,7 @@ class Server(object):
         # Build follower, which will manage following line
         self.follower = f_mod.Follower()
 
-        # Create command handlers mapping
+        # Create cmd -> handler methods mapping (dict)
         self.handlers = dict()
         for name, method in getmembers(self, ismethod):
             if name.startswith(self.handler_prefix):
@@ -87,10 +87,10 @@ class Server(object):
                                                 self.server_bind_addr))
         while True:
             try:
-                # Receive JSON-formated message
+                # Receive JSON-formated message as a dict
                 msg = self.socket.recv_json()
                 self.logger.debug("Received: {}".format(msg))
-                
+
                 # Handle message, send reply
                 reply_msg = self.on_message(msg)
                 self.logger.debug("Replying: {}".format(reply_msg))
@@ -107,9 +107,9 @@ class Server(object):
     def on_message(self, msg):
         """Confirm message format and take appropriate action.
 
-        :param msg_raw: Raw message string received by ZMQ.
-        :type msg_raw: string
-        :returns: Success or error message with description.
+        :param msg: Message received by ZMQ socket.
+        :type msg: dict
+        :returns: A dict with reply from a handler or error message.
 
         """
         try:
@@ -132,7 +132,7 @@ class Server(object):
         else:
             opts = None
 
-        # TODO: Switch from if..else to a string -> function map (dict)
+        # Use cmd -> handlers mapping for better performance
         try:
             return self.handlers[cmd](opts)
         except KeyError as e:
@@ -145,6 +145,7 @@ class Server(object):
         :param status: Exit status code ("Error"/"Success").
         :param result: Optional details of result (eg current speed).
         :param msg: Optional message (eg "Not implemented").
+        :returns: A dict with status, result and msg.
 
         """
         if status != "Success" and status != "Error":
@@ -376,7 +377,7 @@ class Server(object):
 
         :param opts: Dict with key 'state' (0/1).
         :type opts: dict
-        :returns: Success or error message with description.
+        :returns: A dict with result = laser state or error message.
 
         """
         # Validate that opts key was given
@@ -405,7 +406,7 @@ class Server(object):
 
         :param opts: Dict with key 'state' (0/1).
         :type opts: dict
-        :returns: Success or error message with description.
+        :returns: A dict with result = spin state or error message.
 
         """
         # Validate that opts key was given
@@ -432,6 +433,8 @@ class Server(object):
     def handle_fire(self, opts):
         """Make fire call to gun, using default parameters.
 
+        :param opts: Ignored.
+        :type opts: dict
         :returns: Success or error message with description.
 
         """
@@ -445,8 +448,13 @@ class Server(object):
     def handle_die(self, opts):
         """Accept poison pill and gracefully exit.
 
+        :param opts: Ignored.
+        :type opts: dict
+        :returns: Success or error message with description.
+
         Note that this method needs to print and send the reply itself,
         as it exits the process before listen() could take those actions.
+        TODO: Instead, use an 'is_alive' flag in listen() for clean exit.
 
         """
         self.logger.info("Success: Received message to die. Bye!")

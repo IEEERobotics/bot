@@ -198,11 +198,3 @@ class PubServer(threading.Thread):
         self.socket.send("ir_back {}".format(reading["back"]))
         self.socket.send("ir_left {}".format(reading["left"]))
         self.socket.send("ir_right {}".format(reading["right"]))
-
-
-if __name__ == "__main__":
-    if len(sys.argv) == 2:
-        pub_server = PubServer(sys.argv[1])
-    else:
-        pub_server = PubServer()
-    pub_server.publish()

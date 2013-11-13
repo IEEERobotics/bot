@@ -20,6 +20,14 @@ client_group = root_group.add_mutually_exclusive_group()
 test_group = root_group.add_mutually_exclusive_group()
 
 # Add arguments
+parser.add_argument("-T", "--test-mode", action="store_true",
+                    help="use simulated hardware, to allow running off the bone")
+test_group.add_argument("-8", "--pep8", action="store_true",
+                        help="run script to check PEP8 style conformance")
+test_group.add_argument("-t", "--tests", action="store_true",
+                        help="run all unit tests")
+parser.add_argument("-s", "--server", action="store_true",
+                    help="start server to provide interface for controlling the bot")
 client_group.add_argument("-a", "--auto-client", action="store_true",
                           help="autonomously solve the course")
 client_group.add_argument("-c", "--cli-client", action="store_true",
@@ -28,16 +36,6 @@ client_group.add_argument("-d", "--desktop-client", action="store_true",
                           help="desktop GUI interface for controlling the bot")
 client_group.add_argument("-u", "--sub-client", action="store_true",
                           help="subscribe to bot's published information")
-test_group.add_argument("-t", "--tests", action="store_true",
-                        help="run all unit tests")
-test_group.add_argument("-8", "--pep8", action="store_true",
-                        help="run script to check PEP8 style conformance")
-parser.add_argument("-T", "--test-mode", action="store_true",
-                    help="use simulated hardware, to allow running off the bone")
-parser.add_argument("-s", "--server", action="store_true",
-                    help="start server to provide interface for controlling the bot")
-parser.add_argument("-p", "--pub-server", action="store_true",
-                    help="start server to publish bot's information")
 
 # Parse the given args
 args = parser.parse_args()
@@ -47,8 +45,6 @@ lib.set_testing(args.test_mode)
 
 if args.test_mode:
     print "Using simulated hardware"
-else:
-    print "Using real hardware. Hopefully you're on a bone."
 
 if args.pep8:
     print "Running PEP8 style checks"
@@ -58,21 +54,15 @@ if args.tests:
     print "Running unit tests"
     os.system("python -m unittest discover")
 
-if args.auto_client:
-    print "Starting autonomous client"
-    planner = pfsm_mod.Robot()
-
 if args.server:
     print "Starting server"
     server = Popen(["./server/server.py", str(args.test_mode)])
     # Give server a chance to get up and running
     sleep(.2)
 
-if args.pub_server:
-    print "Starting PubServer"
-    pub_server = Popen(["./server/pub_server.py", str(args.test_mode)])
-    # Give server a chance to get up and running
-    sleep(.2)
+if args.auto_client:
+    print "Starting autonomous client"
+    planner = pfsm_mod.Robot()
 
 if args.cli_client:
     print "Starting CLI client"

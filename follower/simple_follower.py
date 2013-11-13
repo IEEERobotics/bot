@@ -62,7 +62,7 @@ class SimpleFollower(object):
 
         """
 
-        for x in range(0 list.max):
+        for x in range(0, list.max):
             step = len(A) % parts
             which_part = -1
             for x in range(0, parts):

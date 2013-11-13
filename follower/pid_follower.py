@@ -1,23 +1,22 @@
 """Logic for line following."""
 
 import sys
+from time import time
 
 import lib.lib as lib
 import hardware.ir_hub as ir_hub_mod
 import driver.mec_driver as mec_driver_mod
 import lib.exceptions as ex
-from time import time
+import follower
 
 
-class PIDFollower(object):
+class PIDFollower(follower.Follower):
 
     """Follow a line. Subclass for specific hardware/methods."""
 
     def __init__(self):
-        """Build Ir arrays, logger and drivers."""
-        self.logger = lib.get_logger()
-        self.irs = ir_hub_mod.IRHub()
-        self.driver = mec_driver_mod.MecDriver()
+        """Build IR arrays, logger and driver."""
+        super(PIDFollower, self).__init__()
         self.front_reading = 0
         self.back_reading = 0
         self.left_reading = 0
@@ -119,7 +118,7 @@ class PIDFollower(object):
 
         """
         self.heading = self.state_table.currentHeading
-        current_ir_reading = self.irs.read_all_arrays()
+        current_ir_reading = self.ir_hub.read_all_arrays()
         # Heading west
         if self.heading == 0:
             # Forward is on the left side

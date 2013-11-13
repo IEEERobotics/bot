@@ -4,7 +4,7 @@
 EX_USAGE=64
 
 # Each should only contain the packages that are added at that level
-light="git python-yaml libzmq-dev python-zmq"
+light="git python-yaml libzmq-dev python-zmq python-simplejson"
 medium="ipython vim python-numpy"
 full="tmux screen nmap tree build-essential python-pip python-dev python-smbus i2c-tools wireless-tools"
 

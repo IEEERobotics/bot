@@ -32,20 +32,20 @@ set_duty     6  250000
 set_polarity 6 0
 load_gpio 45
 
-# Gun motor 0: P9_14 (pwm3/ehr1A)
-load_pwm     3
-set_period   3 1000000
-set_duty     3  250000
-set_polarity 3 0
+# Gun laser: P8_35 (gpio8)
+load_gpio 8
 
-# Gun motor 1: P9_16 (pwm4/ehr1B)
-load_pwm     4
-set_period   4 1000000
-set_duty     4  250000
-set_polarity 4 0
+# Gun motor - left: P8_37 (gpio78)
+load_gpio 78
 
-# Gun solenoid/trigger: P9_12 (gpio60)
-load_gpio 60
+# Gun motor - right: P8_39 (gpio76)
+load_gpio 76
+
+# Gun trigger - retract: P8_41 (gpio74)
+load_gpio 74
+
+# Gun trigger - advance: P8_43 (gpio72)
+load_gpio 72
 
 # Turret servo - pan: P9_42 (pwm2/ecap0)
 load_pwm     2

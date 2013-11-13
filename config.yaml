@@ -15,7 +15,7 @@ gun: {
     },
     trigger_gpios: {
         retract: 74,  # Gun trigger - retract: P8_41 (gpio74)
-        advance: 72   # Gun trigger - advance: P8_43 (gpio74)
+        advance: 72   # Gun trigger - advance: P8_43 (gpio72)
     }
 }
 ultrasonics:

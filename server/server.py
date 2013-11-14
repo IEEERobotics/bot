@@ -56,7 +56,7 @@ class Server(object):
                                                     self.config["testing"]))
             lib.set_testing(self.config["testing"])
 
-        # Listen for incoming requests
+        # Build socket to listen for requests
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REP)
         self.server_bind_addr = "{protocol}://{host}:{port}".format(

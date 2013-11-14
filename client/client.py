@@ -16,7 +16,7 @@ class Client(object):
 
     """Parent class for clients that control the bot."""
 
-    def __init__(self, client_type="request"):
+    def __init__(self):
         """Get logger and config, connect to server.
 
         Note that this constructor supports building request or subscribe
@@ -36,23 +36,34 @@ class Client(object):
 
         # Build ZMQ socket and connect to server
         self.context = zmq.Context()
-        if client_type == "request":
-            self.logger.debug("Building request type client.")
-            self.sock = self.context.socket(zmq.REQ)
-            self.server_connect_addr = "{protocol}://{host}:{port}".format(
-                protocol=self.config["server_protocol"],
-                host=self.config["server_host"],
-                port=self.config["server_port"])
-        elif client_type == "subscribe":
-            self.logger.debug("Building subscribe type client.")
-            self.sock = self.context.socket(zmq.SUB)
-            self.server_connect_addr = "{protocol}://{host}:{port}".format(
-                protocol=self.config["server_protocol"],
-                host=self.config["server_host"],
-                port=self.config["pub_server_port"])
-        self.sock.connect(self.server_connect_addr)
+        self.sock = self.context.socket(zmq.REQ)
+        self.server_addr = "{protocol}://{host}:{port}".format(
+            protocol=self.config["server_protocol"],
+            host=self.config["server_host"],
+            port=self.config["server_port"])
+        self.sock.connect(self.server_addr)
         self.logger.info("Connected to server at {}".format(
-                                                self.server_connect_addr))
+                                                self.server_addr))
+
+        # Build ZMQ subscribe socket for PubServer
+        self.sub_sock = self.context.socket(zmq.SUB)
+        self.sub_addr = "{protocol}://{host}:{port}".format(
+            protocol=self.config["server_protocol"],
+            host=self.config["server_host"],
+            port=self.config["pub_server_pub_port"])
+        self.sub_sock.connect(self.sub_addr)
+        self.logger.info("Connected to server at {}".format(
+                                                self.sub_addr))
+
+         # Build ZMQ request socket for PubServer
+        self.topic_sock = self.context.socket(zmq.REQ)
+        self.topic_addr = "{protocol}://{host}:{port}".format(
+            protocol=self.config["server_protocol"],
+            host=self.config["server_host"],
+            port=self.config["pub_server_topic_port"])
+        self.topic_sock.connect(self.topic_addr)
+        self.logger.info("Connected to server at {}".format(
+                                                self.topic_addr))
 
     def __str__(self):
         """Build human-readable representation of client.
@@ -65,14 +76,17 @@ class Client(object):
     def cleanUp(self):
         """Tear down ZMQ socket."""
         self.sock.close()
+        self.sub_sock.close()
+        self.topic_sock.close()
         self.context.term()
         self.logger.info("Disconnected from server")
 
-    def send_cmd(self, cmd, opts=None):
+    def send_cmd(self, cmd, opts=None, server="Server"):
         """Send generic commands to server.
 
         :param cmd: Value of 'cmd' key to send.
         :param opts: Value of 'opts' key to send.
+        :param server: Server to send command to.
         :returns: True for success, False for failure.
 
         """
@@ -84,15 +98,25 @@ class Client(object):
         else:
             msg["opts"] = {}
 
-        # Send message, handle reply
-        self.logger.info("Sending: {}".format(msg))
-        self.sock.send_json(msg)
-        reply = self.sock.recv_json()
+        # Send message to appropriate server
+        if server == "Server":
+            self.logger.info("Sending to Server: {}".format(msg))
+            self.sock.send_json(msg)
+            reply = self.sock.recv_json()
+        elif server == "PubServer":
+            self.logger.info("Sending to PubServer: {}".format(msg))
+            self.topic_sock.send_json(msg)
+            reply = self.topic_sock.recv_json()
+        else:
+            self.logger.warning("Unknown server: {}".format(server))
+            return False
+
+        # Handle reply
         if reply["status"] == "Success":
-            self.logger.info("Server reply: {}".format(reply))
+            self.logger.info("Reply: {}".format(reply))
             return True
         else:
-            self.logger.warn("Server reply: {}".format(reply))
+            self.logger.warn("Reply: {}".format(reply))
             return False
 
     def send_aim(self, pitch, yaw):
@@ -176,6 +200,13 @@ class Client(object):
         opts = {}
         opts["speed"] = speed
         return self.send_cmd(cmd, opts)
+
+    def send_pub_set(self, topic):
+        """"""
+        cmd = "pub_set"
+        opts = {}
+        opts["topic"] = topic
+        return self.send_cmd(cmd, opts, server="PubServer")
 
     def send_die(self):
         """Send die command to server.

@@ -75,7 +75,7 @@ class MecDriver(driver.Driver):
         v_forward_left = self.motors["front_right"].velocity + \
             self.motors["back_left"].velocity
         return int(round(
-            degrees(atan2(v_forward_right, v_forward_left) - \ pi / 4))) % 360
+            degrees(atan2(v_forward_right, v_forward_left) - pi / 4))) % 360
         # TODO: Verify math; -pi/4 is because hypot will compute direction
         #   along forward_right diagonal
         # TODO: Correct this so that zero angle is returned

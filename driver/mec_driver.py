@@ -1,7 +1,7 @@
 """Pass low-level move commands to motors with mecanum wheels."""
 
 from math import sin, cos, pi, fabs, sqrt, hypot, atan2, degrees
-
+from time import sleep
 import driver
 import lib.lib as lib
 import hardware.motor as m_mod
@@ -18,6 +18,11 @@ class MecDriver(driver.Driver):
     max_angle = 360
     min_rotate_speed = -100
     max_rotate_speed = 100
+
+    #Used to keep track of last set speeds.
+    translate_speed = 0
+    translate_angle = 0
+    rotate_speed = 0
 
     def __init__(self):
         """Run superclass's init, build motor abstraction objects."""
@@ -274,9 +279,24 @@ class MecDriver(driver.Driver):
         self.motors["back_left"].speed = fabs(back_left)
         self.motors["back_right"].speed = fabs(back_right)
 
-    def jerk(self):
-        """Move forward for a certain amount of time or distance"""
-        pass  # TODO: Implement this
+    def jerk(self, time, speed):
+        """Recieves time (in seconds) and speed
+           Note: Since "speed" is programmer units, not real ones
+           the distance it moves can not be accurately measured."""
+
+        # Set motor to "speed"
+        for motor in self.motors.itervalues():
+            motor.speed = speed
+            motor.direction = "forward"
+
+        # Wait for "time" seconds
+        sleep(time)
+
+        # stop motors.
+        for motor in self.motors.itervalues():
+            motor.speed = 0
+
+        # TODO(Ahmed) Find way to approximate distance, and return value
 
     def oscillate(self):
         """Oscillate sideways, increasing in amplitude until line is found"""

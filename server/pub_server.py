@@ -5,6 +5,7 @@ import sys
 import os
 from time import sleep
 import threading
+from inspect import getmembers, ismethod
 
 try:
     import zmq
@@ -29,7 +30,14 @@ import follower.follower as f_mod
 
 class PubServer(threading.Thread):
 
-    """Publish information about the status of the bot."""
+    """Publish information about the status of the bot.
+
+    Note that by default, there are no topics set to publish. Clients can
+    send topics to the REP ZMQ socket owned by PubServer to set new topics.
+
+    """
+
+    publisher_prefix = "pub_"
 
     def __init__(self, context):
         """Override Thread.__init__, build ZMQ PUB socket."""
@@ -67,43 +75,66 @@ class PubServer(threading.Thread):
         self.poller = zmq.Poller()
         self.poller.register(self.topic_sock, zmq.POLLIN)
 
+        # Create topic -> publisher methods mapping (dict)
+        self.publishers = dict()
+        for name, method in getmembers(self, ismethod):
+            if name.startswith(self.publisher_prefix):
+                topic = name.replace(self.publisher_prefix, "", 1)
+                self.publishers[topic] = method
+        self.logger.info("{} publishers registered".format(len(self.publishers)))
+
+        # Topics that will be published
+        self.topics = []
+
     def run(self):
-        """Override Thread.run. Execution starts here when thread is started."""
+        """Check for new publisher topics, add them, publish topics.
+
+        Note that this overrides Thread.run and is the entry point when
+        starting this thread.
+
+        """
         while True:
-            socks = dict(self.poller.poll(0))
+            # Check if there's a new topic to add, block for 1 sec
+            socks = dict(self.poller.poll(1000))
+
+            # If there's a new topic message, add the topic
             if self.topic_sock in socks:
-                topic = self.topic_sock.recv_json()
-                self.logger.info("New pub topic: {}".format(topic))
-                reply = self.build_reply("Error", msg="Not yet implemented")
+                msg = self.topic_sock.recv_json()
+                reply = self.on_message(msg)
+                self.logger.info(reply)
                 self.topic_sock.send_json(reply)
-                self.logger.warning("Adding topics not implemented")
+
+            # Publish topics
             self.publish()
 
     def publish(self):
         """Publish information about bot."""
-        self.pub_drive_motor_br_detail()
-        self.pub_drive_motor_fr_detail()
-        self.pub_drive_motor_bl_detail()
-        self.pub_drive_motor_fl_detail()
-        #self.pub_gun_motor_detail()
-        self.pub_turret_detail()
-        #self.pub_gun_speed()
-        self.pub_turret_yaw()
-        self.pub_turret_pitch()
-        self.pub_drive_motor_br_speed()
-        self.pub_drive_motor_fr_speed()
-        self.pub_drive_motor_bl_speed()
-        self.pub_drive_motor_fl_speed()
-        self.pub_drive_motor_br_dir()
-        self.pub_drive_motor_fr_dir()
-        self.pub_drive_motor_bl_dir()
-        self.pub_drive_motor_fl_dir()
-        self.pub_drive_motor_br_vel()
-        self.pub_drive_motor_fr_vel()
-        self.pub_drive_motor_bl_vel()
-        self.pub_drive_motor_fl_vel()
-        self.pub_irs()
-        sleep(1)
+        for topic in self.topics:
+            self.publishers[topic]()
+
+    def on_message(self, msg):
+        """Parse message to get topic, add new topics.
+
+        :param msg: Raw message received on ZMQ socket.
+        :type msg: dict
+        :returns: Reply message to send out ZMQ socket.
+
+        """
+        try:
+            topic = msg["opts"]["topic"]
+            assert type(topic) is str
+        except KeyError:
+            self.build_reply("Error", "No 'opts' or 'topic' key")
+        except AssertionError:
+            self.build_reply("Error", "Topic is not a string")
+
+        if topic in self.topics:
+            reply_msg = "Topic already set: {}".format(topic)
+            return self.build_reply("Error", msg=reply_msg)
+        else:
+            self.topics.append(topic)
+            reply_msg = "Topic added: {}".format(topic)
+            return self.build_reply("Success", msg=reply_msg)
 
     def build_reply(self, status, result=None, msg=None):
         """Helper function for building standard replies.
@@ -117,13 +148,13 @@ class PubServer(threading.Thread):
         if status != "Success" and status != "Error":
             self.logger.warn("Status is typically 'Success' or 'Error'")
 
-        reply_msg = {}
-        reply_msg["status"] = status
+        reply = {}
+        reply["status"] = status
         if result is not None:
-            reply_msg["result"] = result
+            reply["result"] = result
         if msg is not None:
-            reply_msg["msg"] = msg
-        return reply_msg
+            reply["msg"] = msg
+        return reply
 
     def pub_drive_motor_br_detail(self):
         """Publish all info about back right drive motor."""

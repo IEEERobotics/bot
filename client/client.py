@@ -9,7 +9,6 @@ except ImportError:
     raise
 
 import lib.lib as lib
-import server.server as server
 
 
 class Client(object):
@@ -81,7 +80,7 @@ class Client(object):
         self.context.term()
         self.logger.info("Disconnected from server")
 
-    def send_cmd(self, cmd, opts=None, server="Server"):
+    def send_cmd(self, cmd, opts=None, server="ControlServer"):
         """Send generic commands to server.
 
         :param cmd: Value of 'cmd' key to send.
@@ -99,8 +98,8 @@ class Client(object):
             msg["opts"] = {}
 
         # Send message to appropriate server
-        if server == "Server":
-            self.logger.info("Sending to Server: {}".format(msg))
+        if server == "ControlServer":
+            self.logger.info("Sending to ControlServer: {}".format(msg))
             self.sock.send_json(msg)
             reply = self.sock.recv_json()
         elif server == "PubServer":

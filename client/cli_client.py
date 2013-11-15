@@ -3,8 +3,6 @@
 import os
 import sys
 
-import lib.lib as lib
-import server.server as server
 import client
 import cmd
 

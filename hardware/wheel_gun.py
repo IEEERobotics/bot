@@ -6,11 +6,12 @@ import lib.lib as lib
 from pybbb.bbb import gpio as gpio_mod
 
 
-class WheelGun:
+class WheelGun(object):
 
     """A wheel-based gun with a laser pointer."""
 
     def __init__(self):
+        """Build logger, get config, build motor, laser and trigger pins."""
         # Load and store logger
         self.logger = lib.get_logger()
 
@@ -29,6 +30,7 @@ class WheelGun:
 
             # Build GPIO pins in test mode
             # NOTE: Simulated directories and files must already exist
+            #   The unittest superclass will build them.
             self.laser_gpio = gpio_mod.GPIO(
                 self.config['gun']['laser_gpio'],
                 gpio_test_dir_base)
@@ -57,32 +59,67 @@ class WheelGun:
             self.trigger_gpios['advance'] = gpio_mod.GPIO(
                 self.config['gun']['trigger_gpios']['advance'])  # gpio72
 
+    @property
+    def laser(self):
+        """Getter for laser's status (on=1 or off=0)."""
+        return self.laser_gpio.value
+
+    @laser.setter
     def laser(self, state=0):
-        """Turn laser ON (1) or OFF (0)."""
+        """Turn laser on (1) or off (0).
+
+        :param state: Set laser to on (1) or off (0).
+
+        """
         if not (state == 0 or state == 1):
             self.logger.warning("Invalid laser state: {}".format(state))
-            return None
-        self.laser_gpio.value = state
-        return state
+        else:
+            self.laser_gpio.value = state
 
+    @property
+    def spin(self):
+        """Gettter for motor spin status.
+
+        Note that this is for using a single GPIO to spin the motors
+        all the way up or all the way down. Once the capes are installed
+        we'll be able to set a variable speed.
+
+        """
+        if self.motor_gpios["left"].value != self.motor_gpios["right"].value:
+            self.logger.warn("Left and right gun motor GPIOs are not equal.")
+            return {"left": self.motor_gpios["left"].value,
+                    "right": self.motor_gpios["right"].value}
+
+        return self.motor_gpios["left"].value
+
+    @spin.setter
     def spin(self, state=0):
-        """Spin motors UP (1) or DOWN (0)."""
+        """Setter for gun motors (1=up, 0=down).
+
+        :param state: Set gear motors to spin (1) or not (0).
+
+        """
         if not (state == 0 or state == 1):
             self.logger.warning("Invalid spin state: {}".format(state))
-            return None
-        self.motor_gpios['left'].value = state
-        self.motor_gpios['right'].value = state
-        return state
+        else:
+            self.motor_gpios['left'].value = state
+            self.motor_gpios['right'].value = state
 
     @property
     def wheel_speed(self):
-        """Getter for wheel rotation speed. Speed is % of max."""
+        """Getter for wheel rotation speed. Speed is % of max.
+
+        Note that this will not be complete until the capes are installed.
+
+        """
         # TODO: Implement once capes are installed
         return
 
     @wheel_speed.setter
     def wheel_speed(self, speed=100):
         """Setter for updates to wheel rotation speed.
+
+        Note that this will not be complete until the capes are installed.
 
         :param speed: Desired speed of wheel rotation (% of max).
         :type speed: int
@@ -97,7 +134,16 @@ class WheelGun:
         return
 
     def fire(self, advance_duration=0.1, delay=0.25, retract_duration=0.11):
-        """Fire a single dart by advancing it, and then reload."""
+        """Fire a single dart by advancing it, and then reload.
+
+        :param advance_duration: Time in seconds to push the trigger forwards.
+        :type advance_duration: float
+        :param delay: Time in seconds between trigger advance/retract.
+        :type delay: float
+        :param retract_duration: Time in seconds to pull the trigger back.
+        :type retract_duration: float
+
+        """
         if advance_duration <= 0.0:
             self.logger.warning(
                 "Invalid advance_duration: {}".format(advance_duration))
@@ -122,13 +168,20 @@ class WheelGun:
             self.logger.warning("Invalid delay: {}".format(delay))
             return False
 
-        self._pulse_gpio(self.trigger_gpios['advance'], advance_duration)
+        self.trigger_gpios['advance'].pulse(advance_duration)
         time.sleep(delay)
-        self._pulse_gpio(self.trigger_gpios['retract'], retract_duration)
+        self.trigger_gpios['retract'].pulse(retract_duration)
         return True
 
     def fire_burst(self, count=3, delay=2):
-        """Fire a number of darts consecutively."""
+        """Fire a number of darts consecutively.
+
+        :param count: Number of darts to fire.
+        :type count: int
+        :param delay: Delay in seconds between firing each dart.
+        :type delay: float
+
+        """
         if count <= 0:
             self.logger.warning("Invalid count: {}".format(count))
             return False
@@ -140,22 +193,4 @@ class WheelGun:
         for i in xrange(count):
             self.fire()
             time.sleep(delay)
-        return True
-
-    def _pulse_gpio(self, pin, duration=0.1):
-        """Actuate a GPIO pin for a given duration.
-
-        :param pin: Which GPIO pin to pulse.
-        :type pin: GPIO
-        :param duration: How long to keep the pin on (secs.).
-        :type duration: float
-
-        """
-        # TODO: Move this method into GPIO?
-        # Use try-finally in case we are interrupted in sleep
-        try:
-            pin.value = 1
-            time.sleep(duration)
-        finally:
-            pin.value = 0
         return True

@@ -83,14 +83,14 @@ class Motor(object):
 
         """
         if self.gpio_num is None:
-            return "Motor PWM:{} GPIO:None speed:{}".format(self.pwm_num,
-                                                            self.speed)
+            return "Motor PWM:{} GPIO:None speed:{}".format(
+                self.pwm_num, self.speed)
         return "Motor PWM:{} GPIO:{} speed:{} dir:{} vel:{}".format(
-                                                             self.pwm_num,
-                                                             self.gpio_num,
-                                                             self.speed,
-                                                             self.direction,
-                                                             self.velocity)
+            self.pwm_num,
+            self.gpio_num,
+            self.speed,
+            self.direction,
+            self.velocity)
 
     def invert(self, inverted):
         self.inverted = inverted

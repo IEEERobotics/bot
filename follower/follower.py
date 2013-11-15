@@ -15,25 +15,17 @@ class Follower(object):
     def __init__(self):
         """Build Ir arrays, logger and drivers."""
         self.logger = lib.get_logger()
-        self.irs = ir_hub_mod.IRHub()
         self.driver = mec_driver_mod.MecDriver()
-        
+        self.ir_hub = ir_hub_mod.IRHub()
+
     def follow(self, state_table):
         """Accept and handle fire commands.
 
-        TODO(dfarrell07): This is a stub
+        This method is not meant to be called, but instead is meant to show
+        that subclasses should override it in their implementation.
 
-        :param cmd: Description of fire action to execute.
+        :param state_table: Data describing current heading.
         
         """
-        current_ir_reading = self.irs.read_all_arrays()
-        front_ir = current_ir_reading["front"]
-        back_ir = current_ir_reading["back"]
-        left_ir = current_ir_reading["left"]
-        right_ir = current_ir_reading["right"]
-        #self.always_work(cmd)
-
-
-    def center_cal(self, front, back):
-        """ calculate the angle off the line """
-        pass
+        self.logger.error("The follow method must be overridden by a subclass")
+        raise NotImplementedError("Subclass must override this method")

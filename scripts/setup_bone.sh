@@ -4,7 +4,7 @@
 EX_USAGE=64
 
 # Each should only contain the packages that are added at that level
-light="git python-yaml libzmq-dev python-zmq"
+light="git python-yaml libzmq-dev python-zmq python-simplejson"
 medium="ipython vim python-numpy"
 full="tmux screen nmap tree build-essential python-pip python-dev python-smbus i2c-tools wireless-tools"
 
@@ -33,11 +33,7 @@ else
     exit $EX_USAGE
 fi
 
-echo "Configuring git..."
-
-git config --global user.name "ncsubot"
-git config --global user.email "ncsubot@gmail.com"
-
+# Add user ncsubot
 if [[ $EUID -e 0 ]]
 then
     echo -n "You ran this as root. Setup ncsubot account? [Y/n] "
@@ -54,9 +50,23 @@ then
         echo "Save and exit when you're done. Hit enter to continue."
         read blah
         visudo
+        
+        # TODO: Add SSH key
     fi
 fi
 
+# Configure git
+echo "Configuring git..."
+if [[ $EUID -e 0 ]]
+then
+    echo "You ran this as root, changing user to ncsubot..."
+    su ncsubot
+fi
+
+git config --global user.name "ncsubot"
+git config --global user.email "ncsubot@gmail.com"
+
+# Get bot code
 if [ ! -f /home/ncsubot/bot ]
 then
     echo "/home/ncsubot/bot doesn't exist."
@@ -91,5 +101,63 @@ else
         git pull
         cd pybbb
         git pull
+    fi
+fi
+
+# Get DMCC library
+if [ ! -f /home/ncsubot/DMCC_Library ]
+then
+    echo "/home/ncsubot/DMCC_Library doesn't exist."
+    echo "Clone DMCC code? [Y/n] "
+    read get_dmcc_code
+
+    if [ "$get_dmcc_code" == "y" -o "$get_dmcc_code" == "Y" -o $get_dmcc_code == ""]
+    then
+        if [[ $EUID -e 0 ]]
+        then
+            echo "You ran this as root, changing user to ncsubot..."
+            su ncsubot
+        fi
+
+        cd /home/ncsubot
+        git clone git@github.com:Exadler/DMCC_Library.git
+    fi
+else
+    echo "/home/ncsubot/DMCC_Library already exists."
+    echo "Update DMCC code? [Y/n] "
+    read update_dmcc_code
+
+    if [ "$update_dmcc_code" == "y" -o "$update_dmcc_code" == "Y" -o $update_dmcc_code == ""]
+    then
+        if [[ $EUID -e 0 ]]
+        then
+            echo "You ran this as root, changing user to ncsubot..."
+            su ncsubot
+        fi
+
+        cd /home/ncsubot/DMCC_Library
+        git pull
+    fi
+fi
+
+if [ -f /home/ncsubot/DMCC_Library ]
+then
+    if [ -e $(python -c "import DMCC") ]
+    then
+        echo "DMCC library is not installed."
+    fi
+    
+    echo "(Re)install DMCC library? [Y/n] "
+    read install_dmcc_code
+    if [ "$install_dmcc_code" == "y" -o "$install_dmcc_code" == "Y" -o $install_dmcc_code == ""]
+    then
+        cd /home/ncsubot/DMCC_Library
+        if [[ $EUID -e 0 ]]
+        then
+            python setupDMCC.py install
+        else
+            echo "Running as ncsubot using sudo to install (enter credentials when prompted)..."
+            sudo python setupDMCC.py install
+        fi
     fi
 fi

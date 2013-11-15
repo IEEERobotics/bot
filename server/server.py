@@ -6,6 +6,7 @@ import os
 from time import sleep
 from math import fabs
 import traceback
+from inspect import getmembers, ismethod
 from simplejson.decoder import JSONDecodeError
 
 try:
@@ -28,11 +29,14 @@ import driver.mec_driver as md_mod
 import hardware.wheel_gun as wgun_mod
 import gunner.wheel_gunner as wg_mod
 import follower.follower as f_mod
+import pub_server as pub_server_mod
 
 
 class Server(object):
 
     """Listen for client commands and make them happen on the bot."""
+
+    handler_prefix = "handle_"
 
     def __init__(self, testing=None):
         """Build all main bot objects, set ZMQ to listen."""
@@ -52,7 +56,7 @@ class Server(object):
                                                     self.config["testing"]))
             lib.set_testing(self.config["testing"])
 
-        # Listen for incoming requests
+        # Build socket to listen for requests
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REP)
         self.server_bind_addr = "{protocol}://{host}:{port}".format(
@@ -61,47 +65,65 @@ class Server(object):
             port=self.config["server_port"])
         self.socket.bind(self.server_bind_addr)
 
-        # Build MecDriver, which will accept and handle movement actions
-        self.driver = md_mod.MecDriver()
-
         # Build WheelGunner, which will accept and handle fire actions
         self.gunner = wg_mod.WheelGunner()
 
         # Build follower, which will manage following line
         self.follower = f_mod.Follower()
+        self.driver = self.follower.driver
+
+        # Build context object, containing bot resources
+        context = self.build_context()
+
+        # Spawn PubServer for publishing bot data
+        self.spawn_pub_server(context)
+
+        # Create cmd -> handler methods mapping (dict)
+        self.handlers = dict()
+        for name, method in getmembers(self, ismethod):
+            if name.startswith(self.handler_prefix):
+                cmd = name.replace(self.handler_prefix, "", 1)
+                self.handlers[cmd] = method
+        self.logger.info("{} handlers registered".format(len(self.handlers)))
 
     def listen(self):
         """Listen for messages, pass them off to be handled and send reply."""
         self.logger.info("Server listening on {}".format(
                                                 self.server_bind_addr))
         while True:
-            # Receive JSON-formated message
             try:
+                # Receive JSON-formated message as a dict
                 msg = self.socket.recv_json()
+                self.logger.debug("Received: {}".format(msg))
+
+                # Handle message, send reply
+                reply_msg = self.on_message(msg)
+                self.logger.debug("Replying: {}".format(reply_msg))
+                self.socket.send_json(reply_msg)
             except JSONDecodeError:
                 error_msg = "Non-JSON message"
                 self.logger.error(error_msg)
                 self.socket.send_json(self.build_reply("Error", msg=error_msg))
-            self.logger.debug("Received: {}".format(msg))
+            except KeyboardInterrupt:
+                self.handle_die()
+            except Exception as e:
+                error_msg = str(e)
+                self.logger.error(error_msg)
+                self.socket.send_json(self.build_reply("Error", msg=error_msg))
 
-            # Handle message, send reply
-            reply_msg = self.handle_msg(msg)
-            self.logger.debug("Replying: {}".format(reply_msg))
-            self.socket.send_json(reply_msg)
-
-    def handle_msg(self, msg):
+    def on_message(self, msg):
         """Confirm message format and take appropriate action.
 
-        :param msg_raw: Raw message string received by ZMQ.
-        :type msg_raw: string
-        :returns: Success or error message with description.
+        :param msg: Message received by ZMQ socket.
+        :type msg: dict
+        :returns: A dict with reply from a handler or error message.
 
         """
         try:
             cmd = msg["cmd"]
             assert type(cmd) is str
         except ValueError:
-            return self.build_reply("Error", 
+            return self.build_reply("Error",
                                     msg="Unable to convert message to dict")
         except KeyError:
             return self.build_reply("Error", msg="No 'cmd' key given")
@@ -117,28 +139,10 @@ class Server(object):
         else:
             opts = None
 
-        # TODO: Switch from if..else to a string -> function map (dict)
-        if cmd == "fwd_strafe_turn":
-            return self.handle_fwd_strafe_turn(opts)
-        elif cmd == "move":
-            return self.handle_move(opts)
-        elif cmd == "rotate":
-            return self.handle_rotate(opts)
-        elif cmd == "auto_fire":
-            return self.handle_auto_fire()
-        elif cmd == "aim":
-            return self.handle_aim(opts)
-        elif cmd == "fire_speed":
-            return self.handle_fire_speed(opts)
-        elif cmd == "laser":
-            return self.handle_laser(opts)
-        elif cmd == "spin":
-            return self.handle_spin(opts)
-        elif cmd == "fire":
-            return self.handle_fire()
-        elif cmd == "die":
-            self.handle_die()
-        else:
+        # Use cmd -> handlers mapping for better performance
+        try:
+            return self.handlers[cmd](opts)
+        except KeyError as e:
             error_msg = "Unknown cmd: {}".format(cmd)
             return self.build_reply("Error", msg=error_msg)
 
@@ -148,6 +152,7 @@ class Server(object):
         :param status: Exit status code ("Error"/"Success").
         :param result: Optional details of result (eg current speed).
         :param msg: Optional message (eg "Not implemented").
+        :returns: A dict with status, result and msg.
 
         """
         if status != "Success" and status != "Error":
@@ -160,6 +165,33 @@ class Server(object):
         if msg is not None:
             reply_msg["msg"] = msg
         return reply_msg
+
+    def build_context(self):
+        """Builds standard object to store resources.
+
+        :returns: Context, which stores standard objects like gunner, gun...
+
+        """
+        context = {}
+        context["gunner"] = self.gunner
+        context["follower"] = self.follower
+        context["driver"] = self.follower.driver
+        context["turret"] = self.gunner.turret
+        context["gun"] = self.gunner.gun
+        context["ir_hub"] = self.follower.ir_hub
+        return context
+
+    def spawn_pub_server(self, context):
+        """Spawn publisher thread, passing it common bot objects.
+
+        :param context: Common objects used by the bot.
+        :type context: dict
+
+        """
+        self.pub_server = pub_server_mod.PubServer(context)
+        # Prevent pub_server thread from blocking the process from closing
+        self.pub_server.setDaemon(True)
+        self.pub_server.start()
 
     def handle_fwd_strafe_turn(self, opts):
         """Validate options and make move call to driver.
@@ -182,7 +214,7 @@ class Server(object):
         except KeyError:
             return self.build_reply("Error", msg="No 'fwd' opt given")
         except ValueError:
-            return self.build_reply("Error", 
+            return self.build_reply("Error",
                                     msg="Could not convert fwd to float")
 
         # Validate strafe option
@@ -192,7 +224,7 @@ class Server(object):
             return "Error: No 'strafe' opt given"
             return self.build_reply("Error", msg="No 'strafe' opt given")
         except ValueError:
-            return self.build_reply("Error", 
+            return self.build_reply("Error",
                                     msg="Could not convert strafe to float")
 
         # Validate turn option
@@ -201,7 +233,7 @@ class Server(object):
         except KeyError:
             return self.build_reply("Error", msg="No 'turn' opt given")
         except ValueError:
-            return self.build_reply("Error", 
+            return self.build_reply("Error",
                                     msg="Could not convert turn to float")
 
         # Make call to driver
@@ -268,7 +300,7 @@ class Server(object):
         """
         # Validate that opts key was given
         if opts is None:
-            return self.build_reply("Error", 
+            return self.build_reply("Error",
                                     msg="opts key required for this cmd")
 
         # Validate speed option
@@ -288,7 +320,7 @@ class Server(object):
 
         return self.build_reply("Success", result=opts)
 
-    def handle_auto_fire(self):
+    def handle_auto_fire(self, opts):
         """Make fire call to gunner. Normally used in autonomous mode.
 
         :returns: success or error message with description.
@@ -351,7 +383,7 @@ class Server(object):
         """
         # Validate that opts key was given
         if opts is None:
-            return self.build_reply("Error", 
+            return self.build_reply("Error",
                                     msg="opts key required for this cmd")
 
         # TODO: Add once capes are installed
@@ -379,12 +411,12 @@ class Server(object):
 
         :param opts: Dict with key 'state' (0/1).
         :type opts: dict
-        :returns: Success or error message with description.
+        :returns: A dict with result = laser state or error message.
 
         """
         # Validate that opts key was given
         if opts is None:
-            return self.build_reply("Error", 
+            return self.build_reply("Error",
                                     msg="opts key required for this cmd")
 
         # Validate state option
@@ -398,7 +430,7 @@ class Server(object):
 
         # Make call to gun
         try:
-            result = self.gunner.gun.laser(state)
+            result = self.gunner.gun.laser = state
             return self.build_reply("Success", result=result)
         except Exception as e:
             return self.build_reply("Error", msg=str(e))
@@ -408,12 +440,12 @@ class Server(object):
 
         :param opts: Dict with key 'state' (0/1).
         :type opts: dict
-        :returns: Success or error message with description.
+        :returns: A dict with result = spin state or error message.
 
         """
         # Validate that opts key was given
         if opts is None:
-            return self.build_reply("Error", 
+            return self.build_reply("Error",
                                     msg="opts key required for this cmd")
 
         # Validate state option
@@ -427,14 +459,16 @@ class Server(object):
 
         # Make call to gun
         try:
-            result = self.gunner.gun.spin(state)
+            result = self.gunner.gun.spin = state
             return self.build_reply("Success", result=result)
         except Exception as e:
             return self.build_reply("Error", msg=str(e))
 
-    def handle_fire(self):
+    def handle_fire(self, opts=None):
         """Make fire call to gun, using default parameters.
 
+        :param opts: Ignored.
+        :type opts: dict
         :returns: Success or error message with description.
 
         """
@@ -445,11 +479,16 @@ class Server(object):
         except Exception as e:
             return self.build_reply("Error", msg=str(e))
 
-    def handle_die(self):
+    def handle_die(self, opts=None):
         """Accept poison pill and gracefully exit.
+
+        :param opts: Ignored.
+        :type opts: dict
+        :returns: Success or error message with description.
 
         Note that this method needs to print and send the reply itself,
         as it exits the process before listen() could take those actions.
+        TODO: Instead, use an 'is_alive' flag in listen() for clean exit.
 
         """
         self.logger.info("Success: Received message to die. Bye!")

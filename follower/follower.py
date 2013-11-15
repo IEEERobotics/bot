@@ -17,22 +17,20 @@ class Follower(object):
         self.logger = lib.get_logger()
         self.irs = ir_hub_mod.IRHub()
         self.driver = mec_driver_mod.MecDriver()
-        
+
     def follow(self, state_table):
         """Accept and handle fire commands.
 
         TODO(dfarrell07): This is a stub
 
         :param cmd: Description of fire action to execute.
-        
+
         """
         current_ir_reading = self.irs.read_all_arrays()
         front_ir = current_ir_reading["front"]
         back_ir = current_ir_reading["back"]
         left_ir = current_ir_reading["left"]
         right_ir = current_ir_reading["right"]
-        #self.always_work(cmd)
-
 
     def center_cal(self, front, back):
         """ calculate the angle off the line """

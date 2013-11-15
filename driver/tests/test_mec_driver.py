@@ -47,7 +47,7 @@ class TestRotate(test_bot.TestBot):
 
             # Check for approximate speed, as float values will seldom be exact
             assert fabs(self.md.rotate_speed - test_rotate_speed) < \
-                        rotate_speed_error_margin
+                rotate_speed_error_margin
 
             # Check directions (skip if speed is too low)
             if fabs(test_rotate_speed) >= 10:
@@ -63,7 +63,7 @@ class TestRotate(test_bot.TestBot):
             # Check for valid duty cycles (speeds)
             for motor in self.md.motors.itervalues():
                 assert MecDriver.min_speed <= motor.speed <= \
-                                              MecDriver.max_speed
+                    MecDriver.max_speed
 
     def test_move(self):
         speed_error_margin = (MecDriver.max_speed -
@@ -76,12 +76,12 @@ class TestRotate(test_bot.TestBot):
                                      MecDriver.max_angle + 1, 10):
                 # Issue move command
                 logger.debug("Set speed  : {:3d}, angle: {:3d}".format(
-                                                          test_speed,
-                                                          test_angle))
+                    test_speed,
+                    test_angle))
                 self.md.move(test_speed, test_angle)
                 logger.debug("Check speed: {:3d}, angle: {:3d}".format(
-                                                          self.md.speed,
-                                                          self.md.angle))
+                    self.md.speed,
+                    self.md.angle))
 
                 """
                 Commented out due to normalizing ruining proportions.
@@ -94,37 +94,44 @@ class TestRotate(test_bot.TestBot):
                 # Don't check angle if speed is too low
                 if fabs(test_speed) >= 10:
                     assert fabs(self.md.angle - test_angle) % 360 < \
-                            angle_error_margin
+                        angle_error_margin
                 # Check for positive values when bot moving forward.
                 if test_angle == 0:
                     for position, motor in self.md.motors.iteritems():
-                        logger.debug("Ahmed Motor: {}, Speed: {}, Motor_speed: {}, Angle: {}, Direction: {}".format(
-                                                                position,
-                                                                test_speed,
-                                                                motor.speed,
-                                                                test_angle,
-                                                                motor.direction))
+                        logger.debug(
+                            "Ahmed Motor: {}, Speed: {}, Motor_speed:" +
+                            "{}, Angle: {}, Direction: {}".format(
+                                position,
+                                test_speed,
+                                motor.speed,
+                                test_angle,
+                                motor.direction
+                            ))
                         assert motor.direction == "forward"
 
                 # Check for valid duty cycles (speeds)
                 for motor in self.md.motors.itervalues():
                     assert MecDriver.min_speed <= motor.speed <= \
-                                                  MecDriver.max_speed
-                
+                        MecDriver.max_speed
+
     def test_move_forward_strafe(self):
         speed_error_margin = (MecDriver.max_speed -
                               MecDriver.min_speed) * 0.05
         angle_error_margin = (MecDriver.max_angle -
                               MecDriver.min_angle) * 0.05
 
-        for test_forward in xrange(MecDriver.min_speed + 1,
-                                 MecDriver.max_speed + 1, 10):
-            for test_strafe in xrange(MecDriver.min_speed,
-                                     MecDriver.max_speed + 1, 10):
+        for test_forward in xrange(
+            MecDriver.min_speed + 1,
+            MecDriver.max_speed + 1, 10
+        ):
+            for test_strafe in xrange(
+                MecDriver.min_speed,
+                MecDriver.max_speed + 1, 10
+            ):
                 # Issue move_forward_strafe command
                 logger.debug("Set forward: {:3d}, strafe: {:3d}".format(
-                                                          test_forward,
-                                                          test_strafe))
+                    test_forward,
+                    test_strafe))
                 self.md.move_forward_strafe(test_forward, test_strafe)
 
                 # Compute expected speed and angle
@@ -135,22 +142,23 @@ class TestRotate(test_bot.TestBot):
                     test_speed = MecDriver.max_speed
                 # Note order of atan2() args to get forward = 0 deg
                 test_angle = int(degrees(atan2(test_strafe, test_forward))) \
-                                % 360
+                    % 360
                 logger.debug("Exp. speed : {:3d}, angle: {:3d}".format(
-                                                          test_speed,
-                                                          test_angle))
+                    test_speed,
+                    test_angle))
 
                 logger.debug("Check speed: {:3d}, angle: {:3d}".format(
-                                                          self.md.speed,
-                                                          self.md.angle))
+                    self.md.speed,
+                    self.md.angle))
 
-                #Note: Speed no longer being checked due to Normalization eqs changing it.
+                #Note: Speed no longer being checked due to
+                #Normalization eqs changing it.
 
                 if fabs(test_speed) >= 10:
                     assert fabs(self.md.angle - test_angle) % 360 < \
-                            angle_error_margin                        
+                        angle_error_margin
 
                 # Check for valid duty cycles (speeds)
                 for motor in self.md.motors.itervalues():
                     assert MecDriver.min_speed <= motor.speed <= \
-                                                  MecDriver.max_speed
+                        MecDriver.max_speed

@@ -182,6 +182,8 @@ class PIDFollower(follower.Follower):
         position = 0
         # Set initial sener hits
         position_count = 0
+        # set intitial last hit index
+        last_hit_index = 0;
         # Move through the list and look for hits
         for n, v in enumerate(array):
             # Count the if there is a hit
@@ -190,6 +192,10 @@ class PIDFollower(follower.Follower):
                 position_count = position_count + 1
                 # Add the position to the last position
                 position = position + v * (15. - n) * 5.625 / 15
+                # keep track of the latest hit
+                if((position_count > 1) and (position_count < 4)):
+                    if(array[n-1] != 1):
+                        return -2
         # If there ate more than 4 hits than stop line following
         if(position_count > 3):
             # Return error condition
@@ -203,19 +209,16 @@ class PIDFollower(follower.Follower):
             return 0
         # If there at more than one and less than 3 hits find the avarge
         else:
-            # As long as hits are side by side
-            if(self.side_by_side(array) == 1):
-                # Return the avarge
-                return position / position_count
-            else:
-                return -2
+            # Return the avarge
+            return position / position_count
+
 
     def side_by_side(self, array):
         """Determines if array hits are beside one another."""
         # The index of the frist hit
         first_hit = array.index(1)
         # The max of the 2 (or one negbhors )
-        if(first_hit != 0 or first_hit != len(array)):
+        if(first_hit != 0 or first_hit != (len(array)-1)):
             # Max neigbor equals the max value of either neighbor
             max_neighbor = max(array.index(first_hit + 1),
                                array.index(frist_hit - 1))
@@ -245,6 +248,9 @@ class PIDFollower(follower.Follower):
                 position_count = position_count + 1
                 # Add the position to the position
                 position = position + v * (n + 0.0) * 12 / 15
+                if((position_count > 1) and (position_count < 4)):
+                    if(array[n-1] != 1):
+                        return -2                
         # If there are more than 4 hits
         if(position_count > 3):
             # Return error condition
@@ -258,8 +264,5 @@ class PIDFollower(follower.Follower):
         # If there are less than 4 hits and more than one hit
         else:
             # As long as hits are side by side
-            if(self.side_by_side(array) == 1):
-                # Return the avarge
-                return position / position_count
-            else:
-                return -2
+            return position / position_count
+

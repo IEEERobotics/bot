@@ -154,3 +154,5 @@ class TestRotate(test_bot.TestBot):
                 for motor in self.md.motors.itervalues():
                     assert MecDriver.min_speed <= motor.speed <= \
                                                   MecDriver.max_speed
+    def test_jerk(self):
+    

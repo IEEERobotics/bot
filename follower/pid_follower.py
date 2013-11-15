@@ -1,23 +1,22 @@
 """Logic for line following."""
 
 import sys
+from time import time
 
 import lib.lib as lib
 import hardware.ir_hub as ir_hub_mod
 import driver.mec_driver as mec_driver_mod
 import lib.exceptions as ex
-from time import time
+import follower
 
 
-class PIDFollower(object):
+class PIDFollower(follower.Follower):
 
     """Follow a line. Subclass for specific hardware/methods."""
 
     def __init__(self):
-        """Build Ir arrays, logger and drivers."""
-        self.logger = lib.get_logger()
-        self.irs = ir_hub_mod.IRHub()
-        self.driver = mec_driver_mod.MecDriver()
+        """Build IR arrays, logger and driver."""
+        super(PIDFollower, self).__init__()
         self.front_reading = 0
         self.back_reading = 0
         self.left_reading = 0
@@ -49,7 +48,7 @@ class PIDFollower(object):
         if((self.front_reading < 0)or(self.back_reading < 0)):
             print "Found X"
         current_time = time()
-        # Calculate the postion of the forward and back sensers
+        # Calculate the position of the forward and back sensers
         self.calculate_position()
         # Call front PID
         self.sampling_time = current_time - previous_time
@@ -100,7 +99,7 @@ class PIDFollower(object):
                                        self.front_ki * i_error
 
     def calculate_position(self):
-        """Calculate the postion of the line as it is on the bot."""
+        """Calculate the position of the line as it is on the bot."""
         # Get rid of the last entry
         self.front_position = self.front_position[:len(self.front_position) - \
                                                    1]
@@ -119,95 +118,95 @@ class PIDFollower(object):
 
         """
         self.heading = self.state_table.currentHeading
-        current_ir_reading = self.irs.read_all_arrays()
+        current_ir_reading = self.ir_hub.read_all_arrays()
         # Heading west
         if self.heading == 0:
             # Forward is on the left side
-            self.front_reading = self.get_postion_lr(
+            self.front_reading = self.get_position_lr(
                                         current_ir_reading["left"])
             # Back is on the right side
-            self.back_reading = self.get_postion_rl(
+            self.back_reading = self.get_position_rl(
                                         current_ir_reading["right"])
             # Left is on the back
-            self.left_reading = self.get_postion_lr(
+            self.left_reading = self.get_position_lr(
                                         current_ir_reading["back"])
             # Right is on the fornt
-            self.right_reading = self.get_postion_rl(
+            self.right_reading = self.get_position_rl(
                                         current_ir_reading["front"])
         # Heading east
         elif self.heading == 180:
             # Forward is on the right side
-            self.front_reading = self.get_postion_lr(
+            self.front_reading = self.get_position_lr(
                                         current_ir_reading["right"])
             # Back is on the left side
-            self.back_reading = self.get_postion_rl(
+            self.back_reading = self.get_position_rl(
                                         current_ir_reading["left"])
             # Left is on the front
-            self.left_reading = self.get_postion_lr(
+            self.left_reading = self.get_position_lr(
                                         current_ir_reading["front"])
             # Right is on the back
-            self.right_reading = self.get_postion_rl(
+            self.right_reading = self.get_position_rl(
                                         current_ir_reading["back"])
         # Heading south
         elif self.heading == 270:
             # Forward is on the front side
-            self.front_reading = self.get_postion_lr(
+            self.front_reading = self.get_position_lr(
                                         current_ir_reading["front"])
             # Back is on the back side
-            self.back_reading = self.get_postion_rl(
+            self.back_reading = self.get_position_rl(
                                         current_ir_reading["back"])
             # Left is on the left
-            self.left_reading = self.get_postion_lr(
+            self.left_reading = self.get_position_lr(
                                         current_ir_reading["left"])
             # right is on the right
-            self.right_reading = self.get_postion_rl(
+            self.right_reading = self.get_position_rl(
                                         current_ir_reading["right"])
             # Heading nouth
         elif self.heading == 90:
             # Forward is on the right side
-            self.front_reading = self.get_postion_lr(
+            self.front_reading = self.get_position_lr(
                                         current_ir_reading["back"])
             # Back is on the left side
-            self.back_reading = self.get_postion_rl(
+            self.back_reading = self.get_position_rl(
                                         current_ir_reading["front"])
             # Left is on the front
-            self.left_reading = self.get_postion_lr(
+            self.left_reading = self.get_position_lr(
                                         current_ir_reading["right"])
             # Right is on the back
-            self.right_reading = self.get_postion_rl(
+            self.right_reading = self.get_position_rl(
                                         current_ir_reading["left"])
 
-    def get_postion_lr(self, array):
-        """Returns a postion in bits from left to right."""
-        # Set initial postion
-        postion = 0
+    def get_position_lr(self, array):
+        """Returns a position in bits from left to right."""
+        # Set initial position
+        position = 0
         # Set initial sener hits
-        postion_count = 0
+        position_count = 0
         # Move through the list and look for hits
         for n, v in enumerate(array):
             # Count the if there is a hit
             if(v == 1):
                 # Count the number of hits
-                postion_count = postion_count + 1
-                # Add the postion to the last postion
-                postion = postion + v * (15. - n) * 5.625 / 15
+                position_count = position_count + 1
+                # Add the position to the last position
+                position = position + v * (15. - n) * 5.625 / 15
         # If there ate more than 4 hits than stop line following
-        if(postion_count > 3):
+        if(position_count > 3):
             # Return error condition
             return -1
         # If there is only one hit
-        elif(postion_count == 1):
-            # Return the postion
-            return postion
+        elif(position_count == 1):
+            # Return the position
+            return position
         # If there are no hits
-        elif(postion_count == 0):
+        elif(position_count == 0):
             return 0
         # If there at more than one and less than 3 hits find the avarge
         else:
             # As long as hits are side by side
-            if(side_by_side(array) == 1):
+            if(self.side_by_side(array) == 1):
                 # Return the avarge
-                return postion / postion_count
+                return position / position_count
             else:
                 return -2
 
@@ -233,34 +232,34 @@ class PIDFollower(object):
             return 1
 
     def get_position_rl(self, array):
-        """Returns a postion in bits from right to left."""
-        # Set initial postion
-        postion = 0
+        """Returns a position in bits from right to left."""
+        # Set initial position
+        position = 0
         # Set initial hit count to 0
-        postion_count = 0
+        position_count = 0
         # Move through the list and look for hits
         for n, v in enumerate(array):
             # If there is a hit
             if(v == 1):
                 # Count the number of hits
-                postion_count = postion_count + 1
-                # Add the postion to the postion
-                postion = postion + v * (n + 0.0) * 12 / 15
+                position_count = position_count + 1
+                # Add the position to the position
+                position = position + v * (n + 0.0) * 12 / 15
         # If there are more than 4 hits
-        if(postion_count > 3):
+        if(position_count > 3):
             # Return error condition
             return -1
         # If there is one condition
-        elif(postion_count == 1):
-            # Return the postion
-            return postion
-        elif(postion_count == 0):
+        elif(position_count == 1):
+            # Return the position
+            return position
+        elif(position_count == 0):
             return 0
         # If there are less than 4 hits and more than one hit
         else:
             # As long as hits are side by side
-            if(side_by_side(array) == 1):
+            if(self.side_by_side(array) == 1):
                 # Return the avarge
-                return postion / postion_count
+                return position / position_count
             else:
                 return -2

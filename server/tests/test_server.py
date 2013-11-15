@@ -274,7 +274,7 @@ class TestHandleRotate(test_bot.TestBot):
         msg["opts"] = {"speed": 100}
         self.socket.send_json(msg)
         reply = self.socket.recv_json()
-        assert reply["status"] == "Success"
+        assert reply["status"] == "Success", reply["msg"]
         assert reply["result"] == msg["opts"]
 
     def testNoSpeedKey(self):

@@ -107,7 +107,7 @@ class CLIClient(client.Client, cmd.Cmd):
         # Get and validate arguments
         try:
             speed = raw_args.split()[0]
-        except ValueError:
+        except (ValueError, IndexError):
             print "Invalid command, see help [cmd]."
             return
 
@@ -219,7 +219,7 @@ class CLIClient(client.Client, cmd.Cmd):
         # Get and validate arguments
         try:
             speed = raw_args.split()[0]
-        except ValueError:
+        except (ValueError, IndexError):
             print "Invalid command, see help [cmd]."
             return
 
@@ -231,6 +231,23 @@ class CLIClient(client.Client, cmd.Cmd):
         """Provide help message for rotate command."""
         print "rotate <speed>"
         print "\tRotate at given speed (-100 to 100, + is counterclockwise)."
+
+    def do_pub_set(self, raw_args):
+        """"""
+        # Get and validate arguments
+        try:
+            topic = raw_args.split()[0]
+        except (ValueError, IndexError):
+            print "Invalid command, see help [cmd]."
+            return
+
+        self.logger.info("New pub topic: {}".format(topic))
+        # Issue commands to server
+        self.send_pub_set(topic)
+
+    def do_pub_del(self, raw_args):
+        """"""
+        pass
 
     def do_die(self, raw_args):
         """Disconnect from server and close client."""

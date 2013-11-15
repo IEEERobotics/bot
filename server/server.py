@@ -29,6 +29,7 @@ import driver.mec_driver as md_mod
 import hardware.wheel_gun as wgun_mod
 import gunner.wheel_gunner as wg_mod
 import follower.follower as f_mod
+import pub_server as pub_server_mod
 
 
 class Server(object):
@@ -55,7 +56,7 @@ class Server(object):
                                                     self.config["testing"]))
             lib.set_testing(self.config["testing"])
 
-        # Listen for incoming requests
+        # Build socket to listen for requests
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REP)
         self.server_bind_addr = "{protocol}://{host}:{port}".format(
@@ -64,14 +65,18 @@ class Server(object):
             port=self.config["server_port"])
         self.socket.bind(self.server_bind_addr)
 
-        # Build MecDriver, which will accept and handle movement actions
-        self.driver = md_mod.MecDriver()
-
         # Build WheelGunner, which will accept and handle fire actions
         self.gunner = wg_mod.WheelGunner()
 
         # Build follower, which will manage following line
         self.follower = f_mod.Follower()
+        self.driver = self.follower.driver
+
+        # Build context object, containing bot resources
+        context = self.build_context()
+
+        # Spawn PubServer for publishing bot data
+        self.spawn_pub_server(context)
 
         # Create cmd -> handler methods mapping (dict)
         self.handlers = dict()
@@ -99,6 +104,8 @@ class Server(object):
                 error_msg = "Non-JSON message"
                 self.logger.error(error_msg)
                 self.socket.send_json(self.build_reply("Error", msg=error_msg))
+            except KeyboardInterrupt:
+                self.handle_die()
             except Exception as e:
                 error_msg = str(e)
                 self.logger.error(error_msg)
@@ -158,6 +165,33 @@ class Server(object):
         if msg is not None:
             reply_msg["msg"] = msg
         return reply_msg
+
+    def build_context(self):
+        """Builds standard object to store resources.
+
+        :returns: Context, which stores standard objects like gunner, gun...
+
+        """
+        context = {}
+        context["gunner"] = self.gunner
+        context["follower"] = self.follower
+        context["driver"] = self.follower.driver
+        context["turret"] = self.gunner.turret
+        context["gun"] = self.gunner.gun
+        context["ir_hub"] = self.follower.ir_hub
+        return context
+
+    def spawn_pub_server(self, context):
+        """Spawn publisher thread, passing it common bot objects.
+
+        :param context: Common objects used by the bot.
+        :type context: dict
+
+        """
+        self.pub_server = pub_server_mod.PubServer(context)
+        # Prevent pub_server thread from blocking the process from closing
+        self.pub_server.setDaemon(True)
+        self.pub_server.start()
 
     def handle_fwd_strafe_turn(self, opts):
         """Validate options and make move call to driver.
@@ -430,7 +464,7 @@ class Server(object):
         except Exception as e:
             return self.build_reply("Error", msg=str(e))
 
-    def handle_fire(self, opts):
+    def handle_fire(self, opts=None):
         """Make fire call to gun, using default parameters.
 
         :param opts: Ignored.
@@ -445,7 +479,7 @@ class Server(object):
         except Exception as e:
             return self.build_reply("Error", msg=str(e))
 
-    def handle_die(self, opts):
+    def handle_die(self, opts=None):
         """Accept poison pill and gracefully exit.
 
         :param opts: Ignored.

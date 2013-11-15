@@ -38,6 +38,7 @@ class PubServer(threading.Thread):
     """
 
     publisher_prefix = "pub_"
+    handler_prefix = "handle_"
 
     def __init__(self, context):
         """Override Thread.__init__, build ZMQ PUB socket."""
@@ -75,6 +76,14 @@ class PubServer(threading.Thread):
         self.poller = zmq.Poller()
         self.poller.register(self.topic_sock, zmq.POLLIN)
 
+        # Create cmd -> handler methods mapping (dict)
+        self.handlers = dict()
+        for name, method in getmembers(self, ismethod):
+            if name.startswith(self.handler_prefix):
+                cmd = name.replace(self.handler_prefix, "", 1)
+                self.handlers[cmd] = method
+        self.logger.info("{} handlers registered".format(len(self.handlers)))
+
         # Create topic -> publisher methods mapping (dict)
         self.publishers = dict()
         for name, method in getmembers(self, ismethod):
@@ -83,7 +92,7 @@ class PubServer(threading.Thread):
                 self.publishers[topic] = method
         self.logger.info("{} publishers registered".format(len(self.publishers)))
 
-        # Topics that will be published
+        # Topics that will be published by default.
         self.topics = []
 
     def run(self):
@@ -97,7 +106,7 @@ class PubServer(threading.Thread):
             # Check if there's a new topic to add, block for 1 sec
             socks = dict(self.poller.poll(1000))
 
-            # If there's a new topic message, add the topic
+            # Check if there's a new topic add/del message
             if self.topic_sock in socks:
                 msg = self.topic_sock.recv_json()
                 reply = self.on_message(msg)
@@ -113,20 +122,59 @@ class PubServer(threading.Thread):
             self.publishers[topic]()
 
     def on_message(self, msg):
-        """Parse message to get topic, add new topics.
+        """Confirm message format and take appropriate action.
 
-        :param msg: Raw message received on ZMQ socket.
+        TODO: Move to superclass
+
+        :param msg: Message received by ZMQ socket.
+        :type msg: dict
+        :returns: A dict with reply from a handler or error message.
+
+        """
+        try:
+            cmd = msg["cmd"]
+            assert type(cmd) is str
+        except ValueError:
+            return self.build_reply("Error",
+                                    msg="Unable to convert message to dict")
+        except KeyError:
+            return self.build_reply("Error", msg="No 'cmd' key given")
+        except AssertionError:
+            return self.build_reply("Error", msg="Key 'cmd' is not a string")
+
+        if "opts" in msg.keys():
+            opts = msg["opts"]
+            try:
+                assert type(opts) is dict
+            except AssertionError:
+                return self.build_reply("Error", msg="Key 'opts' not a dict")
+        else:
+            opts = None
+
+        # Use cmd -> handlers mapping for better performance
+        try:
+            return self.handlers[cmd](opts)
+        except KeyError as e:
+            error_msg = "Unknown cmd: {}".format(cmd)
+            return self.build_reply("Error", msg=error_msg)
+
+    def handle_pub_add(self, opts):
+        """Parse message to get topic, add new topic.
+
+        :param msg: Opts received via ZMQ, including topic.
         :type msg: dict
         :returns: Reply message to send out ZMQ socket.
 
         """
         try:
-            topic = msg["opts"]["topic"]
+            topic = opts["topic"]
             assert type(topic) is str
         except KeyError:
-            self.build_reply("Error", "No 'opts' or 'topic' key")
+            self.build_reply("Error", "No 'topic' key")
         except AssertionError:
             self.build_reply("Error", "Topic is not a string")
+
+        # TODO: Assert that topic is valid
 
         if topic in self.topics:
             reply_msg = "Topic already set: {}".format(topic)
@@ -136,8 +184,34 @@ class PubServer(threading.Thread):
             reply_msg = "Topic added: {}".format(topic)
             return self.build_reply("Success", msg=reply_msg)
 
+    def handle_pub_del(self, opts):
+        """Parse message to get topic, delete given topic.
+
+        :param msg: Opts received via ZMQ, including topic.
+        :type msg: dict
+        :returns: Reply message to send out ZMQ socket.
+
+        """
+        try:
+            topic = opts["topic"]
+            assert type(topic) is str
+        except KeyError:
+            self.build_reply("Error", "No 'topic' key")
+        except AssertionError:
+            self.build_reply("Error", "Topic is not a string")
+
+        if topic in self.topics:
+            self.topics.remove(topic)
+            reply_msg = "Topic deleted: {}".format(topic)
+            return self.build_reply("Success", msg=reply_msg)
+        else:
+            reply_msg = "Topic not set: {}".format(topic)
+            return self.build_reply("Error", msg=reply_msg)
+
     def build_reply(self, status, result=None, msg=None):
         """Helper function for building standard replies.
+
+        TODO: Move to superclass
 
         :param status: Exit status code ("Error"/"Success").
         :param result: Optional details of result (eg current speed).

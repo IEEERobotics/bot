@@ -201,9 +201,26 @@ class Client(object):
         opts["speed"] = speed
         return self.send_cmd(cmd, opts)
 
-    def send_pub_set(self, topic):
-        """"""
-        cmd = "pub_set"
+    def send_pub_add(self, topic):
+        """Send command to add a new topic for PubServer to publish.
+
+        :param topic: Topic that PubServer should start publishing.
+        :type topic: string
+
+        """
+        cmd = "pub_add"
+        opts = {}
+        opts["topic"] = topic
+        return self.send_cmd(cmd, opts, server="PubServer")
+
+    def send_pub_del(self, topic):
+        """Send command to delete topic that PubServer is publishing.
+
+        :param topic: Topic that PubServer should stop publishing.
+        :type topic: string
+
+        """
+        cmd = "pub_del"
         opts = {}
         opts["topic"] = topic
         return self.send_cmd(cmd, opts, server="PubServer")

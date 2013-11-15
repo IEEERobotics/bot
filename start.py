@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # Start various clients, server or tests
 
-import sys
 import argparse
 from subprocess import Popen
 import os
@@ -56,7 +55,7 @@ if args.tests:
 
 if args.server:
     print "Starting server"
-    server = Popen(["./server/server.py", str(args.test_mode)])
+    server = Popen(["./server/control_server.py", str(args.test_mode)])
     # Give server a chance to get up and running
     sleep(.2)
 

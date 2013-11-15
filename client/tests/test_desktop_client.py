@@ -15,7 +15,6 @@ except ImportError:
 
 try:
     import lib.lib as lib
-    import server as server_mod
     import client.desktop_client as dclient_mod
     import tests.test_bot as test_bot
 except ImportError:
@@ -36,7 +35,7 @@ class TestBasic(test_bot.TestBot):
         super(TestBasic, self).setUp()
 
         # Build server. Arg is testing or not.
-        self.server = Popen(["./server/server.py", "True"])
+        self.server = Popen(["./server/control_server.py", "True"])
 
         # Build socket and connect to server
         self.context = zmq.Context()

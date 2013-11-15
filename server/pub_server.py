@@ -3,7 +3,6 @@
 
 import sys
 import os
-from time import sleep
 import threading
 from inspect import getmembers, ismethod
 
@@ -13,22 +12,14 @@ except ImportError:
     sys.stderr.write("ERROR: Failed to import zmq. Is it installed?")
     raise
 
-try:
-    import yaml
-except ImportError, err:
-    sys.stderr.write("ERROR: {}. Try installing python-yaml.\n".format(err))
-    raise
-
 new_path = [os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")]
 sys.path = new_path + sys.path
 
 import lib.lib as lib
-import driver.mec_driver as md_mod
-import gunner.wheel_gunner as wg_mod
-import follower.follower as f_mod
+import server.server as server
 
 
-class PubServer(threading.Thread):
+class PubServer(threading.Thread, server.Server):
 
     """Publish information about the status of the bot.
 
@@ -38,22 +29,18 @@ class PubServer(threading.Thread):
     """
 
     publisher_prefix = "pub_"
-    handler_prefix = "handle_"
 
     def __init__(self, context):
         """Override Thread.__init__, build ZMQ PUB socket."""
-        # Call superclass __init__
+        # Call superclass __init__ methods
         threading.Thread.__init__(self)
+        server.Server.__init__(self)
 
         # Unpack required objects from context
         self.gunner = context["gunner"]
         self.follower = context["follower"]
         self.driver = context["driver"]
         self.ir_hub = context["ir_hub"]
-
-        # Load configuration and logger
-        self.config = lib.load_config()
-        self.logger = lib.get_logger()
 
         # Build ZMQ publisher socket
         self.context = zmq.Context()
@@ -75,14 +62,6 @@ class PubServer(threading.Thread):
         # Build poller and register topic socket
         self.poller = zmq.Poller()
         self.poller.register(self.topic_sock, zmq.POLLIN)
-
-        # Create cmd -> handler methods mapping (dict)
-        self.handlers = dict()
-        for name, method in getmembers(self, ismethod):
-            if name.startswith(self.handler_prefix):
-                cmd = name.replace(self.handler_prefix, "", 1)
-                self.handlers[cmd] = method
-        self.logger.info("{} handlers registered".format(len(self.handlers)))
 
         # Create topic -> publisher methods mapping (dict)
         self.publishers = dict()
@@ -120,43 +99,6 @@ class PubServer(threading.Thread):
         """Publish information about bot."""
         for topic in self.topics:
             self.publishers[topic]()
-
-    def on_message(self, msg):
-        """Confirm message format and take appropriate action.
-
-        TODO: Move to superclass
-
-        :param msg: Message received by ZMQ socket.
-        :type msg: dict
-        :returns: A dict with reply from a handler or error message.
-
-        """
-        try:
-            cmd = msg["cmd"]
-            assert type(cmd) is str
-        except ValueError:
-            return self.build_reply("Error",
-                                    msg="Unable to convert message to dict")
-        except KeyError:
-            return self.build_reply("Error", msg="No 'cmd' key given")
-        except AssertionError:
-            return self.build_reply("Error", msg="Key 'cmd' is not a string")
-
-        if "opts" in msg.keys():
-            opts = msg["opts"]
-            try:
-                assert type(opts) is dict
-            except AssertionError:
-                return self.build_reply("Error", msg="Key 'opts' not a dict")
-        else:
-            opts = None
-
-        # Use cmd -> handlers mapping for better performance
-        try:
-            return self.handlers[cmd](opts)
-        except KeyError as e:
-            error_msg = "Unknown cmd: {}".format(cmd)
-            return self.build_reply("Error", msg=error_msg)
 
     def handle_pub_add(self, opts):
         """Parse message to get topic, add new topic.
@@ -207,28 +149,6 @@ class PubServer(threading.Thread):
         else:
             reply_msg = "Topic not set: {}".format(topic)
             return self.build_reply("Error", msg=reply_msg)
-
-    def build_reply(self, status, result=None, msg=None):
-        """Helper function for building standard replies.
-
-        TODO: Move to superclass
-
-        :param status: Exit status code ("Error"/"Success").
-        :param result: Optional details of result (eg current speed).
-        :param msg: Optional message (eg "Not implemented").
-        :returns: A dict with status, result and msg.
-
-        """
-        if status != "Success" and status != "Error":
-            self.logger.warn("Status is typically 'Success' or 'Error'")
-
-        reply = {}
-        reply["status"] = status
-        if result is not None:
-            reply["result"] = result
-        if msg is not None:
-            reply["msg"] = msg
-        return reply
 
     def pub_drive_motor_br_detail(self):
         """Publish all info about back right drive motor."""

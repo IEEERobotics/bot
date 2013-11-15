@@ -15,7 +15,6 @@ except ImportError:
 
 try:
     import lib.lib as lib
-    import server as server_mod
     import tests.test_bot as test_bot
 except ImportError:
     print "ImportError: Use `python -m unittest discover` from project root."
@@ -35,7 +34,7 @@ class TestHandleMessage(test_bot.TestBot):
         super(TestHandleMessage, self).setUp()
 
         # Build server. Arg is testing or not.
-        self.server = Popen(["./server/server.py", "True"])
+        self.server = Popen(["./server/control_server.py", "True"])
 
         # Build socket and connect to server
         self.context = zmq.Context()
@@ -105,7 +104,7 @@ class TestHandleFwdStrafeTurn(test_bot.TestBot):
         super(TestHandleFwdStrafeTurn, self).setUp()
 
         # Build server. Arg is testing or not.
-        self.server = Popen(["./server/server.py", "True"])
+        self.server = Popen(["./server/control_server.py", "True"])
 
         # Build socket and connect to server
         self.context = zmq.Context()
@@ -146,7 +145,7 @@ class TestHandleMove(test_bot.TestBot):
         super(TestHandleMove, self).setUp()
 
         # Build server. Arg is testing or not.
-        self.server = Popen(["./server/server.py", "True"])
+        self.server = Popen(["./server/control_server.py", "True"])
 
         # Build socket and connect to server
         self.context = zmq.Context()
@@ -247,7 +246,7 @@ class TestHandleRotate(test_bot.TestBot):
         super(TestHandleRotate, self).setUp()
 
         # Build server. Arg is testing or not.
-        self.server = Popen(["./server/server.py", "True"])
+        self.server = Popen(["./server/control_server.py", "True"])
 
         # Build socket and connect to server
         self.context = zmq.Context()
@@ -318,7 +317,7 @@ class TestHandleAutoFire(test_bot.TestBot):
         super(TestHandleAutoFire, self).setUp()
 
         # Build server. Arg is testing or not.
-        self.server = Popen(["./server/server.py", "True"])
+        self.server = Popen(["./server/control_server.py", "True"])
 
         # Build socket and connect to server
         self.context = zmq.Context()
@@ -358,7 +357,7 @@ class TestHandleAim(test_bot.TestBot):
         super(TestHandleAim, self).setUp()
 
         # Build server. Arg is testing or not.
-        self.server = Popen(["./server/server.py", "True"])
+        self.server = Popen(["./server/control_server.py", "True"])
 
         # Build socket and connect to server
         self.context = zmq.Context()
@@ -460,7 +459,7 @@ class TestHandleFireSpeed(test_bot.TestBot):
         super(TestHandleFireSpeed, self).setUp()
 
         # Build server. Arg is testing or not.
-        self.server = Popen(["./server/server.py", "True"])
+        self.server = Popen(["./server/control_server.py", "True"])
 
         # Build socket and connect to server
         self.context = zmq.Context()

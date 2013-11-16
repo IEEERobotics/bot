@@ -1,11 +1,7 @@
-"""Abstraction layer for line-following IR arrays."""
+"""Superclass for IR array abstractions."""
 
 import lib.lib as lib
 import pybbb.bbb.gpio as gpio_mod
-import pybbb.bbb.adc as adc_mod
-
-num_ir_units = 16  # Number of IR sensor units in one array
-ord_zero = ord('0')  # Cached ordinal value of zero, for efficiency
 
 
 class IRArray(object):
@@ -19,7 +15,7 @@ class IRArray(object):
 
     """
 
-    def __init__(self, name, input_adc_pin):
+    def __init__(self, name, input_gpio_pin):
         """Setup required pins and get logger/config.
 
         :param name: Identifier for this IR array.
@@ -28,39 +24,28 @@ class IRArray(object):
         :type input_adc_pin: int
 
         """
-        # Store name and input ADC pin for this IR array
+        # Store name and input GPIO pin for this IR array
         self.name = name
-        self.input_adc_pin = input_adc_pin
 
-        # Get and store logger object
+        # Get logger and config
         self.logger = lib.get_logger()
-
-        # Load system configuration
         config = lib.load_config()
 
-        # Create GPIO and ADC objects
+        # Create GPIO for reading sensed IR values
         if config["testing"]:
             # Get dir of simulated hardware files from config
-            gpio_test_dir_base = config["test_gpio_base_dir"]
-            adc_test_dir = config["test_adc_base_dir"]
+            gpio_test_dir = config["test_gpio_base_dir"]
 
-            # Build GPIO and ADC objects for testing
-            self.ir_select_gpios = [gpio_mod.GPIO(gpio, gpio_test_dir_base)
-                                    for gpio in config["ir_select_gpios"]]
-            self.ir_input_adc = adc_mod.ADC(self.input_adc_pin,
-                                    base_filename=(adc_test_dir + '/AIN'))
+            # Build GPIO object in test mode
+            # TODO: Update config to reflect use of GPIOs
+            self.input_gpio = gpio_mod.GPIO(input_gpio_pin, gpio_test_dir)
         else:
             try:
-                self.ir_select_gpios = [gpio_mod.GPIO(gpio)
-                                        for gpio in config["ir_select_gpios"]]
-                self.ir_input_adc = adc_mod.ADC(self.input_adc_pin)
+                self.input_gpio = gpio_mod.GPIO(input_gpio_pin)
             except Exception as e:
-                self.logger.error("GPIOs & ADC could not be initialized. " +
+                self.logger.error("GPIOs could not be initialized. " +
                                   "Not on the bone? Run unit test instead. " +
                                   "Exception: {}".format(e))
-
-        # Create buffer to store readings from all sensor units
-        self.reading = [0] * num_ir_units
 
     def __str__(self):
         """Returns human-readable representation.
@@ -69,53 +54,20 @@ class IRArray(object):
 
         """
         return "{} ({}): {}".format(
-            self.name, self.input_adc_pin, self.reading)
+            self.name, self.input_gpio, self.selected_unit_val)
 
-    def select_lines(self, values):
-        """Set select lines (GPIO pins) to given values.
+    @property
+    def selected_unit_val(self):
+        """Getter for the value of the currently selected IR unit.
 
-        :param values: Binary iterable with length at least that
-            of ir_select_gpios (ideally the same).
-        :type values: iterable
+        Note that it's the responsibility of IRHub to select the active line.
+        All arrays should then be read to get each of their values for that line.
 
-        """
-        for gpio, value in zip(self.ir_select_gpios, values):
-            gpio.value = value
+        To state it another way, an agent should iterate through the 16 select
+        lines, calling this method on each of the four IR arrays at every
+        iteration.
 
-    def select_lines_str(self, values_str):
-        """Efficient version of select_lines, directly uses a binary string."""
-        for gpio, value in zip(self.ir_select_gpios, values_str):
-            gpio.value = ord(value) - ord_zero
-
-    def select_unit(self, unit):
-        """Selects IR sensor unit (0-15)."""
-        # Convert unit number to array of 0s and 1s
-        #self.select_lines([int(x) for x in "{:04b}".format(unit)])
-        # Use binary string directly; more efficient
-        self.select_lines_str("{:04b}".format(unit))
-        # TODO: Use bitarray instead: https://pypi.python.org/pypi/bitarray/
-
-    def read_adc(self):
-        """Read the currently selected IR unit on the input ADC line."""
-        return self.ir_input_adc.read()
-
-    def read_unit(self, unit):
-        """Read a desired IR sensor unit."""
-        # TODO: Do we need a short sleep to let ADC measure value correctly?
-        self.select_unit(unit)
-        return self.read_adc()
-
-    def read_all_units(self):
-        """Poll IR sensor units and return sensed information.
-
-        :returns: Readings from all IR sensor units managed by this object.
+        :returns: 1/0, depending on the light under this array's selected IR.
 
         """
-        # TODO: Zero out self.reading?
-        # TODO more efficient loop using permutations?
-        for unit in xrange(num_ir_units):
-            self.reading[unit] = self.read_unit(unit)
-        self.logger.debug("IR reading:- {}".format(self))
-        # NOTE: Caller should make a copy if a read_all_units() is executed
-        # while previous values are being used
-        return self.reading
+        return self.input_gpio.value

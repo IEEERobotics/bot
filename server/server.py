@@ -21,7 +21,6 @@ class Server(object):
 
     """Listen for client commands and make them happen on the bot."""
 
-    publisher_prefix = "pub_"
     handler_prefix = "handle_"
 
     def __init__(self):
@@ -37,15 +36,6 @@ class Server(object):
                 cmd = name.replace(self.handler_prefix, "", 1)
                 self.handlers[cmd] = method
         self.logger.info("{} handlers registered".format(len(self.handlers)))
-
-        # Create topic -> publisher methods mapping (dict)
-        self.publishers = dict()
-        for name, method in getmembers(self, ismethod):
-            if name.startswith(self.publisher_prefix):
-                topic = name.replace(self.publisher_prefix, "", 1)
-                self.publishers[topic] = method
-        self.logger.info("{} publishers registered".format(len(self.publishers)))
-
 
     def on_message(self, msg):
         """Confirm message format and take appropriate action.

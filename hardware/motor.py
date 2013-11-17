@@ -20,7 +20,7 @@ class Motor(object):
     """
 
     def __init__(self, pwm_num, gpio_num=None, inverted=False):
-        """Setup logger and PWM interface.
+        """Build GPIO and PWM pins, set initial values.
 
         Note that the default gpio_num=None param implies that the motor
         has no direction. Its direction should be manually changed by
@@ -93,6 +93,14 @@ class Motor(object):
             self.velocity)
 
     def invert(self, inverted):
+        """Provides ability to invert motor direction.
+
+        This is needed to account for the physical position of motors.
+
+        :param inverted: True to swap typical forward and reverse directions.
+        :type inverted: bool
+
+        """
         self.inverted = inverted
         if self.inverted:
             self.forward = REVERSE

@@ -31,7 +31,6 @@ targeting: gunner/targeting/targeting0.yaml
 test_pwm_base_dir: simulator/pins/pwm/pwm
 test_gpio_base_dir: simulator/pins/gpio/gpio
 test_adc_base_dir: simulator/pins/adc
-test_strat_base_dir: planner/tests/strategies/
 fsm_tests: ./planner/tests/input/RobotNormalTest.txt
 testing: false
 server_protocol: tcp
@@ -40,5 +39,4 @@ server_host: 127.0.0.1  # Default hostname clients connect to
 server_port: 60000  # (Primary) ControlServer port
 pub_server_pub_port: 60001  # PubServer published bot data on this port
 pub_server_topic_port: 60002  # PubServer is told topics to set on this port
-num_ir_arrays: 4
 irs_per_array: 16

@@ -118,49 +118,6 @@ def set_testing(state, config_file=None):
     write_config(config)
 
 
-def set_strat(strat_file):
-    """Modify config.yaml to point to the given strategy file.
-
-    The given strat_file is assumed to exist in the directory pointed to
-    by test_strat_base_dir in config.yaml. If that assumption doesn't hold,
-    use set_strat_qual to pass a full path from the root of the repo.
-
-    :param strat_file: Strategy file to set in config.yaml.
-    :type strat_file: string
-
-    """
-    # Get current config
-    config = load_config()
-
-    # Update config with new strategy
-    strat_file_qual = config["test_strat_base_dir"] + strat_file
-    config["strategy"] = strat_file_qual
-
-    # Write new config
-    write_config(config)
-
-
-def set_strat_qual(strat_file_qual):
-    """Modify config.yaml to point to the given strategy file.
-
-    The given strat_file_qual is assumed to be a path from the root of the
-    repo to a strategy file. If you just want to use pass the name of the file
-    and use test_strat_base_dir from config.yaml, instead call set_strat.
-
-    :param strat_file: Qualified strategy file to set in config.yaml.
-    :type strat_file: string
-
-    """
-    # Get current config
-    config = load_config()
-
-    # Update config with new strategy
-    config["strategy"] = strat_file_qual
-
-    # Write new config
-    write_config(config)
-
-
 def get_logger(prefix=None):
     """Build and return a logger for formatted stream and file output.
 

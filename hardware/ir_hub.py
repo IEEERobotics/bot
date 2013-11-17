@@ -3,6 +3,7 @@
 import time
 import lib.lib as lib
 import hardware.ir as ir_mod
+import pybbb.bbb.gpio as gpio_mod
 
 ord_zero = ord('0')  # Cached ordinal value of zero, for efficiency
 
@@ -39,18 +40,21 @@ class IRHub(object):
         self.logger = lib.get_logger()
         config = lib.load_config()
 
+        # Number of IR sensors on an array
+        self.num_ir_units = config["irs_per_array"]
+
         # Build GPIO pins used to select which IR units are active
         if config["testing"]:
             # Get dir of simulated hardware files from config
             gpio_test_dir_base = config["test_gpio_base_dir"]
 
             # Build GPIOs used for selecting active IR units in test mode
-            self.ir_select_gpios = [gpio_mod.GPIO(gpio, gpio_test_dir_base)
+            self.select_gpios = [gpio_mod.GPIO(gpio, gpio_test_dir_base)
                                     for gpio in config["ir_select_gpios"]]
         else:
             try:
                 # Build GPIOs used for selecting active IR units
-                self.ir_select_gpios = [gpio_mod.GPIO(gpio)
+                self.select_gpios = [gpio_mod.GPIO(gpio)
                                         for gpio in config["ir_select_gpios"]]
             except Exception as e:
                 self.logger.error("GPIOs could not be initialized. " +
@@ -96,7 +100,7 @@ class IRHub(object):
         # TODO: Use bitarray instead: https://pypi.python.org/pypi/bitarray/
         line_val = "{:04b}".format(n)
 
-        for gpio, value in zip(self.ir_select_gpios, line_val):
+        for gpio, value in zip(self.select_gpios, line_val):
             gpio.value = ord(value) - ord_zero
 
     def read_nth_units(self, n):

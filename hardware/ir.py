@@ -5,22 +5,27 @@ import pybbb.bbb.gpio as gpio_mod
 
 
 class IRArray(object):
-    """Class for abstracting IR sensors.
+    """Superclass for IR array sensor abstractions.
 
-    The current plan is to use two 8 bit IR sensors on each side
-    of the bot. This class will allow that pair of sensors to be
-    addressed as a single unit.
-
-    Currently a stub, waiting for working IR sensors to be built.
+    There are two 8-unit IR arrays on each of the four sides of the bot,
+    which are abstracted in hardware into a 16 unit array. There are
+    currently two types of arrays, one digital and one analog. This class
+    acts as a superclass for the two types, as they are very similar and
+    will be handled by IRHub as if they are identical.
 
     """
 
-    def __init__(self, name, input_gpio_pin):
+    def __init__(self, name, read_gpio_pin):
         """Setup required pins and get logger/config.
+
+        Note that the value read on the read_gpio_pin will depend on
+        the currently value on the GPIO select lines. IRHub manages
+        the iteration over the select lines and the reading of each
+        array's read_gpio at each step of the iteration.
 
         :param name: Identifier for this IR array.
         :type name: string
-        :param input_adc_pin: Input ADC pin number for this IR array.
+        :param read_gpio_pin: Pin used by array to read an IR unit.
         :type input_adc_pin: int
 
         """
@@ -38,10 +43,10 @@ class IRArray(object):
 
             # Build GPIO object in test mode
             # TODO: Update config to reflect use of GPIOs
-            self.input_gpio = gpio_mod.GPIO(input_gpio_pin, gpio_test_dir)
+            self.read_gpio = gpio_mod.GPIO(read_gpio_pin, gpio_test_dir)
         else:
             try:
-                self.input_gpio = gpio_mod.GPIO(input_gpio_pin)
+                self.read_gpio = gpio_mod.GPIO(read_gpio_pin)
             except Exception as e:
                 self.logger.error("GPIOs could not be initialized. " +
                                   "Not on the bone? Run unit test instead. " +
@@ -70,4 +75,4 @@ class IRArray(object):
         :returns: 1/0, depending on the light under this array's selected IR.
 
         """
-        return self.input_gpio.value
+        return self.read_gpio.value

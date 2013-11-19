@@ -79,7 +79,24 @@ class TestBot(unittest.TestCase):
             self.setup_adc(adc_num)
 
     def setup_pwm(self, pwm_num, run, duty_ns, period_ns, polarity):
-        """Set files that simulate BBB PWMs to known state."""
+        """Set files that simulate BBB PWMs to known state.
+
+        Note that pin properties (all params other than pwm_num) should
+        be newline terminated because this is how the BeagleBone Black
+        stores values in the file-like objects it uses to control hardware.
+
+        :param pwm_num: Pin number of PWM pin to set to given state.
+        :type pwm_num: int
+        :param run: Run state to set PWM pin to (1/0, newline terminated).
+        :type run: string
+        :param duty_ns: Duty cycle to set PWM pin to (newline terminated).
+        :type duty_ns: string
+        :param period_ns: Period to set PWM pin to (newline terminated).
+        :type period_ns: string
+        :param polarity: Polarity to set PWM pin to (1/0, newline terminated).
+        :type polarity: string
+
+        """
         test_dir = self.config["test_pwm_base_dir"] + str(pwm_num)
 
         # Build test directories if they don't exist
@@ -97,7 +114,20 @@ class TestBot(unittest.TestCase):
             f.write(polarity)
 
     def setup_gpio(self, gpio_num, value="0\n", direction="out\n"):
-        """Set files that simulate BBB GPIOs to known state."""
+        """Set files that simulate BBB GPIOs to known state.
+
+        Note that pin properties (all params other than gpio_num) should
+        be newline terminated because this is how the BeagleBone Black
+        stores values in the file-like objects it uses to control hardware.
+
+        :param gpio_num: Pin number of GPIO to set to value/direction params.
+        :type gpio_num: int
+        :param value: Value to set GPIO to. Default is recommended.
+        :type value: string
+        :param direction: Direction to set GPIO to. Default is recommended.
+        :type direction: string
+
+        """
         test_dir = self.config["test_gpio_base_dir"] + str(gpio_num)
 
         # Build test directories if they don't exist
@@ -111,7 +141,18 @@ class TestBot(unittest.TestCase):
             f.write(direction)
 
     def setup_adc(self, adc_num, value="0\n"):
-        """Set files that simulate BBB ADCs to known state."""
+        """Set files that simulate BBB ADCs to known state.
+
+        Note that pin properties (all params other than adc_num) should
+        be newline terminated because this is how the BeagleBone Black
+        stores values in the file-like objects it uses to control hardware.
+
+        :param adc_num: Pin number of ADC to set to value param.
+        :type adc_num: int
+        :param value: Value to set ADC pin to. Default is recommended.
+        :type value: string
+
+        """
         test_dir = self.config["test_adc_base_dir"]
 
         # Create ADC test directory if it doesn't exist
@@ -123,7 +164,17 @@ class TestBot(unittest.TestCase):
             f.write(value)
 
     def get_pwm(self, pwm_num):
-        """Get current values in simulated PWM file."""
+        """Get current values in simulated PWM file.
+
+        Note that each value in the returned dict will be a newline
+        terminated string, as this is how the BeagleBone black stores
+        values in the file-like objects it uses to control hardware.
+
+        :param pwm_num: Pin number of PWM pin to read.
+        :type pwm_num: int
+        :returns: Dict with run, duty_ns, period_ns and polarity PWM info.
+
+        """
         test_dir = self.config["test_pwm_base_dir"] + str(pwm_num)
 
         # Get values in PWM simulated hardware files
@@ -139,7 +190,17 @@ class TestBot(unittest.TestCase):
         return results
 
     def get_gpio(self, gpio_num):
-        """Get current values in simulated GPIO file."""
+        """Get current values in simulated GPIO file.
+
+        Note that each value in the returned dict will be a newline
+        terminated string, as this is how the BeagleBone black stores
+        values in the file-like objects it uses to control hardware.
+
+        :param gpio_num: Pin number of GPIO to read.
+        :type gpio_num: int
+        :returns: Dict with value and direction of given simulated GPIO.
+
+        """
         test_dir = self.config["test_gpio_base_dir"] + str(gpio_num)
 
         # Get values in GPIO simulated hardware files
@@ -151,7 +212,17 @@ class TestBot(unittest.TestCase):
         return results
 
     def get_adc(self, adc_num):
-        """Get current value in simulated ADC file."""
+        """Get current value in simulated ADC file.
+
+        Note that the returned value will be a newline terminated
+        string, as this is how the BeagleBone black stores values
+        in the file-like objects it uses to control hardware.
+
+        :param adc_num: Pin number of ADC to read.
+        :type adc_num: int
+        :returns: Current value of the given simulated ADC.
+
+        """
         test_dir = self.config["test_adc_base_dir"]
 
         # Get value in ADC simulated hardware file

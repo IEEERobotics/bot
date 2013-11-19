@@ -338,7 +338,7 @@ class Finish(State):
         return self.robot.finish
 
 
-class StateMachine:
+class StateMachine(object):
     """Initializes and execute states, and manage transitions"""
 
     def __init__(self):

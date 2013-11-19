@@ -129,63 +129,6 @@ class TestSetTesting(test_bot.TestBot):
             lib.set_testing(False, config_file="fake.yaml")
 
 
-class TestSetStrat(test_bot.TestBot):
-
-    """Test setting the strategy file in config."""
-
-    def setUp(self):
-        """Get and store original config and strat file."""
-        self.orig_config = lib.load_config()
-
-    def tearDown(self):
-        """Restore original strat file."""
-        lib.write_config(self.orig_config)
-
-    def test_set_fake(self):
-        """Set strat file to a fake file.
-
-        Note that the validity of the strat file is not currently validated
-        in lib, which is why no exception is expected here.
-
-        """
-        fake_strat_file = "fake_strat.yaml"
-        lib.set_strat(fake_strat_file)
-        new_config = lib.load_config()
-        new_strat = self.orig_config["test_strat_base_dir"] + fake_strat_file
-        assert new_config["strategy"] == new_strat
-
-
-class TestSetStratQual(test_bot.TestBot):
-
-    """Test setting a qualified strategy file in config."""
-
-    def setUp(self):
-        """Get and store original config and strat file."""
-        self.orig_config = lib.load_config()
-
-    def tearDown(self):
-        """Restore original strat file."""
-        lib.write_config(self.orig_config)
-
-    def test_set_same(self):
-        """Set strat file to its current value."""
-        lib.set_strat_qual(self.orig_config["strategy"])
-        new_config = lib.load_config()
-        assert new_config == self.orig_config
-
-    def test_set_fake(self):
-        """Set strat file to a fake file.
-
-        Note that the validity of the strat file is not currently validated
-        in lib, which is why no exception is expected here.
-
-        """
-        fake_strat = self.orig_config["test_strat_base_dir"] + "fake.yaml"
-        lib.set_strat_qual(fake_strat)
-        new_config = lib.load_config()
-        assert new_config["strategy"] == fake_strat
-
-
 class TestGetLogger(test_bot.TestBot):
 
     """Test getting a logger object."""

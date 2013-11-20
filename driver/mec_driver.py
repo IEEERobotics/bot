@@ -283,24 +283,25 @@ class MecDriver(driver.Driver):
         self.motors["back_left"].speed = fabs(back_left)
         self.motors["back_right"].speed = fabs(back_right)
 
-    def jerk(self, time, speed):
-        """Recieves time (in seconds) and speed
-           Note: Since "speed" is programmer units, not real ones
-           the distance it moves can not be accurately measured."""
+    def jerk(self):
+        """Makes small forward jump in position.
+            """
+        #Time and speed of jerk.
+        jerk_time = 3
+        jerk_speed = 30
 
         # Set motor to "speed"
         for motor in self.motors.itervalues():
-            motor.speed = speed
+            motor.speed = jerk_speed
             motor.direction = "forward"
 
         # Wait for "time" seconds
-        sleep(time)
+        sleep(jerk_time)
 
         # stop motors.
         for motor in self.motors.itervalues():
             motor.speed = 0
 
-        # TODO(Ahmed) Find way to approximate distance, and return value
 
     def oscillate(self):
         """Oscillate sideways, increasing in amplitude until line is found"""

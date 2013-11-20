@@ -135,7 +135,7 @@ class Jerk(State):
         # Pass in time,speed.   
         # todo: figure out what numbers this should be.
         # For now, move forward for 3 seconds at 30% speed
-        self.driver.jerk(3, 30)
+        self.driver.jerk()
         self.logger.debug( "Execute: Rote initial move.\n")
 
     def next(self):

@@ -68,21 +68,6 @@ class TestWriteConfig(test_bot.TestBot):
         assert updated_config["logging"]["log_file"] == orig_log_file
 
 
-class TestLoadStrategy(test_bot.TestBot):
-
-    """Test loading the strategy file defined in config.yaml"""
-
-    def test_type(self):
-        """Load strategy file with default settings, assert it's a dict."""
-        strat = lib.load_strategy()
-        assert type(strat) is dict
-
-    def test_invalid(self):
-        """Pass an invalid path to strategy file."""
-        with self.assertRaises(IOError):
-            strat = lib.load_strategy("fake_strat.yaml")
-
-
 class TestLoadTargeting(test_bot.TestBot):
 
     """Test loading the targeting file defined in config.yaml"""

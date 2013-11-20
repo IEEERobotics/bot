@@ -27,7 +27,7 @@ class MinMaxRange(namedtuple('MinMaxRange', ['min', 'max'])):
             return value
 
 
-class DMCCMotor:
+class DMCCMotor(object):
     """A motor controlled by a DMCC cape."""
 
     board_num_range = MinMaxRange(min=0, max=3)  # 4 boards

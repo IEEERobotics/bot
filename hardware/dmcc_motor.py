@@ -37,31 +37,42 @@ class DMCCMotor(object):
 
     def __init__(self, board_num, motor_num):
         """Initialize a DMCC motor, given board (cape) and motor numbers.
-        
+
         :param board_num: Board number in board_num_range.
         :type board_num: int
-        
+
         :param motor_num: Motor number in motor_num_range.
         :type motor_num: int
-        
+
         """
         self.config = lib.load_config()
         self.logger = lib.get_logger()
-        
+
         assert (self.board_num_range.check(board_num) and
             self.motor_num_range.check(motor_num))
         self.board_num = board_num
         self.motor_num = motor_num
-        
+
         # TODO: More optimized testing setup, with getter-setter remapping
         self.is_testing = self.config["testing"] or dmcc_testing
         if self.is_testing:
             self._velocity = 0  # last set velocity, only when testing
-        
+
         self._power = 0  # last set power; DMCC can't read back power
-        
+
         self.logger.debug("DMCC motor: board #{}, motor #{}, power = {}"
             .format(self.board_num, self.motor_num, self.power))
+
+    @property
+    def voltage(self):
+        """Return the current motor supply voltage.
+
+        :returns: Motor supply voltage (volts).
+
+        """
+        if self.is_testing:
+            return 0.0
+        return DMCC.getMotorVoltage(self.board_num)
 
     @property
     def power(self):

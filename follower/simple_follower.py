@@ -19,7 +19,7 @@ class SimpleFollower(object):
     def overall_move(self):
         """Constant loop for the movement information."""
         while True:
-            dic = self.ir_hub.read_all_arrays()
+            dic = self.ir_hub.read_all()
             if on_line(dic["front"], dic["back"]):
                 rotate_correct()
             else:
@@ -77,7 +77,7 @@ class SimpleFollower(object):
         """Determines the direction to move the bot."""
         half_length = self.config["irs_per_array"] / 2
         mid_space = 2
-        front = self.ir_hub.read_all_arrays()["front"]
+        front = self.ir_hub.read_all()["front"]
 
         values = []
         f_left = self.sum_array(front, 0, half_length - mid_space)

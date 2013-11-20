@@ -33,7 +33,8 @@ class TestBot(unittest.TestCase):
         self.setup_gun_motors()
         self.setup_gun_trigger()
         self.setup_ir_select_gpios()
-        self.setup_ir_input_adcs()
+        self.setup_ir_analog_input_gpios()
+        self.setup_ir_digital_input_gpios()
 
     def setup_drive_motors(self):
         """Set driving motor simulation files to known state."""
@@ -69,14 +70,34 @@ class TestBot(unittest.TestCase):
             self.setup_gpio(gpio_num)
 
     def setup_ir_select_gpios(self):
-        """Set IR GPIO simulation files to known state."""
+        """Set IR GPIO simulation files to known state.
+
+        These GPIO pins are used to select which IR units
+        are selected for reading.
+
+        """
         for gpio_num in self.config["ir_select_gpios"]:
             self.setup_gpio(gpio_num)
 
-    def setup_ir_input_adcs(self):
-        """Set IR ADC simulation files to known state."""
-        for adc_name, adc_num in self.config["ir_input_adcs"].iteritems():
-            self.setup_adc(adc_num)
+    def setup_ir_analog_input_gpios(self):
+        """Set IR GPIO simulation files to known state.
+
+        These GPIO pints are used to read the currently
+        selected IR unit on an analog IR array.
+
+        """
+        for gpio_num in self.config["ir_analog_input_gpios"].values():
+            self.setup_gpio(gpio_num)
+
+    def setup_ir_digital_input_gpios(self):
+        """Set IR GPIO simulation files to known state.
+
+        These GPIO pints are used to read the currently
+        selected IR unit on a digital IR array.
+
+        """
+        for gpio_num in self.config["ir_digital_input_gpios"].values():
+            self.setup_gpio(gpio_num)
 
     def setup_pwm(self, pwm_num, run, duty_ns, period_ns, polarity):
         """Set files that simulate BBB PWMs to known state.

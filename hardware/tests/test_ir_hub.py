@@ -36,7 +36,7 @@ class TestReadings(test_bot.TestBot):
 
     def testIRHub(self):
         """Confirm that IRHub behavior is as expected."""
-        readings = self.ir_hub.read_all_arrays()
+        readings = self.ir_hub.read_all()
         assert type(readings) is dict, \
             "IR hub readings type: {}".format(type(reading))
         for name, reading in readings.iteritems():

@@ -2,7 +2,8 @@
 
 import time
 import lib.lib as lib
-import hardware.ir as ir_mod
+import ir_analog as ir_analog_mod
+import ir_digital as ir_digital_mod
 import pybbb.bbb.gpio as gpio_mod
 
 ord_zero = ord('0')  # Cached ordinal value of zero, for efficiency
@@ -118,6 +119,7 @@ class IRHub(object):
         self.select_nth_units(n)
 
         for name, array in self.arrays.iteritems():
+            # TODO: There's a logic error here. Need to append to list.
             self.reading[name] = array.selected_unit_val
 
     def read_all(self):
@@ -132,7 +134,7 @@ class IRHub(object):
         # TODO more efficient loop using permutations?
         for unit_n in xrange(self.num_ir_units):
             self.read_nth_units(unit_n)
-        self.logger.debug("IR reading:- {}".format(self.reading))
+        self.logger.debug("IR reading: {}".format(self.reading))
         return self.reading
 
 
@@ -149,7 +151,7 @@ def read_loop(delay=1):
     print "Starting read loop... [Ctrl+C to quit]"
     while True:
         try:
-            readings = hub.read_all_arrays()
+            readings = hub.read_all()
             print "\nIR Readings:-"
             print "\n".join("{}: {}".format(name, reading)
                             for name, reading in readings.iteritems())

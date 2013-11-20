@@ -118,7 +118,7 @@ class PIDFollower(follower.Follower):
 
         """
         self.heading = self.state_table.currentHeading
-        current_ir_reading = self.ir_hub.read_all_arrays()
+        current_ir_reading = self.ir_hub.read_all()
         # Heading west
         if self.heading == 0:
             # Forward is on the left side

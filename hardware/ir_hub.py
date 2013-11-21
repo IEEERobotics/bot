@@ -119,8 +119,7 @@ class IRHub(object):
         self.select_nth_units(n)
 
         for name, array in self.arrays.iteritems():
-            # TODO: There's a logic error here. Need to append to list.
-            self.reading[name] = array.selected_unit_val
+            self.reading[name][n] = array.selected_unit_val
 
     def read_all(self):
         """Poll IR sensor units and return sensed information.

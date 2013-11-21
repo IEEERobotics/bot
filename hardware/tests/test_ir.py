@@ -1,4 +1,4 @@
-"""Test cases for IR abstraction class."""
+"""Test cases for IR abstraction superclass."""
 import sys
 import os
 import unittest
@@ -17,32 +17,30 @@ except ImportError:
 logger = lib.get_logger()
 
 
-@unittest.skip("Not updated for new IR abstractions")
-class TestIRArrays(test_bot.TestBot):
+class TestSelectedUnitVal(test_bot.TestBot):
 
-    """Test reading IR sensor values using IR array abstractions."""
+    """Test getter for the currently selected unit of an IR array."""
 
     def setUp(self):
         """Get config and built IR object."""
         # Run general bot test setup
-        super(TestIRArrays, self).setUp()
+        super(TestSelectedUnitVal, self).setUp()
 
-        # Build IR array objects
-        ir_input_adcs = self.config["ir_input_adcs"]
-        self.arrays = {}
-        for name, pin in ir_input_adcs.iteritems():
-            self.arrays[name] = ir_mod.IRArray(name, pin)
+        # Create IR array objects
+        self.array = {}
+        ir_digital_input_gpios = self.config["ir_digital_input_gpios"]
+        self.name = ir_digital_input_gpios.keys()[0]
+        self.gpio = ir_digital_input_gpios.values()[0]
+        self.array[self.name] = ir_mod.IRArray(self.name, self.gpio)
 
     def tearDown(self):
         """Restore testing flag state in config file."""
         # Run general bot test tear down
-        super(TestIRArrays, self).tearDown()
+        super(TestSelectedUnitVal, self).tearDown()
 
-    def testIRArrays(self):
-        """Confirm that IRArray behavior is as expected."""
-        for name, array in self.arrays.iteritems():
-            reading = array.read_all_units()
-            assert type(reading) is list, \
-                "IR array: {}, reading type: {}".format(name, type(reading))
-            for ir_value in reading:
-                assert ir_value == 0
+    def test_manual_confirm(self):
+        """Use the getter then confirm using simulated hardware."""
+        observed_val = self.array[self.name].selected_unit_val
+        expected_val = int(self.get_gpio(self.gpio)["value"])
+        assert observed_val == expected_val, "{} != {}".format(observed_val,
+                                                               expected_val)

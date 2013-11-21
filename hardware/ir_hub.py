@@ -8,6 +8,7 @@ import pybbb.bbb.gpio as gpio_mod
 
 ord_zero = ord('0')  # Cached ordinal value of zero, for efficiency
 
+
 class IRHub(object):
 
     """Class for abstracting all IR arrays and working with them as a unit.
@@ -18,7 +19,7 @@ class IRHub(object):
 
     The way that IR values are read is somewhat complex because of our
     highly optimized hardware configuration. The two sets of pins used
-    to work with the IR arrays fall into to categories: GPIO select lines 
+    to work with the IR arrays fall into to categories: GPIO select lines
     and GPIO pins used to read values.
 
     To walk though an example, a number between 0 and num_ir_units-1 is
@@ -33,7 +34,7 @@ class IRHub(object):
 
     """
 
-    num_ir_units = 16 #  Number of IR sensors on an array
+    num_ir_units = 16  # Number of IR sensors on an array
 
     def __init__(self):
         """Build IR array abstraction objects."""
@@ -64,7 +65,6 @@ class IRHub(object):
  
         # Read mapping (dict) of IR array names to input GPIO pins from config
         # NOTE: IR unit select lines are common
-        # TODO: Update to use GPIOs in config once GPIOs are known
         ir_analog_input_gpios = config["ir_analog_input_gpios"]
         ir_digital_input_gpios = config["ir_digital_input_gpios"]
 
@@ -135,31 +135,3 @@ class IRHub(object):
             self.read_nth_units(unit_n)
         self.logger.debug("IR reading: {}".format(self.reading))
         return self.reading
-
-
-def read_loop(delay=1):
-    """Read IR array values using an IRHub object indefinitely.
-
-    To be used interactively on bot for testing IR arrays, not in other code.
-
-    :param delay: Time in seconds to wait between IR reads
-    :type delay: float
-
-    """
-    hub = IRHub()
-    print "Starting read loop... [Ctrl+C to quit]"
-    while True:
-        try:
-            readings = hub.read_all()
-            print "\nIR Readings:-"
-            print "\n".join("{}: {}".format(name, reading)
-                            for name, reading in readings.iteritems())
-            time.sleep(delay)
-        except KeyboardInterrupt:
-            print "Quitting..."
-            break
-    print "Done."
-
-
-if __name__ == "__main__":
-    read_loop()

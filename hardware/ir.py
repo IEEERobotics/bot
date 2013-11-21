@@ -42,7 +42,6 @@ class IRArray(object):
             gpio_test_dir = config["test_gpio_base_dir"]
 
             # Build GPIO object in test mode
-            # TODO: Update config to reflect use of GPIOs
             self.read_gpio = gpio_mod.GPIO(read_gpio_pin, gpio_test_dir)
         else:
             try:
@@ -66,7 +65,8 @@ class IRArray(object):
         """Getter for the value of the currently selected IR unit.
 
         Note that it's the responsibility of IRHub to select the active line.
-        All arrays should then be read to get each of their values for that line.
+        All arrays should then be read to get each of their values for that
+        line.
 
         To state it another way, an agent should iterate through the 16 select
         lines, calling this method on each of the four IR arrays at every

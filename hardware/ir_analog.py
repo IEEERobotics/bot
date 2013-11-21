@@ -21,6 +21,10 @@ class IRAnalog(ir.IRArray):
         the iteration over the select lines and the reading of each
         array's read_gpio at each step of the iteration.
 
+        The analog array's hardware requires some configuration via
+        I2C before it can be used. We don't currently know how that
+        works, so for now we'll assume its GPIOs are ready to read.
+
         :param name: Identifier for this IR array.
         :type name: string
         :param read_gpio_pin: Pin used by array to read an IR unit.

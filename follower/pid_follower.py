@@ -58,7 +58,7 @@ class PIDFollower(follower.Follower):
         back_error = self.back_pid()
         # Update motors
         self.motors(front_error, back_error)
-        # Take the current time set it equal to the privious time
+        # Take the current time set it equal to the previous time
         previous_time = current_time
 
     def motors(self, front_error, back_error):
@@ -92,9 +92,9 @@ class PIDFollower(follower.Follower):
         # Calculate the intergration error
         i_error = (self.back_position[0] + self.back_position[1]) / \
             2 * self.sampling_time + self.previous_back_i_error
-        # Update the previous intergration error with the new error
+        # Update the previous integration error with the new error
         self.previous_back_i_error = i_error
-        # Return the total error fot the back of the bot
+        # Return the total error for the back of the bot
         return self.front_kp * p_error + self.front_kd * d_error + \
             self.front_ki * i_error
 
@@ -196,7 +196,7 @@ class PIDFollower(follower.Follower):
                 if((position_count > 1) and (position_count < 4)):
                     if(array[n - 1] != 1):
                         return -2
-        # If there ate more than 4 hits than stop line following
+        # If there are more than 4 hits than stop line following
         if(position_count > 3):
             # Return error condition
             return -1
@@ -207,7 +207,7 @@ class PIDFollower(follower.Follower):
         # If there are no hits
         elif(position_count == 0):
             return 0
-        # If there at more than one and less than 3 hits find the avarge
+        # If there are more than one and less than 3 hits find the avarge
         else:
             # Return the avarge
             return position / position_count

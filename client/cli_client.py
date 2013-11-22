@@ -248,6 +248,11 @@ class CLIClient(client.Client, cmd.Cmd):
         # Issue commands to server
         self.send_pub_add(topic)
 
+    def help_pub_add(self):
+        """Provide help message for pub_add command."""
+        print "pub_add <topic>"
+        print "\tTell PubServer to start publishing this topic."
+
     def do_pub_del(self, raw_args):
         """Delete topics that PubServer is publishing.
 
@@ -265,6 +270,11 @@ class CLIClient(client.Client, cmd.Cmd):
         self.logger.info("Deleting pub topic: {}".format(topic))
         # Issue commands to server
         self.send_pub_del(topic)
+
+    def help_pub_del(self):
+        """Provide help message for pub_add command."""
+        print "pub_del <topic>"
+        print "\tTell PubServer to stop publishing this topic."
 
     def do_die(self, raw_args):
         """Disconnect from server and close client."""

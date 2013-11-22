@@ -255,7 +255,7 @@ class PubServer(threading.Thread, server.Server):
 
     def pub_irs(self):
         """Publish IR readings from all sensors."""
-        reading = self.ir_hub.read_all_arrays()
+        reading = self.ir_hub.read_all()
         self.pub_sock.send("ir_front {}".format(reading["front"]))
         self.pub_sock.send("ir_back {}".format(reading["back"]))
         self.pub_sock.send("ir_left {}".format(reading["left"]))

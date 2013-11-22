@@ -19,8 +19,9 @@ class TestBot(unittest.TestCase):
 
     def setUp(self):
         """Get config, set simulation pins to known state, set test flag."""
-        # Load config
+        # Load config and logger
         self.config = lib.load_config()
+        self.logger = lib.get_logger()
 
         # Set testing flag in config
         self.orig_test_state = self.config["testing"]
@@ -33,7 +34,8 @@ class TestBot(unittest.TestCase):
         self.setup_gun_motors()
         self.setup_gun_trigger()
         self.setup_ir_select_gpios()
-        self.setup_ir_input_adcs()
+        self.setup_ir_analog_input_gpios()
+        self.setup_ir_digital_input_gpios()
 
     def setup_drive_motors(self):
         """Set driving motor simulation files to known state."""
@@ -69,14 +71,34 @@ class TestBot(unittest.TestCase):
             self.setup_gpio(gpio_num)
 
     def setup_ir_select_gpios(self):
-        """Set IR GPIO simulation files to known state."""
+        """Set IR GPIO simulation files to known state.
+
+        These GPIO pins are used to select which IR units
+        are selected for reading.
+
+        """
         for gpio_num in self.config["ir_select_gpios"]:
             self.setup_gpio(gpio_num)
 
-    def setup_ir_input_adcs(self):
-        """Set IR ADC simulation files to known state."""
-        for adc_name, adc_num in self.config["ir_input_adcs"].iteritems():
-            self.setup_adc(adc_num)
+    def setup_ir_analog_input_gpios(self):
+        """Set IR GPIO simulation files to known state.
+
+        These GPIO pints are used to read the currently
+        selected IR unit on an analog IR array.
+
+        """
+        for gpio_num in self.config["ir_analog_input_gpios"].values():
+            self.setup_gpio(gpio_num)
+
+    def setup_ir_digital_input_gpios(self):
+        """Set IR GPIO simulation files to known state.
+
+        These GPIO pints are used to read the currently
+        selected IR unit on a digital IR array.
+
+        """
+        for gpio_num in self.config["ir_digital_input_gpios"].values():
+            self.setup_gpio(gpio_num)
 
     def setup_pwm(self, pwm_num, run, duty_ns, period_ns, polarity):
         """Set files that simulate BBB PWMs to known state.
@@ -97,6 +119,31 @@ class TestBot(unittest.TestCase):
         :type polarity: string
 
         """
+        if type(run) is not str:
+            self.logger.error("Param 'run' must be a string")
+            raise ValueError("Param 'rum' must be a string")
+        if type(duty_ns) is not str:
+            self.logger.error("Param 'duty_ns' must be a string")
+            raise ValueError("Param 'duty_ns' must be a string")
+        if type(period_ns) is not str:
+            self.logger.error("Param 'period_ns' must be a string")
+            raise ValueError("Param 'period_ns' must be a string")
+        if type(polarity) is not str:
+            self.logger.error("Param 'polarity' must be a string")
+            raise ValueError("Param 'polarity' must be a string")
+        if run[-1:] != "\n":
+            self.logger.error("Param 'run' must be newline-terminated")
+            raise ValueError("Param 'run' must be newline-terminated")
+        if duty_ns[-1:] != "\n":
+            self.logger.error("Param 'duty_ns' must be newline-terminated")
+            raise ValueError("Param 'duty_ns' must be newline-terminated")
+        if period_ns[-1:] != "\n":
+            self.logger.error("Param 'period_ns' must be newline-terminated")
+            raise ValueError("Param 'period_ns' must be newline-terminated")
+        if polarity[-1:] != "\n":
+            self.logger.error("Param 'polarity' must be newline-terminated")
+            raise ValueError("Param 'polarity' must be newline-terminated")
+
         test_dir = self.config["test_pwm_base_dir"] + str(pwm_num)
 
         # Build test directories if they don't exist
@@ -128,6 +175,19 @@ class TestBot(unittest.TestCase):
         :type direction: string
 
         """
+        if type(value) is not str:
+            self.logger.error("Param 'value' must be a string")
+            raise ValueError("Param 'value' must be a string")
+        if type(direction) is not str:
+            self.logger.error("Param 'direction' must be a string")
+            raise ValueError("Param 'direction' must be a string")
+        if value[-1:] != "\n":
+            self.logger.error("Param 'value' must be newline-terminated")
+            raise ValueError("Param 'value' must be newline-terminated")
+        if direction[-1:] != "\n":
+            self.logger.error("Param 'direction' must be newline-terminated")
+            raise ValueError("Param 'direction' must be newline-terminated")
+
         test_dir = self.config["test_gpio_base_dir"] + str(gpio_num)
 
         # Build test directories if they don't exist
@@ -153,6 +213,13 @@ class TestBot(unittest.TestCase):
         :type value: string
 
         """
+        if type(value) is not str:
+            self.logger.error("Param 'value' must be a string")
+            raise ValueError("Param 'value' must be a string")
+        if value[-1:] != "\n":
+            self.logger.error("Param 'value' must be newline-terminated")
+            raise ValueError("Param 'value' must be newline-terminated")
+
         test_dir = self.config["test_adc_base_dir"]
 
         # Create ADC test directory if it doesn't exist

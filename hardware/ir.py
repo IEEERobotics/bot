@@ -31,6 +31,7 @@ class IRArray(object):
         """
         # Store name and input GPIO pin for this IR array
         self.name = name
+        self.read_gpio_pin = read_gpio_pin
 
         # Get logger and config
         self.logger = lib.get_logger()
@@ -58,7 +59,7 @@ class IRArray(object):
 
         """
         return "{} ({}): {}".format(
-            self.name, self.input_gpio, self.selected_unit_val)
+            self.name, self.read_gpio_pin, self.selected_unit_val)
 
     @property
     def selected_unit_val(self):

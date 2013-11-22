@@ -6,8 +6,6 @@ import ir_analog as ir_analog_mod
 import ir_digital as ir_digital_mod
 import pybbb.bbb.gpio as gpio_mod
 
-ord_zero = ord('0')  # Cached ordinal value of zero, for efficiency
-
 
 class IRHub(object):
 
@@ -96,13 +94,20 @@ class IRHub(object):
         Note that this applies to all arrays. So, selecting unit n
         implies selecting it for all arrays managed by this abstraction.
 
+        :param n: IR unit to select, between 0 and num_ir_units-1.
+        :type n: int
+        :raises ValueError: If n isn't between 0 and num_ir_units-1
+
         """
+        if n < 0 or n >= self.num_ir_units:
+            self.logger.error("Invalid value of n: {}".format(n))
+            raise ValueError("n must be between 0 and num_ir_units-1")
+
         # Use binary string directly; more efficient
-        # TODO: Use bitarray instead: https://pypi.python.org/pypi/bitarray/
         line_val = "{:04b}".format(n)
 
         for gpio, value in zip(self.select_gpios, line_val):
-            gpio.value = ord(value) - ord_zero
+            gpio.value = int(value)
 
     def read_nth_units(self, n):
         """Read the currently selected IR units on each array.
@@ -115,7 +120,15 @@ class IRHub(object):
         The method updates the cached reading value for the nth unit
         of each array managed by this abstraction.
 
+        :param n: IR unit to read, between 0 and num_ir_units-1.
+        :type n: int
+        :raises ValueError: If n isn't between 0 and num_ir_units-1
+
         """
+        if n < 0 or n >= self.num_ir_units:
+            self.logger.error("Invalid value of n: {}".format(n))
+            raise ValueError("n must be between 0 and num_ir_units-1")
+
         self.select_nth_units(n)
 
         for name, array in self.arrays.iteritems():

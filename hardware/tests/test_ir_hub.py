@@ -27,7 +27,7 @@ class TestSelectNthUnits(test_bot.TestBot):
         # Run general bot test setup
         super(TestSelectNthUnits, self).setUp()
 
-        # Built IR hub abstraction object
+        # Build IR hub abstraction object
         self.ir_hub = ir_hub_mod.IRHub()
 
     def tearDown(self):
@@ -73,7 +73,7 @@ class TestReadNthUnits(test_bot.TestBot):
         # Run general bot test setup
         super(TestReadNthUnits, self).setUp()
 
-        # Built IR hub abstraction object
+        # Build IR hub abstraction object
         self.ir_hub = ir_hub_mod.IRHub()
 
     def tearDown(self):
@@ -84,14 +84,14 @@ class TestReadNthUnits(test_bot.TestBot):
     def gen_random_read_vals(self):
         """Sets simulated read GPIOs of each array to known, random val."""
         set_vals = {}
-        for name, gpio in self.ir_hub.arrays.iteritems():
+        for name, array in self.ir_hub.arrays.iteritems():
+            gpio = array.read_gpio_pin
             set_vals[name] = random.randint(0, 1)
             self.setup_gpio(gpio, value=str(set_vals[name]) + "\n")
         return set_vals
 
-    @unittest.skip("Something's broken about this test. Still working on it.")
     def test_all_valid_n(self):
-        """Loop over every valid value for n."""
+        """Loop over and read every valid value for n."""
         for array_reading in self.ir_hub.reading.values():
             assert len(array_reading) == self.ir_hub.num_ir_units
             for unit_reading in array_reading:
@@ -99,11 +99,13 @@ class TestReadNthUnits(test_bot.TestBot):
 
         for n in range(0, self.ir_hub.num_ir_units):
             expected_vals = self.gen_random_read_vals()
-            self.ir_hub.select_nth_units(n)
+            self.ir_hub.read_nth_units(n)
             for name, array_reading in self.ir_hub.reading.iteritems():
                 observed_val = array_reading[n]
                 assert observed_val == expected_vals[name], \
-                       "{} != {}".format(observed_val, expected_vals[name])
+                       "{} != {} for {} array".format(observed_val,
+                                                      expected_vals[name],
+                                                      name)
 
     def test_n_max(self):
         """Confirm that values at max are accepted."""
@@ -133,7 +135,7 @@ class TestReadAll(test_bot.TestBot):
         # Run general bot test setup
         super(TestReadAll, self).setUp()
 
-        # Built IR hub abstraction object
+        # Build IR hub abstraction object
         self.ir_hub = ir_hub_mod.IRHub()
 
     def tearDown(self):

@@ -42,7 +42,7 @@ class Client(object):
             port=self.config["server_port"])
         self.sock.connect(self.server_addr)
         self.logger.info("Connected to server at {}".format(
-                                                self.server_addr))
+            self.server_addr))
 
         # Build ZMQ subscribe socket for PubServer
         self.sub_sock = self.context.socket(zmq.SUB)
@@ -52,7 +52,7 @@ class Client(object):
             port=self.config["pub_server_pub_port"])
         self.sub_sock.connect(self.sub_addr)
         self.logger.info("Connected to server at {}".format(
-                                                self.sub_addr))
+            self.sub_addr))
 
          # Build ZMQ request socket for PubServer
         self.topic_sock = self.context.socket(zmq.REQ)
@@ -62,7 +62,7 @@ class Client(object):
             port=self.config["pub_server_topic_port"])
         self.topic_sock.connect(self.topic_addr)
         self.logger.info("Connected to server at {}".format(
-                                                self.topic_addr))
+            self.topic_addr))
 
     def __str__(self):
         """Build human-readable representation of client.

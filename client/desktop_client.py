@@ -60,8 +60,9 @@ class DesktopClient(client.Client):
         self.turn = 0  # TODO: Add turning
 
         # Numpy convention: (height, width, depth)
-        self.imageOut = np.zeros((self.window_height, self.window_width, 3),
-                                  dtype=np.uint8)
+        self.imageOut = np.zeros(
+            (self.window_height, self.window_width, 3),
+            dtype=np.uint8)
         # OpenCV convention: (x, y)
         self.imageCenter = (self.window_width / 2, self.window_height / 2)
 
@@ -96,7 +97,7 @@ class DesktopClient(client.Client):
 
         if showKeys:
             self.logger.debug("key = {}, keyCode = {}, keyChar = {}".format(
-                                                       key, keyCode, keyChar))
+                key, keyCode, keyChar))
 
         if keyCode == 0x1b or keyChar == 'q' or keyChar == 'Q':  # quit
             self.keepRunning = False
@@ -116,11 +117,12 @@ class DesktopClient(client.Client):
         elif keyChar == 'd' or keyChar == 'D':  # Right
             self.strafe += 1
         else:
-            self.logger.warning("Unknown key = {}, keyCode = {}, " + \
-                                                   "keyChar = {}".format(
-                                                   key,
-                                                   keyCode,
-                                                   keyChar))
+            self.logger.warning(
+                "Unknown key = {}, keyCode = {}, " +
+                "keyChar = {}".format(
+                key,
+                keyCode,
+                keyChar))
             return
 
         self.sendCommand()
@@ -135,8 +137,8 @@ class DesktopClient(client.Client):
         :param param: User-defined data callback option.
 
         """
-        self.logger.debug("{} @ ({}, {}) [flags = {}]".format(event, x, y,
-                                                                        flags))
+        self.logger.debug("{} @ ({}, {}) [flags = {}]".format(
+            event, x, y, flags))
         # Stop when left button is released
         if event == cv.CV_EVENT_LBUTTONUP:
             self.logger.debug("Mouse released, stopping.")
@@ -159,24 +161,24 @@ class DesktopClient(client.Client):
         if not self.isProcessing.acquire(blocking=False):
             return
         self.logger.debug("[{}] Acquired".format(
-                                          threading.current_thread().name))
+            threading.current_thread().name))
 
         # Send zero for any val in its deadband.
         # NOTE: Y-flip
         snap_forward = 0 if forward_range.zero_min < self.forward < \
-                                                forward_range.zero_max \
-                                                else -self.forward
+            forward_range.zero_max \
+            else -self.forward
         snap_strafe = 0 if strafe_range.zero_min < self.strafe < \
-                                              strafe_range.zero_max \
-                                              else self.strafe
+            strafe_range.zero_max \
+            else self.strafe
         snap_turn = 0 if turn_range.zero_min < self.turn < \
-                                               turn_range.zero_max \
-                                               else self.turn
+            turn_range.zero_max \
+            else self.turn
 
         self.send_fwd_strafe_turn(snap_forward, snap_strafe, snap_turn)
 
         self.logger.debug("[{}] Releasing".format(
-                                           threading.current_thread().name))
+            threading.current_thread().name))
         self.isProcessing.release()
 
     def draw(self):

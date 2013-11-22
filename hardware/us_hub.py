@@ -18,7 +18,7 @@ class USHub(object):
 
         # Create IR array objects
         self.USs = {}
-        for name, params in config["ultrasonics"]:
+        for name, params in config["ultrasonics"].iteritems():
             self.USs[name] = us_mod.US(name, params)
 
     def __str__(self):

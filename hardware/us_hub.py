@@ -18,8 +18,8 @@ class USHub(object):
 
         # Create IR array objects
         self.USs = {}
-        for us in config["ultrasonics"]:
-            self.USs[us["position"]] = us_mod.US(us["position"], us["GPIO"])
+        for name, params in config["ultrasonics"]:
+            self.USs[name] = us_mod.US(name, params)
 
     def __str__(self):
         """Returns human-readable representation of USHub.

@@ -1,4 +1,4 @@
-drive_motors:
+drive_motors:  # [deprecated: will be using DMCC motors soon; TODO: Need DMCC board, motor nums to be specified]
 - {GPIO: 117, PWM: 0, position: front_right}  # Drive motor 0: P9_31 (pwm0/ehr0A), P9_25 (gpio117)
 - {GPIO: 115, PWM: 1, position: front_left}   # Drive motor 1: P9_29 (pwm1/ehr0B), P9_27 (gpio115)
 - {GPIO: 47, PWM: 5, position: back_left}     # Drive motor 2: P8_19 (pwm5/ehr2B), P8_15 (gpio47)
@@ -18,11 +18,12 @@ gun: {
         advance: 72   # Gun trigger - advance: P8_43 (gpio72)
     }
 }
-ultrasonics:
-- {GPIO: -1, position: front}
-- {GPIO: -1, position: left}
-- {GPIO: -1, position: back}
-- {GPIO: -1, position: right}
+ultrasonics: {  # locations are [x, y] in meters, assume approx. 30cm x 30cm bot with right = +X axis, top = +Y axis
+    front: { gpio: -1, location: [  0.0,  0.15], direction: [ 0.0,  1.0] },
+    left:  { gpio: -1, location: [-0.15,     0], direction: [-1.0,  0.0] },
+    back:  { gpio: -1, location: [  0.0, -0.15], direction: [ 0.0, -1.0] },
+    right: { gpio: -1, location: [ 15.0,   0.0], direction: [ 1.0,  0.0] },
+}
 ir_select_gpios: [44, 26, 46, 65]  # GPIOs to select IR sensor units: [P8_12 (gpio44), P8_14 (gpio26), P8_16 (gpio46), P8_18 (gpio65)]
 ir_analog_input_gpios: {front: 0, right: 2}  # GPIO pins to read selected IR sensor units: P9_39 (AIN0), P9_37 (AIN2)
 ir_digital_input_gpios: {back: 4, left: 1}  # GPIO pins to read selected IR sensor units: P9_38 (AIN4), P9_40 (AIN1)

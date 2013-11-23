@@ -25,8 +25,8 @@ ultrasonics: {  # locations are [x, y] in meters, assume approx. 30cm x 30cm bot
     right: { gpio: -1, location: [ 15.0,   0.0], direction: [ 1.0,  0.0] },
 }
 ir_select_gpios: [44, 26, 46, 65]  # GPIOs to select IR sensor units: [P8_12 (gpio44), P8_14 (gpio26), P8_16 (gpio46), P8_18 (gpio65)]
-ir_analog_input_gpios: {front: 0, right: 2}  # GPIO pins to read selected IR sensor units: P9_39 (AIN0), P9_37 (AIN2)
-ir_digital_input_gpios: {back: 4, left: 1}  # GPIO pins to read selected IR sensor units: P9_38 (AIN4), P9_40 (AIN1)
+ir_analog_input_gpios: {front: 39, right: 35}  # GPIO pins to read selected IR sensor units: P8_04 (gpio39), P8_06 (gpio35)
+ir_digital_input_gpios: {back: 67, left: 68}  # GPIO pins to read selected IR sensor units: P8_08 (gpio67), P8_10 (gpio68)
 logging: {log_file: logs/bot.log, file_handler_level: DEBUG, stream_handler_level: INFO}  # Logging options
 strategy: planner/strategies/strategy0.yaml
 targeting: gunner/targeting/targeting0.yaml

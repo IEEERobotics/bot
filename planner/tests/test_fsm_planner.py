@@ -19,7 +19,7 @@ logger = lib.get_logger()
 
 class TestFSM(test_bot.TestBot):
 
-    """"""
+    """Very basic tests for FSMPlanner."""
 
     def setUp(self):
         """Setup test hardware files and create mec_driver object"""
@@ -33,8 +33,7 @@ class TestFSM(test_bot.TestBot):
         """Restore testing flag state in config file."""
         # Run general bot test tear down
         super(TestFSM, self).tearDown()
-        lib.set_testing(self.orig_test_state)
 
     def testBaseCase(self):
-        """"""
+        """Simply run through the basic solution."""
         self.fsm.run()

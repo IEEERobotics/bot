@@ -71,8 +71,8 @@ class US(object):
         :returns: String giving name, distance etc. of ultrasonic sensor.
 
         """
-        return ("{name}: {{ gpio: {gpio}, loc: ({loc[0]:.2f}, {loc[1]:.2f}), "
-            + "dir: ({dir[0]:.2f}, {dir[1]:.2f}), dist: {dist:.3f} }}").format(
+        return ("{name}: {{ gpio: {gpio}, loc: ({loc[0]}, {loc[1]}), "
+            + "dir: ({dir[0]}, {dir[1]}), dist: {dist} }}").format(
                                                         name=self.name,
                                                         gpio=self.gpio_num,
                                                         loc=self.location,

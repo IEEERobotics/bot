@@ -79,10 +79,10 @@ class Servo(object):
 
         """
         if position > 180:
-            self.logger.warn("Invalid pos {}, using 180.".format(position))
+            self.logger.warning("Invalid pos {}, using 180.".format(position))
             position = 180
         elif position < 0:
-            self.logger.warn("Invalid position {}, using 0.".format(position))
+            self.logger.warning("Invalid position {}, using 0.".format(position))
             position = 0
 
         # Set duty

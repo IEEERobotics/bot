@@ -78,7 +78,7 @@ class DesktopClient(client.Client):
                 if key != -1:
                     self.onKeyPress(key)
         except KeyboardInterrupt:
-            self.logger.warn("Why kill me with a Ctrl+C? Try Esc next time.")
+            self.logger.warning("Why kill me with a Ctrl+C? Try Esc.")
             self.isProcessing.release()
 
         self.cleanUp()

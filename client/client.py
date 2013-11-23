@@ -115,7 +115,7 @@ class Client(object):
             self.logger.info("Reply: {}".format(reply))
             return True
         else:
-            self.logger.warn("Reply: {}".format(reply))
+            self.logger.warning("Reply: {}".format(reply))
             return False
 
     def send_aim(self, pitch, yaw):

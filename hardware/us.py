@@ -52,7 +52,7 @@ class US(object):
                                   "Exception: {}".format(e))
 
         # Warn user that this code is only a stub
-        self.logger.warn("US abstraction not implemented, range will be 0.")
+        self.logger.warning("US abstraction not implemented, range will be 0.")
 
     def update(self):
         """Actively read and update distance value (may take some time).

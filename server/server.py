@@ -82,7 +82,7 @@ class Server(object):
 
         """
         if status != "Success" and status != "Error":
-            self.logger.warn("Status is typically 'Success' or 'Error'")
+            self.logger.warning("Status is typically 'Success' or 'Error'")
 
         reply_msg = {}
         reply_msg["status"] = status

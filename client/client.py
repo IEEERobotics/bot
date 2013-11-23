@@ -31,7 +31,7 @@ class Client(object):
         self.logger = lib.get_logger()
 
         # Get config
-        self.config = lib.load_config()
+        self.config = lib.get_config()
 
         # Build ZMQ socket and connect to server
         self.context = zmq.Context()

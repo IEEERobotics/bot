@@ -33,7 +33,7 @@ class US(object):
         self._distance = 0.0
 
         # Get config and logger
-        config = lib.load_config()
+        config = lib.get_config()
         self.logger = lib.get_logger()
 
         # Testing setup

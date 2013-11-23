@@ -38,7 +38,7 @@ class IRHub(object):
         """Build IR array abstraction objects."""
         # Load config and logger
         self.logger = lib.get_logger()
-        config = lib.load_config()
+        config = lib.get_config()
 
         # Number of IR sensors on an array
         self.num_ir_units = config["irs_per_array"]

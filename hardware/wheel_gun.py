@@ -16,7 +16,7 @@ class WheelGun(object):
         self.logger = lib.get_logger()
 
         # Load and store configuration dict
-        self.config = lib.load_config()
+        self.config = lib.get_config()
         self.max_trigger_duration = float(
             self.config['gun']['max_trigger_duration'])  # 0.25 secs.
 

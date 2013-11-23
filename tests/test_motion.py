@@ -24,7 +24,7 @@ class TestMotion(unittest.TestCase):
         #   using physical motors
 
         # Load config, get logger
-        self.config = lib.load_config()
+        self.config = lib.get_config()
 
         # Create motor objects to test
         self.num_motors = 4

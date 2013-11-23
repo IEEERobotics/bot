@@ -15,19 +15,19 @@ except ImportError:
     raise
 
 
-class TestLoadConfig(test_bot.TestBot):
+class TestGetConfig(test_bot.TestBot):
 
     """Test loading configuration."""
 
     def test_type(self):
         """Confirm that type of config is a dict."""
-        config = lib.load_config()
+        config = lib.get_config()
         assert type(config) is dict
 
     def test_invalid(self):
         """Test proper failure for fake config file."""
         with self.assertRaises(IOError):
-            config = lib.load_config("fake.yaml")
+            config = lib.get_config("fake.yaml")
 
 
 class TestWriteConfig(test_bot.TestBot):
@@ -36,9 +36,9 @@ class TestWriteConfig(test_bot.TestBot):
 
     def test_same(self):
         """Confirm that writing without changes produces no change."""
-        config = lib.load_config()
+        config = lib.get_config()
         lib.write_config(config)
-        result_config = lib.load_config()
+        result_config = lib.get_config()
         assert config == result_config
 
     def test_modify_log_file(self):
@@ -46,7 +46,7 @@ class TestWriteConfig(test_bot.TestBot):
         test_log_file = "logs/test.log"
 
         # Get initial config
-        config = lib.load_config()
+        config = lib.get_config()
         orig_log_file = config["logging"]["log_file"]
 
         # Modify config
@@ -54,7 +54,7 @@ class TestWriteConfig(test_bot.TestBot):
         lib.write_config(config)
 
         # Get and check updated config
-        updated_config = lib.load_config()
+        updated_config = lib.get_config()
         assert updated_config == config
         assert updated_config["logging"]["log_file"] == test_log_file
 
@@ -63,7 +63,7 @@ class TestWriteConfig(test_bot.TestBot):
         lib.write_config(config)
 
         # Test reverted change
-        updated_config = lib.load_config()
+        updated_config = lib.get_config()
         assert updated_config == config
         assert updated_config["logging"]["log_file"] == orig_log_file
 
@@ -89,7 +89,7 @@ class TestSetTesting(test_bot.TestBot):
 
     def setUp(self):
         """Get and store original config."""
-        self.orig_config = lib.load_config()
+        self.orig_config = lib.get_config()
 
     def tearDown(self):
         """Restore original testing flag."""
@@ -98,14 +98,14 @@ class TestSetTesting(test_bot.TestBot):
     def test_same(self):
         """Test writing the current value of testing flag."""
         lib.set_testing(self.orig_config["testing"])
-        new_config = lib.load_config()
+        new_config = lib.get_config()
         assert new_config == self.orig_config
 
     def test_invalid_state(self):
         """Test passing a non-boolean value for state param."""
         with self.assertRaises(TypeError):
             lib.set_testing("not_bool")
-        new_config = lib.load_config()
+        new_config = lib.get_config()
         assert self.orig_config == new_config
 
     def test_invalid_config(self):

@@ -46,7 +46,7 @@ class DMCCMotor(object):
         :type motor_num: int
 
         """
-        self.config = lib.load_config()
+        self.config = lib.get_config()
         self.logger = lib.get_logger()
         self.is_testing = self.config["testing"] or dmcc_testing
         # TODO: Optimize testing setup, with dummy DMCC module?

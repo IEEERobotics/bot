@@ -15,7 +15,7 @@ _config_file = None
 _logger = None
 
 
-def load_config(config_file="config.yaml"):
+def get_config(config_file="config.yaml"):
     """Load and return configuration options.
 
     Note that this config is only loaded once (it's a singleton).
@@ -58,7 +58,7 @@ def load_strategy(strat_file=None):
 
     """
     if strat_file is None:
-        config = load_config()
+        config = get_config()
         strat_file = config["strategy"]
 
     # Build valid path from CWD to strategy file
@@ -77,7 +77,7 @@ def load_targeting(targ_file=None):
 
     """
     if targ_file is None:
-        config = load_config()
+        config = get_config()
         targ_file = config["targeting"]
 
     # Build valid path from CWD to targeting file
@@ -107,9 +107,9 @@ def set_testing(state, config_file=None):
 
     # Get current config
     if config_file is None:
-        config = load_config()
+        config = get_config()
     else:
-        config = load_config(config_file)
+        config = get_config(config_file)
 
     # Update config with new testing state
     config["testing"] = state
@@ -140,7 +140,7 @@ def get_logger(prefix=None):
         return _logger
 
     # Get config so that path to log file can be read.
-    config = load_config()
+    config = get_config()
 
     # Setup path to log output. Allows usage from any subpackage.
     if prefix is None:

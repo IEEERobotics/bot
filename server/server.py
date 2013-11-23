@@ -26,7 +26,7 @@ class Server(object):
     def __init__(self):
         """Build all main bot objects, set ZMQ to listen."""
         # Load configuration and logger
-        self.config = lib.load_config()
+        self.config = lib.get_config()
         self.logger = lib.get_logger()
 
         # Create cmd -> handler methods mapping (dict)

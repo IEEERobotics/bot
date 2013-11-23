@@ -23,7 +23,7 @@ class Servo(object):
         self.pwm_num = pwm_num
 
         # Load config
-        config = lib.load_config()
+        config = lib.get_config()
 
         if config["testing"]:
             # Get dir of simulated hardware files from config

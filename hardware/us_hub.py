@@ -14,7 +14,7 @@ class USHub(object):
         self.logger = lib.get_logger()
 
         # Load system configuration
-        config = lib.load_config()
+        config = lib.get_config()
 
         # Create IR array objects
         self.USs = {}

@@ -65,7 +65,7 @@ class TestStates(State):
         """
         super(TestStates, self).__init__()
         self.robot = robot
-        self.config = lib.load_config()
+        self.config = lib.get_config()
         self.f = open(self.config["fsm_tests"])
         self.logger = lib.get_logger()
 
@@ -357,7 +357,7 @@ class Robot(StateMachine):
         self.logger = lib.get_logger()
 
         # Load and store configuration
-        self.config = lib.load_config()
+        self.config = lib.get_config()
 
     def run(self):
         #State initialization

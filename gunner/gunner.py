@@ -20,7 +20,7 @@ class Gunner(object):
         self.logger = lib.get_logger()
 
         # Load and store configuration dict
-        self.config = lib.load_config()
+        self.config = lib.get_config()
 
         # Load and store targeting dict
         self.targ = lib.load_targeting(self.config["targeting"])

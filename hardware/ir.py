@@ -35,7 +35,7 @@ class IRArray(object):
 
         # Get logger and config
         self.logger = lib.get_logger()
-        config = lib.load_config()
+        config = lib.get_config()
 
         # Create GPIO for reading sensed IR values
         if config["testing"]:

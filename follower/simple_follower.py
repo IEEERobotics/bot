@@ -14,7 +14,7 @@ class SimpleFollower(object):
         self.logger = lib.get_logger()
         self.ir_hub = ir_hub_mod.IRHub()
         self.driver = driver_mod.MecDriver()
-        self.config = lib.load_config()
+        self.config = lib.get_config()
 
     def overall_move(self):
         """Constant loop for the movement information."""

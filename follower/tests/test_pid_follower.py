@@ -1,3 +1,4 @@
+"""Test case for pid follower"""
 import sys
 import os
 import unittest

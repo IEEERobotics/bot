@@ -8,6 +8,7 @@ import hardware.ir_hub as ir_hub_mod
 import driver.mec_driver as mec_driver_mod
 import lib.exceptions as ex
 import follower
+import pid as pid_mod 
 
 
 class PIDFollower(follower.Follower):
@@ -35,27 +36,34 @@ class PIDFollower(follower.Follower):
         self.heading = 2.8125
         self.previous_front_i_error = 0
         self.previous_back_i_error = 0
+        self.front_pid = pid_mod.PID()
+        self.back_pid = pid_mod.PID()
 
     def follow(self, state_table):
         """Accept and handle fire commands."""
         self.state_table = state_table
         # Get the intial condetion
         previous_time = time()
-        #while(1)
+        # Init front_pid
+        self.front_pid.set_k_values(1, 0, 0)
+        # Inti back_pid
+        self.back_pid.set_k_values(1, 0, 0)
+        # Get current Heading
+        self.heading = self.state_table.currentHeading
+        # while(1)
         # Assign the arrays to the correct heading
         self.assign_arrays()
         # Get the current time of the cpu
         if((self.front_reading < 0)or(self.back_reading < 0)):
             print "Found X"
+        # Get the current time of the cpu
         current_time = time()
-        # Calculate the position of the forward and back sensers
-        self.calculate_position()
         # Call front PID
         self.sampling_time = current_time - previous_time
         # Call front PID
-        front_error = self.front_pid()
+        front_error = self.front_pid.pid(self.heading, self.front_reading, self.sampling_time)
         # Call back PID
-        back_error = self.back_pid()
+        back_error = self.back_pid.pid(self.heading, self.back_reading, self.sampling_time)
         # Update motors
         self.motors(front_error, back_error)
         # Take the current time set it equal to the privious time
@@ -65,59 +73,13 @@ class PIDFollower(follower.Follower):
         """Used to update the motors speed and angler moation."""
         pass
 
-    def front_pid(self):
-        """Calculate the k value for the forward pid."""
-        # Calculate the papration error
-        p_error = (self.heading - self.front_position[0])
-        # Calculate the derivation error
-        d_error = (self.front_position[0] -
-                   self.front_position[1]) / self.sampling_time
-        # Calulate the intergration error
-        i_error = (self.front_position[0] +
-                   self.front_position[1]) / 2 * self.sampling_time + \
-            self.previous_front_i_error
-        # Update the previous intergration error to the new error
-        self.previous_front_i_error = i_error
-        # Return the total error for the front of the bot
-        return self.front_kp * p_error + self.front_kd * d_error + \
-            self.front_ki * i_error
-
-    def back_pid(self):
-        """Calculate the k value for the back PID."""
-        # Caculate the papration error
-        p_error = (self.heading - self.back_position[0])
-        # Calculate the derivation error
-        d_error = (self.back_position[0] - self.back_position[1]) / \
-            self.sampling_time
-        # Calculate the intergration error
-        i_error = (self.back_position[0] + self.back_position[1]) / \
-            2 * self.sampling_time + self.previous_back_i_error
-        # Update the previous intergration error with the new error
-        self.previous_back_i_error = i_error
-        # Return the total error fot the back of the bot
-        return self.front_kp * p_error + self.front_kd * d_error + \
-            self.front_ki * i_error
-
-    def calculate_position(self):
-        """Calculate the position of the line as it is on the bot."""
-        # Get rid of the last entry
-        self.front_position = self.front_position[:len(
-            self.front_position) - 1]
-        # Add current reading to the list
-        self.front_position.insert(0, self.front_reading)
-        # Get rid of the last entry
-        self.front_position = self.front_position[:len(
-            self.front_position) - 1]
-        # Add current reading to the list
-        self.front_position.insert(0, self.back_reading)
-
     def assign_arrays(self):
         """Take 4x16 bit arrays and assigns the array to proper orientations.
 
         Note that the 'proper orientaitons are front, back, left and right.
 
         """
-        self.heading = self.state_table.currentHeading
+        # Get the current IR reaidngs
         current_ir_reading = self.ir_hub.read_all_arrays()
         # Heading west
         if self.heading == 0:

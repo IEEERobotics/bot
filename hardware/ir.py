@@ -51,6 +51,7 @@ class IRArray(object):
                 self.logger.error("GPIOs could not be initialized. " +
                                   "Not on the bone? Run unit test instead. " +
                                   "Exception: {}".format(e))
+        self.read_gpio.input()
 
     def __str__(self):
         """Returns human-readable representation.

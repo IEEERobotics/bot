@@ -5,8 +5,6 @@ from time import time
 
 import lib.lib as lib
 import hardware.ir_hub as ir_hub_mod
-import driver.mec_driver as mec_driver_mod
-import lib.exceptions as ex
 import follower
 
 

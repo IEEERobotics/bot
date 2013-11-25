@@ -1,19 +1,10 @@
 """Test cases for mec driver."""
-import sys
-import os
-import unittest
+
 from math import fabs, hypot, atan2, degrees
 
-sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
-
-try:
-    import lib.lib as lib
-    import driver.mec_driver as md_mod
-    from driver.mec_driver import MecDriver  # for convenience
-    import tests.test_bot as test_bot
-except ImportError:
-    print "ImportError: Use 'python -m unittest discover' from project root."
-    raise
+import lib.lib as lib
+from driver.mec_driver import MecDriver  # For convenience
+import tests.test_bot as test_bot
 
 # Logger object
 logger = lib.get_logger()

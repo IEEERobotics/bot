@@ -1,24 +1,16 @@
 """Test cases for lightweight server."""
-import sys
-import os
-import unittest
-from multiprocessing import Process
-from subprocess import Popen
 
-sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
+import unittest
+from subprocess import Popen
 
 try:
     import zmq
 except ImportError:
-    print "Failed to import zmq"
-    sys.exit(1)
-
-try:
-    import lib.lib as lib
-    import tests.test_bot as test_bot
-except ImportError:
-    print "ImportError: Use `python -m unittest discover` from project root."
+    sys.stderr.write("ERROR: Failed to import zmq. Is it installed?")
     raise
+
+import lib.lib as lib
+import tests.test_bot as test_bot
 
 # Build logger
 logger = lib.get_logger()

@@ -1,10 +1,9 @@
 """Client for sending commands to the bot's server via CLI."""
 
 import os
-import sys
+import cmd
 
 import client
-import cmd
 
 
 class CLIClient(client.Client, cmd.Cmd):

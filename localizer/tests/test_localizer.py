@@ -1,19 +1,8 @@
 """Localizer unit tests"""
 
-import sys
-import os
-import unittest
-
-# Prepend this module's directory to the python path
-sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
-
-try:
-    import lib.lib as lib
-    from localizer.localizer import Localizer
-    import tests.test_bot as test_bot
-except ImportError:
-    print "ImportError: Use 'python -m unittest discover' from project root."
-    raise
+import lib.lib as lib
+from localizer.localizer import Localizer
+import tests.test_bot as test_bot
 
 # Assing global logger object, if not already in memory
 logger = lib.get_logger()

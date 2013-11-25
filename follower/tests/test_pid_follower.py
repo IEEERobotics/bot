@@ -1,16 +1,9 @@
-import sys
-import os
-import unittest
+"""Unit tests for PIDFollower."""
 
-sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
-try:
-    import lib.lib as lib
-    import follower.pid_follower as f_mod
-    import planner.fsm_planner as fsm
-    import tests.test_bot as test_bot
-except ImportError:
-    print "ImportError: Use `python -m unittest discover` from project root."
-    raise
+import lib.lib as lib
+import follower.pid_follower as f_mod
+import planner.fsm_planner as fsm
+import tests.test_bot as test_bot
 
 # Build logger
 logger = lib.get_logger()

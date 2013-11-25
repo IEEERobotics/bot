@@ -1,18 +1,9 @@
 """Test cases for lib."""
-import sys
-import os
-import unittest
-import copy
+
 import logging
 
-sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
-
-try:
-    import lib.lib as lib
-    import tests.test_bot as test_bot
-except ImportError:
-    print "ImportError: Use `python -m unittest discover` from project root."
-    raise
+import lib.lib as lib
+import tests.test_bot as test_bot
 
 
 class TestGetConfig(test_bot.TestBot):

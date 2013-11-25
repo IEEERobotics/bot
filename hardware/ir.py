@@ -1,7 +1,8 @@
 """Superclass for IR array abstractions."""
 
-import lib.lib as lib
 import pybbb.bbb.gpio as gpio_mod
+
+import lib.lib as lib
 
 
 class IRArray(object):

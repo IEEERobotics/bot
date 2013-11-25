@@ -2,8 +2,9 @@
 
 import time
 
-import lib.lib as lib
 from pybbb.bbb import gpio as gpio_mod
+
+import lib.lib as lib
 
 
 class WheelGun(object):

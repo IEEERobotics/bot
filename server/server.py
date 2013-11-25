@@ -1,18 +1,7 @@
-#!/usr/bin/env python
 """Server for handling interaction between clients and bot."""
 
 import sys
-import os
 from inspect import getmembers, ismethod
-
-try:
-    import zmq
-except ImportError:
-    sys.stderr.write("ERROR: Failed to import zmq. Is it installed?")
-    raise
-
-new_path = [os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")]
-sys.path = new_path + sys.path
 
 import lib.lib as lib
 

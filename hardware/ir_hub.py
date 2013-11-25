@@ -1,10 +1,12 @@
 """Abstraction of all line-following arrays as one unit."""
 
 import time
+
+import pybbb.bbb.gpio as gpio_mod
+
 import lib.lib as lib
 import ir_analog as ir_analog_mod
 import ir_digital as ir_digital_mod
-import pybbb.bbb.gpio as gpio_mod
 
 
 class IRHub(object):

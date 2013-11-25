@@ -3,7 +3,6 @@
 
 import sys
 import os
-from time import sleep
 from math import fabs
 import traceback
 from inspect import getmembers, ismethod

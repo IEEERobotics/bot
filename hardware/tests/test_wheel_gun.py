@@ -1,17 +1,10 @@
 """Test cases for wheel_gun module."""
 
-import sys
-import os
 import time
 import unittest
 
-try:
-    import lib.lib as lib
-    import tests.test_bot as test_bot
-    import hardware.wheel_gun as wgun_mod
-except ImportError:
-    print "ImportError: Use 'python -m unittest discover' from project root."
-    raise
+import tests.test_bot as test_bot
+import hardware.wheel_gun as wgun_mod
 
 
 class TestWheelGun(test_bot.TestBot):
@@ -31,9 +24,6 @@ class TestWheelGun(test_bot.TestBot):
         """Setup test hardware files and create WheelGun instance."""
         # Run general bot test setup
         super(TestWheelGun, self).setUp()
-
-        # Get logger
-        self.logger = lib.get_logger()
 
         # Remap time.sleep to a dummy sleep function so that tests run fast
         self.real_sleep = time.sleep

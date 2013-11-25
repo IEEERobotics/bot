@@ -1,7 +1,6 @@
 """Abstraction layer for DMCC-based motors."""
 
 from collections import namedtuple
-import lib.lib as lib
 
 dmcc_testing = False  # a hard testing flag, if DMCC is not found
 try:
@@ -9,6 +8,8 @@ try:
 except ImportError:
     print "DMCC ImportError; forcing test mode."
     dmcc_testing = True
+
+import lib.lib as lib
 
 
 # TODO: Move this to a util module?

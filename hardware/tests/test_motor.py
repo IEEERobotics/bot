@@ -1,18 +1,10 @@
 """Test cases for motor abstraction class."""
-import sys
-import os
-import unittest
+
 from random import randint
 
-sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
-
-try:
-    import lib.lib as lib
-    import hardware.motor as m_mod
-    import tests.test_bot as test_bot
-except ImportError:
-    print "ImportError: Use `python -m unittest discover` from project root."
-    raise
+import lib.lib as lib
+import hardware.motor as m_mod
+import tests.test_bot as test_bot
 
 # Build logger
 logger = lib.get_logger()

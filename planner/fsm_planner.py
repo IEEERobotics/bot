@@ -1,11 +1,6 @@
 """Implementation of the State design pattern for line-following strategy"""
 
-import string
-import sys
-#sys.path.append('/Users/alwynsmith/bot/')
-
 import lib.lib as lib
-import lib.exceptions as ex
 import driver.mec_driver as md_mod
 import gunner.wheel_gunner as wg_mod
 import follower.pid_follower as f_mod

@@ -9,6 +9,10 @@ try:
 except ImportError:
     print "ImportError: smbus module not found; I2C communication disabled"
 
+def swap_bytes_uint16(value):
+    """Swaps the bytes (endianness) of a 16-bit integer."""
+    return ((value & 0x00ff) << 8) | ((value & 0xff00) >> 8)
+
 
 class IRAnalog(ir.IRArray):
     """Abstraction for analog IR arrays.
@@ -39,22 +43,39 @@ class IRAnalog(ir.IRArray):
 
         """
         super(IRAnalog, self).__init__(name, read_gpio_pin)
-        
-        # ADC configuration code (I2C)
-        # TODO: Generalize this for different ADCs
-        if i2c_available:
-            self.bus1 = smbus.SMBus(1)
-            self.bus1.write_byte_data(0x50, 0x02, 0x2d)
-            self.bus1.write_word_data(0x50, 0x03, 0x0000)
-            self.bus1.write_word_data(0x50, 0x04, 0x0750)
-            self.bus1.write_word_data(0x50, 0x05, 0x0080)
 
-    def read_accurate_value(self):
+        # ADC configuration over I2C
+        adc_config = self.config['ir_analog_adc_config']
+        self.i2c_addr = adc_config['i2c_addr'][name]
         if i2c_available:
-            raw_value = self.bus1.read_word_data(0x50, 0x00)
-            # raw_value:- D15: alert; D14-D12, D3-D0: reserved; D11-D4: value
-            byte_value = int("{:16b}".format(value)[4:-4], 2)  # bits D11-D14
-            inv_value = byte_value ^ 0xff  # invert it
-            return inv_value
+            # Open I2C bus
+            self.bus = smbus.SMBus(adc_config['i2c_bus'])
+
+            # Configure ADC using I2C commands
+            for reg_name, reg in adc_config['i2c_registers'].iteritems():
+                if 'init' in reg and reg['init'] is not None:
+                    if reg['bytes'] == 1:
+                        self.bus.write_byte_data(self.i2c_addr,
+                                                reg['addr'], reg['init'])
+                    elif reg['bytes'] == 2:
+                        # TODO: Check if we need to use swap_bytes_uint16()
+                        self.bus.write_word_data(self.i2c_addr,
+                                                reg['addr'], reg['init'])
+
+            # Cache some config items that we may need later
+            self.result_addr = adc_config['result_addr']  # 2 bytes
+            self.result_mask = adc_config['result_mask']
+            self.result_shift = adc_config['result_shift']
+        self.logger.debug("Setup {} (on I2C addr: {})".format(self,
+                                                        hex(self.i2c_addr)))
+
+    def read_adc_result(self):
+        if i2c_available:
+            raw_result = swap_bytes_uint16(self.bus.read_word_data(
+                                                        self.i2c_addr,
+                                                        self.result_addr))
+            # raw_result:- D15: alert; D14-D12, D3-D0: reserved; D11-D4: value
+            result = (raw_result & self.result_mask) >> self.result_shift
+            return result
         else:
             return 0

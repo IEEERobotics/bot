@@ -36,12 +36,12 @@ class IRArray(object):
 
         # Get logger and config
         self.logger = lib.get_logger()
-        config = lib.get_config()
+        self.config = lib.get_config()
 
         # Create GPIO for reading sensed IR values
-        if config["testing"]:
+        if self.config["testing"]:
             # Get dir of simulated hardware files from config
-            gpio_test_dir = config["test_gpio_base_dir"]
+            gpio_test_dir = self.config["test_gpio_base_dir"]
 
             # Build GPIO object in test mode
             self.read_gpio = gpio_mod.GPIO(read_gpio_pin, gpio_test_dir)

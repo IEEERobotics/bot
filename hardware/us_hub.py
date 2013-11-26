@@ -38,6 +38,6 @@ class USHub(object):
         """
         readings = {}
         for position, us in self.USs.iteritems():
-            readings[positoin] = us.distance
+            readings[position] = us.distance
         self.logger.debug("USHub readings: {}".format(readings))
         return readings

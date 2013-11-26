@@ -7,7 +7,6 @@ import os
 from time import sleep
 
 import lib.lib as lib
-import client.desktop_client as desktop_client_mod
 import client.cli_client as cli_client_mod
 import client.sub_client as sub_client_mod
 import planner.fsm_planner as pfsm_mod
@@ -31,8 +30,6 @@ client_group.add_argument("-a", "--auto-client", action="store_true",
                           help="autonomously solve the course")
 client_group.add_argument("-c", "--cli-client", action="store_true",
                           help="CLI interface for controlling the bot")
-client_group.add_argument("-d", "--desktop-client", action="store_true",
-                          help="desktop GUI interface for controlling the bot")
 client_group.add_argument("-u", "--sub-client", action="store_true",
                           help="subscribe to bot's published information")
 
@@ -66,10 +63,6 @@ if args.auto_client:
 if args.cli_client:
     print "Starting CLI client"
     cli_client_mod.CLIClient().cmdloop()
-
-if args.desktop_client:
-    print "Starting desktop client"
-    desktop_client_mod.DesktopClient().run()
 
 if args.sub_client:
     print "Starting subscriber client"

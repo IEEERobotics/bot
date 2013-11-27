@@ -29,7 +29,6 @@ class TestBot(unittest.TestCase):
         self.setup_gun_trigger()
         self.setup_ir_select_gpios()
         self.setup_ir_analog_input_gpios()
-        self.setup_ir_digital_input_gpios()
 
     def setup_drive_motors(self):
         """Set driving motor simulation files to known state."""

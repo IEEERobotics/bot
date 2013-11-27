@@ -19,9 +19,9 @@ class TestSelectedUnitVal(test_bot.TestBot):
 
         # Create IR array objects
         self.array = {}
-        ir_digital_input_gpios = self.config["ir_digital_input_gpios"]
-        self.name = ir_digital_input_gpios.keys()[0]
-        self.gpio = ir_digital_input_gpios.values()[0]
+        ir_analog_input_gpios = self.config["ir_analog_input_gpios"]
+        self.name = ir_analog_input_gpios.keys()[0]
+        self.gpio = ir_analog_input_gpios.values()[0]
         self.array[self.name] = ir_mod.IRArray(self.name, self.gpio)
 
     def tearDown(self):

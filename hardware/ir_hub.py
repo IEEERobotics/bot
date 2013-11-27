@@ -6,7 +6,6 @@ import pybbb.bbb.gpio as gpio_mod
 
 import lib.lib as lib
 import ir_analog as ir_analog_mod
-import ir_digital as ir_digital_mod
 
 
 class IRHub(object):
@@ -66,15 +65,11 @@ class IRHub(object):
         # Read mapping (dict) of IR array names to input GPIO pins from config
         # NOTE: IR unit select lines are common
         ir_analog_input_gpios = config["ir_analog_input_gpios"]
-        ir_digital_input_gpios = config["ir_digital_input_gpios"]
 
         # Create IR array objects
         self.arrays = {}
         for name, gpio in ir_analog_input_gpios.iteritems():
             self.arrays[name] = ir_analog_mod.IRAnalog(name, gpio)
-
-        for name, gpio in ir_digital_input_gpios.iteritems():
-            self.arrays[name] = ir_digital_mod.IRDigital(name, gpio)
 
         # Create buffer to store readings from all sensor units
         self.reading = {}

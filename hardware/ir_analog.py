@@ -9,6 +9,7 @@ try:
 except ImportError:
     print "ImportError: smbus module not found; I2C communication disabled"
 
+# TODO: Try using read_i2c_block_data() and write_i2c_block_data() instead?
 def swap_bytes_uint16(value):
     """Swaps the bytes (endianness) of a 16-bit integer."""
     return ((value & 0x00ff) << 8) | ((value & 0xff00) >> 8)

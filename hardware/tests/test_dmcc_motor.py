@@ -18,10 +18,10 @@ class TestDMCCMotor(test_bot.TestBot):
         super(TestDMCCMotor, self).setUp()
         logger.info("Running {}()".format(self._testMethodName))
 
-        # Build motor in testing mode (TODO: Update config.yaml and use that)
-        self.board_num = 0  # self.config["drive_motors"][0]["board"]
-        self.motor_num = 1  # self.config["drive_motors"][0]["motor"]
-        self.motor = dm_mod.DMCCMotor(self.board_num, self.motor_num)
+        # Build motor in testing mode
+        board_num = self.config['dmcc_motors']['front_left']['board_num']
+        motor_num = self.config['dmcc_motors']['front_left']['motor_num']
+        self.motor = dm_mod.DMCCMotor(board_num, motor_num)
 
     def tearDown(self):
         """Restore testing flag state in config file."""

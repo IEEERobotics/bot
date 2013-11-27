@@ -51,11 +51,11 @@ class Gunner(object):
         try:
             assert 0 <= yaw <= 180
         except AssertionError:
-            raise AssertionError("Yaw angle is out of bounds")
+            raise AssertionError("Yaw is out of bounds: {}".format(yaw))
         try:
             assert 0 <= pitch <= 180
         except AssertionError:
-            raise AssertionError("Pitch angle is out of bounds")
+            raise AssertionError("Pitch is out of bounds: {}".format(pitch))
 
         self.logger.debug("Aiming turret to ({}, {})".format(yaw, pitch))
         self.turret.yaw = yaw

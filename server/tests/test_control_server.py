@@ -427,7 +427,7 @@ class TestHandleAim(test_bot.TestBot):
         self.socket.send_json(msg)
         reply = self.socket.recv_json()
         assert reply["status"] == "Error"
-        assert reply["msg"] == "Yaw angle is out of bounds"
+        assert reply["msg"] == "Yaw is out of bounds: 181"
 
     def testInvalidPitchValue(self):
         """Test aim message with out of bounds pitch value."""
@@ -437,7 +437,7 @@ class TestHandleAim(test_bot.TestBot):
         self.socket.send_json(msg)
         reply = self.socket.recv_json()
         assert reply["status"] == "Error"
-        assert reply["msg"] == "Pitch angle is out of bounds"
+        assert reply["msg"] == "Pitch is out of bounds: 181"
 
 
 @unittest.skip("Not yet implemented")

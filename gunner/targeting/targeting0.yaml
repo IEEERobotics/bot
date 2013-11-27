@@ -16,7 +16,7 @@ rows:
           pitch: 25
         - slot: 2
           speed: 80
-          yaw: -50
+          yaw: 50
           pitch: 30
     - row: 1
       slots:
@@ -30,7 +30,7 @@ rows:
           pitch: 25
         - slot: 2
           speed: 90
-          yaw: -50
+          yaw: 50
           pitch: 30
     - row: 2
       slots:
@@ -44,5 +44,5 @@ rows:
           pitch: 25
         - slot: 2
           speed: 100
-          yaw: -50
+          yaw: 50
           pitch: 30

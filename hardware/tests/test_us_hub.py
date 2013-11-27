@@ -26,9 +26,10 @@ class TestReadAll(test_bot.TestBot):
         super(TestReadAll, self).tearDown()
 
     def testStructure(self):
-        """Confirm that stub behavior is working as expected."""
+        """Confirm that structure of returned results is as expected."""
         readings = self.us_hub.read_all()
         assert type(readings) is dict
+        assert len(readings) == len(self.config["ultrasonics"])
         for position, distance in readings.iteritems():
             assert type(position) is str
             assert type(distance) is float

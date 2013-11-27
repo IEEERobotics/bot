@@ -17,7 +17,7 @@ class TestDistance(test_bot.TestBot):
         # Run general bot test setup
         super(TestDistance, self).setUp()
 
-        # Built ultrasonic abstraction object
+        # Build ultrasonic abstraction object
         name, params = self.config["ultrasonics"].items()[0]
         self.us = us_mod.US(name, params)
         logger.info("Testing US sensor: {}".format(self.us))

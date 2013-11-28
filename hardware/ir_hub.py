@@ -1,6 +1,6 @@
 """Abstraction of all line-following arrays as one unit."""
 
-import time
+from time import time
 
 import pybbb.bbb.gpio as gpio_mod
 
@@ -76,6 +76,8 @@ class IRHub(object):
         for array_name in self.arrays.keys():
             self.reading[array_name] = [0] * 16
 
+        self.last_read_time = None
+
     def __str__(self):
         """Returns human-readable representation of IRHub.
 
@@ -144,4 +146,25 @@ class IRHub(object):
         for unit_n in xrange(self.num_ir_units):
             self.read_nth_units(unit_n)
         self.logger.debug("IR reading: {}".format(self.reading))
+        self.last_read_time = time()
         return self.reading
+
+    def read_cached(self, max_staleness=1):
+        """Get cached IR data if it's fresher than param, else read IRs.
+
+        :param max_staleness: Return cache if it's fresher than this (secs).
+        :type max_staleness: float
+        :returns: Dict with IR data, read time and flag if read was required.
+
+        """
+        if self.last_read_time is None:
+            # Handles when read_all hasn't been called
+            self.read_all()
+            fresh = True
+        elif time() - self.last_read_time <= max_staleness:
+            fresh = False
+        else:
+            self.read_all()
+            fresh = True
+        return {"readings": self.reading, "time": self.last_read_time,
+            "fresh": fresh}

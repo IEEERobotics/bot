@@ -1,6 +1,7 @@
 """Test cases for IRHub abstraction class."""
 
 import random
+from time import time, sleep
 
 import lib.lib as lib
 import hardware.ir_hub as ir_hub_mod
@@ -136,7 +137,7 @@ class TestReadAll(test_bot.TestBot):
         super(TestReadAll, self).tearDown()
 
     def testStructure(self):
-        """Confirm that IRHub behavior is as expected."""
+        """Confirm structure of reading is as expected."""
         readings = self.ir_hub.read_all()
         assert type(readings) is dict, \
             "IR hub readings type: {}".format(type(reading))
@@ -145,3 +146,62 @@ class TestReadAll(test_bot.TestBot):
             assert type(reading) is list
             for ir_value in reading:
                 assert ir_value == 0
+
+
+class TestReadCached(test_bot.TestBot):
+
+    """Test reading IR arrays using a cache."""
+
+    def setUp(self):
+        """Get config and built IRHub object."""
+        # Run general bot test setup
+        super(TestReadCached, self).setUp()
+
+        # Build IR hub abstraction object
+        self.ir_hub = ir_hub_mod.IRHub()
+
+    def tearDown(self):
+        """Restore testing flag state in config file."""
+        # Run general bot test tear down
+        super(TestReadCached, self).tearDown()
+
+    def testStructure(self):
+        """Confirm structure of returned result is as expected."""
+        result = self.ir_hub.read_cached()
+        assert type(result) is dict, \
+            "read_cached returned type: {}".format(type(result))
+
+        # Validate IR reading data types
+        assert type(result["readings"]) is dict
+        for name, reading in result["readings"].iteritems():
+            assert type(name) is str
+            assert type(reading) is list
+            for ir_value in reading:
+                assert ir_value == 0
+
+        # Validate time type
+        assert type(result["time"]) is float
+
+        # Validate freshness flag type
+        assert type(result["fresh"]) is bool
+
+    def testTime(self):
+        """Test that time value is reasonable."""
+        result = self.ir_hub.read_cached()
+        # Just a very general assertion that the time's reasonable
+        assert time() - result["time"] < 60
+
+    def testSeries(self):
+        """Test caching behavior with a series of reads over time."""
+        max_staleness = .05
+        # Do first read, which we expect to be fresh as there's no cache
+        first_result = self.ir_hub.read_cached()
+        assert first_result["fresh"] is True
+
+        for delay in [0, .1]:
+            sleep(delay)
+            result = self.ir_hub.read_cached(max_staleness)
+            if delay > .05:
+                assert result["fresh"] is True
+            else:
+                assert result["fresh"] is False

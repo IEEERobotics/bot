@@ -69,7 +69,11 @@ class IRHub(object):
         # Create IR array objects
         self.arrays = {}
         for name, gpio in ir_analog_input_gpios.iteritems():
-            self.arrays[name] = ir_analog_mod.IRAnalog(name, gpio)
+            try:
+                self.arrays[name] = ir_analog_mod.IRAnalog(name, gpio)
+            except IOError:
+                self.logger.error("Unable to create {} IR array".format(name))
+                self.arrays[name] = None
 
         # Create buffer to store readings from all sensor units
         self.reading = {}
@@ -131,6 +135,8 @@ class IRHub(object):
         self.select_nth_units(n)
 
         for name, array in self.arrays.iteritems():
+            if array is None:
+                continue
             self.reading[name][n] = array.selected_unit_val
 
     def read_all(self):

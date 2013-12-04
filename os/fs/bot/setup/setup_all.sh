@@ -72,4 +72,10 @@ load_gpio 26  # P8_14
 load_gpio 46  # P8_16
 load_gpio 65  # P8_18
 
+# IR analog input GPIOs
+load_gpio 39  # P8_04, front
+load_gpio 67  # P8_06, back
+load_gpio 68  # P8_08, left
+load_gpio 35  # P8_10, right
+
 enable_adcs

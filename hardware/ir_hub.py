@@ -1,6 +1,6 @@
 """Abstraction of all line-following arrays as one unit."""
 
-from time import time
+from time import time, sleep
 
 import pybbb.bbb.gpio as gpio_mod
 
@@ -43,6 +43,9 @@ class IRHub(object):
 
         # Number of IR sensors on an array
         self.num_ir_units = config["irs_per_array"]
+
+        # Pause between each select-read operation to let ADCs settle
+        self.ir_read_delay = config["ir_read_delay"]
 
         # Build GPIO pins used to select which IR units are active
         if config["testing"]:
@@ -133,6 +136,7 @@ class IRHub(object):
             raise ValueError("n must be between 0 and num_ir_units-1")
 
         self.select_nth_units(n)
+        sleep(self.ir_read_delay)  # let ADCs settle
 
         for name, array in self.arrays.iteritems():
             if array is None:

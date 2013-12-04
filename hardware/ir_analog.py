@@ -56,12 +56,9 @@ class IRAnalog(ir.IRArray):
             for reg_name, reg in adc_config['i2c_registers'].iteritems():
                 if 'init' in reg and reg['init'] is not None:
                     if reg['bytes'] == 1:
-                        self.bus.write_byte_data(self.i2c_addr,
-                                                reg['addr'], reg['init'])
+                        self.set_adc_byte(reg['addr'], reg['init'])
                     elif reg['bytes'] == 2:
-                        # TODO: Check if we need to use swap_bytes_uint16()
-                        self.bus.write_word_data(self.i2c_addr,
-                                                reg['addr'], reg['init'])
+                        self.set_adc_word(reg['addr'], reg['init'])
 
             # Cache some config items that we may need later
             self.result_addr = adc_config['result_addr']  # 2 bytes
@@ -69,6 +66,13 @@ class IRAnalog(ir.IRArray):
             self.result_shift = adc_config['result_shift']
         self.logger.debug("Setup {} (on I2C addr: {})".format(self,
                                                         hex(self.i2c_addr)))
+
+    def set_adc_byte(self, register, byte_value):
+        self.bus.write_byte_data(self.i2c_addr, register, byte_value)
+
+    def set_adc_word(self, register, word_value):
+        # TODO: Check if we need to use swap_bytes_uint16()
+        self.bus.write_word_data(self.i2c_addr, register, word_value)
 
     def read_adc_result(self):
         if i2c_available:

@@ -28,7 +28,7 @@ ultrasonics: {  # locations are [x, y] in meters, assume approx. 30cm x 30cm bot
     front: { gpio: -1, location: [  0.0,  0.15], direction: [ 0.0,  1.0] },
     left:  { gpio: -1, location: [-0.15,     0], direction: [-1.0,  0.0] },
     back:  { gpio: -1, location: [  0.0, -0.15], direction: [ 0.0, -1.0] },
-    right: { gpio: -1, location: [ 15.0,   0.0], direction: [ 1.0,  0.0] },
+    right: { gpio: -1, location: [ 0.15,   0.0], direction: [ 1.0,  0.0] },
 }
 ir_select_gpios: [44, 26, 46, 65]  # GPIOs to select IR sensor units: [P8_12 (gpio44), P8_14 (gpio26), P8_16 (gpio46), P8_18 (gpio65)]
 ir_analog_input_gpios: {front: 39, back: 67, left: 68, right: 35}  # GPIO pins to read selected IR sensor units: P8_04 (gpio39), P8_06 (gpio35), P8_08 (gpio67), P8_10 (gpio68)

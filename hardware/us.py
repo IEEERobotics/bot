@@ -26,6 +26,11 @@ class US(object):
         :type params: dict
 
         """
+        # Get config and logger
+        self.config = lib.get_config()
+        self.logger = lib.get_logger()
+        self.is_testing = self.config["testing"]
+
         # Store name and params, initialize other members
         self.name = name
         self.gpio_num = params['gpio']
@@ -34,14 +39,10 @@ class US(object):
         self.gpio = None
         self._distance = 0.0
 
-        # Get config and logger
-        config = lib.get_config()
-        self.logger = lib.get_logger()
-
         # Testing setup
-        if config["testing"]:
+        if self.is_testing:
             # Get dir of simulated hardware files from config
-            gpio_test_dir = config["test_gpio_base_dir"]
+            gpio_test_dir = self.config["test_gpio_base_dir"]
 
             # Build GPIO object in test mode
             self.gpio = gpio_mod.GPIO(self.gpio_num, gpio_test_dir)
@@ -52,6 +53,8 @@ class US(object):
                 self.logger.error("GPIOs could not be initialized. " +
                                   "Not on the bone? Run unit test instead. " +
                                   "Exception: {}".format(e))
+
+        self.logger.debug("Setup {}".format(self))
 
         # Warn user that this code is only a stub
         self.logger.warning("US abstraction not implemented, range will be 0.")
@@ -64,7 +67,8 @@ class US(object):
         :returns: Distance reported by ultrasonic sensor in meters.
 
         """
-        self._distance = 0.0
+        if not self.is_testing:
+            pass # TODO: Read ultrasonic sensor value
         return self._distance
 
     def __str__(self):

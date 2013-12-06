@@ -14,6 +14,8 @@ import planner.fsm_planner as pfsm_mod
 
 # Build parser and argument groups
 parser = argparse.ArgumentParser(description="start bot clients, servers and tests")
+
+# Starting clients should be mutually exclusive
 client_group = parser.add_mutually_exclusive_group()
 
 # Add arguments
@@ -31,6 +33,11 @@ client_group.add_argument("-c", "--cli-client", action="store_true",
     help="CLI interface for controlling the bot")
 client_group.add_argument("-u", "--sub-client", action="store_true",
     help="subscribe to bot's published information")
+
+# Print help if no arguments are given
+if len(sys.argv) == 1:
+    parser.print_help()
+    sys.exit(1)
 
 # Parse the given args
 args = parser.parse_args()

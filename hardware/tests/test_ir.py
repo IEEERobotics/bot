@@ -4,9 +4,6 @@ import lib.lib as lib
 import hardware.ir as ir_mod
 import tests.test_bot as test_bot
 
-# Build logger
-logger = lib.get_logger()
-
 
 class TestSelectedUnitVal(test_bot.TestBot):
 

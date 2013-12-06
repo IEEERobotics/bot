@@ -6,9 +6,6 @@ import lib.lib as lib
 import hardware.servo as s_mod
 import tests.test_bot as test_bot
 
-# Build logger
-logger = lib.get_logger()
-
 
 class TestPosition(test_bot.TestBot):
 

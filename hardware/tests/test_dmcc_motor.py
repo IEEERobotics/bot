@@ -16,7 +16,7 @@ class TestDMCCMotor(test_bot.TestBot):
         """Setup test hardware files and build motor object."""
         # Run general bot test setup
         super(TestDMCCMotor, self).setUp()
-        logger.info("Running {}()".format(self._testMethodName))
+        self.logger.info("Running {}()".format(self._testMethodName))
 
         # Build motor in testing mode
         board_num = self.config['dmcc_motors']['front_left']['board_num']
@@ -34,26 +34,31 @@ class TestDMCCMotor(test_bot.TestBot):
             "Can't test non-existent property \"{}\"!".format(prop)
         assert (hasattr(prop_range, 'min') and hasattr(prop_range, 'max')), \
             "Invalid property range: {} (min/max missing)".format(prop_range)
-        logger.debug("[init] {}: {}".format(prop, getattr(self.motor, prop)))
+        self.logger.debug("[init] {}: {}".format(prop,
+            getattr(self.motor, prop)))
 
         # Min
         setattr(self.motor, prop, prop_range.min)
-        logger.debug("[min] {}: {}".format(prop, getattr(self.motor, prop)))
+        self.logger.debug("[min] {}: {}".format(prop,
+            getattr(self.motor, prop)))
         assert getattr(self.motor, prop) == prop_range.min
 
         # Max
         setattr(self.motor, prop, prop_range.max)
-        logger.debug("[max] {}: {}".format(prop, getattr(self.motor, prop)))
+        self.logger.debug("[max] {}: {}".format(prop,
+            getattr(self.motor, prop)))
         assert getattr(self.motor, prop) == prop_range.max
 
         # Under min; should use min
         setattr(self.motor, prop, prop_range.min - 1)
-        logger.debug("[under] {}: {}".format(prop, getattr(self.motor, prop)))
+        self.logger.debug("[under] {}: {}".format(prop,
+            getattr(self.motor, prop)))
         assert getattr(self.motor, prop) == prop_range.min
 
         # Over max; should use max
         setattr(self.motor, prop, prop_range.max + 1)
-        logger.debug("[over] {}: {}".format(prop, getattr(self.motor, prop)))
+        self.logger.debug("[over] {}: {}".format(prop,
+            getattr(self.motor, prop)))
         assert getattr(self.motor, prop) == prop_range.max
 
     def _test_sweep(self, prop, prop_range, num_steps=25):
@@ -62,18 +67,20 @@ class TestDMCCMotor(test_bot.TestBot):
             "Can't test non-existent property \"{}\"!".format(prop)
         assert (hasattr(prop_range, 'min') and hasattr(prop_range, 'max')), \
             "Invalid property range: {} (min/max missing)".format(prop_range)
-        logger.debug("[init] {}: {}".format(prop, getattr(self.motor, prop)))
+        self.logger.debug("[init] {}: {}".format(prop,
+            getattr(self.motor, prop)))
 
         prop_step = (prop_range.max - prop_range.min) / num_steps
         for value in range(prop_range.min, prop_range.max, prop_step):
             setattr(self.motor, prop, value)
             assert getattr(self.motor, prop) == value
-        logger.debug("[final] {}: {}".format(prop, getattr(self.motor, prop)))
+        self.logger.debug("[final] {}: {}".format(prop,
+            getattr(self.motor, prop)))
 
     def test_power_stop(self):
         """Test stopping the motor by setting power to zero."""
         self.motor.power = 0
-        logger.debug("[zero] motor power: {}".format(self.motor.power))
+        self.logger.debug("[zero] motor power: {}".format(self.motor.power))
         assert self.motor.power == 0
 
     def test_power_limits(self):
@@ -105,7 +112,7 @@ class TestDMCCMotor(test_bot.TestBot):
         assert self.motor.setPositionPID(-5000, -100, -500)
         target_position = 5000
         self.motor.position = target_position
-        logger.debug("[PID] position: {}".format(self.motor.position))
+        self.logger.debug("[PID] position: {}".format(self.motor.position))
         assert self.motor.position == target_position
         self.motor.position = 0  # set back to zero
 
@@ -114,6 +121,6 @@ class TestDMCCMotor(test_bot.TestBot):
         assert self.motor.setVelocityPID(-5000, -100, -500)
         target_velocity = 1000
         self.motor.velocity = target_velocity
-        logger.debug("[PID] velocity: {}".format(self.motor.velocity))
+        self.logger.debug("[PID] velocity: {}".format(self.motor.velocity))
         assert self.motor.velocity == target_velocity
         self.motor.velocity = 0  # set back to zero

@@ -7,9 +7,6 @@ import gunner.gunner as g_mod
 import hardware.turret as t_mod
 import tests.test_bot as test_bot
 
-# Build logger
-logger = lib.get_logger()
-
 
 class TestAimTurret(test_bot.TestBot):
 

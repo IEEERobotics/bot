@@ -6,10 +6,8 @@ import lib.lib as lib
 from localizer.us_localizer import USLocalizer
 import tests.test_bot as test_bot
 
-# Assing global logger object, if not already in memory
-logger = lib.get_logger()
-
 inches_to_meters = .0254
+
 
 class TestUSLocalizer(test_bot.TestBot):
     def setUp(self):

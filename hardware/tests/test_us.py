@@ -4,9 +4,6 @@ import lib.lib as lib
 import hardware.us as us_mod
 import tests.test_bot as test_bot
 
-# Build logger
-logger = lib.get_logger()
-
 
 class TestDistance(test_bot.TestBot):
 
@@ -20,7 +17,6 @@ class TestDistance(test_bot.TestBot):
         # Build ultrasonic abstraction object
         name, params = self.config["ultrasonics"].items()[0]
         self.us = us_mod.US(name, params)
-        logger.info("Testing US sensor: {}".format(self.us))
 
     def tearDown(self):
         """Restore testing flag state in config file."""

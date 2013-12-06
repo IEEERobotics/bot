@@ -4,9 +4,6 @@ import lib.lib as lib
 from localizer.localizer import Localizer
 import tests.test_bot as test_bot
 
-# Assing global logger object, if not already in memory
-logger = lib.get_logger()
-
 
 class TestLocalizer(test_bot.TestBot):
     def setUp(self):

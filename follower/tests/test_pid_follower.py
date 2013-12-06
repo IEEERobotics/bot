@@ -5,10 +5,6 @@ import follower.pid_follower as f_mod
 import planner.fsm_planner as fsm
 import tests.test_bot as test_bot
 
-# Build logger
-logger = lib.get_logger()
-# Distance math
-
 
 class TestPIDFollower(test_bot.TestBot):
 

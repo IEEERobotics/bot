@@ -7,9 +7,6 @@ import lib.lib as lib
 import hardware.ir_hub as ir_hub_mod
 import tests.test_bot as test_bot
 
-# Build logger
-logger = lib.get_logger()
-
 
 class TestSelectNthUnits(test_bot.TestBot):
 

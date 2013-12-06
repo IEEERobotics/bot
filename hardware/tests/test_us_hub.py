@@ -4,9 +4,6 @@ import lib.lib as lib
 import hardware.us_hub as us_hub_mod
 import tests.test_bot as test_bot
 
-# Build logger
-logger = lib.get_logger()
-
 
 class TestReadAll(test_bot.TestBot):
 

@@ -7,9 +7,6 @@ import lib.lib as lib
 import hardware.solenoid as s_mod
 import tests.test_bot as test_bot
 
-# Build logger
-logger = lib.get_logger()
-
 
 @unittest.skip("No solenoids configured (not being used on bot)")
 class TestState(test_bot.TestBot):

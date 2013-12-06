@@ -4,9 +4,6 @@ import lib.lib as lib
 import gunner.wheel_gunner as wg_mod
 import tests.test_bot as test_bot
 
-# Build logger
-logger = lib.get_logger()
-
 
 class TestAutoFire(test_bot.TestBot):
 

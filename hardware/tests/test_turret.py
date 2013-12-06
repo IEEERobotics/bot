@@ -6,9 +6,6 @@ import lib.lib as lib
 import hardware.turret as t_mod
 import tests.test_bot as test_bot
 
-# Build logger
-logger = lib.get_logger()
-
 
 class TestAngle(test_bot.TestBot):
 

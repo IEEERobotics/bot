@@ -4,9 +4,6 @@ import lib.lib as lib
 import planner.fsm_planner as fsm_mod
 import tests.test_bot as test_bot
 
-# Logger object
-logger = lib.get_logger()
-
 
 class TestFSM(test_bot.TestBot):
 

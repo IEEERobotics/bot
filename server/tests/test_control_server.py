@@ -12,9 +12,6 @@ except ImportError:
 import lib.lib as lib
 import tests.test_bot as test_bot
 
-# Build logger
-logger = lib.get_logger()
-
 
 class TestHandleMessage(test_bot.TestBot):
 

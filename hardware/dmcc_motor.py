@@ -157,7 +157,7 @@ class DMCCMotor(object):
             self._velocity = value
             return True
         return DMCC.setTargetVel(
-            self.board_num, self.motor_num, self.value) == 0
+            self.board_num, self.motor_num, value) == 0
 
     def setPID(self, target, P, I, D):
         """Set PID target parameter (position or velocity) and constants.

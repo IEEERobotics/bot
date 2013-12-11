@@ -1,8 +1,8 @@
 """Logic for line following."""
 
 import sys
-from time import time
 import lib.lib as lib
+from time import time
 import hardware.ir_hub as ir_hub_mod
 import follower
 

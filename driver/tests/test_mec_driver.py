@@ -148,3 +148,12 @@ class TestRotate(test_bot.TestBot):
                 for motor in self.md.motors.itervalues():
                     assert MecDriver.min_speed <= motor.speed <= \
                                                   MecDriver.max_speed
+
+    """
+    def test_oscillate(self):
+        
+        # Test oscillation for every heading in intervals of 30
+        for i in xrange(1, 360, 90):
+            logger.debug("Oscillating: Heading: {}".format(i))
+            self.md.oscillate(i)
+    """

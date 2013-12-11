@@ -2,7 +2,6 @@
 
 import sys
 from time import time
-
 import lib.lib as lib
 import hardware.ir_hub as ir_hub_mod
 import follower

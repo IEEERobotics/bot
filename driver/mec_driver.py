@@ -161,12 +161,12 @@ class MecDriver(driver.Driver):
             raise AssertionError("Speed is out of bounds")
 
         # Angle bounds may be unnecessary.
-        """
+        
         try:
             assert MecDriver.min_angle <= angle <= MecDriver.max_angle
         except AssertionError:
             raise AssertionError("Angle is out of bounds")
-        """
+        
 
         # Handle zero speed, prevent divide-by-zero error
         if speed == 0:  # TODO deadband (epsilon) check?

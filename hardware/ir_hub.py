@@ -178,3 +178,29 @@ class IRHub(object):
             fresh = True
         return {"readings": self.reading, "time": self.last_read_time,
             "fresh": fresh}
+
+
+def live_read_loop(delay=0.25, accurate=False):
+    hub = IRHub()
+    if accurate:
+        print "ir_hub.live_read_loop(): Remapping read method to get ADC values"
+        for name, array in hub.arrays.iteritems():
+            if isinstance(array, ir_analog_mod.IRAnalog):
+                array.selected_unit_val = array.read_adc_result
+    
+    print "ir_hub.live_read_loop(): Starting read loop... [Ctrl+C to exit]"
+    while True:
+        try:
+            readings = hub.read_all()
+            print "\n{}".format(time())
+            print "\n".join("{}: {}".format(name, reading)
+                            for name, reading in readings.iteritems())
+            sleep(delay)
+        except KeyboardInterrupt:
+            print "ir_hub.live_read_loop(): Interrupted; exiting..."
+            break
+
+
+if __name__ == "__main__":
+    print "ir_hub.__main__: Running live read loop"
+    live_read_loop(accurate=True)

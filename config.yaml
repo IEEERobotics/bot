@@ -31,10 +31,10 @@ ultrasonics: {  # locations are [x, y] in meters, assume approx. 30cm x 30cm bot
     right: { gpio: -1, location: [ 0.15,   0.0], direction: [ 1.0,  0.0] },
 }
 ir_select_gpios: [44, 26, 46, 65]  # GPIOs to select IR sensor units: [P8_12 (gpio44), P8_14 (gpio26), P8_16 (gpio46), P8_18 (gpio65)]
-ir_analog_input_gpios: {front: 39, back: 67, left: 68, right: 35}  # GPIO pins to read selected IR sensor units: P8_04 (gpio39), P8_06 (gpio35), P8_08 (gpio67), P8_10 (gpio68)
+ir_analog_input_gpios: {front: 39, back: 35, left: 67, right: 68}  # GPIO pins to read selected IR sensor units: P8_04 (gpio39), P8_06 (gpio35), P8_08 (gpio67), P8_10 (gpio68)
 ir_analog_adc_config: {  # ADC configuration
     i2c_bus: 1,  # System I2C bus to use to talk to ADCs
-    i2c_addr: {front: 0x50, back: 0x00, left: 0x01, right: 0x51},  # I2C (7-bit) addresses for ADCs: 0x50, 0x51 (TODO: Replace placeholder addresses for back and left with actual values)
+    i2c_addr: {front: 0x50, back: 0x59, left: 0x5a, right: 0x51},  # I2C (7-bit) addresses for ADCs: 0x50, 0x51 (TODO: Check addresses)
     i2c_registers: {  # Register addresses, num bytes and initial values to set (if any)
         alert_status     : { addr: 0x01, bytes: 1},
         configuration    : { addr: 0x02, bytes: 1, init: 0x2d },    # 0x2d: Fastest cycle time, no alert hold, alert flag & pin enabled, active high
@@ -59,7 +59,7 @@ fsm_tests: ./planner/tests/input/RobotNormalTest.txt
 testing: false
 server_protocol: tcp
 server_bind_host: "*"  # Special hostname servers bind to, for listening on all interfaces
-server_host: 127.0.0.1  # Default hostname clients connect to
+server_host: 192.168.2.4  # Default hostname clients connect to
 server_port: 60000  # (Primary) ControlServer port
 pub_server_pub_port: 60001  # PubServer published bot data on this port
 pub_server_topic_port: 60002  # PubServer is told topics to set on this port

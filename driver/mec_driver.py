@@ -5,7 +5,7 @@ from time import sleep, time
 import driver
 import lib.lib as lib
 import hardware.motor as m_mod
-import follower.follower as follower_mod
+
 
 class MecDriver(driver.Driver):
     """Subclass of Driver for movement with mecanum wheels."""
@@ -316,47 +316,4 @@ class MecDriver(driver.Driver):
         move(0,0)
 
 
-    def oscillate(self, heading):
-        """Oscillate sideways, increasing in amplitude until line is found"""
 
-        # Time in seconds for which bot oscillates in each direction.
-        # Speed at which the bot is oscillating.
-        # Increase in speed after each oscillation cycle.
-        # Todo(Ahmed): Find reasonable constants.
-        osc_time = 1
-        osc_speed = 10
-        osc_increment = 10
-
-        # The oscillation directions, perpendicular to parameter "heading"
-        angle1 = heading + 90
-        angle2 = heading - 90
-
-        # Todo: Consider making this a function call.
-        line_not_found = True
-        while line_not_found:
-
-            # Drives in each direction.
-            self.move(osc_speed, angle1)
-            # Passes control to find line, which moves until it finds line or runs out of time.
-            # Note: watch_for_line returns "line_found" (bool) and "time_elapsed" (int)
-            results = follower_mod.watch_for_line(osc_time)
-            self.move(0,0)
-            if results["line_found"]:
-                line_not_found = False
-
-            # Search in other direction.
-            self.move(osc_speed, angle2)
-            # "time elapsed" is used as max_time for more precise movements.
-            results = follower_mod.watch_for_line(results["time_elapsed"]*2)
-            self.logger.debug("Oscillation part 1: osc_speed: {}, heading: {}".format(osc_speed,
-                                                                                        heading))
-            self.move(0,0)         
-            if results["line_found"]:
-                line_not_found = False
-            
-
-            # If line is not found, Continue looping until line is found.
-            # For now, stop when max speed is hit.
-            osc_speed = osc_speed + 10
-            if osc_speed >= MecDriver.max_speed:
-                line_not_found = False

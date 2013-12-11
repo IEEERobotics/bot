@@ -98,14 +98,15 @@ class Follower(object):
 
             # Search in other direction.
             self.driver.move(osc_speed, angle2)
+
             # "time elapsed" is used as max_time for more precise movements.
             results = self.watch_for_line(results["time_elapsed"]*2)
             self.logger.debug("Oscillation direction 1: osc_speed: {}, heading: {}".format(osc_speed,
                                                                                         heading))
-            self.driver.move(0,0)         
+            self.driver.move(0,0)   
+      
             if results["line_found"]:
                 line_not_found = False
-
 
             # If line is not found, Continue looping until line is found.
             # For now, stop when max speed is hit.

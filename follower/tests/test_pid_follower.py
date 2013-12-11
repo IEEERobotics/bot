@@ -62,7 +62,6 @@ class TestPIDFollower(test_bot.TestBot):
         self.assertEquals(-1, self.follower.get_position_rl(fail02))
         self.assertEquals(-2, self.follower.get_position_rl(fail03))
 
-    def test_oscillate(self):        
-        # Test oscillation for every heading in intervals of 30
-        for i in xrange(0, 360, 180):
+    def test_oscillate(self):
+        for i in xrange(0,360,90):
             self.follower.oscillate(i, 0.01)

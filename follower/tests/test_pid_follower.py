@@ -64,5 +64,5 @@ class TestPIDFollower(test_bot.TestBot):
 
     def test_oscillate(self):        
         # Test oscillation for every heading in intervals of 30
-        for i in xrange(1, 360, 90):
-            self.follower.oscillate(i)
+        for i in xrange(0, 360, 180):
+            self.follower.oscillate(i, 0.01)

@@ -55,14 +55,13 @@ class Follower(object):
                 if time() - start_time > max_time:
                     return {"line_found": False, "time_elapsed": time() - start_time}
 
-    def oscillate(self, heading):
+    def oscillate(self, heading, osc_time=1):
         """Oscillate sideways, increasing in amplitude until line is found"""
 
         # Time in seconds for which bot oscillates in each direction.
         # Speed at which the bot is oscillating.
         # Increase in speed after each oscillation cycle.
         # Todo(Ahmed): Find reasonable constants.
-        osc_time = 1
         osc_speed = 10
         osc_increment = 10
 
@@ -80,8 +79,8 @@ class Follower(object):
 
         
         # Test headings for valid 0,360 values.
-        assert 0 < angle1 < 360
-        assert 0 < angle2 < 360
+        assert 0 <= angle1 <= 360, "angle1 is {}".format(angle1)
+        assert 0 <= angle2 <= 360, "angle2 is {}".format(angle2)
 
         # Todo: Consider making this a function call.
         line_not_found = True
@@ -101,7 +100,7 @@ class Follower(object):
             self.driver.move(osc_speed, angle2)
             # "time elapsed" is used as max_time for more precise movements.
             results = self.watch_for_line(results["time_elapsed"]*2)
-            self.logger.debug("Oscillation part 1: osc_speed: {}, heading: {}".format(osc_speed,
+            self.logger.debug("Oscillation direction 1: osc_speed: {}, heading: {}".format(osc_speed,
                                                                                         heading))
             self.driver.move(0,0)         
             if results["line_found"]:
@@ -110,6 +109,6 @@ class Follower(object):
 
             # If line is not found, Continue looping until line is found.
             # For now, stop when max speed is hit.
-            osc_speed = osc_speed + 90
+            osc_speed += 90
             if osc_speed >= self.driver.max_speed:
                 line_not_found = False

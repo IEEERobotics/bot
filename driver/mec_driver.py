@@ -241,7 +241,7 @@ class MecDriver(driver.Driver):
         speed, rotate_speed is number between 0, 100.
         """
 
-        # Speeds should add up to max. speed (100)
+        # Speeds should add up to max_speed (100)
         # TODO: Should this be fabs(rotate_speed)?
         total_speed = translate_speed + rotate_speed
         assert total_speed <= MecDriver.max_speed
@@ -290,6 +290,7 @@ class MecDriver(driver.Driver):
     def jerk(self):
         """Makes small forward jump in position.
             """
+
         #Time and speed of jerk.
         jerk_time = 3
         jerk_speed = 30
@@ -314,6 +315,5 @@ class MecDriver(driver.Driver):
         move(translate_speed, translate_angle)
         sleep(time)
         move(0,0)
-
 
 

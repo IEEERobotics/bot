@@ -45,6 +45,9 @@ class IRAnalog(ir.IRArray):
         """
         super(IRAnalog, self).__init__(name, read_gpio_pin)
 
+        # Verbose output flag
+        self.ir_verbose_output = self.config["ir_verbose_output"]
+
         # ADC configuration over I2C
         adc_config = self.config['ir_analog_adc_config']
         self.i2c_addr = adc_config['i2c_addr'][name]
@@ -81,6 +84,9 @@ class IRAnalog(ir.IRArray):
                                                         self.result_addr))
             # raw_result:- D15: alert; D14-D12, D3-D0: reserved; D11-D4: value
             result = (raw_result & self.result_mask) >> self.result_shift
+            if self.ir_verbose_output:
+                self.logger.info("Raw: {0:016b}, result: {1:08b} ({1})".format(
+                    raw_result, result))  # [debug]
             return result
         else:
             return 0

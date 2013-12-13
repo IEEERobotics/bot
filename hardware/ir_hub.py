@@ -47,6 +47,14 @@ class IRHub(object):
         # Pause between each select-read operation to let ADCs settle
         self.ir_read_delay = config["ir_read_delay"]
 
+        # Use accurate reading (ADC) or not (GPIO)
+        self.ir_read_adc = config["ir_read_adc"]
+
+        # Verbose output flag
+        self.ir_verbose_output = config["ir_verbose_output"]
+        if self.ir_verbose_output:
+            self.logger.info("Verbose output enabled")
+
         # Build GPIO pins used to select which IR units are active
         if config["testing"]:
             # Get dir of simulated hardware files from config
@@ -141,7 +149,21 @@ class IRHub(object):
         for name, array in self.arrays.iteritems():
             if array is None:
                 continue
-            self.reading[name][n] = array.selected_unit_val
+
+            if self.ir_verbose_output:
+                # Read both ADC & GPIO and display values
+                adc_result = array.read_adc_result()  # NOTE IRAnalog array
+                gpio_result = array.selected_unit_val
+                self.reading[name][n] = adc_result \
+                                            if self.ir_read_adc \
+                                            else array.selected_unit_val
+                self.logger.info("IR ({}, {}) ADC: {}, GPIO: {}".format(
+                                            name, n, adc_result, gpio_result))
+            else:
+                # Read only one, ADC or GPIO
+                self.reading[name][n] = array.read_adc_result() \
+                                            if self.ir_read_adc \
+                                            else array.selected_unit_val
 
     def read_all(self):
         """Poll IR sensor units and return sensed information.
@@ -181,13 +203,15 @@ class IRHub(object):
 
 
 def live_read_loop(delay=0.25, accurate=False):
-    hub = IRHub()
+    # Reconfiguration (NOTE: Need to do this before instantiating IRHub)
+    config = lib.get_config()
+    config["ir_verbose_output"] = True
     if accurate:
-        print "ir_hub.live_read_loop(): Remapping read method to get ADC values"
-        for name, array in hub.arrays.iteritems():
-            if isinstance(array, ir_analog_mod.IRAnalog):
-                array.selected_unit_val = array.read_adc_result
+        print "ir_hub.live_read_loop(): Requesting accurate IR values (ADC)"
+        config["ir_read_adc"] = True
     
+    # Instantiate IRHub object and run infinite read loop
+    hub = IRHub()
     print "ir_hub.live_read_loop(): Starting read loop... [Ctrl+C to exit]"
     while True:
         try:

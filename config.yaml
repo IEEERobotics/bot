@@ -48,7 +48,9 @@ ir_analog_adc_config: {  # ADC configuration
     result_mask: 0x0ff0,  # Mask to apply to conversion result
     result_shift: 4,  # No. of bits to shift to the right after applying mask
 }
-ir_read_delay: 0.005  # duration in secs. to pause between each select-read operation to let ADCs settle
+ir_read_delay: 0.01  # duration in secs. to pause between each select-read operation to let ADCs settle
+ir_read_adc: False  # read accurate ADC values instead of binary GPIO values
+ir_verbose_output: False  # print verbose output to console (log level: INFO) - to be used for debugging & testing only
 logging: {log_file: logs/bot.log, file_handler_level: DEBUG, stream_handler_level: INFO}  # Logging options
 strategy: planner/strategies/strategy0.yaml
 targeting: gunner/targeting/targeting0.yaml

@@ -118,7 +118,7 @@ def set_testing(state, config_file=None):
     write_config(config)
 
 
-def get_logger(prefix=None):
+def get_logger():
     """Build and return a logger for formatted stream and file output.
 
     Note that if a logger has already been built, a new one will not
@@ -129,8 +129,6 @@ def get_logger(prefix=None):
 
     TODO (dfarrell07): Refactor to not use a global
 
-    :param prefix: Optional path from CWD to dir that contains logs dir.
-    :type prefix: string
     :returns: The constructed logging object.
 
     """
@@ -142,9 +140,8 @@ def get_logger(prefix=None):
     # Get config so that path to log file can be read.
     config = get_config()
 
-    # Setup path to log output. Allows usage from any subpackage.
-    if prefix is None:
-        qual_log_file = config["logging"]["log_file"]
+    # Get path from repo root to log file
+    log_file = config["logging"]["log_file"]
 
     # Build logger
     logger = logging.getLogger(__name__)
@@ -152,7 +149,7 @@ def get_logger(prefix=None):
 
     # Check if log exists and should therefore be rolled
     needRoll = False
-    if path.isfile(qual_log_file):
+    if path.isfile(log_file):
         needRoll = True
 
     # Build file output formatter
@@ -166,7 +163,7 @@ def get_logger(prefix=None):
                                          "%(message)s")
 
     # Build file handler (for output log output to files)
-    file_handler = logging.handlers.RotatingFileHandler(qual_log_file,
+    file_handler = logging.handlers.RotatingFileHandler(log_file,
                                                         mode="a",
                                                         backupCount=50,
                                                         delay=True)

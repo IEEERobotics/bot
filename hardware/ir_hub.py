@@ -44,6 +44,10 @@ class IRHub(object):
         # Number of IR sensors on an array
         self.num_ir_units = config["irs_per_array"]
 
+        # Swap halves of each 16-unit array or not
+        # TODO: Remove this once corrected in hardware (see: select_nth_units)
+        self.ir_swap_halves = config["ir_swap_halves"]
+
         # Pause between each select-read operation to let ADCs settle
         self.ir_read_delay = config["ir_read_delay"]
 
@@ -116,6 +120,10 @@ class IRHub(object):
         if n < 0 or n >= self.num_ir_units:
             self.logger.error("Invalid value of n: {}".format(n))
             raise ValueError("n must be between 0 and num_ir_units-1")
+
+        # Flip MSB to effectively swap array halves, if necessary
+        if self.ir_swap_halves:
+            n ^= 8  # assumes 4 select lines, so MSB = 1000 = 8
 
         # Use binary string directly; more efficient
         line_val = "{:04b}".format(n)

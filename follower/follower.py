@@ -34,9 +34,9 @@ class Follower(object):
         self.ir_pos = dict()
         # IR aggregate values = sum(ir_pos * readings) / sum(readings)
         self.ir_agg = dict()
-        for name, array in self.ir_hub.arrays:
+        for name, reading in self.ir_hub.reading.iteritems():
             self.ir_pos[name] = np.float32(np.linspace(
-                -(len(array) / 2), (len(array) / 2), len(array)))
+                -(len(reading) / 2), (len(reading) / 2), len(reading)))
             # TODO(napratin,3/4): Ensure proper ordering?
             self.ir_agg[name] = None  # None when no unit is lit
             self.logger.debug("ir_pos['{}'] = {}"
@@ -50,7 +50,7 @@ class Follower(object):
     def update(self):
         """Read IR values, compute aggregates."""
         ir_readings = self.ir_hub.read_binary(60)
-        for name, reading in ir_readings:
+        for name, reading in ir_readings.iteritems():
             reading_arr = np.int_(reading)  # convert readings to numpy array
             reading_sum = np.sum(np_reading)  # = no. of units lit
             if reading_sum > 0:

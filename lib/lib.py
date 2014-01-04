@@ -192,3 +192,12 @@ def get_logger():
     logger.debug("Logger built")
     _logger = logger
     return logger
+
+def api_call(f):
+    """Decorator used to register a method so that it becomes callable through
+    the API.
+
+    """
+    f.__api_call = True
+    return f
+

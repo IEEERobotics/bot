@@ -3,6 +3,7 @@
 import gunner
 import hardware.wheel_gun as wgun_mod
 
+import lib.lib as lib
 
 class WheelGunner(gunner.Gunner):
 
@@ -14,7 +15,8 @@ class WheelGunner(gunner.Gunner):
 
         # Build WheelGun
         self.gun = wgun_mod.WheelGun()
-
+    
+    @lib.api_call
     def auto_fire(self):
         """Get location, aim turret, accelerate wheels and advance dart."""
         # Get the block we're over

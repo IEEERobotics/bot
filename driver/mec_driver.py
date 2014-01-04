@@ -102,6 +102,7 @@ class MecDriver(driver.Driver):
         # TODO: Verify math; v/4 to take mean?
         return int(round((v_right - v_left) / 4))
 
+    @lib.api_call
     def rotate(self, rotate_speed):
         """Pass rotation speed as -100 to +100
         (positive is counterclockwise)."""
@@ -144,6 +145,7 @@ class MecDriver(driver.Driver):
         for motor in self.motors.itervalues():
             motor.speed = abs_speed
 
+    @lib.api_call
     def move(self, speed, angle):
         """Move holonomically without rotation.
 
@@ -219,6 +221,7 @@ class MecDriver(driver.Driver):
         self.motors["back_left"].speed = fabs(back_left)
         self.motors["back_right"].speed = fabs(back_right)
 
+    @lib.api_call
     def move_forward_strafe(self, forward, strafe):
         # Scale down speed by sqrt(2) to make sure we're in range
         # NOTE(napratin, 9/27): Scaling down is not required since we clamp
@@ -232,6 +235,7 @@ class MecDriver(driver.Driver):
         angle = degrees(atan2(strafe, forward)) % 360
         self.move(speed, angle)
 
+    @lib.api_call
     def compound_move(self, translate_speed, translate_angle, rotate_speed):
         """Translate and move at same time.
 
@@ -287,6 +291,7 @@ class MecDriver(driver.Driver):
         self.motors["back_left"].speed = fabs(back_left)
         self.motors["back_right"].speed = fabs(back_right)
 
+    @lib.api_call
     def jerk(self):
         """Makes small forward jump in position.
             """
@@ -307,6 +312,7 @@ class MecDriver(driver.Driver):
         for motor in self.motors.itervalues():
             motor.speed = 0
 
+    @lib.api_call
     def drive(self, translate_speed, translate_angle, time):
         """Moves in direction of translate angle at translate speed for set 
             time (in seconds) and then stops.  

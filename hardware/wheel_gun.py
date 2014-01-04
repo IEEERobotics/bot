@@ -6,7 +6,6 @@ from pybbb.bbb import gpio as gpio_mod
 
 import lib.lib as lib
 
-
 class WheelGun(object):
 
     """A wheel-based gun with a laser pointer."""
@@ -60,13 +59,13 @@ class WheelGun(object):
             self.trigger_gpios['advance'] = gpio_mod.GPIO(
                 self.config['gun']['trigger_gpios']['advance'])  # gpio72
 
-    @property
-    def laser(self):
+    @lib.api_call
+    def get_laser(self):
         """Getter for laser's status (on=1 or off=0)."""
         return self.laser_gpio.value
 
-    @laser.setter
-    def laser(self, state=0):
+    @lib.api_call
+    def set_laser(self, state=0):
         """Turn laser on (1) or off (0).
 
         :param state: Set laser to on (1) or off (0).
@@ -77,9 +76,11 @@ class WheelGun(object):
         else:
             self.laser_gpio.value = state
 
-    @property
-    def spin(self):
-        """Gettter for motor spin status.
+    laser = property(get_laser, set_laser)
+
+    @lib.api_call
+    def get_spin(self):
+        """Getter for motor spin status.
 
         Note that this is for using a single GPIO to spin the motors
         all the way up or all the way down. Once the capes are installed
@@ -93,8 +94,8 @@ class WheelGun(object):
 
         return self.motor_gpios["left"].value
 
-    @spin.setter
-    def spin(self, state=0):
+    @lib.api_call
+    def set_spin(self, state=0):
         """Setter for gun motors (1=up, 0=down).
 
         :param state: Set gear motors to spin (1) or not (0).
@@ -106,18 +107,20 @@ class WheelGun(object):
             self.motor_gpios['left'].value = state
             self.motor_gpios['right'].value = state
 
-    @property
-    def wheel_speed(self):
+    spin = property(get_spin, set_spin)
+
+    @lib.api_call
+    def get_wheel_speed(self):
         """Getter for wheel rotation speed. Speed is % of max.
 
         Note that this will not be complete until the capes are installed.
 
         """
         # TODO: Implement once capes are installed
-        return
+        return -1
 
-    @wheel_speed.setter
-    def wheel_speed(self, speed=100):
+    @lib.api_call
+    def set_wheel_speed(self, speed=100):
         """Setter for updates to wheel rotation speed.
 
         Note that this will not be complete until the capes are installed.
@@ -134,6 +137,9 @@ class WheelGun(object):
         # TODO: Implement once capes are installed
         return
 
+    wheel_speed = property(get_wheel_speed, set_wheel_speed)
+
+    @lib.api_call
     def fire(self, advance_duration=0.1, delay=0.25, retract_duration=0.11):
         """Fire a single dart by advancing it, and then reload.
 
@@ -174,6 +180,7 @@ class WheelGun(object):
         self.trigger_gpios['retract'].pulse(retract_duration)
         return True
 
+    @lib.api_call
     def fire_burst(self, count=3, delay=2):
         """Fire a number of darts consecutively.
 

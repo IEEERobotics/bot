@@ -58,9 +58,34 @@ class LineFollower(follower.Follower):
 
     def motors(self, front_error, back_error):
         """Used to Update the motors speed and angler moation."""
-        translate_speed = abs(front_error/16)*100
-        translate_angle = back_error/16
+        # Calculate translate_speed
+        # MAX speed - error in the front sensor / total number
+        # of states
+        translate_speed =  100 - ( front_error / 16 )
+        # Calculate rotate_speed
+        # Max speed - Translate speed
         rotate_speed = 100 - translate_speed
+        # Calculate translate_angle
+        translate_angle = back_error * (180 / 16);
+        if( translate_angle < 0 ):
+            # Swift to the left
+            translate_angle = 360 - translate_angle
+        else:
+            # swift to the right
+            translate_angle = translate_angle   
+        if( translate_speed > 100 ):
+            # If translate_speed is greater than 100 set to 100
+            translate_speed = 100
+        elif( translate_speed < 0 ):
+            # If translate_speed is greater than 100 set to 100
+            translate_speed = 0
+        if( rotate_speed > 100 ):
+            # If rotate_speed is greater than 100 set to 100
+            rotate_speed = 100
+        elif( rotate_speed < 0 ):
+            # If rotate_speed is greater than 100 set to 100
+            rotate_speed = 0
+        # Adjust motor speeds 
         mec_driver_mod.compound_move(translate_speed, translate_angle, rotate_speed)
 
     def assign_states(self):

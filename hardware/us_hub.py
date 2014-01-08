@@ -27,8 +27,8 @@ class USHub(object):
         :returns: Info about each ultrasonic sensor owned by this USHub.
 
         """
-        return "USHub: {}".format("; ".join(str(us)
-                                   for us in self.sensors.itervalues()))
+        return "USHub: {}".format(
+            "; ".join(str(us) for us in self.sensors.itervalues()))
 
     def read_all(self):
         """Get readings from all ultrasonic sensors.

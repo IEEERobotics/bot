@@ -34,31 +34,31 @@ class TestDMCCMotor(test_bot.TestBot):
             "Can't test non-existent property \"{}\"!".format(prop)
         assert (hasattr(prop_range, 'min') and hasattr(prop_range, 'max')), \
             "Invalid property range: {} (min/max missing)".format(prop_range)
-        self.logger.debug("[init] {}: {}".format(prop,
-            getattr(self.motor, prop)))
+        self.logger.debug("[init] {}: {}".format(
+            prop, getattr(self.motor, prop)))
 
         # Min
         setattr(self.motor, prop, prop_range.min)
-        self.logger.debug("[min] {}: {}".format(prop,
-            getattr(self.motor, prop)))
+        self.logger.debug("[min] {}: {}".format(
+            prop, getattr(self.motor, prop)))
         assert getattr(self.motor, prop) == prop_range.min
 
         # Max
         setattr(self.motor, prop, prop_range.max)
-        self.logger.debug("[max] {}: {}".format(prop,
-            getattr(self.motor, prop)))
+        self.logger.debug("[max] {}: {}".format(
+            prop, getattr(self.motor, prop)))
         assert getattr(self.motor, prop) == prop_range.max
 
         # Under min; should use min
         setattr(self.motor, prop, prop_range.min - 1)
-        self.logger.debug("[under] {}: {}".format(prop,
-            getattr(self.motor, prop)))
+        self.logger.debug("[under] {}: {}".format(
+            prop, getattr(self.motor, prop)))
         assert getattr(self.motor, prop) == prop_range.min
 
         # Over max; should use max
         setattr(self.motor, prop, prop_range.max + 1)
-        self.logger.debug("[over] {}: {}".format(prop,
-            getattr(self.motor, prop)))
+        self.logger.debug("[over] {}: {}".format(
+            prop, getattr(self.motor, prop)))
         assert getattr(self.motor, prop) == prop_range.max
 
     def _test_sweep(self, prop, prop_range, num_steps=25):
@@ -67,15 +67,15 @@ class TestDMCCMotor(test_bot.TestBot):
             "Can't test non-existent property \"{}\"!".format(prop)
         assert (hasattr(prop_range, 'min') and hasattr(prop_range, 'max')), \
             "Invalid property range: {} (min/max missing)".format(prop_range)
-        self.logger.debug("[init] {}: {}".format(prop,
-            getattr(self.motor, prop)))
+        self.logger.debug("[init] {}: {}".format(
+            prop, getattr(self.motor, prop)))
 
         prop_step = (prop_range.max - prop_range.min) / num_steps
         for value in range(prop_range.min, prop_range.max, prop_step):
             setattr(self.motor, prop, value)
             assert getattr(self.motor, prop) == value
-        self.logger.debug("[final] {}: {}".format(prop,
-            getattr(self.motor, prop)))
+        self.logger.debug("[final] {}: {}".format(
+            prop, getattr(self.motor, prop)))
 
     def test_power_stop(self):
         """Test stopping the motor by setting power to zero."""

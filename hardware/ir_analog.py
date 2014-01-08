@@ -10,6 +10,8 @@ except ImportError:
     print "ImportError: smbus module not found; I2C communication disabled"
 
 # TODO: Try using read_i2c_block_data() and write_i2c_block_data() instead?
+
+
 def swap_bytes_uint16(value):
     """Swaps the bytes (endianness) of a 16-bit integer."""
     return ((value & 0x00ff) << 8) | ((value & 0xff00) >> 8)
@@ -67,8 +69,8 @@ class IRAnalog(ir.IRArray):
             self.result_addr = adc_config['result_addr']  # 2 bytes
             self.result_mask = adc_config['result_mask']
             self.result_shift = adc_config['result_shift']
-        self.logger.debug("Setup {} (on I2C addr: {})".format(self,
-                                                        hex(self.i2c_addr)))
+        self.logger.debug("Setup {} (on I2C addr: {})".format(
+            self, hex(self.i2c_addr)))
 
     def set_adc_byte(self, register, byte_value):
         self.bus.write_byte_data(self.i2c_addr, register, byte_value)
@@ -79,9 +81,9 @@ class IRAnalog(ir.IRArray):
 
     def read_adc_result(self):
         if i2c_available:
-            raw_result = swap_bytes_uint16(self.bus.read_word_data(
-                                                        self.i2c_addr,
-                                                        self.result_addr))
+            raw_result = swap_bytes_uint16(
+                self.bus.read_word_data(
+                    self.i2c_addr, self.result_addr))
             # raw_result:- D15: alert; D14-D12, D3-D0: reserved; D11-D4: value
             result = (raw_result & self.result_mask) >> self.result_shift
             if self.ir_verbose_output:

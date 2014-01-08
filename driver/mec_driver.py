@@ -160,13 +160,12 @@ class MecDriver(driver.Driver):
         except AssertionError:
             raise AssertionError("Speed is out of bounds")
 
-        # Angle bounds may be unnecessary.
-        
+        # Angle bounds may be unnecessary
+
         try:
             assert MecDriver.min_angle <= angle <= MecDriver.max_angle
         except AssertionError:
             raise AssertionError("Angle is out of bounds")
-        
 
         # Handle zero speed, prevent divide-by-zero error
         if speed == 0:  # TODO deadband (epsilon) check?
@@ -308,12 +307,10 @@ class MecDriver(driver.Driver):
             motor.speed = 0
 
     def drive(self, translate_speed, translate_angle, time):
-        """Moves in direction of translate angle at translate speed for set 
-            time (in seconds) and then stops.  
+        """Moves in direction of translate angle at translate speed for set
+            time (in seconds) and then stops.
            """
 
         move(translate_speed, translate_angle)
         sleep(time)
-        move(0,0)
-
-
+        move(0, 0)

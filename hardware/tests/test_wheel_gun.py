@@ -60,7 +60,7 @@ class TestLaser(TestWheelGun):
 
         """
         read_value = int(self.get_gpio(
-                            self.config['gun']['laser_gpio'])['value'])
+            self.config['gun']['laser_gpio'])['value'])
         assert read_value == value, "{} != {}".format(read_value, value)
 
     def test_laser_on(self):

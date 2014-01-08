@@ -65,18 +65,20 @@ class IRHub(object):
             gpio_test_dir_base = config["test_gpio_base_dir"]
 
             # Build GPIOs used for selecting active IR units in test mode
-            self.select_gpios = [gpio_mod.GPIO(gpio, gpio_test_dir_base)
-                                    for gpio in config["ir_select_gpios"]]
+            self.select_gpios = [
+                gpio_mod.GPIO(gpio, gpio_test_dir_base)
+                for gpio in config["ir_select_gpios"]]
         else:
             try:
                 # Build GPIOs used for selecting active IR units
-                self.select_gpios = [gpio_mod.GPIO(gpio)
-                                        for gpio in config["ir_select_gpios"]]
+                self.select_gpios = [
+                    gpio_mod.GPIO(gpio)
+                    for gpio in config["ir_select_gpios"]]
             except Exception as e:
                 self.logger.error("GPIOs could not be initialized. " +
                                   "Not on the bone? Run unit test instead. " +
                                   "Exception: {}".format(e))
- 
+
         # Read mapping (dict) of IR array names to input GPIO pins from config
         # NOTE: IR unit select lines are common
         ir_analog_input_gpios = config["ir_analog_input_gpios"]
@@ -163,15 +165,15 @@ class IRHub(object):
                 adc_result = array.read_adc_result()  # NOTE IRAnalog array
                 gpio_result = array.selected_unit_val
                 self.reading[name][n] = adc_result \
-                                            if self.ir_read_adc \
-                                            else array.selected_unit_val
+                    if self.ir_read_adc \
+                    else array.selected_unit_val
                 self.logger.info("IR ({}, {}) ADC: {}, GPIO: {}".format(
-                                            name, n, adc_result, gpio_result))
+                    name, n, adc_result, gpio_result))
             else:
                 # Read only one, ADC or GPIO
                 self.reading[name][n] = array.read_adc_result() \
-                                            if self.ir_read_adc \
-                                            else array.selected_unit_val
+                    if self.ir_read_adc \
+                    else array.selected_unit_val
 
     def read_all(self):
         """Poll IR sensor units and return sensed information.
@@ -207,7 +209,7 @@ class IRHub(object):
             self.read_all()
             fresh = True
         return {"readings": self.reading, "time": self.last_read_time,
-            "fresh": fresh}
+                "fresh": fresh}
 
 
 def live_read_loop(delay=0.25, accurate=False):
@@ -217,7 +219,7 @@ def live_read_loop(delay=0.25, accurate=False):
     if accurate:
         print "ir_hub.live_read_loop(): Requesting accurate IR values (ADC)"
         config["ir_read_adc"] = True
-    
+
     # Instantiate IRHub object and run infinite read loop
     hub = IRHub()
     print "ir_hub.live_read_loop(): Starting read loop... [Ctrl+C to exit]"

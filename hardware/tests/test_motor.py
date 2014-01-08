@@ -150,7 +150,7 @@ class TestNoDirection(test_bot.TestBot):
 
     def test_get_dir(self):
         """Get direction for a motor that should have no direction."""
-        assert self.motor.direction == None
+        assert self.motor.direction is None
 
     def test_vol(self):
         """Get velocity for a motor that has no direction."""

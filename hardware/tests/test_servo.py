@@ -63,10 +63,10 @@ class TestPosition(test_bot.TestBot):
         """Test position over max position. Should use maximum."""
         self.servo.position = 181
         assert self.servo.position == 180, \
-                                      "Actual: {}".format(self.servo.position)
+            "Actual: {}".format(self.servo.position)
 
     def test_under_min(self):
         """Test position under minimum position. Should use minimum."""
         self.servo.position = -1
         assert self.servo.position == 0, \
-                                      "Actual: {}".format(self.servo.position)
+            "Actual: {}".format(self.servo.position)

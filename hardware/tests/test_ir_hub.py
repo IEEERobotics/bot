@@ -98,9 +98,8 @@ class TestReadNthUnits(test_bot.TestBot):
             for name, array_reading in self.ir_hub.reading.iteritems():
                 observed_val = array_reading[n]
                 assert observed_val == expected_vals[name], \
-                       "{} != {} for {} array".format(observed_val,
-                                                      expected_vals[name],
-                                                      name)
+                    "{} != {} for {} array".format(
+                        observed_val, expected_vals[name], name)
 
     def test_n_max(self):
         """Confirm that values at max are accepted."""

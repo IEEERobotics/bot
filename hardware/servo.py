@@ -46,11 +46,11 @@ class Servo(object):
 
         """
         return "Servo #{}: pos:{} duty/period: {}/{} pol:{}".format(
-                                                             self.pwm_num,
-                                                             self.position,
-                                                             self.pwm.duty,
-                                                             self.pwm.period,
-                                                             self.pwm.polarity)
+            self.pwm_num,
+            self.position,
+            self.pwm.duty,
+            self.pwm.period,
+            self.pwm.polarity)
 
     @property
     def position(self):
@@ -82,7 +82,8 @@ class Servo(object):
             self.logger.warning("Invalid pos {}, using 180.".format(position))
             position = 180
         elif position < 0:
-            self.logger.warning("Invalid position {}, using 0.".format(position))
+            self.logger.warning(
+                "Invalid position {}, using 0.".format(position))
             position = 0
 
         # Set duty

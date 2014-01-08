@@ -87,7 +87,8 @@ class WheelGun(object):
 
         """
         if self.motor_gpios["left"].value != self.motor_gpios["right"].value:
-            self.logger.warning("Left and right gun motor GPIOs are not equal.")
+            self.logger.warning(
+                "Left and right gun motor GPIOs are not equal.")
             return {"left": self.motor_gpios["left"].value,
                     "right": self.motor_gpios["right"].value}
 

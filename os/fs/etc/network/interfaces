@@ -13,18 +13,15 @@ iface usb0 inet static
     network 192.168.7.0
     gateway 192.168.7.1
 
-# Wi-Fi: WPA with post-up DHCP client trigger
 auto wlan0
-iface wlan0 inet manual
-    wpa-ssid skynet
-    wpa-psk whenisjudgementday
-#    post-up "dhclient wlan0"
-
-auto wlan1
-iface wlan1 inet static
+iface wlan0 inet static
     address 10.2.1.1
     netmask 255.255.255.0
 
+auto wlan1
+iface wlan1 inet dhcp
+    wireless-essid ncsu
+    wireless-mode managed
 
 # Ethernet
 iface eth0 inet dhcp

@@ -19,5 +19,4 @@ DAEMON_CONF="/etc/hostapd/hostapd.conf"
 #
 #DAEMON_OPTS=""
 
-#DAEMON_SBIN=/usr/sbin/hostapd
-DAEMON_SBIN=/usr/sbin/hostapd.rtl871x
+DAEMON_SBIN=/usr/sbin/hostapd

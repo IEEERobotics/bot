@@ -24,6 +24,7 @@ iface wlan1 inet dhcp
     wireless-mode managed
 
 # Ethernet
-iface eth0 inet dhcp
-# Example to keep MAC address between reboots
-#hwaddress ether DE:AD:BE:EF:CA:FE
+iface eth0 inet static
+    address 192.168.1.1
+    netmask 255.255.255.0
+

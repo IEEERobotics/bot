@@ -193,11 +193,17 @@ def get_logger():
     _logger = logger
     return logger
 
+
 def api_call(f):
     """Decorator used to register a method so that it becomes callable through
     the API.
 
+    TODO(dfarrell07): Shorten summary, add longer note here if needed.
+
+    :param f: TODO
+    :type f: TODO
+    :returns: TODO
+
     """
     f.__api_call = True
     return f
-

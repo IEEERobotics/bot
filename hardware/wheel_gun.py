@@ -6,6 +6,7 @@ from pybbb.bbb import gpio as gpio_mod
 
 import lib.lib as lib
 
+
 class WheelGun(object):
 
     """A wheel-based gun with a laser pointer."""

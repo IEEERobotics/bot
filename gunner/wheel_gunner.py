@@ -2,7 +2,6 @@
 
 import gunner
 import hardware.wheel_gun as wgun_mod
-
 import lib.lib as lib
 
 class WheelGunner(gunner.Gunner):

@@ -9,9 +9,11 @@ import zmq
 
 new_path = [os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")]
 sys.path = new_path + sys.path
+
 import lib.lib as lib
 from gunner.wheel_gunner import WheelGunner
 from follower.follower import Follower
+
 
 def is_api_method(obj, name):
     """Tests whether named method exists in obj and is flagged for API export.
@@ -26,11 +28,14 @@ def is_api_method(obj, name):
         return False
     return (ismethod(method) and hasattr(method, '__api_call'))
 
+
 def api_success(msg = '', result = None):
     return { 'status':'success', 'msg':msg, 'result':result }
 
+
 def api_error(msg = ''):
     return { 'status':'error', 'msg': msg }
+
 
 class ApiServer(object):
 
@@ -110,7 +115,6 @@ class ApiServer(object):
                 self.logger.debug("Sending API response: {}".format(reply))
                 self.socket.send_json(reply)
             except JSONDecodeError:
-                # TODO: Use logger at warning level
                 self.logger.warning("Not a JSON message!")
                 self.socket.send_json(api_error('Not a JSON message!'))
             except KeyboardInterrupt:
@@ -224,6 +228,7 @@ class ApiServer(object):
         """Raise a test exception which will be returned to the caller."""
         # TODO(dfarrell07): Is this method necessary?
         raise Exception("Exception test")
+
 
 if __name__ == '__main__':
     if len(sys.argv) == 2:

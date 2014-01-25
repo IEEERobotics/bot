@@ -2,8 +2,9 @@
 """Send commands to the bot's API server through a generated CLI interface."""
 
 import cmd
-import api_client
 import sys
+
+import api_client
 
 
 class CLIClient(cmd.Cmd):
@@ -141,6 +142,7 @@ class CLIClient(cmd.Cmd):
     def help_EOF(self):
         """Provide help message for EOF (ctrl+d) command."""
         print "Exit the program with ctrl+d."
+
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:

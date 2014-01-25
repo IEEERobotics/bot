@@ -8,7 +8,7 @@ import sys
 from time import sleep
 
 import lib.lib as lib
-import client.cli_client as cli_client_mod
+import client.api_cli as cli_client_mod
 import client.sub_client as sub_client_mod
 import planner.fsm_planner as pfsm_mod
 
@@ -63,7 +63,7 @@ if args.tests:
 
 if args.server:
     print "Starting server"
-    server = Popen(["./server/control_server.py", str(args.test_mode)])
+    server = Popen(["./server/api_server.py", str(args.test_mode)])
     # Give server a chance to get up and running
     sleep(.3)
 
@@ -73,7 +73,12 @@ if args.auto_client:
 
 if args.cli_client:
     print "Starting CLI client"
-    cli_client_mod.CLIClient().cmdloop()
+    config = lib.get_config("config.yaml")
+    server_addr = "{protocol}://{host}:{port}".format(
+        protocol=config["server_protocol"],
+        host=config["server_host"],
+        port=config["server_port"])
+    cli_client_mod.CLIClient(server_addr).cmdloop()
 
 if args.sub_client:
     print "Starting subscriber client"

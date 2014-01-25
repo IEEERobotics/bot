@@ -44,9 +44,11 @@ class LineFollower(follower.Follower):
             # Call front PID
             self.sampling_time = current_time - previous_time
             # Call front PID
-            front_error = self.front_pid.pid(0, self.front_state, self.sampling_time)
+            front_error = self.front_pid.pid(
+                0, self.front_state, self.sampling_time)
             # Call back PID
-            back_error = self.back_pid.pid(0, self.back_state, self.sampling_time)
+            back_error = self.back_pid.pid(
+                0, self.back_state, self.sampling_time)
             # Update motors
             self.motors(front_error, back_error)
             # Take the current time set it equal to the previous time
@@ -216,7 +218,7 @@ class LineFollower(follower.Follower):
             if abs(self.hit_position[0] - self.hit_position[1]) > 1:
                 # Error: Discontinuity in sensors
                 return 19
-        state = state - 5
+        state = state - 15
         return state
 
     def get_position_rl(self, readings):

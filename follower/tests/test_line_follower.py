@@ -13,10 +13,6 @@ except ImportError:
     print "ImportError: Use `python -m unittest discover` from project root."
     raise
 
-# Build logger
-logger = lib.get_logger()
-# Distance math
-
 
 class TestLineFollower(test_bot.TestBot):
 
@@ -72,7 +68,9 @@ class TestLineFollower(test_bot.TestBot):
             position[index] =  1
             if(index > 0):
                 position[index -1] = 0
-            self.assertEquals(index * 2 - 15, self.follower.get_position_lr(position))
+            self.assertEquals(
+                index * 2 - 15, self.follower.get_position_lr(
+                    position))
         position = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         for index, value in enumerate(position):
             position[index] =  1
@@ -80,7 +78,9 @@ class TestLineFollower(test_bot.TestBot):
                 continue
             if(index > 1):
                 position[index -2] = 0
-            self.assertEquals((index - 1) * 2 - 15 + 1, self.follower.get_position_lr(position))
+            self.assertEquals(
+                (index - 1) * 2 - 15 + 1, self.follower.get_position_lr(
+                    position))
 
     def test_get_state_rl_errors(self):
         """Test cases for get position left right for error throws.
@@ -120,7 +120,9 @@ class TestLineFollower(test_bot.TestBot):
             position[index] =  1
             if(index > 0):
                 position[index -1] = 0
-            self.assertEquals(( index * 2 - 15) * -1, self.follower.get_position_rl(position))
+            self.assertEquals(
+                ( index * 2 - 15) * -1, self.follower.get_position_rl(
+                    position))
         position = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         for index, value in enumerate(position):
             position[index] =  1
@@ -128,6 +130,54 @@ class TestLineFollower(test_bot.TestBot):
                 continue
             if(index > 1):
                 position[index -2] = 0
-            self.assertEquals(((index - 1) * 2 - 15 + 1) * -1, self.follower.get_position_rl(position))
+            self.assertEquals(
+                ((index - 1) * 2 - 15 + 1) * -1, 
+                self.follower.get_position_rl(position))
        
+    def test_assign_states(self):
+        self.follower.heading = 0
+
+        test_array = {"front": [0] * 16, "back": [0] * 16,
+            "right": [0] * 16, "left": [0] * 16}
+
+        for i in range(16):
+            test_array["front"] = [0] * 16
+            test_array["back"] = [0] * 16
+            test_array["front"][i] = 1
+            test_array["back"][i] = 1
+            self.follower.assign_states(test_array)
+            self.logger.info("front: {}".format(self.follower.front_state))
+            self.logger.info("back: {}".format(self.follower.back_state))
+            self.logger.info(self.follower.right_state)
+            self.logger.info(self.follower.left_state)
+            for n in range(16):
+                test_array["right"] = [0] * 16
+                test_array["right"][n] = 1
+            test_array["right"] = [0] * 16
+            for n in range(16):
+                test_array["left"] = [0] * 16
+                test_array["left"][n] = 1
+            test_array["left"] = [0] * 16
+            for n in range(16):
+                test_array["left"] = [0] * 16
+                test_array["left"][n] = 1
+                test_array["right"] = [0] * 16
+                test_array["right"][n] = 1
+            test_array["left"] = [0] * 16
+            test_array["right"] = [0] * 16
+            if(i != 15):
+                test_array["back"][i+1] = 1
+                test_array["front"][i+1] = 1
+                for n in range(16):
+                    test_array["right"] = [0] * 16
+                    test_array["right"][n] = 1
+                test_array["right"] = [0] * 16
+                for n in range(16):
+                    test_array["left"] = [0] * 16
+                    test_array["left"][n] = 1
+                for n in range(16):
+                    test_array["left"] = [0] * 16
+                    test_array["left"][n] = 1
+                    test_array["right"] = [0] * 16
+                    test_array["right"][n] = 1
 

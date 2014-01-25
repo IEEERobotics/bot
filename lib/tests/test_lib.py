@@ -1,33 +1,24 @@
 """Test cases for lib."""
-import sys
-import os
-import unittest
-import copy
+
 import logging
 
-sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
-
-try:
-    import lib.lib as lib
-    import tests.test_bot as test_bot
-except ImportError:
-    print "ImportError: Use `python -m unittest discover` from project root."
-    raise
+import lib.lib as lib
+import tests.test_bot as test_bot
 
 
-class TestLoadConfig(test_bot.TestBot):
+class TestGetConfig(test_bot.TestBot):
 
     """Test loading configuration."""
 
     def test_type(self):
         """Confirm that type of config is a dict."""
-        config = lib.load_config()
+        config = lib.get_config()
         assert type(config) is dict
 
     def test_invalid(self):
         """Test proper failure for fake config file."""
         with self.assertRaises(IOError):
-            config = lib.load_config("fake.yaml")
+            config = lib.get_config("fake.yaml")
 
 
 class TestWriteConfig(test_bot.TestBot):
@@ -36,9 +27,9 @@ class TestWriteConfig(test_bot.TestBot):
 
     def test_same(self):
         """Confirm that writing without changes produces no change."""
-        config = lib.load_config()
+        config = lib.get_config()
         lib.write_config(config)
-        result_config = lib.load_config()
+        result_config = lib.get_config()
         assert config == result_config
 
     def test_modify_log_file(self):
@@ -46,7 +37,7 @@ class TestWriteConfig(test_bot.TestBot):
         test_log_file = "logs/test.log"
 
         # Get initial config
-        config = lib.load_config()
+        config = lib.get_config()
         orig_log_file = config["logging"]["log_file"]
 
         # Modify config
@@ -54,7 +45,7 @@ class TestWriteConfig(test_bot.TestBot):
         lib.write_config(config)
 
         # Get and check updated config
-        updated_config = lib.load_config()
+        updated_config = lib.get_config()
         assert updated_config == config
         assert updated_config["logging"]["log_file"] == test_log_file
 
@@ -63,24 +54,9 @@ class TestWriteConfig(test_bot.TestBot):
         lib.write_config(config)
 
         # Test reverted change
-        updated_config = lib.load_config()
+        updated_config = lib.get_config()
         assert updated_config == config
         assert updated_config["logging"]["log_file"] == orig_log_file
-
-
-class TestLoadStrategy(test_bot.TestBot):
-
-    """Test loading the strategy file defined in config.yaml"""
-
-    def test_type(self):
-        """Load strategy file with default settings, assert it's a dict."""
-        strat = lib.load_strategy()
-        assert type(strat) is dict
-
-    def test_invalid(self):
-        """Pass an invalid path to strategy file."""
-        with self.assertRaises(IOError):
-            strat = lib.load_strategy("fake_strat.yaml")
 
 
 class TestLoadTargeting(test_bot.TestBot):
@@ -104,7 +80,7 @@ class TestSetTesting(test_bot.TestBot):
 
     def setUp(self):
         """Get and store original config."""
-        self.orig_config = lib.load_config()
+        self.orig_config = lib.get_config()
 
     def tearDown(self):
         """Restore original testing flag."""
@@ -113,77 +89,20 @@ class TestSetTesting(test_bot.TestBot):
     def test_same(self):
         """Test writing the current value of testing flag."""
         lib.set_testing(self.orig_config["testing"])
-        new_config = lib.load_config()
+        new_config = lib.get_config()
         assert new_config == self.orig_config
 
     def test_invalid_state(self):
         """Test passing a non-boolean value for state param."""
         with self.assertRaises(TypeError):
             lib.set_testing("not_bool")
-        new_config = lib.load_config()
+        new_config = lib.get_config()
         assert self.orig_config == new_config
 
     def test_invalid_config(self):
         """Test passing an invalid path to the config file."""
         with self.assertRaises(IOError):
             lib.set_testing(False, config_file="fake.yaml")
-
-
-class TestSetStrat(test_bot.TestBot):
-
-    """Test setting the strategy file in config."""
-
-    def setUp(self):
-        """Get and store original config and strat file."""
-        self.orig_config = lib.load_config()
-
-    def tearDown(self):
-        """Restore original strat file."""
-        lib.write_config(self.orig_config)
-
-    def test_set_fake(self):
-        """Set strat file to a fake file.
-
-        Note that the validity of the strat file is not currently validated
-        in lib, which is why no exception is expected here.
-
-        """
-        fake_strat_file = "fake_strat.yaml"
-        lib.set_strat(fake_strat_file)
-        new_config = lib.load_config()
-        new_strat = self.orig_config["test_strat_base_dir"] + fake_strat_file
-        assert new_config["strategy"] == new_strat
-
-
-class TestSetStratQual(test_bot.TestBot):
-
-    """Test setting a qualified strategy file in config."""
-
-    def setUp(self):
-        """Get and store original config and strat file."""
-        self.orig_config = lib.load_config()
-
-    def tearDown(self):
-        """Restore original strat file."""
-        lib.write_config(self.orig_config)
-
-    def test_set_same(self):
-        """Set strat file to its current value."""
-        lib.set_strat_qual(self.orig_config["strategy"])
-        new_config = lib.load_config()
-        assert new_config == self.orig_config
-
-    def test_set_fake(self):
-        """Set strat file to a fake file.
-
-        Note that the validity of the strat file is not currently validated
-        in lib, which is why no exception is expected here.
-
-        """
-        fake_strat = self.orig_config["test_strat_base_dir"] + "fake.yaml"
-        lib.set_strat_qual(fake_strat)
-        new_config = lib.load_config()
-        assert new_config["strategy"] == fake_strat
 
 
 class TestGetLogger(test_bot.TestBot):

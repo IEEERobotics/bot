@@ -23,7 +23,7 @@ class Servo(object):
         self.pwm_num = pwm_num
 
         # Load config
-        config = lib.load_config()
+        config = lib.get_config()
 
         if config["testing"]:
             # Get dir of simulated hardware files from config
@@ -46,11 +46,11 @@ class Servo(object):
 
         """
         return "Servo #{}: pos:{} duty/period: {}/{} pol:{}".format(
-                                                             self.pwm_num,
-                                                             self.position,
-                                                             self.pwm.duty,
-                                                             self.pwm.period,
-                                                             self.pwm.polarity)
+            self.pwm_num,
+            self.position,
+            self.pwm.duty,
+            self.pwm.period,
+            self.pwm.polarity)
 
     @property
     def position(self):
@@ -79,10 +79,11 @@ class Servo(object):
 
         """
         if position > 180:
-            self.logger.warn("Invalid pos {}, using 180.".format(position))
+            self.logger.warning("Invalid pos {}, using 180.".format(position))
             position = 180
         elif position < 0:
-            self.logger.warn("Invalid position {}, using 0.".format(position))
+            self.logger.warning(
+                "Invalid position {}, using 0.".format(position))
             position = 0
 
         # Set duty

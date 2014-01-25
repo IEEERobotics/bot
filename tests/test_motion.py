@@ -1,15 +1,10 @@
 """Test cases for physical bot motion using motors."""
-import sys
-import os
+
 import unittest
 import time
 
-try:
-    import lib.lib as lib
-    import hardware.motor as m_mod
-except ImportError:
-    print "ImportError: Use `python -m unittest discover` from project root."
-    raise
+import lib.lib as lib
+import hardware.motor as m_mod
 
 # Build logger
 logger = lib.get_logger()
@@ -24,7 +19,7 @@ class TestMotion(unittest.TestCase):
         #   using physical motors
 
         # Load config, get logger
-        self.config = lib.load_config()
+        self.config = lib.get_config()
 
         # Create motor objects to test
         self.num_motors = 4

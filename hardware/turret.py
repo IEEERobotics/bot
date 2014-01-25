@@ -14,7 +14,7 @@ class Turret(object):
         self.logger = lib.get_logger()
 
         # Load config
-        config = lib.load_config()
+        config = lib.get_config()
 
         # Build and store abstraction of servos for x and y axis movement
         self.servos = {}

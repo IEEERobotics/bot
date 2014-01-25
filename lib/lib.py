@@ -15,7 +15,7 @@ _config_file = None
 _logger = None
 
 
-def load_config(config_file="config.yaml"):
+def get_config(config_file="config.yaml"):
     """Load and return configuration options.
 
     Note that this config is only loaded once (it's a singleton).
@@ -58,7 +58,7 @@ def load_strategy(strat_file=None):
 
     """
     if strat_file is None:
-        config = load_config()
+        config = get_config()
         strat_file = config["strategy"]
 
     # Build valid path from CWD to strategy file
@@ -77,7 +77,7 @@ def load_targeting(targ_file=None):
 
     """
     if targ_file is None:
-        config = load_config()
+        config = get_config()
         targ_file = config["targeting"]
 
     # Build valid path from CWD to targeting file
@@ -107,9 +107,9 @@ def set_testing(state, config_file=None):
 
     # Get current config
     if config_file is None:
-        config = load_config()
+        config = get_config()
     else:
-        config = load_config(config_file)
+        config = get_config(config_file)
 
     # Update config with new testing state
     config["testing"] = state
@@ -118,50 +118,7 @@ def set_testing(state, config_file=None):
     write_config(config)
 
 
-def set_strat(strat_file):
-    """Modify config.yaml to point to the given strategy file.
-
-    The given strat_file is assumed to exist in the directory pointed to
-    by test_strat_base_dir in config.yaml. If that assumption doesn't hold,
-    use set_strat_qual to pass a full path from the root of the repo.
-
-    :param strat_file: Strategy file to set in config.yaml.
-    :type strat_file: string
-
-    """
-    # Get current config
-    config = load_config()
-
-    # Update config with new strategy
-    strat_file_qual = config["test_strat_base_dir"] + strat_file
-    config["strategy"] = strat_file_qual
-
-    # Write new config
-    write_config(config)
-
-
-def set_strat_qual(strat_file_qual):
-    """Modify config.yaml to point to the given strategy file.
-
-    The given strat_file_qual is assumed to be a path from the root of the
-    repo to a strategy file. If you just want to use pass the name of the file
-    and use test_strat_base_dir from config.yaml, instead call set_strat.
-
-    :param strat_file: Qualified strategy file to set in config.yaml.
-    :type strat_file: string
-
-    """
-    # Get current config
-    config = load_config()
-
-    # Update config with new strategy
-    config["strategy"] = strat_file_qual
-
-    # Write new config
-    write_config(config)
-
-
-def get_logger(prefix=None):
+def get_logger():
     """Build and return a logger for formatted stream and file output.
 
     Note that if a logger has already been built, a new one will not
@@ -172,8 +129,6 @@ def get_logger(prefix=None):
 
     TODO (dfarrell07): Refactor to not use a global
 
-    :param prefix: Optional path from CWD to dir that contains logs dir.
-    :type prefix: string
     :returns: The constructed logging object.
 
     """
@@ -183,11 +138,10 @@ def get_logger(prefix=None):
         return _logger
 
     # Get config so that path to log file can be read.
-    config = load_config()
+    config = get_config()
 
-    # Setup path to log output. Allows usage from any subpackage.
-    if prefix is None:
-        qual_log_file = config["logging"]["log_file"]
+    # Get path from repo root to log file
+    log_file = config["logging"]["log_file"]
 
     # Build logger
     logger = logging.getLogger(__name__)
@@ -195,7 +149,7 @@ def get_logger(prefix=None):
 
     # Check if log exists and should therefore be rolled
     needRoll = False
-    if path.isfile(qual_log_file):
+    if path.isfile(log_file):
         needRoll = True
 
     # Build file output formatter
@@ -209,7 +163,7 @@ def get_logger(prefix=None):
                                          "%(message)s")
 
     # Build file handler (for output log output to files)
-    file_handler = logging.handlers.RotatingFileHandler(qual_log_file,
+    file_handler = logging.handlers.RotatingFileHandler(log_file,
                                                         mode="a",
                                                         backupCount=50,
                                                         delay=True)

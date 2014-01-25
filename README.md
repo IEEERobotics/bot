@@ -10,6 +10,12 @@ Code for the IEEE Robotics Team's 2014 robot(s).
 * Read *and follow* our [style requirements](README.md#style).
 * Check GitHub's [issue tracker] to find work we need done and/or report on your progress.
 
+## GitHub: Issues and Wiki
+
+We use GitHub's [issues](https://github.com/NCSUhardware/bot/issues) feature to report and track bugs, tasks, feature requests, questions and generally any thread that's related to the code. Checking the issues frequently keeps you up to date on the work being done, the work that needs to be done (please contribute!) and anything that may be wrong with code you're responsible for.
+
+As the code matures, we'll put more effort into developing this repo's [wiki](https://github.com/NCSUhardware/bot/wiki). As you find things that should be documented, please feel free to edit wiki pages and create your own. 
+
 ## Style
 
 ### Code Style
@@ -26,16 +32,6 @@ If you don't think you can manage that, please, please set up [pre-commit hooks]
 
 I suggest running the program pep8 against your code before each commit. You can use the [bot/scripts/check_pep8.sh](scripts/check_pep8.sh) script to test all *.py files in the repo. See the [dependencies](README.md#pep8-checker) section for install instructions.
 
-#### C
-
-[PEP7] will be the standard, but pay special attention to exception #2, as I expect C code will be more likely to pull code blocks from other libs.
-
-Exception 2: "Be consistent with surrounding code...although this is also an opportunity to clean up someone else's mess."
-
-#### Shell
-
-If you really care, give [Google's Shell Style Guide][1] a read. Don't be too pedantic about shell scripts.
-
 ### Docstring Style
 
 For general docstring style guidance, see [PEP257]. Specialize your docstrings for Sphinx, as described [here][2]. You may also find [this][3] docstring and Sphinx information helpful.
@@ -47,7 +43,7 @@ Create unit tests for any code you write. Be sure to run all tests before commit
 While in the root directory of the project, run our automated tests with:
 
 ```bash
-python -m unittest discover
+./start.py -t
 ```
 
 To run a specific test case, use this syntax (from the root of the repo):
@@ -199,23 +195,9 @@ Adapt according to paths on your system. Again, verify by running `pep8` from th
 
 ### NumPy
 
-This is currently only needed for running client/desktop_client.py.
-
 #### Linux (Debian/Ubuntu)
 
 Install with `sudo apt-get install python-numpy`. Celebrate. :)
-
-#### Mac
-
-TODO: How?
-
-### OpenCV
-
-This is currently only needed for running client/desktop_client.py.
-
-#### Linux (Debian/Ubuntu)
-
-Install with `sudo apt-get install python-opencv`. Celebrate. :)
 
 #### Mac
 

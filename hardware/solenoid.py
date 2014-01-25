@@ -26,7 +26,7 @@ class Solenoid(object):
         self.gpio_num = gpio_num
 
         # Load system configuration
-        config = lib.load_config()
+        config = lib.get_config()
 
         if config["testing"]:
             # Get dir of simulated hardware files from config

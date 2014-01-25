@@ -1,18 +1,7 @@
-#!/usr/bin/env python
 """Server for handling interaction between clients and bot."""
 
 import sys
-import os
 from inspect import getmembers, ismethod
-
-try:
-    import zmq
-except ImportError:
-    sys.stderr.write("ERROR: Failed to import zmq. Is it installed?")
-    raise
-
-new_path = [os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")]
-sys.path = new_path + sys.path
 
 import lib.lib as lib
 
@@ -26,7 +15,7 @@ class Server(object):
     def __init__(self):
         """Build all main bot objects, set ZMQ to listen."""
         # Load configuration and logger
-        self.config = lib.load_config()
+        self.config = lib.get_config()
         self.logger = lib.get_logger()
 
         # Create cmd -> handler methods mapping (dict)
@@ -82,7 +71,7 @@ class Server(object):
 
         """
         if status != "Success" and status != "Error":
-            self.logger.warn("Status is typically 'Success' or 'Error'")
+            self.logger.warning("Status is typically 'Success' or 'Error'")
 
         reply_msg = {}
         reply_msg["status"] = status

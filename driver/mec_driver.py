@@ -1,7 +1,7 @@
 """Pass low-level move commands to motors with mecanum wheels."""
 
 from math import sin, cos, pi, fabs, sqrt, hypot, atan2, degrees
-from time import sleep
+from time import sleep, time
 import driver
 import lib.lib as lib
 import hardware.motor as m_mod
@@ -159,6 +159,9 @@ class MecDriver(driver.Driver):
             assert MecDriver.min_speed <= speed <= MecDriver.max_speed
         except AssertionError:
             raise AssertionError("Speed is out of bounds")
+
+        # Angle bounds may be unnecessary
+
         try:
             assert MecDriver.min_angle <= angle <= MecDriver.max_angle
         except AssertionError:
@@ -237,7 +240,7 @@ class MecDriver(driver.Driver):
         speed, rotate_speed is number between 0, 100.
         """
 
-        # Speeds should add up to max. speed (100)
+        # Speeds should add up to max_speed (100)
         # TODO: Should this be fabs(rotate_speed)?
         total_speed = translate_speed + rotate_speed
         assert total_speed <= MecDriver.max_speed
@@ -283,25 +286,31 @@ class MecDriver(driver.Driver):
         self.motors["back_left"].speed = fabs(back_left)
         self.motors["back_right"].speed = fabs(back_right)
 
-    def jerk(self, time, speed):
-        """Recieves time (in seconds) and speed
-           Note: Since "speed" is programmer units, not real ones
-           the distance it moves can not be accurately measured."""
+    def jerk(self):
+        """Makes small forward jump in position.
+            """
+
+        #Time and speed of jerk.
+        jerk_time = 3
+        jerk_speed = 30
 
         # Set motor to "speed"
         for motor in self.motors.itervalues():
-            motor.speed = speed
+            motor.speed = jerk_speed
             motor.direction = "forward"
 
         # Wait for "time" seconds
-        sleep(time)
+        sleep(jerk_time)
 
         # stop motors.
         for motor in self.motors.itervalues():
             motor.speed = 0
 
-        # TODO(Ahmed) Find way to approximate distance, and return value
+    def drive(self, translate_speed, translate_angle, time):
+        """Moves in direction of translate angle at translate speed for set
+            time (in seconds) and then stops.
+           """
 
-    def oscillate(self):
-        """Oscillate sideways, increasing in amplitude until line is found"""
-        pass  # TODO: Implement this
+        move(translate_speed, translate_angle)
+        sleep(time)
+        move(0, 0)

@@ -4,37 +4,40 @@
 import argparse
 from subprocess import Popen
 import os
+import sys
 from time import sleep
 
 import lib.lib as lib
-import client.desktop_client as desktop_client_mod
 import client.cli_client as cli_client_mod
 import client.sub_client as sub_client_mod
 import planner.fsm_planner as pfsm_mod
 
 # Build parser and argument groups
 parser = argparse.ArgumentParser(description="start bot clients, servers and tests")
-root_group = parser.add_mutually_exclusive_group()
-client_group = root_group.add_mutually_exclusive_group()
-test_group = root_group.add_mutually_exclusive_group()
+
+# Starting clients should be mutually exclusive
+client_group = parser.add_mutually_exclusive_group()
 
 # Add arguments
 parser.add_argument("-T", "--test-mode", action="store_true",
-                    help="use simulated hardware, to allow running off the bone")
-test_group.add_argument("-8", "--pep8", action="store_true",
-                        help="run script to check PEP8 style conformance")
-test_group.add_argument("-t", "--tests", action="store_true",
-                        help="run all unit tests")
+    help="use simulated hardware, to allow running off the bone")
+parser.add_argument("-8", "--pep8", action="store_true",
+    help="run script to check PEP8 style conformance")
+parser.add_argument("-t", "--tests", action="store_true",
+    help="run all unit tests")
 parser.add_argument("-s", "--server", action="store_true",
-                    help="start server to provide interface for controlling the bot")
+    help="start server to provide interface for controlling the bot")
 client_group.add_argument("-a", "--auto-client", action="store_true",
-                          help="autonomously solve the course")
+    help="autonomously solve the course")
 client_group.add_argument("-c", "--cli-client", action="store_true",
-                          help="CLI interface for controlling the bot")
-client_group.add_argument("-d", "--desktop-client", action="store_true",
-                          help="desktop GUI interface for controlling the bot")
+    help="CLI interface for controlling the bot")
 client_group.add_argument("-u", "--sub-client", action="store_true",
-                          help="subscribe to bot's published information")
+    help="subscribe to bot's published information")
+
+# Print help if no arguments are given
+if len(sys.argv) == 1:
+    parser.print_help()
+    sys.exit(1)
 
 # Parse the given args
 args = parser.parse_args()
@@ -44,6 +47,11 @@ lib.set_testing(args.test_mode)
 
 if args.test_mode:
     print "Using simulated hardware"
+
+# Fail if starting the server on the bot and not root
+if not args.test_mode and args.server and os.geteuid() != 0:
+    print "Error: Running server in non-test mode requires root privileges."
+    sys.exit(1)
 
 if args.pep8:
     print "Running PEP8 style checks"
@@ -57,7 +65,7 @@ if args.server:
     print "Starting server"
     server = Popen(["./server/control_server.py", str(args.test_mode)])
     # Give server a chance to get up and running
-    sleep(.2)
+    sleep(.3)
 
 if args.auto_client:
     print "Starting autonomous client"
@@ -66,10 +74,6 @@ if args.auto_client:
 if args.cli_client:
     print "Starting CLI client"
     cli_client_mod.CLIClient().cmdloop()
-
-if args.desktop_client:
-    print "Starting desktop client"
-    desktop_client_mod.DesktopClient().run()
 
 if args.sub_client:
     print "Starting subscriber client"

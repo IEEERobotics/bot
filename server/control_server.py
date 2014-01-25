@@ -3,7 +3,6 @@
 
 import sys
 import os
-from time import sleep
 from math import fabs
 import traceback
 from inspect import getmembers, ismethod
@@ -35,7 +34,7 @@ class ControlServer(server.Server):
         server.Server.__init__(self)
         
         # Load configuration and logger
-        self.config = lib.load_config()
+        self.config = lib.get_config()
         self.logger = lib.get_logger()
 
         # Testing flag will cause objects to run on simulated hardware

@@ -1,21 +1,10 @@
 """Test cases for servo abstraction class."""
-import sys
-import os
-import unittest
+
 from random import randint
 
-sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
-
-try:
-    import lib.lib as lib
-    import hardware.servo as s_mod
-    import tests.test_bot as test_bot
-except ImportError:
-    print "ImportError: Use `python -m unittest discover` from project root."
-    raise
-
-# Build logger
-logger = lib.get_logger()
+import lib.lib as lib
+import hardware.servo as s_mod
+import tests.test_bot as test_bot
 
 
 class TestPosition(test_bot.TestBot):
@@ -74,10 +63,10 @@ class TestPosition(test_bot.TestBot):
         """Test position over max position. Should use maximum."""
         self.servo.position = 181
         assert self.servo.position == 180, \
-                                      "Actual: {}".format(self.servo.position)
+            "Actual: {}".format(self.servo.position)
 
     def test_under_min(self):
         """Test position under minimum position. Should use minimum."""
         self.servo.position = -1
         assert self.servo.position == 0, \
-                                      "Actual: {}".format(self.servo.position)
+            "Actual: {}".format(self.servo.position)

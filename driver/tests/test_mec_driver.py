@@ -1,22 +1,10 @@
 """Test cases for mec driver."""
-import sys
-import os
-import unittest
+
 from math import fabs, hypot, atan2, degrees
 
-sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
-
-try:
-    import lib.lib as lib
-    import driver.mec_driver as md_mod
-    from driver.mec_driver import MecDriver  # for convenience
-    import tests.test_bot as test_bot
-except ImportError:
-    print "ImportError: Use 'python -m unittest discover' from project root."
-    raise
-
-# Logger object
-logger = lib.get_logger()
+import lib.lib as lib
+from driver.mec_driver import MecDriver  # For convenience
+import tests.test_bot as test_bot
 
 
 class TestRotate(test_bot.TestBot):
@@ -41,9 +29,7 @@ class TestRotate(test_bot.TestBot):
         for test_rotate_speed in xrange(MecDriver.min_rotate_speed,
                                         MecDriver.max_rotate_speed + 1):
             # Issue rotate command
-            logger.debug("Set rotate_speed: {}".format(test_rotate_speed))
             self.md.rotate(test_rotate_speed)
-            logger.debug("Check rotate_speed: {}".format(self.md.rotate_speed))
 
             # Check for approximate speed, as float values will seldom be exact
             assert fabs(self.md.rotate_speed - test_rotate_speed) < \
@@ -75,11 +61,11 @@ class TestRotate(test_bot.TestBot):
             for test_angle in xrange(MecDriver.min_angle,
                                      MecDriver.max_angle + 1, 10):
                 # Issue move command
-                logger.debug("Set speed  : {:3d}, angle: {:3d}".format(
+                self.logger.debug("Set speed  : {:3d}, angle: {:3d}".format(
                     test_speed,
                     test_angle))
                 self.md.move(test_speed, test_angle)
-                logger.debug("Check speed: {:3d}, angle: {:3d}".format(
+                self.logger.debug("Check speed: {:3d}, angle: {:3d}".format(
                     self.md.speed,
                     self.md.angle))
 
@@ -98,7 +84,7 @@ class TestRotate(test_bot.TestBot):
                 # Check for positive values when bot moving forward.
                 if test_angle == 0:
                     for position, motor in self.md.motors.iteritems():
-                        logger.debug(
+                        self.logger.debug(
                             "Ahmed Motor: {}, Speed: {}, Motor_speed:" +
                             "{}, Angle: {}, Direction: {}".format(
                                 position,
@@ -129,7 +115,7 @@ class TestRotate(test_bot.TestBot):
                 MecDriver.max_speed + 1, 10
             ):
                 # Issue move_forward_strafe command
-                logger.debug("Set forward: {:3d}, strafe: {:3d}".format(
+                self.logger.debug("Set forward: {:3d}, strafe: {:3d}".format(
                     test_forward,
                     test_strafe))
                 self.md.move_forward_strafe(test_forward, test_strafe)
@@ -143,11 +129,11 @@ class TestRotate(test_bot.TestBot):
                 # Note order of atan2() args to get forward = 0 deg
                 test_angle = int(degrees(atan2(test_strafe, test_forward))) \
                     % 360
-                logger.debug("Exp. speed : {:3d}, angle: {:3d}".format(
+                self.logger.debug("Exp. speed : {:3d}, angle: {:3d}".format(
                     test_speed,
                     test_angle))
 
-                logger.debug("Check speed: {:3d}, angle: {:3d}".format(
+                self.logger.debug("Check speed: {:3d}, angle: {:3d}".format(
                     self.md.speed,
                     self.md.angle))
 
@@ -162,3 +148,12 @@ class TestRotate(test_bot.TestBot):
                 for motor in self.md.motors.itervalues():
                     assert MecDriver.min_speed <= motor.speed <= \
                                                   MecDriver.max_speed
+
+    """
+    def test_oscillate(self):
+        
+        # Test oscillation for every heading in intervals of 30
+        for i in xrange(1, 360, 90):
+            logger.debug("Oscillating: Heading: {}".format(i))
+            self.md.oscillate(i)
+    """

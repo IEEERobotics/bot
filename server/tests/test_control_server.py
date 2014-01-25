@@ -1,27 +1,16 @@
 """Test cases for lightweight server."""
-import sys
-import os
-import unittest
-from multiprocessing import Process
-from subprocess import Popen
 
-sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
+import unittest
+from subprocess import Popen
 
 try:
     import zmq
 except ImportError:
-    print "Failed to import zmq"
-    sys.exit(1)
-
-try:
-    import lib.lib as lib
-    import tests.test_bot as test_bot
-except ImportError:
-    print "ImportError: Use `python -m unittest discover` from project root."
+    sys.stderr.write("ERROR: Failed to import zmq. Is it installed?")
     raise
 
-# Build logger
-logger = lib.get_logger()
+import lib.lib as lib
+import tests.test_bot as test_bot
 
 
 class TestHandleMessage(test_bot.TestBot):
@@ -435,7 +424,7 @@ class TestHandleAim(test_bot.TestBot):
         self.socket.send_json(msg)
         reply = self.socket.recv_json()
         assert reply["status"] == "Error"
-        assert reply["msg"] == "Yaw angle is out of bounds"
+        assert reply["msg"] == "Yaw is out of bounds: 181"
 
     def testInvalidPitchValue(self):
         """Test aim message with out of bounds pitch value."""
@@ -445,7 +434,7 @@ class TestHandleAim(test_bot.TestBot):
         self.socket.send_json(msg)
         reply = self.socket.recv_json()
         assert reply["status"] == "Error"
-        assert reply["msg"] == "Pitch angle is out of bounds"
+        assert reply["msg"] == "Pitch is out of bounds: 181"
 
 
 @unittest.skip("Not yet implemented")

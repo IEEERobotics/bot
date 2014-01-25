@@ -20,7 +20,7 @@ class Gunner(object):
         self.logger = lib.get_logger()
 
         # Load and store configuration dict
-        self.config = lib.load_config()
+        self.config = lib.get_config()
 
         # Load and store targeting dict
         self.targ = lib.load_targeting(self.config["targeting"])
@@ -51,11 +51,11 @@ class Gunner(object):
         try:
             assert 0 <= yaw <= 180
         except AssertionError:
-            raise AssertionError("Yaw angle is out of bounds")
+            raise AssertionError("Yaw is out of bounds: {}".format(yaw))
         try:
             assert 0 <= pitch <= 180
         except AssertionError:
-            raise AssertionError("Pitch angle is out of bounds")
+            raise AssertionError("Pitch is out of bounds: {}".format(pitch))
 
         self.logger.debug("Aiming turret to ({}, {})".format(yaw, pitch))
         self.turret.yaw = yaw

@@ -2,8 +2,9 @@
 
 import time
 
-import lib.lib as lib
 from pybbb.bbb import gpio as gpio_mod
+
+import lib.lib as lib
 
 
 class WheelGun(object):
@@ -16,7 +17,7 @@ class WheelGun(object):
         self.logger = lib.get_logger()
 
         # Load and store configuration dict
-        self.config = lib.load_config()
+        self.config = lib.get_config()
         self.max_trigger_duration = float(
             self.config['gun']['max_trigger_duration'])  # 0.25 secs.
 
@@ -86,7 +87,8 @@ class WheelGun(object):
 
         """
         if self.motor_gpios["left"].value != self.motor_gpios["right"].value:
-            self.logger.warn("Left and right gun motor GPIOs are not equal.")
+            self.logger.warning(
+                "Left and right gun motor GPIOs are not equal.")
             return {"left": self.motor_gpios["left"].value,
                     "right": self.motor_gpios["right"].value}
 

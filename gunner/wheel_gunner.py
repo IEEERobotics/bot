@@ -1,8 +1,5 @@
 """Logic for firing using a wheel-based design."""
 
-from time import sleep
-
-import lib.lib as lib
 import gunner
 import hardware.wheel_gun as wgun_mod
 

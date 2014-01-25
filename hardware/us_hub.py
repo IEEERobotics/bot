@@ -14,12 +14,12 @@ class USHub(object):
         self.logger = lib.get_logger()
 
         # Load system configuration
-        config = lib.load_config()
+        config = lib.get_config()
 
-        # Create IR array objects
-        self.USs = {}
-        for us in config["ultrasonics"]:
-            self.USs[us["position"]] = us_mod.US(us["position"], us["GPIO"])
+        # Create ultrasonic sensor objects
+        self.sensors = {}
+        for name, params in config["ultrasonics"].iteritems():
+            self.sensors[name] = us_mod.US(name, params)
 
     def __str__(self):
         """Returns human-readable representation of USHub.
@@ -27,8 +27,8 @@ class USHub(object):
         :returns: Info about each ultrasonic sensor owned by this USHub.
 
         """
-        return "USHub: {}".format("; ".join(str(us)
-                                   for us in self.USs.itervalues()))
+        return "USHub: {}".format(
+            "; ".join(str(us) for us in self.sensors.itervalues()))
 
     def read_all(self):
         """Get readings from all ultrasonic sensors.
@@ -37,7 +37,7 @@ class USHub(object):
 
         """
         readings = {}
-        for position, us in self.USs.iteritems():
-            readings[positoin] = us.distance
+        for name, sensor in self.sensors.iteritems():
+            readings[name] = sensor.distance
         self.logger.debug("USHub readings: {}".format(readings))
         return readings

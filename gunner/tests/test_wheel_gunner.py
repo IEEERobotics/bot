@@ -1,21 +1,8 @@
 """Test cases for wheel gunner."""
-import sys
-import os
-import unittest
-from random import randint
 
-sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
-
-try:
-    import lib.lib as lib
-    import gunner.wheel_gunner as wg_mod
-    import tests.test_bot as test_bot
-except ImportError:
-    print "ImportError: Use `python -m unittest discover` from project root."
-    raise
-
-# Build logger
-logger = lib.get_logger()
+import lib.lib as lib
+import gunner.wheel_gunner as wg_mod
+import tests.test_bot as test_bot
 
 
 class TestAutoFire(test_bot.TestBot):

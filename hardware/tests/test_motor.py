@@ -1,21 +1,10 @@
 """Test cases for motor abstraction class."""
-import sys
-import os
-import unittest
+
 from random import randint
 
-sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
-
-try:
-    import lib.lib as lib
-    import hardware.motor as m_mod
-    import tests.test_bot as test_bot
-except ImportError:
-    print "ImportError: Use `python -m unittest discover` from project root."
-    raise
-
-# Build logger
-logger = lib.get_logger()
+import lib.lib as lib
+import hardware.motor as m_mod
+import tests.test_bot as test_bot
 
 
 class TestSpeed(test_bot.TestBot):
@@ -161,7 +150,7 @@ class TestNoDirection(test_bot.TestBot):
 
     def test_get_dir(self):
         """Get direction for a motor that should have no direction."""
-        assert self.motor.direction == None
+        assert self.motor.direction is None
 
     def test_vol(self):
         """Get velocity for a motor that has no direction."""

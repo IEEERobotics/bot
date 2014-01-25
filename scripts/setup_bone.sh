@@ -33,8 +33,10 @@ else
     exit $EX_USAGE
 fi
 
+export EDITOR=vim
+
 # Add user ncsubot
-if [[ $EUID -e 0 ]]
+if [[ $EUID -eq 0 ]]
 then
     echo -n "You ran this as root. Setup ncsubot account? [Y/n] "
     read setup_ncsubot
@@ -57,7 +59,7 @@ fi
 
 # Configure git
 echo "Configuring git..."
-if [[ $EUID -e 0 ]]
+if [[ $EUID -eq 0 ]]
 then
     echo "You ran this as root, changing user to ncsubot..."
     su ncsubot
@@ -73,9 +75,9 @@ then
     echo "Clone the code? [Y/n] "
     read get_code
 
-    if [ "$get_code" == "y" -o "$get_code" == "Y" -o $get_code == ""]
+    if [ "$get_code" == "y" -o "$get_code" == "Y" -o "$get_code" == "" ]
     then
-        if [[ $EUID -e 0 ]]
+        if [[ $EUID -eq 0 ]]
         then
             echo "You ran this as root, changing user to ncsubot..."
             su ncsubot
@@ -89,9 +91,9 @@ else
     echo "Update the code? [Y/n] "
     read update_code
 
-    if [ "$update_code" == "y" -o "$update_code" == "Y" -o $update_code == ""]
+    if [ "$update_code" == "y" -o "$update_code" == "Y" -o $update_code == "" ]
     then
-        if [[ $EUID -e 0 ]]
+        if [[ $EUID -eq 0 ]]
         then
             echo "You ran this as root, changing user to ncsubot..."
             su ncsubot
@@ -111,9 +113,9 @@ then
     echo "Clone DMCC code? [Y/n] "
     read get_dmcc_code
 
-    if [ "$get_dmcc_code" == "y" -o "$get_dmcc_code" == "Y" -o $get_dmcc_code == ""]
+    if [ "$get_dmcc_code" == "y" -o "$get_dmcc_code" == "Y" -o $get_dmcc_code == "" ]
     then
-        if [[ $EUID -e 0 ]]
+        if [[ $EUID -eq 0 ]]
         then
             echo "You ran this as root, changing user to ncsubot..."
             su ncsubot
@@ -127,9 +129,9 @@ else
     echo "Update DMCC code? [Y/n] "
     read update_dmcc_code
 
-    if [ "$update_dmcc_code" == "y" -o "$update_dmcc_code" == "Y" -o $update_dmcc_code == ""]
+    if [ "$update_dmcc_code" == "y" -o "$update_dmcc_code" == "Y" -o $update_dmcc_code == "" ]
     then
-        if [[ $EUID -e 0 ]]
+        if [[ $EUID -eq 0 ]]
         then
             echo "You ran this as root, changing user to ncsubot..."
             su ncsubot
@@ -149,10 +151,10 @@ then
     
     echo "(Re)install DMCC library? [Y/n] "
     read install_dmcc_code
-    if [ "$install_dmcc_code" == "y" -o "$install_dmcc_code" == "Y" -o $install_dmcc_code == ""]
+    if [ "$install_dmcc_code" == "y" -o "$install_dmcc_code" == "Y" -o $install_dmcc_code == "" ]
     then
         cd /home/ncsubot/DMCC_Library
-        if [[ $EUID -e 0 ]]
+        if [[ $EUID -eq 0 ]]
         then
             python setupDMCC.py install
         else

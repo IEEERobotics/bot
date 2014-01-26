@@ -1,12 +1,12 @@
 #!/bin/sh
 ### BEGIN INIT INFO
-# Provides:          masquerading 
+# Provides:          masquerade
 # Required-Start:    networking
 # Required-Stop:     $local_fs
 # Default-Start:     S
 # Default-Stop:      0 6
-# Short-Description: Turn on masquerading through eth0
-# Description: Turn on masquerading through eth0
+# Short-Description: Turn on masquerading
+# Description: Turn on masquerading
 ### END INIT INFO
 
 iptables -t nat -F

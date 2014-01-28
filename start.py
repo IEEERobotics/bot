@@ -39,6 +39,23 @@ if len(sys.argv) == 1:
     parser.print_help()
     sys.exit(1)
 
+# Build addresses of remote resources
+config = lib.get_config("config.yaml")
+api_addr = "{protocol}://{host}:{port}".format(
+    protocol=config["server_protocol"],
+    host=config["server_host"],
+    port=config["server_port"])
+
+sub_addr = "{protocol}://{host}:{port}".format(
+    protocol=config["server_protocol"],
+    host=config["server_host"],
+    port=config["pub_server_pub_port"])
+
+topic_addr = "{protocol}://{host}:{port}".format(
+    protocol=config["server_protocol"],
+    host=config["server_host"],
+    port=config["pub_server_topic_port"])
+
 # Parse the given args
 args = parser.parse_args()
 
@@ -73,23 +90,8 @@ if args.auto_client:
 
 if args.cli_client:
     print "Starting CLI client"
-    config = lib.get_config("config.yaml")
-    server_addr = "{protocol}://{host}:{port}".format(
-        protocol=config["server_protocol"],
-        host=config["server_host"],
-        port=config["server_port"])
-    
-    sub_addr = "{protocol}://{host}:{port}".format(
-        protocol=config["server_protocol"],
-        host=config["server_host"],
-        port=config["pub_server_pub_port"])
-
-    topic_addr = "{protocol}://{host}:{port}".format(
-        protocol=config["server_protocol"],
-        host=config["server_host"],
-        port=config["pub_server_topic_port"])
-    cli_client_mod.CLIClient(server_addr, sub_addr, topic_addr).cmdloop()
+    cli_client_mod.CLIClient(api_addr, sub_addr, topic_addr).cmdloop()
 
 if args.sub_client:
     print "Starting subscriber client"
-    sub_client_mod.SubClient().print_msgs()
+    sub_client_mod.SubClient(sub_addr, topic_addr).print_msgs()

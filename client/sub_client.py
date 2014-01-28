@@ -2,6 +2,7 @@
 
 import sys
 from pprint import pprint
+from time import time
 
 try:
     import zmq
@@ -26,14 +27,14 @@ class SubClient(client.Client):
         self.sub_sock = self.context.socket(zmq.SUB)
         self.sub_addr = sub_addr
         self.sub_sock.connect(self.sub_addr)
-        print "Connected to server at {}".format(
+        print "SubClient subscribed to PubServer at {}".format(
             self.sub_addr)
 
         # Build ZMQ request socket for PubServer
         self.topic_sock = self.context.socket(zmq.REQ)
         self.topic_addr = topic_addr
         self.topic_sock.connect(self.topic_addr)
-        print "Connected to server at {}".format(
+        print "SubClient can set PubServer topics at {}".format(
             self.topic_addr)
 
     def set_topics(self):
@@ -98,3 +99,15 @@ class SubClient(client.Client):
         opts = {}
         opts["topic"] = topic
         return self.send_cmd(cmd, self.topic_sock, opts)
+
+    def ping(self):
+        """Ping the remote PubServer.
+
+        :returns: Reply messages and reply time in seconds.
+
+        """
+        cmd = "ping"
+        start = time()
+        reply = self.send_cmd(cmd, self.topic_sock)
+        reply_time = time() - start
+        return reply, reply_time

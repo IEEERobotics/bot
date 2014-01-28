@@ -68,7 +68,7 @@ class ApiClient(Client):
         self.context = zmq.Context()
         self.api_sock = self.context.socket(zmq.REQ)
         self.api_sock.connect(api_addr)
-        print "Connected to server at {}".format(api_addr)
+        print "ApiClient connected to API server at {}".format(api_addr)
         self.discover()
 
     # TODO: should init/teardown be wrapped in a python context manager?

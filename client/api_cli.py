@@ -41,17 +41,17 @@ class CLIClient(cmd.Cmd):
         # Call superclass __init__
         cmd.Cmd.__init__(self)
 
-    def default(self, line):
+    def default(self, raw_args):
         """Handle dynamic command list retrieved from server.
 
-        :param line: Mandatory param for Cmd handler, not used.
-        :type line: string
+        :param raw_args: Mandatory param for Cmd handler, not used.
+        :type raw_args: string
 
         """
         try:
-            obj_name,_,rest = line.partition(' ')
+            obj_name,_,rest = raw_args.partition(' ')
         except ValueError:
-            # Tried to split line with only a single word
+            # Tried to split raw_args with only a single word
             return
         if obj_name in self.api.objects:
             method_name,_,params = rest.partition(' ')
@@ -112,11 +112,11 @@ class CLIClient(cmd.Cmd):
                 methods = [x for x in self.api.objects[obj] if x.startswith(text)]
                 return methods
 
-    def do_list(self, line):
+    def do_list(self, raw_args):
         """Provide a list of bot API objects and their methods.
 
-        :param line: Mandatory param for Cmd handler, not used.
-        :type line: string
+        :param raw_args: Mandatory param for Cmd handler, not used.
+        :type raw_args: string
 
         """
         print
@@ -128,11 +128,11 @@ class CLIClient(cmd.Cmd):
                 print "    - {}".format(method)
         print
 
-    def do_ping(self, line):
+    def do_ping(self, raw_args):
         """Ping the remote server API on the bot.
 
-        :param line: Mandatory param for Cmd handler, not used.
-        :type line: string
+        :param raw_args: Mandatory param for Cmd handler, not used.
+        :type raw_args: string
 
         """
         reply, reply_time = self.api.ping()
@@ -140,6 +140,29 @@ class CLIClient(cmd.Cmd):
             print "API response time:", reply_time*1000, "ms"
         else:
             print "Error: {}".format(reply)
+
+    def help_ping(self):
+        """Provide help message for ping command."""
+        print "ping"
+        print "\tPing remote server API (on the bot)."
+
+    def do_pping(self, raw_args):
+        """Ping the remote PubServer.
+
+        :param raw_args: Mandatory param for Cmd handler, not used.
+        :type raw_args: string
+
+        """
+        reply, reply_time = self.sub_client.ping()
+        if reply['status'] == 'success':
+            print "API response time:", reply_time*1000, "ms"
+        else:
+            print "Error: {}".format(reply)
+
+    def help_pping(self):
+        """Provide help message for pping command."""
+        print "pping"
+        print "\tPing remote PubServer (on the bot)."
 
     def do_pub_add(self, raw_args):
         """Set topics for PubServer to publish.
@@ -187,8 +210,22 @@ class CLIClient(cmd.Cmd):
         print "pub_del <topic>"
         print "\tTell PubServer to stop publishing this topic."
 
+    def do_sub(self, raw_args):
+        """Print topics subscribed to via SubClient.
+
+        :param raw_args: Mandatory param for Cmd handler, not used.
+        :type raw_args: string
+
+        """
+        self.sub_client.print_msgs()
+
     def do_die(self, raw_args):
-        """Disconnect from server and close client."""
+        """Disconnect from server and close client.
+
+        :param raw_args: Mandatory param for Cmd handler, not used.
+        :type raw_args: string
+
+        """
         print "Disconnecting..."
         self.api.cleanUp()
         print "Bye!"
@@ -199,11 +236,11 @@ class CLIClient(cmd.Cmd):
         print "die"
         print "\tDisconnect from server and close client."
 
-    def do_EOF(self, line):
+    def do_EOF(self, raw_args):
         """Cleans up when ctrl+d is used to exit client.
 
-        :param line: Mandatory param for Cmd handler, not used.
-        :type line: string
+        :param raw_args: Mandatory param for Cmd handler, not used.
+        :type raw_args: string
 
         """
         print "Disconnecting..."
@@ -214,6 +251,11 @@ class CLIClient(cmd.Cmd):
     def help_EOF(self):
         """Provide help message for EOF (ctrl+d) command."""
         print "Exit the program with ctrl+d."
+
+    def help_help(self):
+        """Provide help message for help command."""
+        print "help [command]"
+        print "\tProvide help on given command. If no param, list commands."
 
 
 if __name__ == '__main__':

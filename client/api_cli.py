@@ -5,6 +5,8 @@ import cmd
 import sys
 
 import api_client
+import sub_client
+import client
 
 
 class CLIClient(cmd.Cmd):
@@ -13,18 +15,30 @@ class CLIClient(cmd.Cmd):
 
     prompt = "bot$ "
 
-    def __init__(self, address):
+    def __init__(self, api_addr, sub_addr, topic_addr):
         """Connect to ZMQ server, general setup.
 
-        :param address: Adderess of ZMQ server to connect to.
-        :type address: string
+        :param api_addr: Adderess of ZMQ server to connect to.
+        :type api_addr: string
+        TODO
 
         """
+        # Build API client
         try:
-            self.api = api_client.ApiClient(address)
-        except Exception:
-            print "Could not connect to remote API at {}".format(address)
+            self.api = api_client.ApiClient(api_addr)
+        except Exception, e:
+            print "Couldn't build ApiClient addr:{} e:{}".format(api_addr, e)
             sys.exit(-1)
+
+        # Build sub client
+        try:
+            self.sub_client = sub_client.SubClient(sub_addr, topic_addr)
+        except Exception, e:
+            print "SubClient error sub_addr:{} topic_addr:{}, e:{}".format(
+                                                sub_addr, topic_addr, e)
+            sys.exit(-1)
+
+        # Call superclass __init__
         cmd.Cmd.__init__(self)
 
     def default(self, line):
@@ -108,7 +122,7 @@ class CLIClient(cmd.Cmd):
         print
         print "Available bot objects and methods"
         print
-        for obj_name,methods in sorted(self.api.objects.items()):
+        for obj_name, methods in sorted(self.api.objects.items()):
             print "{}:".format(obj_name)
             for method in methods:
                 print "    - {}".format(method)
@@ -121,11 +135,69 @@ class CLIClient(cmd.Cmd):
         :type line: string
 
         """
-        time, reply = self.api.ping()
+        reply, reply_time = self.api.ping()
         if reply['status'] == 'success':
-            print "API response time:", time*1000, "ms"
+            print "API response time:", reply_time*1000, "ms"
         else:
             print "Error: {}".format(reply)
+
+    def do_pub_add(self, raw_args):
+        """Set topics for PubServer to publish.
+
+        :param raw_args: Commands string with topic name to add.
+        :type raw_args: string
+
+        """
+        # Get and validate arguments
+        try:
+            topic = raw_args.split()[0]
+        except (ValueError, IndexError):
+            print "Invalid command, see help [cmd]."
+            return
+
+        print "New pub topic: {}".format(topic)
+        # Issue commands to server
+        self.sub_client.add_topic(topic)
+
+    def help_pub_add(self):
+        """Provide help message for pub_add command."""
+        print "pub_add <topic>"
+        print "\tTell PubServer to start publishing this topic."
+
+    def do_pub_del(self, raw_args):
+        """Delete topics that PubServer is publishing.
+
+        :param raw_args: Commands string with topic name to delete.
+        :type raw_args: string
+
+        """
+        # Get and validate arguments
+        try:
+            topic = raw_args.split()[0]
+        except (ValueError, IndexError):
+            print "Invalid command, see help [cmd]."
+            return
+
+        print "Deleting pub topic: {}".format(topic)
+        # Issue commands to server
+        self.sub_client.del_topic(topic)
+
+    def help_pub_del(self):
+        """Provide help message for pub_del command."""
+        print "pub_del <topic>"
+        print "\tTell PubServer to stop publishing this topic."
+
+    def do_die(self, raw_args):
+        """Disconnect from server and close client."""
+        print "Disconnecting..."
+        self.api.cleanUp()
+        print "Bye!"
+        return True
+
+    def help_die(self):
+        """Provide help message for die command."""
+        print "die"
+        print "\tDisconnect from server and close client."
 
     def do_EOF(self, line):
         """Cleans up when ctrl+d is used to exit client.

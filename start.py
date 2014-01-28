@@ -78,7 +78,17 @@ if args.cli_client:
         protocol=config["server_protocol"],
         host=config["server_host"],
         port=config["server_port"])
-    cli_client_mod.CLIClient(server_addr).cmdloop()
+    
+    sub_addr = "{protocol}://{host}:{port}".format(
+        protocol=config["server_protocol"],
+        host=config["server_host"],
+        port=config["pub_server_pub_port"])
+
+    topic_addr = "{protocol}://{host}:{port}".format(
+        protocol=config["server_protocol"],
+        host=config["server_host"],
+        port=config["pub_server_topic_port"])
+    cli_client_mod.CLIClient(server_addr, sub_addr, topic_addr).cmdloop()
 
 if args.sub_client:
     print "Starting subscriber client"

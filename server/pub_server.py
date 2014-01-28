@@ -30,17 +30,17 @@ class PubServer(threading.Thread, server.Server):
 
     publisher_prefix = "pub_"
 
-    def __init__(self, context):
+    def __init__(self, systems):
         """Override Thread.__init__, build ZMQ PUB socket."""
         # Call superclass __init__ methods
         threading.Thread.__init__(self)
         server.Server.__init__(self)
 
-        # Unpack required objects from context
-        self.gunner = context["gunner"]
-        self.follower = context["follower"]
-        self.driver = context["driver"]
-        self.ir_hub = context["ir_hub"]
+        # Unpack required objects from systems
+        self.gunner = systems["gunner"]
+        self.follower = systems["follower"]
+        self.driver = systems["driver"]
+        self.ir_hub = systems["ir_hub"]
 
         # Build ZMQ publisher socket
         self.context = zmq.Context()
@@ -72,7 +72,7 @@ class PubServer(threading.Thread, server.Server):
         self.logger.info("{} publishers registered".format(len(self.publishers)))
 
         # Topics that will be published by default.
-        self.topics = []
+        self.topics = ["turret_detail"]
 
     def run(self):
         """Check for new publisher topics, add them, publish topics.

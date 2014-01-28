@@ -13,6 +13,7 @@ sys.path = new_path + sys.path
 import lib.lib as lib
 from gunner.wheel_gunner import WheelGunner
 from follower.follower import Follower
+import pub_server as pub_server_mod
 
 
 def is_api_method(obj, name):
@@ -76,6 +77,9 @@ class ApiServer(object):
 
         self.systems = self.assign_subsystems()
         self.logger.info("API server initialized")
+
+        # Don't spawn pub_server until told to via API
+        self.pub_server = None
 
     def assign_subsystems(self):
         """Instantiates and stores references to bot specific bot subsystems.
@@ -158,6 +162,7 @@ class ApiServer(object):
         as the result.
 
         TODO(dfarrell07): Shorten summary and returns to one line.
+        TODO(dfarrell07): Any reason this shouldn't be accessible from call?
 
         """
         self.logger.debug("List of API objects requested")
@@ -226,8 +231,33 @@ class ApiServer(object):
     @lib.api_call
     def exception(self):
         """Raise a test exception which will be returned to the caller."""
-        # TODO(dfarrell07): Is this method necessary?
         raise Exception("Exception test")
+
+    @lib.api_call
+    def kill_server(self):
+        self.logger.info("Received message to die. Bye!")
+        reply = api_success("Received message to die. Bye!")
+        # Need to actually send reply here as we're about to exit
+        self.logger.debug("Sending API response: {}".format(reply))
+        self.socket.send_json(reply)
+        # TODO(dfarrell07): Better cleanup?
+        sys.exit(0)
+        
+    @lib.api_call
+    def spawn_pub_server(self):
+        """Spawn publisher thread."""
+        if self.pub_server is None:
+            self.pub_server = pub_server_mod.PubServer(self.systems)
+            # Prevent pub_server thread from blocking the process from closing
+            self.pub_server.setDaemon(True)
+            self.pub_server.start()
+            msg = "Spawned pub server"
+            self.logger.info(msg)
+            return api_success(msg)
+        else:
+            err_msg = "Pub server is already running"
+            self.logger.warning(err_msg)
+            return api_error(err_msg)
 
 
 if __name__ == '__main__':

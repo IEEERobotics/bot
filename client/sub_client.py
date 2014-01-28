@@ -16,10 +16,25 @@ class SubClient(client.Client):
 
     """Use ZMQ SUB socket to get information about the bot."""
 
-    def __init__(self):
+    def __init__(self, sub_addr, topic_addr):
         """Get logger and config, build subscribe socket and set topics."""
+        # Call superclass
         super(SubClient, self).__init__()
-        self.set_topics()
+
+        # Build ZMQ subscribe socket for PubServer
+        self.context = zmq.Context()
+        self.sub_sock = self.context.socket(zmq.SUB)
+        self.sub_addr = sub_addr
+        self.sub_sock.connect(self.sub_addr)
+        print "Connected to server at {}".format(
+            self.sub_addr)
+
+        # Build ZMQ request socket for PubServer
+        self.topic_sock = self.context.socket(zmq.REQ)
+        self.topic_addr = topic_addr
+        self.topic_sock.connect(self.topic_addr)
+        print "Connected to server at {}".format(
+            self.topic_addr)
 
     def set_topics(self):
         """Subscribe to a set of topics.
@@ -60,4 +75,26 @@ class SubClient(client.Client):
                 pprint(self.sub_sock.recv())
             except KeyboardInterrupt:
                 print "Closing SubClient"
-                sys.exit(0)
+                return
+
+    def add_topic(self, topic):
+        """"""
+        # Set our sub socket to listen for the new topic
+        self.sub_sock.setsockopt(zmq.SUBSCRIBE, topic)
+
+        # Tell the server to start publishing the new topic
+        cmd = "pub_add"
+        opts = {}
+        opts["topic"] = topic
+        return self.send_cmd(cmd, self.topic_sock, opts)
+
+    def del_topic(self, topic):
+        """"""
+        # Tell sub socket to stop listening to the given topic
+        self.sub_sock.setsockopt(zmq.UNSUBSCRIBE, topic)
+
+        # Tell the server to stop publishing the given topic
+        cmd = "pub_del"
+        opts = {}
+        opts["topic"] = topic
+        return self.send_cmd(cmd, self.topic_sock, opts)

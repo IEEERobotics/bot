@@ -271,7 +271,7 @@ class CLIClient(client.Client, cmd.Cmd):
         self.send_pub_del(topic)
 
     def help_pub_del(self):
-        """Provide help message for pub_add command."""
+        """Provide help message for pub_del command."""
         print "pub_del <topic>"
         print "\tTell PubServer to stop publishing this topic."
 

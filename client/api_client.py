@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 # TODO(dfarrell07): Module-level docstring
 
-import time
+from time import time
 import zmq
 from simplejson.decoder import JSONDecodeError
 
+from client import Client
 
-def api_method(socket, obj_name, method):
+
+def api_method(api_sock, obj_name, method):
     """Factory for ZMQ-based remote function calls.
 
-    :param socket: ZMQ socket to API server, used when this method is called.
-    :type socket: zmq.core.socket.Socket
+    :param api_sock: ZMQ socket to API server, used when this method is called.
+    :type api_sock: zmq.core.socket.Socket
     :param obj_name: Name of the remote object that contains the method.
     :type obj_name: string
     :param method: Name of the remote method to call.
@@ -24,9 +26,9 @@ def api_method(socket, obj_name, method):
         :returns: Dict result returned by server.
 
         """
-        socket.send_json({'cmd': 'call', 'opts': {'name': obj_name,
+        api_sock.send_json({'cmd': 'call', 'opts': {'name': obj_name,
                                     'func': method, 'params': kwargs}})
-        result = socket.recv_json()
+        result = api_sock.recv_json()
         return result
 
     return func
@@ -41,35 +43,38 @@ class ApiClass(object):
 
     """
 
-    def __init__(self, socket, obj_name, methods):
+    def __init__(self, api_sock, obj_name, methods):
         # TODO(dfarrell07): Docstring
         # Build ZMQ-backed API call methods for this object
         self.name = obj_name
         self.api_methods = methods
         for method in methods:
-            setattr(self, method, api_method(socket, obj_name, method))
+            setattr(self, method, api_method(api_sock, obj_name, method))
 
 
-class ApiClient(object):
+class ApiClient(Client):
 
     # TODO(dfarrell07): Docstring
 
-    def __init__(self, address='tcp://127.0.0.1:60000'):
+    def __init__(self, api_addr='tcp://127.0.0.1:60000'):
         """Build ZMQ socket, connect to API server, discover exported objects.
 
-        :param address: Address of API server to connect to via ZMQ.
-        :type address: string
+        :param api_addr: Address of API server to connect to via ZMQ.
+        :type api_addr: string
 
         """
+        # Build ZMQ socket to talk with API server
+        self.api_addr = api_addr
         self.context = zmq.Context()
-        self.socket = self.context.socket(zmq.REQ)
-        self.socket.connect(address)
+        self.api_sock = self.context.socket(zmq.REQ)
+        self.api_sock.connect(api_addr)
+        print "Connected to server at {}".format(api_addr)
         self.discover()
 
     # TODO: should init/teardown be wrapped in a python context manager?
     def cleanUp(self):
         """Tear down ZMQ socket."""
-        self.socket.close()
+        self.api_sock.close()
         self.context.term()
 
     def recv(self):
@@ -79,7 +84,7 @@ class ApiClient(object):
 
         """
         try:
-            result = self.socket.recv_json()
+            result = self.api_sock.recv_json()
         except JSONDecodeError:
             print "Non-JSON response from server"
             result = {}
@@ -92,13 +97,13 @@ class ApiClient(object):
         TODO(dfarrell07): Shorten summary, add longer note here if needed.
 
         """
-        self.socket.send_json({'cmd': 'list'})
+        self.api_sock.send_json({'cmd': 'list'})
         reply = self.recv()
         self.objects = reply.get('result', {})
         # objects is a dict indexed by object name, whose values are lists of
         # method names
         for obj_name, methods in self.objects.items():
-            setattr(self, obj_name, ApiClass(self.socket, obj_name, methods))
+            setattr(self, obj_name, ApiClass(self.api_sock, obj_name, methods))
 
     def call(self, obj, func, params = {}):
         """Call a remote API method by name.  
@@ -116,18 +121,20 @@ class ApiClient(object):
         :returns: Result dict returned by remote API server.
 
         """
-        self.socket.send_json({'cmd': 'call', 'opts': {'name': obj,
-                                            'func': func, 'params': params}})
-        result = self.socket.recv_json()
-        return result
+        opts = {}
+        opts["name"] = obj
+        opts["func"] = func
+        opts["params"] = params
+        return self.send_cmd("call", self.api_sock, opts)
 
     def ping(self):
         """Ping the remote API.
 
-        :returns: Response time in seconds, standard API response dict.
+        :returns: Reply messages and reply time in seconds.
 
         """
-        start = time.time()
-        self.socket.send_json({'cmd':'ping'})
-        reply = self.socket.recv_json()
-        return time.time() - start, reply
+        cmd = "ping"
+        start = time()
+        reply = self.send_cmd(cmd, self.api_sock)
+        reply_time = time() - start
+        return reply, reply_time

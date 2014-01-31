@@ -75,7 +75,7 @@ class ApiServer(object):
             port=self.config["server_port"])
         try:
             self.socket.bind(self.server_bind_addr)
-        except zmq.core.error.ZMQError:
+        except zmq.error.ZMQError:
             self.logger.error("ZMQ error. Is a server already running?")
             self.logger.warning("You may be connected to an old server instance.")
             sys.exit(1)

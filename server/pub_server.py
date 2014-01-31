@@ -5,6 +5,7 @@ import sys
 import os
 import threading
 from inspect import getmembers, ismethod
+from time import sleep
 
 try:
     import zmq
@@ -23,8 +24,7 @@ class PubServer(threading.Thread, server.Server):
 
     """Publish information about the status of the bot.
 
-    Note that by default, there are no topics set to publish. Clients can
-    send topics to the REP ZMQ socket owned by PubServer to set new topics.
+    Note that by default, there are no topics set to publish.
 
     """
 
@@ -51,104 +51,29 @@ class PubServer(threading.Thread, server.Server):
             port=self.config["pub_server_pub_port"])
         self.pub_sock.bind(self.pub_addr)
 
-        # Build ZMQ reply socket for setting topics
-        self.topic_sock = self.context.socket(zmq.REP)
-        self.topic_addr = "{protocol}://{host}:{port}".format(
-            protocol=self.config["server_protocol"],
-            host=self.config["server_bind_host"],
-            port=self.config["pub_server_topic_port"])
-        self.topic_sock.bind(self.topic_addr)
-
-        # Build poller and register topic socket
-        self.poller = zmq.Poller()
-        self.poller.register(self.topic_sock, zmq.POLLIN)
-
-        # Create topic -> publisher methods mapping (dict)
-        self.publishers = dict()
+        # Collect methods used to publish topics
+        self.publishers = []
         for name, method in getmembers(self, ismethod):
             if name.startswith(self.publisher_prefix):
-                topic = name.replace(self.publisher_prefix, "", 1)
-                self.publishers[topic] = method
+                self.publishers.append(method)
         self.logger.info("{} publishers registered".format(len(self.publishers)))
 
-        # Topics that will be published by default.
-        self.topics = ["turret_detail"]
-
     def run(self):
-        """Check for new publisher topics, add them, publish topics.
+        """Entry point for thread, just publishes topics.
 
         Note that this overrides Thread.run and is the entry point when
         starting this thread.
 
         """
         while True:
-            # Check if there's a new topic to add, block for 1 sec
-            socks = dict(self.poller.poll(1000))
-
-            # Check if there's a new topic add/del message
-            if self.topic_sock in socks:
-                msg = self.topic_sock.recv_json()
-                reply = self.on_message(msg)
-                self.logger.info(reply)
-                self.topic_sock.send_json(reply)
-
             # Publish topics
+            sleep(1) # Publish at 1 sec intervals
             self.publish()
 
     def publish(self):
         """Publish information about bot."""
-        for topic in self.topics:
-            self.publishers[topic]()
-
-    def handle_pub_add(self, opts):
-        """Parse message to get topic, add new topic.
-
-        :param msg: Opts received via ZMQ, including topic.
-        :type msg: dict
-        :returns: Reply message to send out ZMQ socket.
-
-        """
-        try:
-            topic = opts["topic"]
-            assert type(topic) is str
-        except KeyError:
-            self.build_reply("Error", "No 'topic' key")
-        except AssertionError:
-            self.build_reply("Error", "Topic is not a string")
-
-        # TODO: Assert that topic is valid
-
-        if topic in self.topics:
-            reply_msg = "Topic already set: {}".format(topic)
-            return self.build_reply("Error", msg=reply_msg)
-        else:
-            self.topics.append(topic)
-            reply_msg = "Topic added: {}".format(topic)
-            return self.build_reply("Success", msg=reply_msg)
-
-    def handle_pub_del(self, opts):
-        """Parse message to get topic, delete given topic.
-
-        :param msg: Opts received via ZMQ, including topic.
-        :type msg: dict
-        :returns: Reply message to send out ZMQ socket.
-
-        """
-        try:
-            topic = opts["topic"]
-            assert type(topic) is str
-        except KeyError:
-            self.build_reply("Error", "No 'topic' key")
-        except AssertionError:
-            self.build_reply("Error", "Topic is not a string")
-
-        if topic in self.topics:
-            self.topics.remove(topic)
-            reply_msg = "Topic deleted: {}".format(topic)
-            return self.build_reply("Success", msg=reply_msg)
-        else:
-            reply_msg = "Topic not set: {}".format(topic)
-            return self.build_reply("Error", msg=reply_msg)
+        for publisher in self.publishers:
+            publisher()
 
     def pub_drive_motor_br_detail(self):
         """Publish all info about back right drive motor."""

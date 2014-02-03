@@ -26,8 +26,7 @@ class Turret(object):
         return "Turret: yaw:{}, pitch:{}".format(self.servos["yaw"],
                                                  self.servos["pitch"])
 
-    @property
-    def yaw(self):
+    def get_yaw(self):
         """Getter for position in degrees of turret on x-axis.
 
         :returns: Angle in degrees of turret on x-axis.
@@ -35,8 +34,7 @@ class Turret(object):
         """
         return self.servos["yaw"].position
 
-    @yaw.setter
-    def yaw(self, angle):
+    def set_yaw(self, angle):
         """Setter for position of turret on yaw-axis.
 
         :param angle: Angle in degrees to set turret to on yaw-axis.
@@ -44,8 +42,9 @@ class Turret(object):
         """
         self.servos["yaw"].position = angle
 
-    @property
-    def pitch(self):
+    yaw = property(get_yaw, set_yaw)
+
+    def get_pitch(self):
         """Getter for position in degrees of turret on pitch-axis.
 
         :returns: Angle in degrees of turret on pitch-axis.
@@ -53,11 +52,12 @@ class Turret(object):
         """
         return self.servos["pitch"].position
 
-    @pitch.setter
-    def pitch(self, angle):
+    def set_pitch(self, angle):
         """Setter for position of turret on pitch-axis.
 
         :param angle: Angle in degrees to set turret to on pitch-axis.
 
         """
         self.servos["pitch"].position = angle
+
+    pitch = property(get_pitch, set_pitch)

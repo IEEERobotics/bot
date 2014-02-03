@@ -14,6 +14,7 @@ import lib.lib as lib
 from gunner.wheel_gunner import WheelGunner
 from follower.follower import Follower
 import pub_server as pub_server_mod
+from lib.messages import *
 
 
 def is_api_method(obj, name):
@@ -27,18 +28,10 @@ def is_api_method(obj, name):
         method = getattr(obj, name)
     except AttributeError:
         return False
-    return (ismethod(method) and hasattr(method, '__api_call'))
+    return (ismethod(method) and hasattr(method, "__api_call"))
 
 
-def api_success(msg = '', result = None):
-    return { 'status':'success', 'msg':msg, 'result':result }
-
-
-def api_error(msg = ''):
-    return { 'status':'error', 'msg': msg }
-
-
-class ApiServer(object):
+class CtrlServer(object):
 
     """Network server that introspects the bot's registered subsystem objects
     and exports selected functionality via JSON over ZeroMQ.
@@ -68,13 +61,13 @@ class ApiServer(object):
 
         # Build socket to listen for requests
         self.context = zmq.Context()
-        self.socket = self.context.socket(zmq.REP)
+        self.ctrl_sock = self.context.socket(zmq.REP)
         self.server_bind_addr = "{protocol}://{host}:{port}".format(
             protocol=self.config["server_protocol"],
             host=self.config["server_bind_host"],
             port=self.config["server_port"])
         try:
-            self.socket.bind(self.server_bind_addr)
+            self.ctrl_sock.bind(self.server_bind_addr)
         except zmq.error.ZMQError:
             self.logger.error("ZMQ error. Is a server already running?")
             self.logger.warning("You may be connected to an old server instance.")
@@ -118,16 +111,18 @@ class ApiServer(object):
                                                 self.server_bind_addr))
         while True:
             try:
-                msg = self.socket.recv_json()
+                msg = self.ctrl_sock.recv_json()
                 # TODO(dfarrell07): Document ** clearly
                 reply = self.handle_message(**msg)
-                self.logger.debug("Sending API response: {}".format(reply))
-                self.socket.send_json(reply)
+                self.logger.debug("Sending: {}".format(reply))
+                self.ctrl_sock.send_json(reply)
             except JSONDecodeError:
-                self.logger.warning("Not a JSON message!")
-                self.socket.send_json(api_error('Not a JSON message!'))
+                err_msg = "Not a JSON message!"
+                self.logger.warning(err_msg)
+                self.ctrl_sock.send_json(ctrl_error(err_msg))
             except KeyboardInterrupt:
                 self.logger.info("Exiting API server. Bye!")
+                self.clean_up()
                 sys.exit(0)
 
     def handle_message(self, cmd=None, opts={}, **extra):
@@ -147,15 +142,15 @@ class ApiServer(object):
         """
         self.logger.debug("API server received cmd: {}, opts: {}".format(
                                                                 cmd, opts))
-        if cmd == 'ping':
-            response = api_success()
-        elif cmd == 'list':
+        if cmd == "ping":
+            response = ctrl_success()
+        elif cmd == "list":
             response = self.list_callables()
-        elif cmd == 'call':
+        elif cmd == "call":
             response = self.call_func(**opts)
         else:
             self.logger.warning("Unrecognized command")
-            response = api_error('Unrecognized command')
+            response = ctrl_error("Unrecognized command")
         return response
 
     def list_callables(self):
@@ -179,9 +174,9 @@ class ApiServer(object):
                 if is_api_method(obj, member[0]):
                     methods.append(member[0])
             response[name] = methods
-        return api_success(msg='', result=response)
+        return ctrl_success(msg="", result=response)
 
-    def call_func(self, name=None, func='', params={}, **extra):
+    def call_func(self, name=None, func="", params={}, **extra):
         """Call a previously registered subsystem function by name.  Only
         methods tagged with the @api_call decorator can be called.
 
@@ -200,28 +195,28 @@ class ApiServer(object):
                 try:
                     # TODO(dfarrell07): Document this call more clearly
                     result = getattr(obj, func)(**params)
-                    return api_success('Called {}.{}'.format(name,func), result)
+                    return ctrl_success("Called {}.{}".format(name,func), result)
                 except TypeError:
                     # This exception is raised when we have a mismatch of the
                     # method's kwargs
                     # TODO: return argspec here?
-                    err_msg = 'Invalid params for {}.{}'.format(name,func)
+                    err_msg = "Invalid params for {}.{}".format(name,func)
                     self.logger.warning(err_msg)
-                    return api_error(err_msg)
+                    return ctrl_error(err_msg)
                 except Exception as e:
                     # We need to catch any exception raised by the called
                     # method and notify the client
                     err_msg = "Exception: '{}'".format(str(e))
                     self.logger.warning(err_msg)
-                    return api_error(err_msg)
+                    return ctrl_error(err_msg)
             else:
                 err_msg = "Invalid method '{}.{}'".format(name,func)
                 self.logger.warning(err_msg)
-                return api_error(err_msg)
+                return ctrl_error(err_msg)
         else:
             err_msg = "Invalid object '{}'".format(name)
             self.logger.warning(err_msg)
-            return api_error(err_msg)
+            return ctrl_error(err_msg)
 
     @lib.api_call
     def echo(self, message=None):
@@ -241,11 +236,11 @@ class ApiServer(object):
     @lib.api_call
     def kill_server(self):
         self.logger.info("Received message to die. Bye!")
-        reply = api_success("Received message to die. Bye!")
+        reply = ctrl_success("Received message to die. Bye!")
         # Need to actually send reply here as we're about to exit
-        self.logger.debug("Sending API response: {}".format(reply))
-        self.socket.send_json(reply)
-        # TODO(dfarrell07): Better cleanup?
+        self.logger.debug("Sending: {}".format(reply))
+        self.ctrl_sock.send_json(reply)
+        self.clean_up()
         sys.exit(0)
         
     @lib.api_call
@@ -258,16 +253,21 @@ class ApiServer(object):
             self.pub_server.start()
             msg = "Spawned pub server"
             self.logger.info(msg)
-            return api_success(msg)
+            return ctrl_success(msg)
         else:
             err_msg = "Pub server is already running"
             self.logger.warning(err_msg)
-            return api_error(err_msg)
+            return ctrl_error(err_msg)
+
+    def clean_up(self):
+        """Tear down ZMQ socket."""
+        self.ctrl_sock.close()
+        self.context.term()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if len(sys.argv) == 2:
-        server = ApiServer(sys.argv[1])
+        server = CtrlServer(sys.argv[1])
     else:
-        server = ApiServer()
+        server = CtrlServer()
     server.listen()

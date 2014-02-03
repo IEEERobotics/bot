@@ -109,8 +109,7 @@ class Motor(object):
             self.forward = FORWARD
             self.reverse = REVERSE
 
-    @property
-    def speed(self):
+    def get_speed(self):
         """Getter for motor's speed as % of max (same as duty cycle).
 
         :returns: Current motor speed as percent of max speed.
@@ -118,8 +117,7 @@ class Motor(object):
         """
         return int(round((self.pwm.duty / float(self.pwm.period)) * 100))
 
-    @speed.setter
-    def speed(self, speed):
+    def set_speed(self, speed):
         """Setter for motor's speed as % of max (same as duty cycle).
 
         :param speed: Speed to set motor to in % of maximum.
@@ -137,8 +135,9 @@ class Motor(object):
         self.pwm.duty = int(round((speed / 100.) * self.pwm.period))
         self.logger.debug("Updated speed {}".format(self))
 
-    @property
-    def direction(self):
+    speed = property(get_speed, set_speed)
+
+    def get_direction(self):
         """Getter for motor's direction.
 
         Motors that have no GPIO pin have no coded direction. This method
@@ -159,8 +158,7 @@ class Motor(object):
         else:
             self.logger.error("Invalid polarity: {}".format(self.gpio))
 
-    @direction.setter
-    def direction(self, direction):
+    def set_direction(self, direction):
         """Setter for motor's direction. Toggles a GPIO pin.
 
         Motors that have no GPIO pin have no coded direction. This method
@@ -186,8 +184,9 @@ class Motor(object):
         self.gpio.value = direction
         self.logger.debug("Updated direction {}".format(self))
 
-    @property
-    def velocity(self):
+    direction = property(get_direction, set_direction)
+
+    def get_velocity(self):
         """Getter for motor's velocity as % of max (+ forward, - backward).
 
         Note that directionless motors (no assigned GPIO pin) will return +.
@@ -199,3 +198,5 @@ class Motor(object):
             return self.speed
 
         return self.speed * (1 if self.gpio.value == self.forward else -1)
+
+    velocity = property(get_velocity)

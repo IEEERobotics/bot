@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Server for publishing data about the bot."""
 
 import sys
@@ -28,8 +27,6 @@ class PubServer(threading.Thread, server.Server):
 
     """
 
-    publisher_prefix = "pub_"
-
     def __init__(self, systems):
         """Override Thread.__init__, build ZMQ PUB socket."""
         # Call superclass __init__ methods
@@ -51,12 +48,28 @@ class PubServer(threading.Thread, server.Server):
             port=self.config["pub_server_pub_port"])
         self.pub_sock.bind(self.pub_addr)
 
-        # Collect methods used to publish topics
-        self.publishers = []
-        for name, method in getmembers(self, ismethod):
-            if name.startswith(self.publisher_prefix):
-                self.publishers.append(method)
-        self.logger.info("{} publishers registered".format(len(self.publishers)))
+        self.topics = {
+            "drive_motor_detail_br": self.driver.motors["back_right"].__str__,
+            "drive_motor_detail_fr": self.driver.motors["front_right"].__str__,
+            "drive_motor_detail_bl": self.driver.motors["back_left"].__str__,
+            "drive_motor_detail_fl": self.driver.motors["front_left"].__str__,
+            "drive_motor_vel_br": self.driver.motors["back_right"].get_velocity,
+            "drive_motor_vel_fr": self.driver.motors["front_right"].get_velocity,
+            "drive_motor_vel_bl": self.driver.motors["back_left"].get_velocity,
+            "drive_motor_vel_fl": self.driver.motors["front_left"].get_velocity,
+            "drive_motor_speed_br": self.driver.motors["back_right"].get_speed,
+            "drive_motor_speed_fr": self.driver.motors["front_right"].get_speed,
+            "drive_motor_speed_bl": self.driver.motors["back_left"].get_speed,
+            "drive_motor_speed_fl": self.driver.motors["front_left"].get_speed,
+            "drive_motor_dir_br": self.driver.motors["back_right"].get_direction,
+            "drive_motor_dir_fr": self.driver.motors["front_right"].get_direction,
+            "drive_motor_dir_bl": self.driver.motors["back_left"].get_direction,
+            "drive_motor_dir_fl": self.driver.motors["front_left"].get_direction,
+            "turret_detail": self.gunner.turret.__str__,
+            "turret_yaw": self.gunner.turret.get_yaw,
+            "turret_pitch": self.gunner.turret.get_pitch,
+            "ir": self.ir_hub.read_all
+        }
 
     def run(self):
         """Entry point for thread, just publishes topics.
@@ -72,116 +85,5 @@ class PubServer(threading.Thread, server.Server):
 
     def publish(self):
         """Publish information about bot."""
-        for publisher in self.publishers:
-            publisher()
-
-    def pub_drive_motor_br_detail(self):
-        """Publish all info about back right drive motor."""
-        br_motor = self.driver.motors["back_right"]
-        self.pub_sock.send("drive_motor_br_detail {}".format(br_motor))
-
-    def pub_drive_motor_fr_detail(self):
-        """Publish all info about front right drive motor."""
-        fr_motor = self.driver.motors["front_right"]
-        self.pub_sock.send("drive_motor_fr_detail {}".format(fr_motor))
-
-    def pub_drive_motor_bl_detail(self):
-        """Publish all info about back left drive motor."""
-        bl_motor = self.driver.motors["back_left"]
-        self.pub_sock.send("drive_motor_bl_detail {}".format(bl_motor))
-
-    def pub_drive_motor_fl_detail(self):
-        """Publish all info about front left drive motor."""
-        fl_motor = self.driver.motors["front_left"]
-        self.pub_sock.send("drive_motor_fl_detail {}".format(fl_motor))
-
-    # TODO: Add back once capes are installed
-    #def pub_gun_motor_detail(self):
-    #    """Publish all info about gun motors"""
-    #    for motor in self.gunner.motors:
-    #        self.pub_sock.send("gun_motor_detail {}".format(motor))
-
-    def pub_turret_detail(self):
-        """Publish all info about turret servos."""
-        self.pub_sock.send("turret_detail {}".format(self.gunner.turret))
-
-    # TODO: Add back once capes are installed
-    #def pub_gun_speed(self):
-    #    """Publish speed of gun motors."""
-    #    self.pub_sock.send("gun_speed {}".format(self.gunner.wheel_speed))
-
-    def pub_turret_yaw(self):
-        """Publish yaw angle of turret."""
-        self.pub_sock.send("turret_yaw {}".format(self.gunner.turret.yaw))
-
-    def pub_turret_pitch(self):
-        """Publish pitch angle of turret."""
-        self.pub_sock.send("turret_pitch {}".format(self.gunner.turret.pitch))
-
-    def pub_drive_motor_br_speed(self):
-        """Publish speed of back right drive motor."""
-        speed = self.driver.motors["back_right"].speed
-        self.pub_sock.send("drive_motor_br_speed {}".format(speed))
-
-    def pub_drive_motor_fr_speed(self):
-        """Publish speed of front right drive motor."""
-        speed = self.driver.motors["front_right"].speed
-        self.pub_sock.send("drive_motor_fr_speed {}".format(speed))
-
-    def pub_drive_motor_bl_speed(self):
-        """Publish speed of back left drive motor."""
-        speed = self.driver.motors["back_left"].speed
-        self.pub_sock.send("drive_motor_bl_speed {}".format(speed))
-
-    def pub_drive_motor_fl_speed(self):
-        """Publish speed of front left drive motor."""
-        speed = self.driver.motors["front_left"].speed
-        self.pub_sock.send("drive_motor_fl_speed {}".format(speed))
-
-    def pub_drive_motor_br_dir(self):
-        """Publish direction of back right drive motor."""
-        direction = self.driver.motors["back_right"].direction
-        self.pub_sock.send("drive_motor_br_dir {}".format(direction))
-
-    def pub_drive_motor_fr_dir(self):
-        """Publish direction of front right drive motor."""
-        direction = self.driver.motors["front_right"].direction
-        self.pub_sock.send("drive_motor_fr_dir {}".format(direction))
-
-    def pub_drive_motor_bl_dir(self):
-        """Publish direction of back left drive motor."""
-        direction = self.driver.motors["back_left"].direction
-        self.pub_sock.send("drive_motor_bl_dir {}".format(direction))
-
-    def pub_drive_motor_fl_dir(self):
-        """Publish direction of front left drive motor."""
-        direction = self.driver.motors["front_left"].direction
-        self.pub_sock.send("drive_motor_fl_dir {}".format(direction))
-
-    def pub_drive_motor_br_vel(self):
-        """Publish velocity of back right drive motor."""
-        velocity = self.driver.motors["back_right"].velocity
-        self.pub_sock.send("drive_motor_br_vel {}".format(velocity))
-
-    def pub_drive_motor_fr_vel(self):
-        """Publish velocity of front right drive motor."""
-        velocity = self.driver.motors["front_right"].velocity
-        self.pub_sock.send("drive_motor_fr_vel {}".format(velocity))
-
-    def pub_drive_motor_bl_vel(self):
-        """Publish velocity of back left drive motor."""
-        velocity = self.driver.motors["back_left"].velocity
-        self.pub_sock.send("drive_motor_bl_vel {}".format(velocity))
-
-    def pub_drive_motor_fl_vel(self):
-        """Publish velocity of front left drive motor."""
-        velocity = self.driver.motors["front_left"].velocity
-        self.pub_sock.send("drive_motor_fl_vel {}".format(velocity))
-
-    def pub_irs(self):
-        """Publish IR readings from all sensors."""
-        reading = self.ir_hub.read_all()
-        self.pub_sock.send("ir_front {}".format(reading["front"]))
-        self.pub_sock.send("ir_back {}".format(reading["back"]))
-        self.pub_sock.send("ir_left {}".format(reading["left"]))
-        self.pub_sock.send("ir_right {}".format(reading["right"]))
+        for topic_name, topic_val in self.topics.iteritems():
+            self.pub_sock.send("{} {}".format(topic_name, topic_val()))

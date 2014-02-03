@@ -13,6 +13,7 @@ import lib.lib as lib
 import tests.test_bot as test_bot
 
 
+@unittest.skip("Not meant to work on API branch.")
 class TestHandleMessage(test_bot.TestBot):
 
     """Basic tests handle message method."""
@@ -79,6 +80,7 @@ class TestHandleMessage(test_bot.TestBot):
         assert reply["msg"] == "Unknown cmd: wrong_cmd"
 
 
+@unittest.skip("Not meant to work on API branch.")
 class TestHandleFwdStrafeTurn(test_bot.TestBot):
 
     """Test fwd, strafe and turn commands.
@@ -124,6 +126,7 @@ class TestHandleFwdStrafeTurn(test_bot.TestBot):
         assert reply["result"] == msg["opts"]
 
 
+@unittest.skip("Not meant to work on API branch.")
 class TestHandleMove(test_bot.TestBot):
 
     """Test move commands."""
@@ -225,6 +228,7 @@ class TestHandleMove(test_bot.TestBot):
         assert reply["msg"] == "Angle is out of bounds"
 
 
+@unittest.skip("Not meant to work on API branch.")
 class TestHandleRotate(test_bot.TestBot):
 
     """Test rotate commands."""
@@ -296,6 +300,7 @@ class TestHandleRotate(test_bot.TestBot):
         assert reply["msg"] == "Rotate speed is out of bounds"
 
 
+@unittest.skip("Not meant to work on API branch.")
 class TestHandleAutoFire(test_bot.TestBot):
 
     """Test auto_fire command."""
@@ -336,6 +341,7 @@ class TestHandleAutoFire(test_bot.TestBot):
         assert reply["result"] == "Fired"
 
 
+@unittest.skip("Not meant to work on API branch.")
 class TestHandleAim(test_bot.TestBot):
 
     """Test turret aiming commands."""

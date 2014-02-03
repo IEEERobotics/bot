@@ -1,41 +1,42 @@
 #!/usr/bin/env python 
-"""Send commands to the bot's API server through a generated CLI interface."""
+"""Send commands to the bot through a CLI interface."""
 
 import cmd
 import sys
 
-import api_client
-import sub_client
-import client
+import client.ctrl_client as ctrl_client_mod
+import client.sub_client as sub_client_mod
 
 
-class CLIClient(cmd.Cmd):
+class CLI(cmd.Cmd):
 
-    """Simple CLI client to the ZMQ API server running on the bot."""
+    """CLI for interacting with the bot."""
 
     prompt = "bot$ "
 
-    def __init__(self, api_addr, sub_addr, topic_addr):
+    def __init__(self, ctrl_addr, sub_addr):
         """Connect to ZMQ server, general setup.
 
-        :param api_addr: Adderess of ZMQ server to connect to.
-        :type api_addr: string
-        TODO
+        We're not using a logger or config here to reduce dependencies.
+
+        :param ctrl_addr: Address of control server to connect to via ZMQ.
+        :type ctrl_addr: string
+        :param sub_addr: Address of PUB/SUB server to connect to via ZMQ.
+        :type sub_addr: string
 
         """
-        # Build API client
+        # Build control client
         try:
-            self.api = api_client.ApiClient(api_addr)
+            self.ctrl_client = ctrl_client_mod.CtrlClient(ctrl_addr)
         except Exception, e:
-            print "Couldn't build ApiClient addr:{} e:{}".format(api_addr, e)
+            print "Couldn't build CtrlClient addr:{} e:{}".format(ctrl_addr, e)
             sys.exit(-1)
 
         # Build sub client
         try:
-            self.sub_client = sub_client.SubClient(sub_addr, topic_addr)
+            self.sub_client = sub_client_mod.SubClient(sub_addr)
         except Exception, e:
-            print "SubClient error sub_addr:{} topic_addr:{}, e:{}".format(
-                                                sub_addr, topic_addr, e)
+            print "SubClient error sub_addr:{}, error:{}".format(sub_addr, e)
             sys.exit(-1)
 
         # Call superclass __init__
@@ -53,9 +54,9 @@ class CLIClient(cmd.Cmd):
         except ValueError:
             # Tried to split raw_args with only a single word
             return
-        if obj_name in self.api.objects:
+        if obj_name in self.ctrl_client.objects:
             method_name,_,params = rest.partition(' ')
-            if method_name in self.api.objects[obj_name]:
+            if method_name in self.ctrl_client.objects[obj_name]:
                 try:
                     def str2param(s):
                         """Quick and dirty heuristic-based string conversion.
@@ -77,7 +78,7 @@ class CLIClient(cmd.Cmd):
                 except ValueError:
                     print "Bad parameter value"
                     return
-                result = self.api.call(obj_name, method_name, param_dict)
+                result = self.ctrl_client.call(obj_name, method_name, param_dict)
                 print "-->", result
             else:
                 print "Unknown API method:", method_name
@@ -106,10 +107,10 @@ class CLIClient(cmd.Cmd):
     def completedefault(self, text, line, begidx, endidx):
         # TODO(dfarrell07): Add docstring
         obj, _, rest = line.partition(' ')
-        if obj in self.api.objects:
+        if obj in self.ctrl_client.objects:
             method, _, params = rest.strip().partition(' ')
             if method == text:  # FIXME: this should actually verify index postion
-                methods = [x for x in self.api.objects[obj] if x.startswith(text)]
+                methods = [x for x in self.ctrl_client.objects[obj] if x.startswith(text)]
                 return methods
 
     def do_list(self, raw_args):
@@ -122,50 +123,41 @@ class CLIClient(cmd.Cmd):
         print
         print "Available bot objects and methods"
         print
-        for obj_name, methods in sorted(self.api.objects.items()):
+        for obj_name, methods in sorted(self.ctrl_client.objects.items()):
             print "{}:".format(obj_name)
             for method in methods:
                 print "    - {}".format(method)
         print
 
+    def help_list(self):
+        """Provide help message for list command."""
+        print "list"
+        print "\tList on-bot objects and methods exposed by the API."
+
     def do_ping(self, raw_args):
-        """Ping the remote server API on the bot.
+        """Ping the control server on the bot.
 
         :param raw_args: Mandatory param for Cmd handler, not used.
         :type raw_args: string
 
         """
-        reply, reply_time = self.api.ping()
-        if reply['status'] == 'success':
-            print "API response time:", reply_time*1000, "ms"
+        reply, reply_time = self.ctrl_client.ping()
+        if reply["type"] == "ctrl_success":
+            print "Ctrl server response time:", reply_time*1000, "ms"
         else:
             print "Error: {}".format(reply)
 
     def help_ping(self):
         """Provide help message for ping command."""
         print "ping"
-        print "\tPing remote server API (on the bot)."
+        print "\tPing the control server on the bot."
 
-    def do_pping(self, raw_args):
-        """Ping the remote PubServer.
+    def do_sub_add(self, raw_args):
+        """Subscribe to a published topic.
 
-        :param raw_args: Mandatory param for Cmd handler, not used.
-        :type raw_args: string
-
-        """
-        reply, reply_time = self.sub_client.ping()
-        if reply['status'] == 'success':
-            print "API response time:", reply_time*1000, "ms"
-        else:
-            print "Error: {}".format(reply)
-
-    def help_pping(self):
-        """Provide help message for pping command."""
-        print "pping"
-        print "\tPing remote PubServer (on the bot)."
-
-    def do_pub_add(self, raw_args):
-        """Set topics for PubServer to publish.
+        Note that with ZMQ (libzmq) versions >= 3.0, topics that are not
+        subscribed to by any client are not published (done automatically
+        at the server).
 
         :param raw_args: Commands string with topic name to add.
         :type raw_args: string
@@ -177,20 +169,21 @@ class CLIClient(cmd.Cmd):
         except (ValueError, IndexError):
             print "Invalid command, see help [cmd]."
             return
-
-        print "New pub topic: {}".format(topic)
-        # Issue commands to server
         self.sub_client.add_topic(topic)
 
-    def help_pub_add(self):
-        """Provide help message for pub_add command."""
-        print "pub_add <topic>"
-        print "\tTell PubServer to start publishing this topic."
+    def help_sub_add(self):
+        """Provide help message for sub_add command."""
+        print "sub_add <topic>"
+        print "\tSubscribe to a published topic."
 
-    def do_pub_del(self, raw_args):
-        """Delete topics that PubServer is publishing.
+    def do_sub_del(self, raw_args):
+        """Unsubscribe from a published topic.
 
-        :param raw_args: Commands string with topic name to delete.
+        Note that with ZMQ (libzmq) versions >= 3.0, topics that are not
+        subscribed to by any client are not published (done automatically
+        at the server).
+
+        :param raw_args: Commands string with topic name to unsubscribe from.
         :type raw_args: string
 
         """
@@ -200,15 +193,12 @@ class CLIClient(cmd.Cmd):
         except (ValueError, IndexError):
             print "Invalid command, see help [cmd]."
             return
-
-        print "Deleting pub topic: {}".format(topic)
-        # Issue commands to server
         self.sub_client.del_topic(topic)
 
-    def help_pub_del(self):
-        """Provide help message for pub_del command."""
-        print "pub_del <topic>"
-        print "\tTell PubServer to stop publishing this topic."
+    def help_sub_del(self):
+        """Provide help message for sub_del command."""
+        print "sub_del <topic>"
+        print "\tUnsubscribe from a published topic."
 
     def do_sub(self, raw_args):
         """Print topics subscribed to via SubClient.
@@ -219,22 +209,28 @@ class CLIClient(cmd.Cmd):
         """
         self.sub_client.print_msgs()
 
+    def help_sub(self):
+        """Provide help message for sub command."""
+        print "sub"
+        print "\tPrint messages subscribed to. Ctrl+c to exit."
+
     def do_die(self, raw_args):
-        """Disconnect from server and close client.
+        """Disconnect from servers and close CLI.
 
         :param raw_args: Mandatory param for Cmd handler, not used.
         :type raw_args: string
 
         """
         print "Disconnecting..."
-        self.api.cleanUp()
+        self.ctrl_client.clean_up()
+        self.sub_client.clean_up()
         print "Bye!"
         return True
 
     def help_die(self):
         """Provide help message for die command."""
         print "die"
-        print "\tDisconnect from server and close client."
+        print "\tDisconnect from servers and close CLI."
 
     def do_EOF(self, raw_args):
         """Cleans up when ctrl+d is used to exit client.
@@ -244,24 +240,26 @@ class CLIClient(cmd.Cmd):
 
         """
         print "Disconnecting..."
-        self.api.cleanUp()
+        self.ctrl_client.clean_up()
+        self.sub_client.clean_up()
         print "Bye!"
         return True
 
     def help_EOF(self):
         """Provide help message for EOF (ctrl+d) command."""
-        print "Exit the program with ctrl+d."
+        print "ctrl+d"
+        print "\tDisconnect from servers and close CLI with ctrl+d."
 
     def help_help(self):
         """Provide help message for help command."""
         print "help [command]"
-        print "\tProvide help on given command. If no param, list commands."
+        print "\tProvide help on given command. If no argument, list commands."
 
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
-        CLIClient('tcp://localhost:60000').cmdloop()
+        CLI('tcp://localhost:60000').cmdloop()
     elif ':' in sys.argv[1]:
-        CLIClient('tcp://{}'.format(sys.argv[1])).cmdloop()
+        CLI('tcp://{}'.format(sys.argv[1])).cmdloop()
     else:
-        CLIClient('tcp://{}:60000'.format(sys.argv[1])).cmdloop()
+        CLI('tcp://{}:60000'.format(sys.argv[1])).cmdloop()

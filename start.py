@@ -8,8 +8,9 @@ import sys
 from time import sleep
 
 import lib.lib as lib
-import client.api_cli as cli_client_mod
+import client.ctrl_client as ctrl_client_mod
 import client.sub_client as sub_client_mod
+import interface.cli as cli_mod
 import planner.fsm_planner as pfsm_mod
 
 # Build parser and argument groups
@@ -27,9 +28,9 @@ parser.add_argument("-t", "--tests", action="store_true",
     help="run all unit tests")
 parser.add_argument("-s", "--server", action="store_true",
     help="start server to provide interface for controlling the bot")
-client_group.add_argument("-a", "--auto-client", action="store_true",
+client_group.add_argument("-a", "--auto", action="store_true",
     help="autonomously solve the course")
-client_group.add_argument("-c", "--cli-client", action="store_true",
+client_group.add_argument("-c", "--cli", action="store_true",
     help="CLI interface for controlling the bot")
 client_group.add_argument("-u", "--sub-client", action="store_true",
     help="subscribe to bot's published information")
@@ -41,7 +42,7 @@ if len(sys.argv) == 1:
 
 # Build addresses of remote resources
 config = lib.get_config("config.yaml")
-api_addr = "{protocol}://{host}:{port}".format(
+ctrl_addr = "{protocol}://{host}:{port}".format(
     protocol=config["server_protocol"],
     host=config["server_host"],
     port=config["server_port"])
@@ -50,11 +51,6 @@ sub_addr = "{protocol}://{host}:{port}".format(
     protocol=config["server_protocol"],
     host=config["server_host"],
     port=config["pub_server_pub_port"])
-
-topic_addr = "{protocol}://{host}:{port}".format(
-    protocol=config["server_protocol"],
-    host=config["server_host"],
-    port=config["pub_server_topic_port"])
 
 # Parse the given args
 args = parser.parse_args()
@@ -80,18 +76,18 @@ if args.tests:
 
 if args.server:
     print "Starting server"
-    server = Popen(["./server/api_server.py", str(args.test_mode)])
+    server = Popen(["./server/ctrl_server.py", str(args.test_mode)])
     # Give server a chance to get up and running
     sleep(.3)
 
-if args.auto_client:
+if args.auto:
     print "Starting autonomous client"
     planner = pfsm_mod.Robot()
 
-if args.cli_client:
-    print "Starting CLI client"
-    cli_client_mod.CLIClient(api_addr, sub_addr, topic_addr).cmdloop()
+if args.cli:
+    print "Starting CLI"
+    cli_mod.CLI(ctrl_addr, sub_addr).cmdloop()
 
 if args.sub_client:
     print "Starting subscriber client"
-    sub_client_mod.SubClient(sub_addr, topic_addr).print_msgs()
+    sub_client_mod.SubClient(sub_addr).print_msgs()

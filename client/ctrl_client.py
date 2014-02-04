@@ -4,7 +4,7 @@ from time import time
 import zmq
 from simplejson.decoder import JSONDecodeError
 
-from lib.messages import *
+import lib.messages as msgs
 
 
 def api_method(ctrl_sock, obj_name, method):
@@ -23,16 +23,14 @@ def api_method(ctrl_sock, obj_name, method):
     :returns: A function that calls the specified method via the ZMQ API.
 
     """
-    def func(**kwargs):
+    def func(**params):
         """Generated function that backs up to a ZMQ call to control server.
 
         :returns: Dict result returned by server.
 
         """
-        opts = {"name": obj_name, "func": method, "params": kwargs}
-        ctrl_sock.send_json(ctrl_cmd("call", opts))
+        ctrl_sock.send_json(msgs.call_req(obj_name, method, params))
         return ctrl_sock.recv_json()
-
     return func
 
 
@@ -94,21 +92,8 @@ class CtrlClient(object):
         self.ctrl_addr = ctrl_addr
         self.ctrl_sock = self.context.socket(zmq.REQ)
         self.ctrl_sock.connect(ctrl_addr)
-        print "CtrlClient connected to CtrlServer at {}".format(ctrl_addr)
         self.discover()
-
-    def recv(self):
-        """Listen for JSON msg from server.
-
-        :returns: Msg dict from server or empty dict if msg was invalid JSON.
-
-        """
-        try:
-            result = self.ctrl_sock.recv_json()
-        except JSONDecodeError:
-            print "Non-JSON response from server"
-            result = {}
-        return result
+        print "CtrlClient connected to CtrlServer at {}".format(ctrl_addr)
 
     def discover(self):
         """Gets list of exported objects/methods, maps to local attributes.
@@ -118,12 +103,16 @@ class CtrlClient(object):
 
         """
         # Send list command to server and get response
-        self.ctrl_sock.send_json(ctrl_cmd("list"))
+        self.ctrl_sock.send_json(msgs.list_req())
         reply = self.ctrl_sock.recv_json()
 
-        # 'self.objects' is a dict indexed by object name, whose values are lists of
-        # method names.
-        self.objects = reply.get("result", {})
+        if reply["type"] != "list_reply":
+            print "Error discovering objects: {}".format(reply)
+            return False
+
+        # 'self.objects' is a dict indexed by object name, whose values
+        # are lists of method names.
+        self.objects = reply["objects"]
 
         # Creates/updates CtrlClient instance vars, giving them the
         # names of exported objects. Each stores an ApiClass that acts
@@ -132,37 +121,47 @@ class CtrlClient(object):
         for obj_name, methods in self.objects.items():
             setattr(self, obj_name, ApiClass(self.ctrl_sock, obj_name, methods))
 
-    def call(self, obj, func, params = {}):
+    def call(self, obj_name, method, params):
         """Call a remote API method by name. 
 
         This is an alternate interface to the remote API, useful when
         calling the locally constructed methods would simply add an
         extra layer of name parsing. Most useful for text-based clients.
 
-        :param obj: Remote object on which to call a function over ZMQ.
-        :type obj: string
-        :param func: Remote function to call over ZMQ.
-        :type func: string
-        :param params: Params to pass to remote function, called over ZMQ.
+        :param obj_name: Remote object on which to call a method over ZMQ.
+        :type obj_name: string
+        :param method: Remote method to call over ZMQ.
+        :type method: string
+        :param params: Params to pass to remote method, called over ZMQ.
         :type params: dict
         :returns: Result dict returned by remote control server.
 
         """
-        opts = {"name": obj, "func": func, "params": params}
-        self.ctrl_sock.send_json(ctrl_cmd("call", opts))
+        self.ctrl_sock.send_json(msgs.call_req(obj_name, method, params))
+        return self.ctrl_sock.recv_json()
+
+    def exit_server(self):
+        """Send a message to the server, asking it to die.
+
+        :returns: Reply message from the server.
+
+        """
+        self.ctrl_sock.send_json(msgs.exit_req())
         return self.ctrl_sock.recv_json()
 
     def ping(self):
         """Ping the control server.
 
-        :returns: Reply messages and reply time in seconds.
+        :returns: Reply time in milliseconds.
 
         """
         start = time()
-        self.ctrl_sock.send_json(ctrl_cmd("ping"))
+        self.ctrl_sock.send_json(msgs.ping_req())
         reply = self.ctrl_sock.recv_json()
-        reply_time = time() - start
-        return reply, reply_time
+        reply_time = (time() - start) * 1000
+        if reply["type"] != "ping_reply":
+            print "Ping failed: {}".format(reply)
+        return reply_time
 
     def clean_up(self):
         """Tear down ZMQ socket."""

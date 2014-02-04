@@ -1,38 +1,101 @@
 """Definitions of messages sent/received by clients and servers."""
 
 
-def ctrl_success(msg="", result=None):
-    """Construct message for CtrlServer-related successful responses.
+def error(msg=""):
+    """Construct message used for sending error messages
 
-    :param msg: Optional description of sucessful response.
+    :param msg: Optional error details.
     :type msg: string
-    :param result: Optional result data, like the return value of a function.
-    :type result: string
-    :returns Constructed ctrl_success dict, ready to be sent over the wire.
+    :returns: Constructed error dict, ready to be sent over the wire.
 
     """
+    return {"type": "error", "msg": msg}
 
-    return {"type": "ctrl_success", "msg": msg, "result": result}
+
+def ping_req():
+    """Construct message used when sending pings.
+
+    :returns: Constructed ping_req dict, ready to be sent over the wire.
+
+    """
+    return {"type": "ping_req"}
 
 
-def ctrl_error(msg=""):
-    """Construct message for CtrlServer-related errors.
+def ping_reply():
+    """Construct message used when replying to pings.
 
-    :param msg: Optional error message.
+    :returns: Constructed ping_reply dict, ready to be sent over the wire.
+
+    """
+    return {"type": "ping_reply"}
+
+
+def list_req():
+    """Construct message used when sending list requests to CtrlServer.
+
+    By 'list', we mean 'give me all the callable methods on your systems'.
+
+    :returns: Constructed list_req dict, ready to be sent over the wire.
+
+    """
+    return {"type": "list_req"}
+
+
+def list_reply(objects):
+    """Construct message used by CtrlServer when replying to list requests.
+
+    By 'list', we mean 'give me all the callable methods on your systems'.
+
+    :param objects: Dict of subsystem object names to their callable methods.
+    :type objects: dict
+    :returns: Constructed list_reply dict, ready to be sent over the wire.
+
+    """
+    return {"type": "list_reply", "objects": objects}
+
+
+def call_req(obj_name, method, params):
+    """Construct message used when sending API calls to CtrlServer.
+
+    :param obj_name: Name of API-exported system that owns the given method.
+    :type obj_name: string
+    :param method: API-exported method to call on the given object.
+    :type method: string
+    :param params: Params to pass to the given method.
+    :type params: dict
+    :returns: Constructed call_req dict, ready to be sent over the wire.
+
+    """
+    return {
+        "type": "call_req",
+        "obj_name": obj_name,
+        "method": method,
+        "params": params
+    }
+
+
+def call_reply(msg, call_return):
+    """Construct message used by CtrlServer when replying to API calls.
+
+    :param msg: Description of API call.
     :type msg: string
-    :returns: Constructed ctrl_error dict, ready to be sent over the wire.
+    :param call_return: Return value of API call.
+    :type call_return: string
+    :returns: Constructed call_reply dict, ready to be sent over the wire.
 
     """
-    return {"type": "ctrl_error", "msg": msg}
+    return {"type": "call_reply", "msg": msg, "call_return": call_return}
 
-def ctrl_cmd(cmd, opts=None):
-    """Construct message used for sending a command to the CtrlServer.
 
-    :param cmd: Primary-key description of the type of message this is.
-    :type cmd: string
-    :param opts: Any data that needs to be passed with this message.
-    :type opts: dict
-    :returns: Constructed cmd_msg dict, ready to be sent over the wire.
+def exit_req():
+    """Construct message used when asking CtrlServer to exit.
+
+    :returns: Constructed exit_req dict, ready to be sent over the wire.
 
     """
-    return {"type": "ctrl_cmd", "cmd": cmd, "opts": opts}
+    return {"type": "exit_req"}
+
+
+def exit_reply():
+    """"""
+    return {"type": "exit_reply"}

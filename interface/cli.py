@@ -155,11 +155,8 @@ class CLI(cmd.Cmd):
         :type raw_args: string
 
         """
-        reply, reply_time = self.ctrl_client.ping()
-        if reply["type"] == "ctrl_success":
-            print "Ctrl server response time:", reply_time*1000, "ms"
-        else:
-            print "Error: {}".format(reply)
+        reply_time = self.ctrl_client.ping()
+        print "CtrlServer response time: {}ms".format(reply_time)
 
     def help_ping(self):
         """Provide help message for ping command."""
@@ -227,6 +224,20 @@ class CLI(cmd.Cmd):
         """Provide help message for sub command."""
         print "sub"
         print "\tPrint messages subscribed to. Ctrl+c to exit."
+
+    def do_exit_ctrl(self, raw_args):
+        """Send message to CtrlServer, asking it to exit.
+
+        :param raw_args: Mandatory param for Cmd handler, not used.
+        :type raw_args: string
+
+        """
+        self.ctrl_client.exit_server()
+
+    def help_exit_ctrl(self):
+        """Provide help message for exit_ctrl command."""
+        print "exit_ctrl"
+        print "\tAsk the CtrlServer to exit."
 
     def do_die(self, raw_args):
         """Disconnect from servers and close CLI.

@@ -14,7 +14,7 @@ import lib.lib as lib
 from gunner.wheel_gunner import WheelGunner
 from follower.follower import Follower
 import pub_server as pub_server_mod
-from lib.messages import *
+import lib.messages as msgs
 
 
 def is_api_method(obj, name):
@@ -121,7 +121,7 @@ class CtrlServer(object):
             except JSONDecodeError:
                 err_msg = "Not a JSON message!"
                 self.logger.warning(err_msg)
-                self.ctrl_sock.send_json(ctrl_error(err_msg))
+                self.ctrl_sock.send_json(msgs.error(err_msg))
             except KeyboardInterrupt:
                 self.logger.info("Exiting control server. Bye!")
                 self.clean_up()
@@ -135,30 +135,41 @@ class CtrlServer(object):
 
         :param msg: Message, received via ZMQ from client, to handle.
         :type msg: dict
-        :returns: A standard ctrl message response dict.
+        :returns: A standard ctrl message reply dict.
 
         """
         self.logger.debug("Received: {}".format(msg))
 
         try:
-            if msg["type"] != "ctrl_cmd":
-                return ctrl_error("CtrlServer expects ctrl_cmd messages")
-            cmd = msg["cmd"]
-            opts = msg["opts"]
+            msg_type = msg["type"]
         except KeyError as e:
-            return ctrl_error(e)
+            return msgs.error(e)
 
-        if cmd == "ping":
-            response = ctrl_success("Ping reply")
-        elif cmd == "list":
-            response = self.list_callables()
-        elif cmd == "call":
-            response = self.call_func(**opts)
+        if msg_type == "ping_req":
+            reply = msgs.ping_reply()
+        elif msg_type == "list_req":
+            reply = self.list_callables()
+        elif msg_type == "call_req":
+            try:
+                obj_name = msg["obj_name"]
+                method = msg["method"]
+                params = msg["params"]
+                reply = self.call_method(obj_name, method, params)
+            except KeyError as e:
+                return msgs.error(e)
+        elif msg_type == "exit_req":
+            self.logger.info("Received message to die. Bye!")
+            reply = msgs.exit_reply()
+            # Need to actually send reply here as we're about to exit
+            self.logger.debug("Sending: {}".format(reply))
+            self.ctrl_sock.send_json(reply)
+            self.clean_up()
+            sys.exit(0)
         else:
-            err_msg = "Unrecognized command"
+            err_msg = "Unrecognized message: {}".format(msg)
             self.logger.warning(err_msg)
-            response = ctrl_error(err_msg)
-        return response
+            reply = msgs.error(err_msg)
+        return reply
 
     def list_callables(self):
         """Build list of callable methods on each exported subsystem object.
@@ -167,10 +178,11 @@ class CtrlServer(object):
         registered subsystem object. Only methods which are flagged using the
         @lib.api_call decorator will be included.
 
-        :returns: ctrl_success msg with callable objects and their methods.
+        :returns: list_reply message with callable objects and their methods.
 
         """
         self.logger.debug("List of callable API objects requested")
+        # Dict of subsystem object names to their callable methods.
         callables = {}
         for name, obj in self.systems.items():
             methods = []
@@ -179,52 +191,50 @@ class CtrlServer(object):
                 if is_api_method(obj, member[0]):
                     methods.append(member[0])
             callables[name] = methods
-        msg = "Dict of subsystem object names to their callable methods."
-        return ctrl_success(msg, result=callables)
+        return msgs.list_reply(callables)
 
-    def call_func(self, name=None, func="", params={}, **extra):
-        """Call a previously registered subsystem function by name. Only
+    def call_method(self, name, method, params):
+        """Call a previously registered subsystem method by name. Only
         methods tagged with the @api_call decorator can be called.
 
         :param name: Assigned name of the registered subsystem.
         :type name: string
-        :param func: Subsystem method to be called.
-        :type func: string
-        :param params: Additional parameters for the called function.
+        :param method: Subsystem method to be called.
+        :type method: string
+        :param params: Additional parameters for the called method.
         :type params: dict
-        :returns: Success/error message dict to be sent to caller.
+        :returns: call_reply or error message dict to be sent to caller.
 
         """
-        self.logger.debug("API call to: {}.{}({})".format(name, func, params))
+        self.logger.debug("API call to: {}.{}({})".format(name, method, params))
         if name in self.systems:
             obj = self.systems[name]
-            if is_api_method(obj, func):
+            if is_api_method(obj, method):
                 try:
-                    # Calls given obj.func, unpacking and passing params dict
-                    call_result = getattr(obj, func)(**params)
-                    msg = "Called {}.{}".format(name, func)
-                    return ctrl_success(msg, call_result)
+                    # Calls given obj.method, unpacking and passing params dict
+                    call_return = getattr(obj, method)(**params)
+                    msg = "Called {}.{}".format(name, method)
+                    self.logger.debug(msg + ",returned:{}".format(call_return))
+                    return msgs.call_reply(msg, call_return)
                 except TypeError:
-                    # This exception is raised when we have a mismatch of the
-                    # method's kwargs
-                    # TODO: return argspec here?
-                    err_msg = "Invalid params for {}.{}".format(name, func)
+                    # Raised when we have a mismatch of the method's kwargs
+                    # TODO: Return argspec here?
+                    err_msg = "Invalid params for {}.{}".format(name, method)
                     self.logger.warning(err_msg)
-                    return ctrl_error(err_msg)
+                    return msgs.error(err_msg)
                 except Exception as e:
-                    # We need to catch any exception raised by the called
-                    # method and notify the client
+                    # Catch exception raised by called method, notify client
                     err_msg = "Exception: '{}'".format(str(e))
                     self.logger.warning(err_msg)
-                    return ctrl_error(err_msg)
+                    return msgs.error(err_msg)
             else:
-                err_msg = "Invalid method: '{}.{}'".format(name, func)
+                err_msg = "Invalid method: '{}.{}'".format(name, method)
                 self.logger.warning(err_msg)
-                return ctrl_error(err_msg)
+                return msgs.error(err_msg)
         else:
             err_msg = "Invalid object: '{}'".format(name)
             self.logger.warning(err_msg)
-            return ctrl_error(err_msg)
+            return msgs.error(err_msg)
 
     @lib.api_call
     def echo(self, msg=None):
@@ -242,17 +252,6 @@ class CtrlServer(object):
         raise Exception("Exception test")
 
     @lib.api_call
-    def kill_server(self):
-        exit_msg = "Received message to die. Bye!"
-        self.logger.info(exit_msg)
-        reply = ctrl_success(exit_msg)
-        # Need to actually send reply here as we're about to exit
-        self.logger.debug("Sending: {}".format(reply))
-        self.ctrl_sock.send_json(reply)
-        self.clean_up()
-        sys.exit(0)
-
-    @lib.api_call
     def spawn_pub_server(self):
         """Spawn publisher thread."""
         if self.pub_server is None:
@@ -262,11 +261,11 @@ class CtrlServer(object):
             self.pub_server.start()
             msg = "Spawned pub server"
             self.logger.info(msg)
-            return ctrl_success(msg)
+            return msg
         else:
-            err_msg = "Pub server is already running"
+            err_msg = "PubServer is already running"
             self.logger.warning(err_msg)
-            return ctrl_error(err_msg)
+            return err_msg
 
     def clean_up(self):
         """Tear down ZMQ socket."""

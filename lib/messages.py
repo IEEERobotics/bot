@@ -2,7 +2,16 @@
 
 
 def ctrl_success(msg="", result=None):
-    """"""
+    """Construct message for CtrlServer-related successful responses.
+
+    :param msg: Optional description of sucessful response.
+    :type msg: string
+    :param result: Optional result data, like the return value of a function.
+    :type result: string
+    :returns Constructed ctrl_success dict, ready to be sent over the wire.
+
+    """
+
     return {"type": "ctrl_success", "msg": msg, "result": result}
 
 
@@ -26,4 +35,4 @@ def ctrl_cmd(cmd, opts=None):
     :returns: Constructed cmd_msg dict, ready to be sent over the wire.
 
     """
-    return {"type": "cmd_msg", "cmd": cmd, "opts": opts}
+    return {"type": "ctrl_cmd", "cmd": cmd, "opts": opts}

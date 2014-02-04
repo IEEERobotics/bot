@@ -3,7 +3,6 @@
 import sys
 import os
 import threading
-from inspect import getmembers, ismethod
 from time import sleep
 
 try:
@@ -12,14 +11,10 @@ except ImportError:
     sys.stderr.write("ERROR: Failed to import zmq. Is it installed?")
     raise
 
-new_path = [os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")]
-sys.path = new_path + sys.path
-
 import lib.lib as lib
-import server.server as server
 
 
-class PubServer(threading.Thread, server.Server):
+class PubServer(threading.Thread):
 
     """Publish information about the status of the bot.
 
@@ -27,11 +22,22 @@ class PubServer(threading.Thread, server.Server):
 
     """
 
+    # How often topics are published, in seconds.
+    pub_delay = 1
+
     def __init__(self, systems):
-        """Override Thread.__init__, build ZMQ PUB socket."""
+        """Override Thread.__init__, build ZMQ PUB socket.
+
+        :param systems: Objects that own resources and drive functionally.
+        :type systems: dict
+
+        """
         # Call superclass __init__ methods
         threading.Thread.__init__(self)
-        server.Server.__init__(self)
+
+        # Load configuration and logger
+        self.config = lib.get_config()
+        self.logger = lib.get_logger()
 
         # Unpack required objects from systems
         self.gunner = systems["gunner"]
@@ -45,9 +51,11 @@ class PubServer(threading.Thread, server.Server):
         self.pub_addr = "{protocol}://{host}:{port}".format(
             protocol=self.config["server_protocol"],
             host=self.config["server_bind_host"],
-            port=self.config["pub_server_pub_port"])
+            port=self.config["pub_server_port"])
         self.pub_sock.bind(self.pub_addr)
 
+        # Mapping of published topics to methods that give their value
+        # I know some of these lines are too long. Fuck it, it's clean code.
         self.topics = {
             "drive_motor_detail_br": self.driver.motors["back_right"].__str__,
             "drive_motor_detail_fr": self.driver.motors["front_right"].__str__,
@@ -80,7 +88,7 @@ class PubServer(threading.Thread, server.Server):
         """
         while True:
             # Publish topics
-            sleep(1) # Publish at 1 sec intervals
+            sleep(self.pub_delay)
             self.publish()
 
     def publish(self):

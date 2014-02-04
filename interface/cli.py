@@ -3,7 +3,11 @@
 
 import cmd
 import sys
+import os
 
+# These paths will need to be changed if this is running ouside of the repo
+new_path = [os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")]
+sys.path = new_path + sys.path
 import client.ctrl_client as ctrl_client_mod
 import client.sub_client as sub_client_mod
 
@@ -25,6 +29,9 @@ class CLI(cmd.Cmd):
         :type sub_addr: string
 
         """
+        # Call superclass __init__
+        cmd.Cmd.__init__(self)
+
         # Build control client
         try:
             self.ctrl_client = ctrl_client_mod.CtrlClient(ctrl_addr)
@@ -39,9 +46,6 @@ class CLI(cmd.Cmd):
             print "SubClient error sub_addr:{}, error:{}".format(sub_addr, e)
             sys.exit(-1)
 
-        # Call superclass __init__
-        cmd.Cmd.__init__(self)
-
     def default(self, raw_args):
         """Handle dynamic command list retrieved from server.
 
@@ -49,20 +53,17 @@ class CLI(cmd.Cmd):
         :type raw_args: string
 
         """
-        try:
-            obj_name,_,rest = raw_args.partition(' ')
-        except ValueError:
-            # Tried to split raw_args with only a single word
-            return
+        obj_name, _, rest = raw_args.partition(' ')
         if obj_name in self.ctrl_client.objects:
-            method_name,_,params = rest.partition(' ')
+            method_name, _, params = rest.partition(' ')
             if method_name in self.ctrl_client.objects[obj_name]:
                 try:
                     def str2param(s):
                         """Quick and dirty heuristic-based string conversion.
 
-                        :param s: TODO
-                        :type s: TODO
+                        :param s: String to be converted to param.
+                        :type s: string
+                        :returns: Param-version of given string (like 'blah' to blah).
 
                         """
                         if s.startswith("'") and s.endswith("'"):
@@ -99,13 +100,26 @@ class CLI(cmd.Cmd):
         """
         # NB: we can't use super() here since Cmd is an old-style class
         names = cmd.Cmd.completenames(self, text, *ignored)
-        api_names = [x for x in self.api.objects.keys() if x.startswith(text)]
+        api_names = [x for x in self.ctrl_client.objects.keys() if x.startswith(text)]
         return names + api_names
 
-    # NB: The matching of the first term is done separately, using the results
-    # of Cmd.copmletenames()
     def completedefault(self, text, line, begidx, endidx):
-        # TODO(dfarrell07): Add docstring
+        """Handles completion of methods exported by API.
+
+        The matching of the first term is done separately, using the results
+        of Cmd.copmletenames()
+
+        :param text: TODO
+        :type text: TODO
+        :param line: TODO
+        :type line: TODO
+        :param begidx: TODO
+        :type begidx: TODO
+        :param endidx: TODO
+        :type endidx: TODO
+        :returns: TODO
+
+        """
         obj, _, rest = line.partition(' ')
         if obj in self.ctrl_client.objects:
             method, _, params = rest.strip().partition(' ')
@@ -232,6 +246,20 @@ class CLI(cmd.Cmd):
         print "die"
         print "\tDisconnect from servers and close CLI."
 
+    def do_shell(self, cmd):
+        """Allows normal shell commands to be run.
+
+        :param cmd: Everything after "shell" or "!", to be passed to shell.
+        :type cmd: string
+
+        """
+        os.system(cmd)
+
+    def help_shell(self):
+        """Provide help message for shell command."""
+        print "!|shell [command]"
+        print "\tSend command to underlying system shell (like Bash)."
+
     def do_EOF(self, raw_args):
         """Cleans up when ctrl+d is used to exit client.
 
@@ -258,8 +286,12 @@ class CLI(cmd.Cmd):
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
-        CLI('tcp://localhost:60000').cmdloop()
-    elif ':' in sys.argv[1]:
-        CLI('tcp://{}'.format(sys.argv[1])).cmdloop()
+        print "No ctrl_addr or sub_addr given, using tcp://localhost:60000,1"
+        CLI("tcp://localhost:60000", "tcp://localhost:60001").cmdloop()
+    elif len(sys.argv) == 3:
+        # Using given ctr_addr and sub_addr
+        ctrl_addr = sys.argv[1]
+        sub_addr = sys.argv[2]
+        CLI(ctrl_addr, sub_addr).cmdloop()
     else:
-        CLI('tcp://{}:60000'.format(sys.argv[1])).cmdloop()
+        print "Error: Expected `./cli.py [ctrl_addr sub_addr]`"

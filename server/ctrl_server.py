@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# TODO(dfarrell07): Needs module docstring
+"""Server that accepts and executes control-type commands on the bot."""
 
 import sys
 import os
@@ -20,10 +20,13 @@ from lib.messages import *
 def is_api_method(obj, name):
     """Tests whether named method exists in obj and is flagged for API export.
 
-    :param name: TODO
-    :type name: TODO
+    :param obj: API-exported object to search for the given method on.
+    :type ojb: string
+    :param name: Name of method to check for.
+    :type name: string
+    :returns: True if given method is on given obj and is exported, else False.
 
-    """ 
+    """
     try:
         method = getattr(obj, name)
     except AttributeError:
@@ -49,14 +52,14 @@ class CtrlServer(object):
 
         # Testing flag will cause objects to run on simulated hardware
         if testing:
-            self.logger.info("Server running in test mode")
+            self.logger.info("CtrlServer running in test mode")
             lib.set_testing(True)
         elif testing is None:
             self.logger.info("Defaulting to config testing flag: {}".format(
                                                     self.config["testing"]))
             lib.set_testing(self.config["testing"])
         else:
-            self.logger.info("Server running in non-test mode")
+            self.logger.info("CtrlServer running in non-test mode")
             lib.set_testing(False)
 
         # Build socket to listen for requests
@@ -65,18 +68,18 @@ class CtrlServer(object):
         self.server_bind_addr = "{protocol}://{host}:{port}".format(
             protocol=self.config["server_protocol"],
             host=self.config["server_bind_host"],
-            port=self.config["server_port"])
+            port=self.config["ctrl_server_port"])
         try:
             self.ctrl_sock.bind(self.server_bind_addr)
         except zmq.error.ZMQError:
             self.logger.error("ZMQ error. Is a server already running?")
-            self.logger.warning("You may be connected to an old server instance.")
+            self.logger.warning("May be connected to an old server instance.")
             sys.exit(1)
 
         self.systems = self.assign_subsystems()
-        self.logger.info("API server initialized")
+        self.logger.info("Control server initialized")
 
-        # Don't spawn pub_server until told to via API
+        # Don't spawn pub_server until told to
         self.pub_server = None
 
     def assign_subsystems(self):
@@ -90,7 +93,7 @@ class CtrlServer(object):
         self.follower = Follower()
 
         systems = {}
-        systems["api"] = self
+        systems["ctrl"] = self
         systems["gunner"] = self.gunner
         systems["follower"] = self.follower
         systems["driver"] = self.follower.driver
@@ -105,15 +108,14 @@ class CtrlServer(object):
         messages to a generic handler.
 
         TODO(dfarrell07): Shorten summary, add longer note here if needed.
-        
+
         """
-        self.logger.info("API server listening on {}".format(
+        self.logger.info("Control server listening on {}".format(
                                                 self.server_bind_addr))
         while True:
             try:
                 msg = self.ctrl_sock.recv_json()
-                # TODO(dfarrell07): Document ** clearly
-                reply = self.handle_message(**msg)
+                reply = self.handle_msg(msg)
                 self.logger.debug("Sending: {}".format(reply))
                 self.ctrl_sock.send_json(reply)
             except JSONDecodeError:
@@ -121,63 +123,67 @@ class CtrlServer(object):
                 self.logger.warning(err_msg)
                 self.ctrl_sock.send_json(ctrl_error(err_msg))
             except KeyboardInterrupt:
-                self.logger.info("Exiting API server. Bye!")
+                self.logger.info("Exiting control server. Bye!")
                 self.clean_up()
                 sys.exit(0)
 
-    def handle_message(self, cmd=None, opts={}, **extra):
-        """Generic message handler.  Parse primary command and call the
+    def handle_msg(self, msg):
+        """Generic message handler. Parse primary command and call the
         corresponding action.
 
         TODO(dfarrell07): Shorten summary and cmd description to one line.
 
-        :param cmd: Command decoded directly from the JSON-dictionary received
-        on the ZMQ request socket. 
-        :type cmd: string
-        :param opts: Options to pass on to the next level handler
-        :type opts: dict
-        :param extra: Additional (ignored) kwargs from dictionary expansion
-        :returns: A standard API response dict.
+        :param msg: Message, received via ZMQ from client, to handle.
+        :type msg: dict
+        :returns: A standard ctrl message response dict.
 
         """
-        self.logger.debug("API server received cmd: {}, opts: {}".format(
-                                                                cmd, opts))
+        self.logger.debug("Received: {}".format(msg))
+
+        try:
+            if msg["type"] != "ctrl_cmd":
+                return ctrl_error("CtrlServer expects ctrl_cmd messages")
+            cmd = msg["cmd"]
+            opts = msg["opts"]
+        except KeyError as e:
+            return ctrl_error(e)
+
         if cmd == "ping":
-            response = ctrl_success()
+            response = ctrl_success("Ping reply")
         elif cmd == "list":
             response = self.list_callables()
         elif cmd == "call":
             response = self.call_func(**opts)
         else:
-            self.logger.warning("Unrecognized command")
-            response = ctrl_error("Unrecognized command")
+            err_msg = "Unrecognized command"
+            self.logger.warning(err_msg)
+            response = ctrl_error(err_msg)
         return response
 
     def list_callables(self):
-        """Use introspection to create a list of callable methods for each 
-        registered subsystem object.  Only methods which are flagged using the
-        @lib.api_call decorator will be included.  
+        """Build list of callable methods on each exported subsystem object.
 
-        :returns: A standard API response dict with a dict of callable objects
-        as the result.
+        Uses introspection to create a list of callable methods for each
+        registered subsystem object. Only methods which are flagged using the
+        @lib.api_call decorator will be included.
 
-        TODO(dfarrell07): Shorten summary and returns to one line.
-        TODO(dfarrell07): Any reason this shouldn't be accessible from call?
+        :returns: ctrl_success msg with callable objects and their methods.
 
         """
-        self.logger.debug("List of API objects requested")
-        response = {}
-        for name,obj in self.systems.items():
+        self.logger.debug("List of callable API objects requested")
+        callables = {}
+        for name, obj in self.systems.items():
             methods = []
             # Filter out methods which are not explicitly flagged for export
             for member in getmembers(obj):
                 if is_api_method(obj, member[0]):
                     methods.append(member[0])
-            response[name] = methods
-        return ctrl_success(msg="", result=response)
+            callables[name] = methods
+        msg = "Dict of subsystem object names to their callable methods."
+        return ctrl_success(msg, result=callables)
 
     def call_func(self, name=None, func="", params={}, **extra):
-        """Call a previously registered subsystem function by name.  Only
+        """Call a previously registered subsystem function by name. Only
         methods tagged with the @api_call decorator can be called.
 
         :param name: Assigned name of the registered subsystem.
@@ -186,21 +192,23 @@ class CtrlServer(object):
         :type func: string
         :param params: Additional parameters for the called function.
         :type params: dict
+        :returns: Success/error message dict to be sent to caller.
 
         """
-        self.logger.debug("API call to: {}.{}({})".format(name,func,params))
+        self.logger.debug("API call to: {}.{}({})".format(name, func, params))
         if name in self.systems:
             obj = self.systems[name]
             if is_api_method(obj, func):
                 try:
-                    # TODO(dfarrell07): Document this call more clearly
-                    result = getattr(obj, func)(**params)
-                    return ctrl_success("Called {}.{}".format(name,func), result)
+                    # Calls given obj.func, unpacking and passing params dict
+                    call_result = getattr(obj, func)(**params)
+                    msg = "Called {}.{}".format(name, func)
+                    return ctrl_success(msg, call_result)
                 except TypeError:
                     # This exception is raised when we have a mismatch of the
                     # method's kwargs
                     # TODO: return argspec here?
-                    err_msg = "Invalid params for {}.{}".format(name,func)
+                    err_msg = "Invalid params for {}.{}".format(name, func)
                     self.logger.warning(err_msg)
                     return ctrl_error(err_msg)
                 except Exception as e:
@@ -210,23 +218,23 @@ class CtrlServer(object):
                     self.logger.warning(err_msg)
                     return ctrl_error(err_msg)
             else:
-                err_msg = "Invalid method '{}.{}'".format(name,func)
+                err_msg = "Invalid method: '{}.{}'".format(name, func)
                 self.logger.warning(err_msg)
                 return ctrl_error(err_msg)
         else:
-            err_msg = "Invalid object '{}'".format(name)
+            err_msg = "Invalid object: '{}'".format(name)
             self.logger.warning(err_msg)
             return ctrl_error(err_msg)
 
     @lib.api_call
-    def echo(self, message=None):
+    def echo(self, msg=None):
         """Echo a message back to the caller.
 
-        :param message: Message to be echoed back to caller, default is None.
+        :param msg: Message to be echoed back to caller, default is None.
         :returns: Message given by param, defaults to None.
 
         """
-        return message
+        return msg
 
     @lib.api_call
     def exception(self):
@@ -235,14 +243,15 @@ class CtrlServer(object):
 
     @lib.api_call
     def kill_server(self):
-        self.logger.info("Received message to die. Bye!")
-        reply = ctrl_success("Received message to die. Bye!")
+        exit_msg = "Received message to die. Bye!"
+        self.logger.info(exit_msg)
+        reply = ctrl_success(exit_msg)
         # Need to actually send reply here as we're about to exit
         self.logger.debug("Sending: {}".format(reply))
         self.ctrl_sock.send_json(reply)
         self.clean_up()
         sys.exit(0)
-        
+
     @lib.api_call
     def spawn_pub_server(self):
         """Spawn publisher thread."""

@@ -63,7 +63,6 @@ testing: false
 server_protocol: tcp
 server_bind_host: "*"  # Special hostname servers bind to, for listening on all interfaces
 server_host: 127.0.0.1  # Default hostname clients connect to
-server_port: 60000  # (Primary) ControlServer port
-pub_server_pub_port: 60001  # PubServer published bot data on this port
-pub_server_topic_port: 60002  # PubServer is told topics to set on this port
+ctrl_server_port: 60000  # Port used to send control messages to the bot
+pub_server_port: 60001  # PubServer publishes bot data on this port
 irs_per_array: 16

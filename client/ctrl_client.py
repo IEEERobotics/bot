@@ -4,8 +4,8 @@ from time import time
 import zmq
 from simplejson.decoder import JSONDecodeError
 
-import client
 from lib.messages import *
+
 
 def api_method(ctrl_sock, obj_name, method):
     """Factory for ZMQ-based remote function calls.
@@ -14,7 +14,7 @@ def api_method(ctrl_sock, obj_name, method):
     called, they pass that call on to the method they represent on the bot
     via ZMQ. They back up to a ZMQ message with the cmd key set to 'call'.
 
-    :param ctrl_sock: ZMQ socket to control server, used when this method is called.
+    :param ctrl_sock: ZMQ socket to CtrlServer, used when method is called.
     :type ctrl_sock: zmq.core.socket.Socket
     :param obj_name: Name of the remote object that contains the method.
     :type obj_name: string
@@ -29,7 +29,7 @@ def api_method(ctrl_sock, obj_name, method):
         :returns: Dict result returned by server.
 
         """
-        opts = {"name": obj_name,"func": method, "params": kwargs}
+        opts = {"name": obj_name, "func": method, "params": kwargs}
         ctrl_sock.send_json(ctrl_cmd("call", opts))
         return ctrl_sock.recv_json()
 
@@ -39,8 +39,8 @@ def api_method(ctrl_sock, obj_name, method):
 class ApiClass(object):
 
     """Interface to a specific remote server object via the API.
-    
-    This class' methods are created during initialization according 
+
+    This class' methods are created during initialization according
     to the initialization parameters.
 
     Note that 'interface' in this context has nothing to do with
@@ -65,7 +65,7 @@ class ApiClass(object):
             setattr(self, method, api_method(ctrl_sock, obj_name, method))
 
 
-class CtrlClient(client.Client):
+class CtrlClient(object):
 
     """Used to issue control commands to the robot remotely.
 
@@ -83,16 +83,14 @@ class CtrlClient(client.Client):
     """
 
     def __init__(self, ctrl_addr="tcp://127.0.0.1:60000"):
-        """Build ZMQ socket, connect to control server, discover exported objects.
+        """Build ZMQ socket, connect to CtrlServer, discover exported objects.
 
         :param ctrl_addr: Address of control server to connect to via ZMQ.
         :type ctrl_addr: string
 
         """
-        # Call superclass
-        super(CtrlClient, self).__init__()
-
         # Build ZMQ socket to talk with control server
+        self.context = zmq.Context()
         self.ctrl_addr = ctrl_addr
         self.ctrl_sock = self.context.socket(zmq.REQ)
         self.ctrl_sock.connect(ctrl_addr)
@@ -113,28 +111,33 @@ class CtrlClient(client.Client):
         return result
 
     def discover(self):
-        """Discover the remote objects exported by the control server and build a
+        """Gets list of exported objects/methods, maps to local attributes.
+        
+        Discover the remote objects exported by the control server and build a
         set of corresponding local objects that interface them. 
-
-        TODO(dfarrell07): Shorten summary, add longer note here if needed.
 
         """
         # Send list command to server and get response
         self.ctrl_sock.send_json(ctrl_cmd("list"))
         reply = self.ctrl_sock.recv_json()
 
-        # objects is a dict indexed by object name, whose values are lists of
-        # method names
+        # 'self.objects' is a dict indexed by object name, whose values are lists of
+        # method names.
         self.objects = reply.get("result", {})
+
+        # Creates/updates CtrlClient instance vars, giving them the
+        # names of exported objects. Each stores an ApiClass that acts
+        # as a local representation of that object (including its 
+        # exported methods).
         for obj_name, methods in self.objects.items():
             setattr(self, obj_name, ApiClass(self.ctrl_sock, obj_name, methods))
 
     def call(self, obj, func, params = {}):
-        """Call a remote API method by name.  
+        """Call a remote API method by name. 
 
         This is an alternate interface to the remote API, useful when
         calling the locally constructed methods would simply add an
-        extra layer of name parsing.  Most useful for text-based clients.
+        extra layer of name parsing. Most useful for text-based clients.
 
         :param obj: Remote object on which to call a function over ZMQ.
         :type obj: string

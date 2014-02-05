@@ -14,16 +14,39 @@ import client.sub_client as sub_client_mod
 
 class CLI(cmd.Cmd):
 
-    """CLI for interacting with the bot."""
+    """CLI for interacting with the bot.
+
+    Note that the architecture is that interfaces, like the Command
+    Line *Interface*, are used by agents like humans to interact
+    with the bot. For interfaces to communicate with the bot, they
+    own clients (like CtrlClient and SubClient), which know how to
+    speak ZMQ to the servers (like CtrlServer and PubServer) running on
+    the bot. Servers own systems (like gunner and driver) and known how
+    to fire commands off to those systems and/or share data about their
+    state.
+
+    """
 
     prompt = "bot$ "
 
     def __init__(self, ctrl_addr, sub_addr):
-        """Connect to ZMQ server, general setup.
+        """Build CtrlClient and SubClient, for connections to servers.
 
         We're not using a logger or config here to reduce dependencies.
 
-        TODO(dfarrell07): better docstring
+        CtrlClient is used for sending commands to the bot. Some commands,
+        like `ping`, are answered by CtrlClient directly. Others, like
+        `fire`, are actually exported methods that CtrlClient exposes
+        via the API. Those calls are passed to the relevant method of a
+        system owned by CtrlClient.
+
+        SubClient manages subscriptions to topics published by PubServer
+        on the bot. Topics can be subscribed to via `sub_add` and removed
+        via `sub_del`. To print the data being published, use `sub`.
+        Only topics that are actually subscribed to by one or more clients
+        will be published by PubServer, saving bot resources. Note that
+        PubServer isn't spawned by default when CtrlServer is created.
+        To spawn it (in its own thread), issue `ctrl spawn_pub_server`.
 
         :param ctrl_addr: Address of control server to connect to via ZMQ.
         :type ctrl_addr: string
@@ -49,21 +72,24 @@ class CLI(cmd.Cmd):
             sys.exit(-1)
 
     def default(self, raw_args):
-        """Handle dynamic command list retrieved from server.
+        """Parses API commands (ex `ctrl echo msg:7`) into calls to CtrlServer.
 
-        TODO(dfarrell07): better docstring
+        API commands are those given by the `list` command. Note that a
+        heuristic is used to convert params (like "7" in the example above)
+        into the types expected by the method that will be called and passed
+        that param by CtrlServer. It has held up well so far.
 
-        :param raw_args: Mandatory param for Cmd handler, not used.
+        :param raw_args: Command from user to be parsed/passed to CtrlServer.
         :type raw_args: string
 
         """
-        obj_name, _, rest = raw_args.partition(' ')
+        obj_name, _, rest = raw_args.partition(" ")
         if obj_name in self.ctrl_client.objects:
-            method_name, _, params = rest.partition(' ')
+            method_name, _, params = rest.partition(" ")
             if method_name in self.ctrl_client.objects[obj_name]:
                 try:
                     param_dict = {}
-                    # Split param into its key:value strs and iterate on them.
+                    # Split param into its key:value strs and iterate on them
                     for param in params.split():
                         # Split key:value param pair
                         key, value = param.split(":")
@@ -71,9 +97,7 @@ class CLI(cmd.Cmd):
                         # We need to convert param's value, which was given to
                         # this method as a string in raw_args, to the type
                         # expected by the method it will be passed to.
-                        # This is a dirty heuristic!
-                        # Exported methods should be robust enough to deal
-                        # with maybe-poorly converted params.
+                        # This is a dirty heuristic (that so far works well)!
 
                         # Try converting to int/float - easy to know if wrong
                         try:
@@ -102,45 +126,58 @@ class CLI(cmd.Cmd):
             print "Unknown command:", obj_name
 
     def completenames(self, text, *ignored):
-        """Augment Cmd.completenames() to handle the object names received
-        after querying the API.
+        """Handles tab-completion of object names exported by the API.
 
-        TODO(dfarrell07): Get first line to <=79, expand below if needed
+        Object names, like those returned by `list` (driver, gun...),
+        aren't known to Cmd.completenames. We extend it here to deal
+        with tab-completing them.
 
-        :param text: TODO
-        :type text: TODO
-        :param *ignored: TODO
-        :type *ignored: TODO
+        :param text: Text the user has type so far, to be tab-completed.
+        :type text: string
+        :param *ignored: Not documented in Cmd.completenames. No idea.
+        :type *ignored: Not documented in Cmd.completenames. Dict?
 
         """
-        # NB: we can't use super() here since Cmd is an old-style class
-        names = cmd.Cmd.completenames(self, text, *ignored)
-        api_names = [x for x in self.ctrl_client.objects.keys() if x.startswith(text)]
-        return names + api_names
+        # NB: We can't use super() here since Cmd is an old-style class
+        # Gets list of do_* methods that match what the user has typed so far
+        cmd_match_names = cmd.Cmd.completenames(self, text, *ignored)
+
+        # Need to do the same thing for exported API methods
+        # Names of objects exported by API (like driver, gunner...)
+        obj_names = self.ctrl_client.objects.keys()
+        # Build list of obj_names that start with text given by user
+        api_match_names = [x for x in obj_names if x.startswith(text)]
+        return cmd_match_names + api_match_names
 
     def completedefault(self, text, line, begidx, endidx):
-        """Handles completion of methods exported by API.
+        """Handles tab-completion of method names exported by API.
 
-        The matching of the first term is done separately, using the results
-        of Cmd.copmletenames()
+        The matching of the first term (the object name exported by the API)
+        is done separately, using the results of copmletenames().
 
-        :param text: TODO
-        :type text: TODO
-        :param line: TODO
-        :type line: TODO
-        :param begidx: TODO
-        :type begidx: TODO
-        :param endidx: TODO
-        :type endidx: TODO
-        :returns: TODO
+        :param text: Part of method name (second arg) typed so far by user.
+        :type text: string
+        :param line: Entire line typed so far by user.
+        :type line: string
+        :param begidx: Index into "line" where "text" begins.
+        :type begidx: int
+        :param endidx: Index into "line" where "text" ends.
+        :type endidx: int
+        :returns: List of exported API methods that match text given by user.
 
         """
-        obj, _, rest = line.partition(' ')
+        obj, _, rest = line.partition(" ")
         if obj in self.ctrl_client.objects:
-            method, _, params = rest.strip().partition(' ')
-            if method == text:  # FIXME: this should actually verify index postion
-                methods = [x for x in self.ctrl_client.objects[obj] if x.startswith(text)]
-                return methods
+            # If the user tries to tab-complete once they have typed
+            # `obj method par..`, "par.." being the start of a param, this
+            # line will grab the method name only, dropping the param. We
+            # can't tab-complete params at the moment (but that would be nice).
+            method, _, params = rest.strip().partition(" ")
+            # Only does this if user is tab-completing method, not params
+            if method == text:  # FIXME: Should actually verify index position
+                method_names = self.ctrl_client.objects[obj]
+                match_names = [x for x in method_names if x.startswith(text)]
+                return match_names
 
     def do_list(self, raw_args):
         """Provide a list of bot API objects and their methods.

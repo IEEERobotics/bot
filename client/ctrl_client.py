@@ -97,9 +97,9 @@ class CtrlClient(object):
 
     def discover(self):
         """Gets list of exported objects/methods, maps to local attributes.
-        
+
         Discover the remote objects exported by the control server and build a
-        set of corresponding local objects that interface them. 
+        set of corresponding local objects that interface them.
 
         """
         # Send list command to server and get response
@@ -116,13 +116,13 @@ class CtrlClient(object):
 
         # Creates/updates CtrlClient instance vars, giving them the
         # names of exported objects. Each stores an ApiClass that acts
-        # as a local representation of that object (including its 
+        # as a local representation of that object (including its
         # exported methods).
         for obj_name, methods in self.objects.items():
             setattr(self, obj_name, ApiClass(self.ctrl_sock, obj_name, methods))
 
     def call(self, obj_name, method, params):
-        """Call a remote API method by name. 
+        """Call a remote API method by name.
 
         This is an alternate interface to the remote API, useful when
         calling the locally constructed methods would simply add an

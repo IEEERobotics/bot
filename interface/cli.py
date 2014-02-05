@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 """Send commands to the bot through a CLI interface."""
 
 import cmd
@@ -22,6 +22,8 @@ class CLI(cmd.Cmd):
         """Connect to ZMQ server, general setup.
 
         We're not using a logger or config here to reduce dependencies.
+
+        TODO(dfarrell07): better docstring
 
         :param ctrl_addr: Address of control server to connect to via ZMQ.
         :type ctrl_addr: string
@@ -49,6 +51,8 @@ class CLI(cmd.Cmd):
     def default(self, raw_args):
         """Handle dynamic command list retrieved from server.
 
+        TODO(dfarrell07): better docstring
+
         :param raw_args: Mandatory param for Cmd handler, not used.
         :type raw_args: string
 
@@ -58,21 +62,32 @@ class CLI(cmd.Cmd):
             method_name, _, params = rest.partition(' ')
             if method_name in self.ctrl_client.objects[obj_name]:
                 try:
-                    def str2param(s):
-                        """Quick and dirty heuristic-based string conversion.
+                    param_dict = {}
+                    # Split param into its key:value strs and iterate on them.
+                    for param in params.split():
+                        # Split key:value param pair
+                        key, value = param.split(":")
 
-                        :param s: String to be converted to param.
-                        :type s: string
-                        :returns: Param-version of given string (like 'blah' to blah).
+                        # We need to convert param's value, which was given to
+                        # this method as a string in raw_args, to the type
+                        # expected by the method it will be passed to.
+                        # This is a dirty heuristic!
+                        # Exported methods should be robust enough to deal
+                        # with maybe-poorly converted params.
 
-                        """
-                        if s.startswith("'") and s.endswith("'"):
-                            return s[1:-1]
-                        elif '.' in s:
-                            return float(s)
-                        return int(s)
-                    # TODO(dfarrell07): Document this line, maybe make multi-line
-                    param_dict = {p.split(':')[0]: str2param(p.split(':')[1]) for p in params.split()} 
+                        # Try converting to int/float - easy to know if wrong
+                        try:
+                            if "." in value:
+                                value = float(value)
+                            else:
+                                value = int(value)
+                        except ValueError:
+                            # It wasn't an int or float, assume string
+                            # If user gave key:'value', strip '' chars
+                            if value.startswith("'") and value.endswith("'"):
+                                value = value[1:-1]
+                            # It's already type string, no need to cast
+                        param_dict[key] = value
                 except IndexError:
                     print "Bad parameter list"
                     return

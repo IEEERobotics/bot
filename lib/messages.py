@@ -97,5 +97,9 @@ def exit_req():
 
 
 def exit_reply():
-    """"""
+    """Construct message used when replying to an exit_req message.
+
+    :returns: Constructed exit_reply dict, ready to be sent over the wire.
+
+    """
     return {"type": "exit_reply"}

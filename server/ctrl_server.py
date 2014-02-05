@@ -206,7 +206,7 @@ class CtrlServer(object):
         :returns: call_reply or error message dict to be sent to caller.
 
         """
-        self.logger.debug("API call to: {}.{}({})".format(name, method, params))
+        self.logger.debug("API call: {}.{}({})".format(name, method, params))
         if name in self.systems:
             obj = self.systems[name]
             if is_api_method(obj, method):

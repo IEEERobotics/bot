@@ -19,6 +19,23 @@ class LineFollower(follower.Follower):
         super(LineFollower, self).__init__()
         self.front_pid = pid_mod.PID()
         self.back_pid = pid_mod.PID()
+        self.red_block = False
+        self.blue_block = False
+        self.intersection = False
+        self.loss_line = False
+
+    def get_red_block(self):
+        return self.red_block
+
+    def get_blue_block(self):
+        return self.blue_block
+
+    def get_intersection(self):
+        return self.intersection
+
+    def get_error_condition(self):
+        return self.loss_line
+
 
     def follow(self, state_table):
         """Used to update the motors speed and angler motion."""
@@ -37,7 +54,7 @@ class LineFollower(follower.Follower):
             self.assign_states()
             # Check for error conditions        
             if self.error != 0:
-                self.modify_run_state()
+                self.update_exit_state()
                 return
             # Get the current time of the CPU
             current_time = time()
@@ -54,8 +71,18 @@ class LineFollower(follower.Follower):
             # Take the current time set it equal to the previous time
             previous_time = current_time
         
-    def modify_run_state(self):
-        pass
+    def update_exit_state(self):
+        if(self.error == 1):
+            self.intersection = True
+        elif(self.error == 2):
+            self.loss_line = True
+        elif(self.error == 3):
+            self.loss_line = True
+        elif(self.error == 4):
+            self.loss_line = True
+        elif(self.error == 5):
+            self.loss_line = True
+        
 
     def motors(self, front_error, back_error):
         """Used to Update the motors speed and angler motion."""
@@ -87,7 +114,8 @@ class LineFollower(follower.Follower):
             # If rotate_speed is greater than 100 set to 100
             rotate_speed = 0
         # Adjust motor speeds 
-        mec_driver_mod.compound_move(translate_speed, translate_angle, rotate_speed)
+        mec_driver_mod.compound_move(
+            translate_speed, translate_angle, rotate_speed)
 
     def assign_states(self, current_ir_reading=None):
         """Take 4x16 bit arrays and assigns the array to proper orientations.
@@ -97,7 +125,7 @@ class LineFollower(follower.Follower):
         """
         # Get the current IR readings
         if current_ir_reading is None:
-            current_ir_reading = self.ir_hub.read_all_arrays()
+            current_ir_reading = self.ir_hub.read_all()
         # Heading west
         if self.heading == 0:
             # Forward is on the left side
@@ -154,41 +182,28 @@ class LineFollower(follower.Follower):
             # Right is on the back
             self.right_state = self.get_position_rl(
                 current_ir_reading["left"])
-        if self.left_state >= 16 or self.right_state >= 16:
-            self.error = -1
-        if self.front_state >= 16:
-            if(self.front_state == 16):
-                # Front lost line
+        if((self.front_state > 15) or (self.back_state > 15) or
+            (self.right_state < 16) or (self.left_state < 16)):
+            if((self.right_state < 16) or (self.left_state < 16) or 
+                (self.front_state == 17) or (self.back_state == 17)):
+                # Found Intersection
                 self.error = 1
-            elif(self.front_state == 17):
+            elif((self.back_state == 18) or (self.front_state == 18)):
+                # at high angle
+                self.error = 5
+            elif((self.front_state == 16) and (self.back_state == 16)):
+                # Front and back lost line
                 self.error = 2
-            elif(self.front_state == 18):
+            elif(self.front_state == 16):
+                # Front lost line
                 self.error = 3
-            elif(self.front_state == 19):
+            elif(self.back_state == 16):
+                # Back lost line
                 self.error = 4
         else:
             self.error = 0
-        if self.back_state >= 16:
-            if self.back_state == 16:
-                # Back lost line
-                self.error = 5
-            elif(self.back_state == 17):
-                self.error = 6
-            elif(self.back_state == 18):
-                self.error = 7
-            elif(self.back_state == 19):
-                self.error = 8
-        else:
-            self.error = 0
-        if self.front_state >= 16 and self.back_state >= 16:
-            if self.front_state == 16 and self.front_state == 16:
-                # Line lost
-                self.error = 9
-            else:
-                # Intersection found
-                self.error = 10
-        else:
-            self.error = 0
+                
+
 
     def get_position_lr(self, readings):
         """Reading the IR sensors from left to right

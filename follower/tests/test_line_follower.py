@@ -116,6 +116,7 @@ class TestLineFollower(test_bot.TestBot):
         self.assertEquals(16, self.follower.get_position_rl(fail08))
         #           1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16
         position = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        # Test good conditions for line in range
         for index, value in enumerate(position):
             position[index] =  1
             if(index > 0):
@@ -135,49 +136,128 @@ class TestLineFollower(test_bot.TestBot):
                 self.follower.get_position_rl(position))
        
     def test_assign_states(self):
-        self.follower.heading = 0
-
+        self.follower.heading = 270
+        # head in the direction of the bone
         test_array = {"front": [0] * 16, "back": [0] * 16,
             "right": [0] * 16, "left": [0] * 16}
-
+        # begin test nomarl operations and intersection detection
         for i in range(16):
             test_array["front"] = [0] * 16
             test_array["back"] = [0] * 16
+            test_array["right"] = [0] * 16
+            test_array["left"] = [0] * 16
             test_array["front"][i] = 1
             test_array["back"][i] = 1
+            # test nomarl operations
             self.follower.assign_states(test_array)
-            self.logger.info("front: {}".format(self.follower.front_state))
-            self.logger.info("back: {}".format(self.follower.back_state))
-            self.logger.info(self.follower.right_state)
-            self.logger.info(self.follower.left_state)
+            self.assertEquals(
+                (i * 2 - 15), self.follower.front_state)
+            self.assertEquals(
+                (i * 2 - 15) * -1, self.follower.back_state)
+            self.assertEquals(16, self.follower.right_state)
+            self.assertEquals(16, self.follower.left_state)
+            self.assertEquals(0, self.follower.error)
             for n in range(16):
                 test_array["right"] = [0] * 16
                 test_array["right"][n] = 1
+                self.follower.assign_states(test_array)
+                # Intersection test
+                self.assertEquals(1,self.follower.error)
             test_array["right"] = [0] * 16
             for n in range(16):
                 test_array["left"] = [0] * 16
                 test_array["left"][n] = 1
+                # Intersection test
+                self.assertEquals(1,self.follower.error)
             test_array["left"] = [0] * 16
             for n in range(16):
                 test_array["left"] = [0] * 16
                 test_array["left"][n] = 1
                 test_array["right"] = [0] * 16
                 test_array["right"][n] = 1
+                # Intersection test
+                self.assertEquals(1,self.follower.error)
             test_array["left"] = [0] * 16
             test_array["right"] = [0] * 16
             if(i != 15):
                 test_array["back"][i+1] = 1
                 test_array["front"][i+1] = 1
+                # nomarl operation
+                self.follower.assign_states(test_array)
+                self.assertEquals(
+                     (i * 2 - 15 + 1), self.follower.front_state)
+                self.assertEquals(
+                    (i * 2 - 15 + 1) * -1, self.follower.back_state)
+                self.assertEquals(16, self.follower.right_state)
+                self.assertEquals(16, self.follower.left_state)
+                self.assertEquals(0, self.follower.error)
                 for n in range(16):
                     test_array["right"] = [0] * 16
                     test_array["right"][n] = 1
+                    self.follower.assign_states(test_array)
+                    # Intersection test
+                    self.assertEquals(1,self.follower.error)
                 test_array["right"] = [0] * 16
                 for n in range(16):
                     test_array["left"] = [0] * 16
                     test_array["left"][n] = 1
+                    self.follower.assign_states(test_array)
+                    # Intersection test
+                    self.assertEquals(1,self.follower.error)
                 for n in range(16):
                     test_array["left"] = [0] * 16
                     test_array["left"][n] = 1
                     test_array["right"] = [0] * 16
                     test_array["right"][n] = 1
+                    self.follower.assign_states(test_array)
+                    # Intersection test
+                    self.assertEquals(1,self.follower.error)
+        test_array["front"] = [0] * 16
+        test_array["back"] = [0] * 16
+        test_array["right"] = [0] * 16
+        test_array["left"] = [0] * 16
+        for i in range(14):
+            test_array["front"] = [0] * 16
+            test_array["front"][i + 2] = 1
+            test_array["front"][i + 1] = 1
+            test_array["front"][i] = 1
+            self.follower.assign_states(test_array)
+            # High angle test
+            self.assertEquals(5, self.follower.error)
+        for i in range(14):
+            test_array["back"] = [0] * 16
+            test_array["back"][i + 2] = 1
+            test_array["back"][i + 1] = 1
+            test_array["back"][i] = 1
+            self.follower.assign_states(test_array)
+            # High angle test
+            self.assertEquals(5, self.follower.error)
+        for i in range(14):
+            test_array["back"] = [0] * 16
+            test_array["back"][i + 2] = 1
+            test_array["back"][i + 1] = 1
+            test_array["back"][i] = 1
+            test_array["front"] = test_array["back"]
+            self.follower.assign_states(test_array)
+            # High angle test
+            self.assertEquals(5, self.follower.error)
+        test_array["front"] = [0] * 16
+        test_array["back"] = [0] * 16
+        # Lost line test
+        self.follower.assign_states(test_array)
+        self.assertEquals(2, self.follower.error)
+        for i in range(16):
+            test_array["front"] = [0] * 16
+            test_array["front"][i] = 1
+            self.follower.assign_states(test_array)
+            # Lost back line test
+            self.assertEquals(4, self.follower.error)
+        test_array["front"] = [0] * 16
+        for i in range(16):
+            test_array["back"] = [0] * 16
+            test_array["back"][i] = 1
+            self.follower.assign_states(test_array)
+            # Lost front line test
+            self.assertEquals(3, self.follower.error)
+
 

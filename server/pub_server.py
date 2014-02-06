@@ -16,9 +16,24 @@ import lib.lib as lib
 
 class PubServer(threading.Thread):
 
-    """Publish information about the status of the bot.
+    """Publish information about the state of the bot.
 
-    Note that by default, there are no topics set to publish.
+    Note that with ZMQ (libzmq) >= 3.0, only topics that are actually
+    subscribed to will be published. In other words, topic filtering
+    happens here, at the publisher. This saves bot resources, so it's
+    strongly suggested that ZMQ >= 3.0 is used.
+
+    The PubServer is a thread, and is meant to be spawned by CtrlServer.
+
+    CtrlServer passes a dict of the bot's systems to PubServer when it's
+    created, which gives PubServer access to the state of the bot.
+
+    Note that the "ir" topic isn't quite a read-only operation, as it
+    must cycle through ADCs and actually use the IR sensors. If the bot
+    is following line, it's likely a bad idea to publish this topic.
+    Using ir_cached is an alternative, as it will returned cached IR
+    values if the are fresher than some given staleness (defaults to
+    one second). This could still cause problems, but it's less likely.
 
     """
 
@@ -76,7 +91,8 @@ class PubServer(threading.Thread):
             "turret_detail": self.gunner.turret.__str__,
             "turret_yaw": self.gunner.turret.get_yaw,
             "turret_pitch": self.gunner.turret.get_pitch,
-            "ir": self.ir_hub.read_all
+            "ir": self.ir_hub.read_all,  # May tieup IRs, bad if line following
+            "ir_cached": self.ir_hub.read_cached  # May give slightly old data
         }
 
     def run(self):
@@ -94,4 +110,8 @@ class PubServer(threading.Thread):
     def publish(self):
         """Publish information about bot."""
         for topic_name, topic_val in self.topics.iteritems():
+            # FIXME: This always calls every function.
+            # ZMQ will drop any topics that no clients are subscribed to, but
+            # the idea is to prevent these calls from being made in the first
+            # place, which is not happening (painfully obvious now).
             self.pub_sock.send("{} {}".format(topic_name, topic_val()))

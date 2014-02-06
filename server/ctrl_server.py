@@ -36,15 +36,44 @@ def is_api_method(obj, name):
 
 class CtrlServer(object):
 
-    """Network server that introspects the bot's registered subsystem objects
-    and exports selected functionality via JSON over ZeroMQ.
+    """Exports bot control via ZMQ.
 
-    TODO(dfarrell07): Shorten summary, add longer note here if needed.
+    Most functionally exported by CtrlServer is in the form of methods
+    exposed by the API. @lib.api_call decorators can be added to bot
+    systems, which tags them for export. They can then be called
+    remotely via CtrlClient, which is typically owned by an interface
+    like the CLI, which typically accepts commands from an agent like
+    a human.
+
+    Some control is exported directly by CtrlServer, not through the
+    API. For example, CtrlServer responds directly to ping messages,
+    list messages (which give the objects/methods exposed by the API),
+    and exit messages.
+
+    CtrlServer is the primary owner of bot resources, which we call
+    systems. For example, it's CtrlServer that instantiates gunner
+    and follower. Through those two, CtrlServer owns the gun, the
+    IR hub, the turret and basically every other bot system.
+
+    The messages that CtrlServer accepts and responds with are fully
+    specified in lib.messages. Make any changes to messages there.
+
+    CtrlServer can be instructed (via the API) to spawn a new thread
+    for a PubServer. When that happens, CtrlServer passes its systems
+    to PubServer, which can read their state and publish it over a
+    ZMQ PUB socket.
 
     """
 
     def __init__(self, testing=None, config_file="config.yaml"):
-        # TODO(dfarrell07): Needs docstring
+        """Build ZMQ REP socket and instantiate bot systems.
+
+        :param testing: True if running on simulated HW, False if on bot.
+        :type testing: boolean
+        :param config_file: Name of file to read configuration from.
+        :type config_file: string
+
+        """
 
         # Load configuration and logger
         self.config = lib.get_config(config_file)
@@ -83,7 +112,7 @@ class CtrlServer(object):
         self.pub_server = None
 
     def assign_subsystems(self):
-        """Instantiates and stores references to bot specific bot subsystems.
+        """Instantiates and stores references to bot subsystems.
 
         :returns: Dict of subsystems, maps system name to instantiated object.
 
@@ -104,14 +133,8 @@ class CtrlServer(object):
         return systems
 
     def listen(self):
-        """Perpetually listen for new connections and hand off well-formed
-        messages to a generic handler.
-
-        TODO(dfarrell07): Shorten summary, add longer note here if needed.
-
-        """
-        self.logger.info("Control server listening on {}".format(
-                                                self.server_bind_addr))
+        """Perpetually listen for messages, pass them to generic handler."""
+        self.logger.info("Control server: {}".format(self.server_bind_addr))
         while True:
             try:
                 msg = self.ctrl_sock.recv_json()
@@ -128,14 +151,11 @@ class CtrlServer(object):
                 sys.exit(0)
 
     def handle_msg(self, msg):
-        """Generic message handler. Parse primary command and call the
-        corresponding action.
-
-        TODO(dfarrell07): Shorten summary and cmd description to one line.
+        """Generic message handler. Hands-off based on type of message.
 
         :param msg: Message, received via ZMQ from client, to handle.
         :type msg: dict
-        :returns: A standard ctrl message reply dict.
+        :returns: An appropriate message reply dict, from lib.messages.
 
         """
         self.logger.debug("Received: {}".format(msg))

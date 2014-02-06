@@ -12,12 +12,21 @@ except ImportError:
 
 class SubClient(object):
 
-    """Use ZMQ SUB socket to get information about the bot."""
+    """Use ZMQ SUB socket to get information about the bot.
+
+    The SubClient is responsible for managing all interaction with PubServer,
+    which publishes information about the state of the bot over a ZMQ SUB
+    socket. Interfaces, like CLI, own clients like SubClient (and/or
+    CtrlClient) and use them to interact with the servers (like PubServer
+    and CtrlServer) running on the bot. The server own bot systems, like
+    gunner and follower.
+
+    """
 
     def __init__(self, sub_addr="tcp://127.0.0.1:60001"):
-        """Build subscriber socket.
+        """Build ZMQ subscriber socket and connect to PubServer.
 
-        :param sub_addr: Address to point ZMQ SUB socket at.
+        :param sub_addr: Address of PubServer, to subscribe to for topics.
         :type sub_addr: string
 
         """

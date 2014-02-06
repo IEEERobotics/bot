@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Start CLI or auto interfaces, CtrlServer or tests.
+"""Start CLI or auto interfaces, CtrlServer or tests."""
 
 import argparse
 from subprocess import Popen

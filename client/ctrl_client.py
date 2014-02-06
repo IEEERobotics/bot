@@ -1,4 +1,4 @@
-# TODO(dfarrell07): Module-level docstring
+"""Exposes bot systems and accepts/issues control-type commands."""
 
 from time import time
 import zmq

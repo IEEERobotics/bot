@@ -41,6 +41,7 @@ class Gunner(object):
         self.logger.error("auto_fire method must be overridden by a subclass.")
         raise NotImplementedError("Subclass must override this method.")
 
+    @lib.api_call
     def aim_turret(self, yaw, pitch):
         """Aim the robot's turret such that firing will be successful.
 

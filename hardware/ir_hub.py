@@ -167,6 +167,7 @@ class IRHub(object):
                     if self.ir_read_adc \
                     else array.selected_unit_val
 
+    @lib.api_call
     def read_all(self):
         """Poll IR sensor units and return sensed information.
 
@@ -183,6 +184,7 @@ class IRHub(object):
         self.last_read_time = time()
         return self.reading
 
+    @lib.api_call
     def read_cached(self, max_staleness=1):
         """Get cached IR data if it's fresher than param, else read IRs.
 

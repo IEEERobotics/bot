@@ -10,11 +10,26 @@ except ImportError, err:
     sys.stderr.write("ERROR: {}. Try installing python-yaml.\n".format(err))
     raise
 
+
+# Global objects
 _config = None
 _config_file = None
 _logger = None
 
 
+# Types
+class Enum(tuple):
+    """Simple enumeration type based on tuple with integer values."""
+
+    __getattr__ = tuple.index
+
+    fromString = tuple.index
+
+    def toString(self, value):
+        return self[value]
+
+
+# Methods
 def get_config(config_file="config.yaml"):
     """Load and return configuration options.
 

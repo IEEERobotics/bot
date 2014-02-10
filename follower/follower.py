@@ -17,7 +17,32 @@ class Follower(object):
         self.ir_hub = ir_hub_mod.IRHub()
         self.driver = mec_driver_mod.MecDriver()
 
-    def follow(self, state_table):
+    @lib.api_call
+    def is_start(self):
+        return True  # TODO: Use color sensor
+
+    @lib.api_call
+    def is_on_line(self):
+        return True  # TODO: Use IR sensors (!LineFollower.loss_line?)
+
+    @lib.api_call
+    def is_on_x(self):
+        return True  # TODO: Use IR sensors (LineFollower.intersection?)
+
+    @lib.api_call
+    def is_on_blue(self):
+        return True  # TODO: Use color sensor
+
+    @lib.api_call
+    def is_on_red(self):
+        return True  # TODO: Use color sensor
+
+    @lib.api_call
+    def is_end_of_line(self):
+        return False  # TODO: Use IR sensors (only one array sees the line?)
+
+    @lib.api_call
+    def follow(self, heading):
         """Accept and handle fire commands.
 
         This method is not meant to be called, but instead is meant to show
@@ -28,6 +53,18 @@ class Follower(object):
         """
         self.logger.error("The follow method must be overridden by a subclass")
         raise NotImplementedError("Subclass must override this method")
+
+    @lib.api_call
+    def center_on_x(self):
+        return True  # TODO: Actually center on intersection
+
+    @lib.api_call
+    def center_on_blue(self):
+        return True  # TODO: Actually center on blue block
+
+    @lib.api_call
+    def center_on_red(self):
+        return True  # TODO: Actually center on red_block
 
     def reading_contains_pattern(self, pattern, reading):
         """Search the given reading for the given pattern.
@@ -59,6 +96,7 @@ class Follower(object):
                     return {"line_found": False,
                             "time_elapsed": time() - start_time}
 
+    @lib.api_call
     def oscillate(self, heading, osc_time=1):
         """Oscillate sideways, increasing in amplitude until line is found"""
 

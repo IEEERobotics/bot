@@ -6,7 +6,6 @@ from time import time
 import lib.lib as lib
 import hardware.ir_hub as ir_hub_mod
 import driver.mec_driver as mec_driver_mod
-import lib.exceptions as ex
 import follower
 import pid as pid_mod
 
@@ -36,23 +35,22 @@ class LineFollower(follower.Follower):
     def get_error_condition(self):
         return self.loss_line
 
-
-    def follow(self, state_table):
-        """Used to update the motors speed and angler motion."""
-        self.state_table = state_table
+    @lib.api_call
+    def follow(self, heading):
+        """Follow line along given heading"""
         # Get the initial condition
         previous_time = time()
-        # Init front_PId
+        # Init front_PID
         self.front_pid.set_k_values(1, 0, 0)
         # Inti back_PID
         self.back_pid.set_k_values(1, 0, 0)
-        # Get current Heading
-        self.heading = self.state_table.currentHeading
+        # Get current heading
+        self.heading = heading
         # Continue until an error condition
         while True:
             # Assign the current states to the correct heading
             self.assign_states()
-            # Check for error conditions        
+            # Check for error conditions
             if self.error != 0:
                 self.update_exit_state()
                 return
@@ -70,7 +68,7 @@ class LineFollower(follower.Follower):
             self.motors(front_error, back_error)
             # Take the current time set it equal to the previous time
             previous_time = current_time
-        
+
     def update_exit_state(self):
         if(self.error == 1):
             self.intersection = True
@@ -82,10 +80,9 @@ class LineFollower(follower.Follower):
             self.loss_line = True
         elif(self.error == 5):
             self.loss_line = True
-        
 
     def motors(self, front_error, back_error):
-        """Used to Update the motors speed and angler motion."""
+        """Used to update the motors speed and angular motion."""
         # Calculate translate_speed
         # MAX speed - error in the front sensor / total number
         # of states
@@ -202,12 +199,10 @@ class LineFollower(follower.Follower):
                 self.error = 4
         else:
             self.error = 0
-                
-
 
     def get_position_lr(self, readings):
-        """Reading the IR sensors from left to right
-        
+        """Reading the IR sensors from left to right.
+
         Calculates the current state in reference to center from 
         left to right. States go form -15 to 15.
 
@@ -237,10 +232,10 @@ class LineFollower(follower.Follower):
         return state
 
     def get_position_rl(self, readings):
-        """Reading the IR sensors from left to right   
-        
+        """Reading the IR sensors from right to left.
+
         Calculates the current state in reference to center from 
-        left to right. States go form -15 to 15.
+        right to left. States go form -15 to 15.
 
         """
         self.hit_position = []

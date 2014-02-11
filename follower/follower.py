@@ -1,21 +1,33 @@
 """Logic for line following."""
 
 import sys
-import lib.lib as lib
 from time import time
+
+import lib.lib as lib
 import hardware.ir_hub as ir_hub_mod
 import driver.mec_driver as mec_driver_mod
+import pid as pid_mod
 
 
 class Follower(object):
 
-    """Follow a line. Subclass for specific hardware/methods."""
+    """Follows a line, detects intersections and stop conditions."""
 
     def __init__(self):
-        """Build Ir arrays, logger and drivers."""
+        # Build logger
         self.logger = lib.get_logger()
+
+        # Build subsystems
         self.ir_hub = ir_hub_mod.IRHub()
         self.driver = mec_driver_mod.MecDriver()
+
+        # Build PIDs
+        self.front_pid = pid_mod.PID()
+        self.back_pid = pid_mod.PID()
+
+        # Initialize other members
+        self.intersection = False
+        self.lost_line = False
 
     @lib.api_call
     def is_start(self):
@@ -23,11 +35,11 @@ class Follower(object):
 
     @lib.api_call
     def is_on_line(self):
-        return True  # TODO: Use IR sensors (!LineFollower.loss_line?)
+        return (not self.lost_line)  # TODO: Use IR sensors to perform check
 
     @lib.api_call
     def is_on_x(self):
-        return True  # TODO: Use IR sensors (LineFollower.intersection?)
+        return self.intersection  # TODO: Use IR sensors to perform check
 
     @lib.api_call
     def is_on_blue(self):
@@ -43,16 +55,37 @@ class Follower(object):
 
     @lib.api_call
     def follow(self, heading):
-        """Accept and handle fire commands.
-
-        This method is not meant to be called, but instead is meant to show
-        that subclasses should override it in their implementation.
-
-        :param state_table: Data describing current heading.
-
-        """
-        self.logger.error("The follow method must be overridden by a subclass")
-        raise NotImplementedError("Subclass must override this method")
+        """Follow line along given heading"""
+        # Get the initial condition
+        previous_time = time()
+        # Init front_PID
+        self.front_pid.set_k_values(1, 0, 0)
+        # Inti back_PID
+        self.back_pid.set_k_values(1, 0, 0)
+        # Get current heading
+        self.heading = heading
+        # Continue until an error condition
+        while True:
+            # Assign the current states to the correct heading
+            self.assign_states()
+            # Check for error conditions
+            if self.error != 0:
+                self.update_exit_state()
+                return
+            # Get the current time of the CPU
+            current_time = time()
+            # Call front PID
+            self.sampling_time = current_time - previous_time
+            # Call front PID
+            front_error = self.front_pid.pid(
+                0, self.front_state, self.sampling_time)
+            # Call back PID
+            back_error = self.back_pid.pid(
+                0, self.back_state, self.sampling_time)
+            # Update motors
+            self.motors(front_error, back_error)
+            # Take the current time set it equal to the previous time
+            previous_time = current_time
 
     @lib.api_call
     def center_on_x(self):
@@ -65,36 +98,6 @@ class Follower(object):
     @lib.api_call
     def center_on_red(self):
         return True  # TODO: Actually center on red_block
-
-    def reading_contains_pattern(self, pattern, reading):
-        """Search the given reading for the given pattern.
-
-        :param pattern: Pattern to search reading for.
-        For example, [1, 1] for a pair of consecutive ones.
-        :type pattern: list
-        :param reading: IR array reading to search for the
-        given pattern. Should contain only 0s and 1s.
-        :type reading: list
-        :returns: True if the pattern is in the reading, False otherwise.
-
-        """
-        return "".join(map(str, pattern)) in "".join(map(str, reading))
-
-    def watch_for_line(self, max_time):
-        """Recieves time period for which to continuously watch for line.
-        Returns True when line is found.
-        Returns False if line is not found before time is hit.
-        """
-        start_time = time()
-        while True:
-            reading = self.ir_hub.read_all()
-            for name, array in reading.iteritems():
-                if self.reading_contains_pattern([1, 1], array):
-                    return {"line_found": True,
-                            "time_elapsed": time() - start_time}
-                if time() - start_time > max_time:
-                    return {"line_found": False,
-                            "time_elapsed": time() - start_time}
 
     @lib.api_call
     def oscillate(self, heading, osc_time=1):
@@ -159,3 +162,226 @@ class Follower(object):
             osc_speed += 90
             if osc_speed >= self.driver.max_speed:
                 line_not_found = False
+
+    def reading_contains_pattern(self, pattern, reading):
+        """Search the given reading for the given pattern.
+
+        :param pattern: Pattern to search reading for.
+        For example, [1, 1] for a pair of consecutive ones.
+        :type pattern: list
+        :param reading: IR array reading to search for the
+        given pattern. Should contain only 0s and 1s.
+        :type reading: list
+        :returns: True if the pattern is in the reading, False otherwise.
+
+        """
+        return "".join(map(str, pattern)) in "".join(map(str, reading))
+
+    def watch_for_line(self, max_time):
+        """Recieves time period for which to continuously watch for line.
+        Returns True when line is found.
+        Returns False if line is not found before time is hit.
+        """
+        start_time = time()
+        while True:
+            reading = self.ir_hub.read_all()
+            for name, array in reading.iteritems():
+                if self.reading_contains_pattern([1, 1], array):
+                    return {"line_found": True,
+                            "time_elapsed": time() - start_time}
+                if time() - start_time > max_time:
+                    return {"line_found": False,
+                            "time_elapsed": time() - start_time}
+
+    def assign_states(self, current_ir_reading=None):
+        """Take 4x16 bit arrays and assigns the array to proper orientations.
+
+        Note that the proper orientations are front, back, left and right.
+
+        """
+        # Get the current IR readings
+        if current_ir_reading is None:
+            current_ir_reading = self.ir_hub.read_all()
+        # Heading west
+        if self.heading == 0:
+            # Forward is on the left side
+            self.front_state = self.get_position_lr(
+                current_ir_reading["left"])
+            # Back is on the right side
+            self.back_state = self.get_position_rl(
+                current_ir_reading["right"])
+            # Left is on the back
+            self.left_state = self.get_position_lr(
+                current_ir_reading["back"])
+            # Right is on the front
+            self.right_state = self.get_position_rl(
+                current_ir_reading["front"])
+        # Heading east
+        elif self.heading == 180:
+            # Forward is on the right side
+            self.front_state = self.get_position_lr(
+                current_ir_reading["right"])
+            # Back is on the left side
+            self.back_state = self.get_position_rl(
+                current_ir_reading["left"])
+            # Left is on the front
+            self.left_state = self.get_position_lr(
+                current_ir_reading["front"])
+            # Right is on the back
+            self.right_state = self.get_position_rl(
+                current_ir_reading["back"])
+        # Heading south
+        elif self.heading == 270:
+            # Forward is on the front side
+            self.front_state = self.get_position_lr(
+                current_ir_reading["front"])
+            # Back is on the back side
+            self.back_state = self.get_position_rl(
+                current_ir_reading["back"])
+            # Left is on the left
+            self.left_state = self.get_position_lr(
+                current_ir_reading["left"])
+            # right is on the right
+            self.right_state = self.get_position_rl(
+                current_ir_reading["right"])
+            # Heading north
+        elif self.heading == 90:
+            # Forward is on the right side
+            self.front_state = self.get_position_lr(
+                current_ir_reading["back"])
+            # Back is on the left side
+            self.back_state = self.get_position_rl(
+                current_ir_reading["front"])
+            # Left is on the front
+            self.left_state = self.get_position_lr(
+                current_ir_reading["right"])
+            # Right is on the back
+            self.right_state = self.get_position_rl(
+                current_ir_reading["left"])
+        if((self.front_state > 15) or (self.back_state > 15) or
+            (self.right_state < 16) or (self.left_state < 16)):
+            if((self.right_state < 16) or (self.left_state < 16) or 
+                (self.front_state == 17) or (self.back_state == 17)):
+                # Found Intersection
+                self.error = 1
+            elif((self.back_state == 18) or (self.front_state == 18)):
+                # at high angle
+                self.error = 5
+            elif((self.front_state == 16) and (self.back_state == 16)):
+                # Front and back lost line
+                self.error = 2
+            elif(self.front_state == 16):
+                # Front lost line
+                self.error = 3
+            elif(self.back_state == 16):
+                # Back lost line
+                self.error = 4
+        else:
+            self.error = 0
+
+    def update_exit_state(self):
+        if(self.error == 1):
+            self.intersection = True
+        elif(self.error == 2):
+            self.lost_line = True
+        elif(self.error == 3):
+            self.lost_line = True
+        elif(self.error == 4):
+            self.lost_line = True
+        elif(self.error == 5):
+            self.lost_line = True
+
+    def get_position_lr(self, readings):
+        """Reading the IR sensors from left to right.
+
+        Calculates the current state in reference to center from 
+        left to right. States go form -15 to 15.
+
+        """
+        self.hit_position = []
+        state = 0.0
+        for index, value in enumerate(readings):
+            if(value == 1):
+               self.hit_position.append(index)
+        if len(self.hit_position) > 3:
+            # Error: Intersection detected
+            return 17
+        if len(self.hit_position) == 0:
+            # Error: No line detected
+            return 16
+        if len(self.hit_position) == 3:
+            # Error: Bot at large error
+            return 18
+        state = self.hit_position[0] * 2
+        if len(self.hit_position) > 1:
+            if self.hit_position[1] > 0:
+                state = state + 1
+            if abs(self.hit_position[0] - self.hit_position[1]) > 1:
+                # Error: Discontinuity in sensors
+                return 19
+        state = state - 15
+        return state
+
+    def get_position_rl(self, readings):
+        """Reading the IR sensors from right to left.
+
+        Calculates the current state in reference to center from 
+        right to left. States go form -15 to 15.
+
+        """
+        self.hit_position = []
+        state = 0.0
+        for index, value in enumerate(readings):
+            if(value == 1):
+               self.hit_position.append(index)
+        if len(self.hit_position) > 3:
+            # Error: Intersection detected
+            return 17
+        if len(self.hit_position) == 0:
+            # Error: No line detected
+            return 16
+        if len(self.hit_position) == 3:
+            # Error: Bot at large error
+            return 18
+        state = self.hit_position[0] * 2
+        if len(self.hit_position) > 1:
+            if(self.hit_position[1] > 0):
+                state = state + 1
+            if(abs(self.hit_position[0] - self.hit_position[1]) > 1):
+                # Error: Discontinuity in sensors
+                return 19
+        state = (state - 15) * -1
+        return state
+
+    def motors(self, front_error, back_error):
+        """Used to update the motors speed and angular motion."""
+        # Calculate translate_speed
+        # MAX speed - error in the front sensor / total number
+        # of states
+        translate_speed =  100 - ( front_error / 16 )
+        # Calculate rotate_speed
+        # Max speed - Translate speed
+        rotate_speed = 100 - translate_speed
+        # Calculate translate_angle
+        translate_angle = back_error * (180 / 16)
+        if translate_angle < 0:
+            # Swift to the left
+            translate_angle = 360 - translate_angle
+        else:
+            # swift to the right
+            translate_angle = translate_angle   
+        if translate_speed > 100:
+            # If translate_speed is greater than 100 set to 100
+            translate_speed = 100
+        elif translate_speed < 0:
+            # If translate_speed is greater than 100 set to 100
+            translate_speed = 0
+        if rotate_speed > 100:
+            # If rotate_speed is greater than 100 set to 100
+            rotate_speed = 100
+        elif rotate_speed < 0:
+            # If rotate_speed is greater than 100 set to 100
+            rotate_speed = 0
+        # Adjust motor speeds 
+        mec_driver_mod.compound_move(
+            translate_speed, translate_angle, rotate_speed)

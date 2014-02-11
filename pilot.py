@@ -65,10 +65,11 @@ class Pilot:
                 else:
                     self.state = self.State.OSCILLATE
             elif self.state == self.State.OSCILLATE:
-                self.call('follower', 'oscillate')  # takes time
+                self.call('follower', 'oscillate',
+                    { 'heading' : self.heading })  # may succeed or fail
                 self.state = self.State.FIND_LINE
             elif self.state == self.State.FOLLOW:
-                self.call('follower', 'follow', { 'heading': self.heading })
+                self.call('follower', 'follow', { 'heading' : self.heading })
                 # When follower is done following, one of the following is true
                 if self.call('follower', 'is_on_x') == True:  # intersection
                     self.state = self.State.CENTER_ON_X
@@ -95,9 +96,9 @@ class Pilot:
                 # TODO: Wait for 3 secs., or ensure aiming takes that long?
                 self.state = self.State.AIM
             elif self.state == self.State.AIM:
-                # TODO: Ask localizer for block position, pass it to gunner
                 # TODO: Turn on laser here? (for testing runs, at least?)
-                self.call('gunner', 'aim_turret')
+                # TODO: Ask localizer for block position, pass it to gunner
+                self.call('gunner', 'aim_turret', { 'yaw' : 90, 'pitch' : 90 })
                 # TODO: Spin up wheel gun here (per shot), or at start?
                 self.state = self.State.FIRE
             elif self.state == self.State.FIRE:

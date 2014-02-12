@@ -54,12 +54,13 @@ then
         echo "Adding SSH keys..."
         mkdir -p ~/.ssh/
         wget -O ~/.ssh/id_rsa https://raw.github.com/NCSUhardware/bot/master/os/fs/root/.ssh/id_rsa?token=2446394__eyJzY29wZSI6IlJhd0Jsb2I6TkNTVWhhcmR3YXJlL2JvdC9tYXN0ZXIvb3MvZnMvcm9vdC8uc3NoL2lkX3JzYSIsImV4cGlyZXMiOjEzOTI3NzczMDl9--21a6fa04250b33c65ca853e4097e6524cc5f4917
+        chmod go-w ~/.ssh/id_rsa
         wget -O ~/.ssh/id_rsa.pub https://raw.github.com/NCSUhardware/bot/master/os/fs/root/.ssh/id_rsa.pub?token=2446394__eyJzY29wZSI6IlJhd0Jsb2I6TkNTVWhhcmR3YXJlL2JvdC9tYXN0ZXIvb3MvZnMvcm9vdC8uc3NoL2lkX3JzYS5wdWIiLCJleHBpcmVzIjoxMzkyNzc3MzgxfQ%3D%3D--4162dfcf86799a443bf7d23827484eb6cc0dded1
     fi
 fi
 
 # Get bot code
-if [ ! -f $BASE/bot ]
+if [ ! -d $BASE/bot ]
 then
     echo "$BASE/bot doesn't exist."
     echo "Clone the code? [Y/n] "
@@ -86,7 +87,7 @@ fi
 
 # Get DMCC library
 # TODO: Get PyDMCC, i2c_device and other support libraries, and set them up
-if [ ! -f $BASE/DMCC_Library ]
+if [ ! -d $BASE/DMCC_Library ]
 then
     echo "$BASE/DMCC_Library doesn't exist."
     echo "Clone DMCC code? [Y/n] "
@@ -109,7 +110,7 @@ else
     fi
 fi
 
-if [ -f $BASE/DMCC_Library ]
+if [ -d $BASE/DMCC_Library ]
 then
     if [ -e $(python -c "import DMCC") ]
     then

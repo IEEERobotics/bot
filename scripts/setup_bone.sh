@@ -2,6 +2,7 @@
 # Install standard software, do git configuration
 
 EX_USAGE=64
+BASE=$HOME
 
 # Each should only contain the packages that are added at that level
 light="git python-yaml libzmq-dev python-zmq python-simplejson"
@@ -19,6 +20,7 @@ echo "      Doing one then later doing another is fine."
 echo -n "[l]ight, [m]edium or [f]ull setup? [l/M/f] "
 read type
 
+sudo apt-get update
 if [ "$type" == "l" -o "$type" == "L" ]
 then
     sudo apt-get install $light
@@ -35,71 +37,47 @@ fi
 
 export EDITOR=vim
 
-# Add user ncsubot
-if [[ $EUID -eq 0 ]]
-then
-    echo -n "You ran this as root. Setup ncsubot account? [Y/n] "
-    read setup_ncsubot
-
-    if [ "$setup_ncsubot" == "Y" -o "$setup_ncsubot" == "y" ]
-    then
-        # Create user account
-        adduser ncsubot
-
-        # Add user to sudoers
-        echo "An editor is about to open. Append the following line (copy/paste):"
-        echo "ncsubot ALL=(ALL:ALL) ALL"
-        echo "Save and exit when you're done. Hit enter to continue."
-        read blah
-        visudo
-        
-        # TODO: Add SSH key
-    fi
-fi
-
 # Configure git
 echo "Configuring git..."
-if [[ $EUID -eq 0 ]]
-then
-    echo "You ran this as root, changing user to ncsubot..."
-    su ncsubot
-fi
-
 git config --global user.name "ncsubot"
 git config --global user.email "ncsubot@gmail.com"
 
-# Get bot code
-if [ ! -f /home/ncsubot/bot ]
+# Add SSH keys
+if [ ! -f ~/.ssh/id_rsa ]
 then
-    echo "/home/ncsubot/bot doesn't exist."
+    echo "SSH keys don't exist."
+    echo "Add SSH keys? [Y/n] "
+    read add_keys
+
+    if [ "$add_keys" == "y" -o "$add_keys" == "Y" -o "$add_keys" == "" ]
+    then
+        echo "Adding SSH keys..."
+        mkdir -p ~/.ssh/
+        wget -O ~/.ssh/id_rsa https://raw.github.com/NCSUhardware/bot/master/os/fs/root/.ssh/id_rsa?token=2446394__eyJzY29wZSI6IlJhd0Jsb2I6TkNTVWhhcmR3YXJlL2JvdC9tYXN0ZXIvb3MvZnMvcm9vdC8uc3NoL2lkX3JzYSIsImV4cGlyZXMiOjEzOTI3NzczMDl9--21a6fa04250b33c65ca853e4097e6524cc5f4917
+        wget -O ~/.ssh/id_rsa.pub https://raw.github.com/NCSUhardware/bot/master/os/fs/root/.ssh/id_rsa.pub?token=2446394__eyJzY29wZSI6IlJhd0Jsb2I6TkNTVWhhcmR3YXJlL2JvdC9tYXN0ZXIvb3MvZnMvcm9vdC8uc3NoL2lkX3JzYS5wdWIiLCJleHBpcmVzIjoxMzkyNzc3MzgxfQ%3D%3D--4162dfcf86799a443bf7d23827484eb6cc0dded1
+    fi
+fi
+
+# Get bot code
+if [ ! -f $BASE/bot ]
+then
+    echo "$BASE/bot doesn't exist."
     echo "Clone the code? [Y/n] "
     read get_code
 
     if [ "$get_code" == "y" -o "$get_code" == "Y" -o "$get_code" == "" ]
     then
-        if [[ $EUID -eq 0 ]]
-        then
-            echo "You ran this as root, changing user to ncsubot..."
-            su ncsubot
-        fi
-
-        cd /home/ncsubot
+        cd $BASE
         git clone --recursive git@github.com:NCSUhardware/bot.git
     fi
 else
-    echo "/home/ncsubot/bot already exists."
+    echo "$BASE/bot already exists."
     echo "Update the code? [Y/n] "
     read update_code
 
     if [ "$update_code" == "y" -o "$update_code" == "Y" -o $update_code == "" ]
     then
-        if [[ $EUID -eq 0 ]]
-        then
-            echo "You ran this as root, changing user to ncsubot..."
-            su ncsubot
-        fi
-
-        cd /home/ncsubot/bot
+        cd $BASE/bot
         git pull
         cd pybbb
         git pull
@@ -107,42 +85,31 @@ else
 fi
 
 # Get DMCC library
-if [ ! -f /home/ncsubot/DMCC_Library ]
+# TODO: Get PyDMCC, i2c_device and other support libraries, and set them up
+if [ ! -f $BASE/DMCC_Library ]
 then
-    echo "/home/ncsubot/DMCC_Library doesn't exist."
+    echo "$BASE/DMCC_Library doesn't exist."
     echo "Clone DMCC code? [Y/n] "
     read get_dmcc_code
 
     if [ "$get_dmcc_code" == "y" -o "$get_dmcc_code" == "Y" -o $get_dmcc_code == "" ]
     then
-        if [[ $EUID -eq 0 ]]
-        then
-            echo "You ran this as root, changing user to ncsubot..."
-            su ncsubot
-        fi
-
-        cd /home/ncsubot
+        cd $BASE
         git clone git@github.com:Exadler/DMCC_Library.git
     fi
 else
-    echo "/home/ncsubot/DMCC_Library already exists."
+    echo "$BASE/DMCC_Library already exists."
     echo "Update DMCC code? [Y/n] "
     read update_dmcc_code
 
     if [ "$update_dmcc_code" == "y" -o "$update_dmcc_code" == "Y" -o $update_dmcc_code == "" ]
     then
-        if [[ $EUID -eq 0 ]]
-        then
-            echo "You ran this as root, changing user to ncsubot..."
-            su ncsubot
-        fi
-
-        cd /home/ncsubot/DMCC_Library
+        cd $BASE/DMCC_Library
         git pull
     fi
 fi
 
-if [ -f /home/ncsubot/DMCC_Library ]
+if [ -f $BASE/DMCC_Library ]
 then
     if [ -e $(python -c "import DMCC") ]
     then
@@ -153,7 +120,7 @@ then
     read install_dmcc_code
     if [ "$install_dmcc_code" == "y" -o "$install_dmcc_code" == "Y" -o $install_dmcc_code == "" ]
     then
-        cd /home/ncsubot/DMCC_Library
+        cd $BASE/DMCC_Library
         if [[ $EUID -eq 0 ]]
         then
             python setupDMCC.py install

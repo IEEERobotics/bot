@@ -48,21 +48,21 @@ class MecFollower(object):
         self.on_x = False
     
     @lib.api_call
-    def get_translate_speed(self)
+    def get_translate_speed(self):
         return self.translate_speed
     
     @lib.api_call
-    def set_translante_speed(self,speed)
+    def set_translante_speed(self,speed):
         self.translate_speed = speed
     
     @lib.api_call    
-    def update(self)
+    def update(self):
         """Read IR values, compute aggregates."""
         ir_readings = self.ir_hub.read_binary(Follower.White_Black)
         for name, reading in ir_readings.iteritems():
             reading_arr = np.int_(reading) # convert readings to numpy array
             reading_sum = np.sum(np_reading) # = no.of units lit
-            if reading_sum > 0;
+            if reading_sum > 0:
                self.ir_agg[name]= (
                     np.sum(self.ir_pos * reading_arr) / reading_sum)
             else:
@@ -70,27 +70,27 @@ class MecFollower(object):
         self.timeLastupdated = time.time()
      
     @lib.api_call     
-    def get_front_error(self)
+    def get_front_error(self):
         return self.front_error
     
     @lib.api_call
-    def get_back_error(self)
+    def get_back_error(self):
         return self.back_error
     
     @lib.api_call
-    def wait_for_start(self)
+    def wait_for_start(self):
         """Poll color sensor unti gree start signal lights up."""
         return self.color_sensor.watch_for_color("green")
      
     @lib.api_call     
-    def is_on_line(self)
+    def is_on_line(self):
         return (not self.lost_line) #TODO: User IR sensors to perform check
      
     @lib.api_call     
-    def is_on_x(self)
+    def is_on_x(self):
         return self.intersection #TODO: User IR sensors to perform check
      
-    def reset_errors(self)
+    def reset_errors(self):
         self.error = "NONE"
         # state variables
         # self.front_state = Follower.No_Line
@@ -135,43 +135,48 @@ class MecFollower(object):
             # Check for error conditions
             if self.error != "NONE":
                # require two successive large_object readings to exit (what are the large objects?)
-               if self.error == "LAREG_OBJECT" and count_object < 1: 
-                  count_object += 1
-                  continue
-                self.update_exit_state()
-                self.logger.info("Error: {}".format(self.error))
-                self.logger.info("FS: {}, BS: {}, ls: {}, RS: {}".format(
+                if self.error == "LAREG_OBJECT" and count_object < 1: 
+                    count_object += 1
+                    continue
+                    self.update_exit_state()
+                    self.logger.info("Error: {}".format(self.error))
+                    self.logger.info("FS: {}, BS: {}, ls: {}, RS: {}".format(
                     self.front_state,
                     self.back_state,
                     self.left_state,
                     self.right_state))
-                self.driver.move(0, 0))
-                return self.error
+                    self.driver.move(0, 0)
+                    return self.error
                 
             # average states.
-            bot_position = (self.front_state+self.back_state)/2  """needs to be changed"""
+            #needs to be changed"""
+            bot_position = (self.front_state+self.back_state)/2 
             # Get the current time of the CPU
             current_time = time()
             self.sampling_time = current_time - previous_time
             # Call PID
+            #needs to be changed"""
             self.front_error = self.front.pid(
-                0,bot_position,self.sampling_time) """ needs to be changed"""
+                0,bot_position,self.sampling_time) 
             # Calculate difference between array's for approx. pseudo angle
             bot_angle = (self.front_state - self.back_state)
             # Call Back PID
+            #needs to be changed"""
             self.rotate_error = self.rotate_pid.pid(
-                0,bot_angle,self.sampling_time) """ needs to be changed """
+                0,bot_angle,self.sampling_time) 
             # Report errors from front and back pids'
             self.logger.info(" FrontErr: {}, BackErr: {}". format(
                 self.front_error,
                 self.back_error))
             # Update motors
-            self.motors(bot_angle) """needs to be changed"""
+            #needs to be changed"""
+            self.motors(bot_angle) 
             # Take the current time set it equal to the previous time
             previous_time = current_time
     
     @lib.api_call    
-    def rotate_on_x(self,direnction ="left", speed=100, time=0.95): """Needs to be changed"""
+    def rotate_on_x(self,direnction ="left", speed=100, time=0.95): 
+        # Needs to be changed"""
         # After center_on_x, rotate in the commanded directions
         # by 90 degrees
         if(direction == "left"):
@@ -249,18 +254,18 @@ class MecFollower(object):
         # To do: Consider making this a function callable
         line_not_found = True
         while line_not_found:
-            
-             # Drivers in each direction
-             self.driver.move(osc_speed, angle1)
-             # Passes control to find line, which moves
-             # until it finds line or runs out of time
-             # Note : watch_for_line returns "line_found"
-             # (bool) and "time_elapsed" (int)
-             results = self.watch_for_line(osc_time)
-             self.driver.move(0, 0)
+                        
+            # Drivers in each direction
+            self.driver.move(osc_speed, angle1)
+            # Passes control to find line, which moves
+            # until it finds line or runs out of time
+            # Note : watch_for_line returns "line_found"
+            # (bool) and "time_elapsed" (int)
+            results = self.watch_for_line(osc_time)
+            self.driver.move(0, 0)
              
-            if results["line_found"]
-                 line_not_found = False
+            if results["line_found"]:
+                line_not_found = False
              
             # Search in other direction
             self.driver.move(osc_speed, angle2)
@@ -618,7 +623,7 @@ class MecFollower(object):
             previous_time = current_time
         return "DONE"
 
-     def smart_jerk(self):
+    def smart_jerk(self):
         """Used to get the bot out of the box"""
         last_count = 0
         while True:
@@ -750,7 +755,7 @@ class MecFollower(object):
                 return "Done"
         # end top while loop
 
-        @lib.api_call
+    @lib.api_call
     def get_result(self):
         self.assign_states()
         return self.error

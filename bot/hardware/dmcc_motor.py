@@ -22,7 +22,7 @@ class DMCCMotorSet(dict):
         """
         self.config = lib.get_config()
         self.logger = lib.get_logger()
-        self.is_testing = self.config["testing"]["DMCC"]
+        self.is_testing = self.config["test_mode"]["DMCC"]
 
         # print "Testing: ", self.config["testing"]
         # print pyDMCC.lib._config

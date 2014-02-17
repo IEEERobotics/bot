@@ -128,15 +128,16 @@ class CtrlServer(object):
 
         """
 
-        self.follower = Follower()
+        #self.follower = Follower()
         self.mec_follower = MecFollower()
 
         systems = {}
         systems["ctrl"] = self
-        #systems["follower"] = self.follower
+        
         systems["mec_follower"] = self.mec_follower
-        systems["driver"] = self.follower.driver
-        systems["ir_hub"] = self.follower.ir_hub
+        systems["driver"] = self.mec_follower.driver
+        systems["ir_hub"] = self.mec_follower.ir_hub
+ 
         self.logger.debug("Systems: {}".format(systems))
         return systems
 

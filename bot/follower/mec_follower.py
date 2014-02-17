@@ -6,11 +6,23 @@ from time import time, sleep
 import numpy as np
 
 import bot.lib.lib as lib
+import bot.hardware.ir_hub as ir_hub_mod
+import bot.driver.mec_driver as mec_driver_mod
 import pid as pid_mod
+import bot.hardware.color_sensor as color_sensor_mod
 
 
 class MecFollower(object):
     """Subclass of Follower for line-following using mecanum wheels."""
+    
+    # Class variables
+    # Array_conds
+    Large_Object = 17 
+    No_Line = 16
+    Noise = 19 
+
+    White_Black = True
+
 
     def __init__(self):
         # Build logging
@@ -19,6 +31,7 @@ class MecFollower(object):
         # Build subsystems
         self.ir_hub = ir_hub_mod.IRHub()
         self.ir_hub.thrsh = 100
+        self.driver = mec_driver_mod.MecDriver()
         self.color_sensor = color_sensor_mod.ColorSensor()
 
         # Build PID class
@@ -26,9 +39,6 @@ class MecFollower(object):
         self.front_error=0.0
         self.back_PID = pid_mod.PID()
         self.back_error=0.0
-        self.error="NONE"
-        self.rotate_pid = pid_mod.PID()
-        self.rotate_error = 0.0
         
         # motor variables
         self.translate_speed=75
@@ -36,10 +46,10 @@ class MecFollower(object):
         
         # state variables
         self.heading = None # must be initialize by calles
-        self.front_state = Follower.No_Line
-        self.back_state = Follower.No_Line
-        self.left_state = Follower.No_Line
-        self.right_state = Follower.No_Line
+        self.front_state = MecFollower.No_Line
+        self.back_state = MecFollower.No_Line
+        self.left_state = MecFollower.No_Line
+        self.right_state = MecFollower.No_Line
         
         #post error vars
         self.intersection = False

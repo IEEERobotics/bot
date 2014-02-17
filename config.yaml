@@ -74,5 +74,5 @@ server_host: 127.0.0.1  # Default hostname clients connect to
 ctrl_server_port: 60000  # Port used to send control messages to the bot
 pub_server_port: 60001  # PubServer publishes bot data on this port
 irs_per_array: 16
-color_sensor: {LED_PWM:5}
+color_sensor: {LED_PWM: 5}
 ir_thresh: 60

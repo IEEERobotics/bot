@@ -9,9 +9,9 @@ g = 9.81 #acceleration due to gravity
 
 # Physical properties of the dart
 m = 0.001 #mass of dart kg
-Cd=.67 # Drag coefficient
-#A = Pi*math.pow(r,2) #cross-sectional area of dart
-A = .001 # Placehiolder value pending more accurate measurement above
+Cd =.67 # Drag coefficient
+r = .006208 #radius of dart
+A = Pi*math.pow(r,2) #cross-sectional area of dart
 rho = 1.2 #mass-density of air kg/m^3
 
 #Physical properties of the target

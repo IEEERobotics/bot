@@ -5,3 +5,5 @@
 *.swm
 *~
 .DS_Store
+*.egg-info
+*.log

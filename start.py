@@ -52,7 +52,7 @@ if args.pep8:
 
 if args.tests:
     print "Running unit tests"
-    os.system("python -m unittest discover")
+    os.system("python -m unittest discover -v")
 
 if args.server:
     # Fail if starting the server on the bot and not root

@@ -1,4 +1,5 @@
-"""Test case for line follower"""
+"""Test case for Follower"""
+
 import sys
 import os
 import unittest
@@ -6,29 +7,27 @@ import unittest
 sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
 try:
     import lib.lib as lib
-    import follower.line_follower as f_mod
-    import planner.fsm_planner as fsm
+    import follower.follower as f_mod
     import tests.test_bot as test_bot
 except ImportError:
     print "ImportError: Use `python -m unittest discover` from project root."
     raise
 
 
-class TestLineFollower(test_bot.TestBot):
+class TestFollower(test_bot.TestBot):
 
     """Test line Follower."""
 
     def setUp(self):
         """Get config and built IR object."""
-        super(TestLineFollower, self).setUp()
+        super(TestFollower, self).setUp()
 
         # Build Follower object
-        self.follower = f_mod.LineFollower()
-        self.state = fsm.StateTable()
+        self.follower = f_mod.Follower()
 
     def tearDown(self):
         """Restore testing flag state in config file."""
-        super(TestLineFollower, self).tearDown()
+        super(TestFollower, self).tearDown()
 
     def test_get_state_lr_errors(self):
         """Test cases for get position left right for error throws.

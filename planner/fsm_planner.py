@@ -3,7 +3,7 @@
 import lib.lib as lib
 import driver.mec_driver as md_mod
 import gunner.wheel_gunner as wg_mod
-import follower.line_follower as f_mod
+import follower.follower as f_mod
 
 
 class StateTable(object):
@@ -170,7 +170,7 @@ class Following(State):
         super(Following, self).__init__()
         self.robot = robot
         self.logger = lib.get_logger()
-        self.lineFollower = f_mod.LineFollower()
+        self.lineFollower = f_mod.Follower()
 
     def run(self):
         """Calls a line following behavior """

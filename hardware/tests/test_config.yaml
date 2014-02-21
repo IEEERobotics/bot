@@ -1,0 +1,53 @@
+testing: True
+logging: {log_file: test.log, file_handler_level: DEBUG, stream_handler_level: CRITICAL}  # Logging options
+
+dmcc_drive_motors: {
+    front_left: { board_num: 0, motor_num: 1 },
+    front_right: { board_num: 0, motor_num: 2 },
+    back_left: { board_num: 1, motor_num: 1 },
+    back_right: { board_num: 1, motor_num: 2 }
+}
+
+dmcc_turret_motors: {
+    left: { board_num: 2, motor_num: 1 },
+    right: { board_num: 2, motor_num: 2 },
+}
+
+dmcc_bad_motor_def: {
+    a_bad_motor: { foo: 1, bar: 2 }
+}
+
+turret_servos:
+- {PWM: 2, axis: yaw}  # Turret servo - pan: P9_42 (pwm2/ecap0)
+- {PWM: 7, axis: pitch}  # Turret servo - tilt: P9_28 (pwm7/ecap2)
+ultrasonics: {  # locations are [x, y] in meters, assume approx. 30cm x 30cm bot with right = +X axis, top = +Y axis
+    front: { gpio: -1, location: [  0.0,  0.15], direction: [ 0.0,  1.0] },
+    left:  { gpio: -1, location: [-0.15,     0], direction: [-1.0,  0.0] },
+    back:  { gpio: -1, location: [  0.0, -0.15], direction: [ 0.0, -1.0] },
+    right: { gpio: -1, location: [ 0.15,   0.0], direction: [ 1.0,  0.0] },
+}
+ir_select_gpios: [44, 26, 46, 65]  # GPIOs to select IR sensor units: [P8_12 (gpio44), P8_14 (gpio26), P8_16 (gpio46), P8_18 (gpio65)]
+ir_analog_input_gpios: {front: 39, back: 35, left: 67, right: 68}  # GPIO pins to read selected IR sensor units: P8_04 (gpio39), P8_06 (gpio35), P8_08 (gpio67), P8_10 (gpio68)
+ir_analog_adc_config: {  # ADC configuration
+    i2c_bus: 1,  # System I2C bus to use to talk to ADCs
+    i2c_addr: {front: 0x51, back: 0x5a, left: 0x50, right: 0x59},  # I2C (7-bit) addresses for ADCs: 0x50, 0x51, 0x59, 0x5a
+    i2c_registers: {  # Register addresses, num bytes and initial values to set (if any)
+        alert_status     : { addr: 0x01, bytes: 1},
+        configuration    : { addr: 0x02, bytes: 1, init: 0x2d },    # 0x2d: Fastest cycle time, no alert hold, alert flag & pin enabled, active high
+        v_low            : { addr: 0x03, bytes: 2, init: 0x0000 },  # Low threshold
+        v_high           : { addr: 0x04, bytes: 2, init: 0x0750 },  # High threshold
+        v_hyst           : { addr: 0x05, bytes: 2, init: 0x0080 },  # Difference to clear alert bit
+        v_min            : { addr: 0x06, bytes: 2 },  # Min conversion result; default: 0x0fff (as per doc, but shouldn't it be 0xff0?)
+        v_max            : { addr: 0x07, bytes: 2 }   # Max conversion result; default: 0x0000
+    },
+    result_addr: 0x00,  # Register address where conversion result is stored (2 bytes)
+    result_mask: 0x0ff0,  # Mask to apply to conversion result
+    result_shift: 4,  # No. of bits to shift to the right after applying mask
+}
+ir_read_delay: 0.01  # duration in secs. to pause between each select-read operation to let ADCs settle
+ir_read_adc: true  # read accurate ADC values instead of binary GPIO values
+ir_verbose_output: false  # print verbose output to console (log level: INFO), for debugging & testing only
+test_pwm_base_dir: simulator/pins/pwm/pwm
+test_gpio_base_dir: simulator/pins/gpio/gpio
+test_adc_base_dir: simulator/pins/adc
+irs_per_array: 16

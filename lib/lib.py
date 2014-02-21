@@ -13,8 +13,9 @@ except ImportError, err:
 
 # Global objects
 _config = None
-_config_file = None
+_loaded_config_file = None
 _logger = None
+default_config = "config.yaml"
 
 
 # Types
@@ -28,30 +29,36 @@ class Enum(tuple):
     def toString(self, value):
         return self[value]
 
-
-# Methods
-def get_config(config_file="config.yaml"):
+def get_config(config_file=None):
     """Load and return configuration options.
 
     Note that this config is only loaded once (it's a singleton).
 
     :param config_file: YAML file to load config from.
     :type config_file: string
-    :returns: Dict description of configuration for this round.
+    :returns: Dict description of configuration.
 
     """
     # Don't load config file if it is already loaded (and filename matches)
-    global _config, _config_file
-    if _config is not None and config_file == _config_file:
+    global _config, _loaded_config_file
+
+    # We can't simply throw default_config in as a default parameter.  Doing so
+    # would make it impossible to differentiate between an unspecified config
+    # (which should use the default only when no config has been loaded) versus
+    # a desire to actually load the default config explicitly.
+    if config_file is None:
+        if _loaded_config_file is None:
+            config_file = default_config
+        else:
+            return _config
+
+    if config_file == _loaded_config_file:
         return _config
-    _config_file = config_file
 
-    # Build valid path from CWD to config file
-    qual_config_file = config_file
-
-    # Open and read config file
-    with open(qual_config_file) as config_fd:
-        return yaml.load(config_fd)
+    with open(config_file) as config_fd:
+        _config = yaml.load(config_fd)
+        _loaded_config_file = config_file
+        return _config
 
 
 def write_config(new_config):

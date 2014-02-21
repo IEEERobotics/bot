@@ -291,21 +291,19 @@ class MecDriver(driver.Driver):
         self.motors["back_right"].speed = fabs(back_right)
 
     @lib.api_call
-    def jerk(self):
+    def jerk(self, jerk_speed = 30, jerk_angle = 0, jerk_time = 3)):
         """Makes small forward jump in position.
             """
 
-        #Time and speed of jerk.
-        jerk_time = 3
-        jerk_speed = 30
 
         # Set motor to "speed"
-        for motor in self.motors.itervalues():
-            motor.speed = jerk_speed
-            motor.direction = "forward"
+        move(jerk_speed,jerk_angle)
 
         # Wait for "time" seconds
         sleep(jerk_time)
+
+        # stop after moving for jerk_time
+        move(0,0)
 
         # stop motors.
         for motor in self.motors.itervalues():

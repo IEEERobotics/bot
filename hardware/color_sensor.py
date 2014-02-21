@@ -49,7 +49,7 @@ class ColorSensor(I2CDevice):
         #       This ensures that normalized values indicate relative proportions.
         #       We could also normalize each by a constant, say, the max value (65535).
         c = float(c)
-	c /= self.max_c #normalize to 0-1
+        c /= self.max_c #normalize to 0-1
         r /= c
         g /= c
         b /= c
@@ -63,6 +63,16 @@ class ColorSensor(I2CDevice):
         g = self.registers['GDATA'].read()
         b = self.registers['BDATA'].read()
         return valid, c, r, g, b
+        
+    def get_percentage(self):
+        """ Returns what portion of detected color is 
+        """
+        v, c, r, g, b = self.get_data_normalized()
+        c = float(c)
+        r = (r/c)*100
+        g = (r/g)*100
+        b = (r/b)*100
+        
 
     def get_baseline(self):
         v, c, r, g, b = self.get_data_normalized()
@@ -75,11 +85,12 @@ def read_loop():
     while True:
         try:
             elapsed = time.time() - t0
-            #print "[{:8.3f}] ".format(elapsed),
-            valid, c, r, g, b = colorSensor.read_data()  # raw read
+            print "[{:8.3f}] ".format(elapsed),
+            #valid, c, r, g, b = colorSensor.read_data()  # raw read
             #print "v: {}  c: {}, r: {}, g: {} b: {}".format(valid, c, r, g, b)
-            v, c, r, g, b = colorSensor.get_data_normalized()  # read normalized RGB values
+            # v, c, r, g, b = colorSensor.get_data_normalized()  # read normalized RGB values 
             print "v: {}, c: {:5.3f}, r: {:5.3f}, g: {:5.3f}, b: {:5.3f}".format(v, c, r, g, b)
+            
             time.sleep(0.1)
         except KeyboardInterrupt:
             break

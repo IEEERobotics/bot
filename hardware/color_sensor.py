@@ -70,8 +70,8 @@ class ColorSensor(I2CDevice):
         v, c, r, g, b = self.get_data_normalized()
         c = float(c)
         r = (r/c)*100
-        g = (r/g)*100
-        b = (r/b)*100
+        g = (g/c)*100
+        b = (b/c)*100
         
 
     def get_baseline(self):
@@ -100,8 +100,7 @@ def read_loop():
             #Find out which color has plurality of percentage.
             if (g > (r+b)):
                 print "green found!"
-                self.logger.debug("Found green at val: v: {}, c: {}, r: {},\
-                                    g: {}, b: {}".format(v, c, r, g, b))
+                self.logger.debug("Found green at val: v: {}, c: {}, r: {},g: {}, b: {}".format(v, c, r, g, b))
 
             print "v: {}, c: {:5.3f}, r: {:5.3f}, g: {:5.3f}, b: {:5.3f}".format(v, c, r, g, b)
 

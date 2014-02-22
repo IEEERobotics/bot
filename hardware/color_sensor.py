@@ -81,6 +81,13 @@ class ColorSensor(I2CDevice):
 def read_loop():
     """Instantiate a ColorSensor object and read indefinitely."""
     colorSensor = ColorSensor()
+    
+    #gets base values for all colors.
+    bv, bc, br, bg, bb  = colorSensor.get_baseline()
+    self.logger.debug("baseline: bv: {}, bc: {}, br: {},\
+                                        bg: {}, bb: {}".format(bv, bc, br, bg, bb))
+
+    
     t0 = time.time()
     while True:
         try:
@@ -89,8 +96,15 @@ def read_loop():
             #valid, c, r, g, b = colorSensor.read_data()  # raw read
             #print "v: {}  c: {}, r: {}, g: {} b: {}".format(valid, c, r, g, b)
             # v, c, r, g, b = colorSensor.get_data_normalized()  # read normalized RGB values 
-            print "v: {}, c: {:5.3f}, r: {:5.3f}, g: {:5.3f}, b: {:5.3f}".format(v, c, r, g, b)
             
+            #Find out which color has plurality of percentage.
+            if (g > (r+b)):
+                print "green found!"
+                self.logger.debug("Found green at val: v: {}, c: {}, r: {},\
+                                    g: {}, b: {}".format(v, c, r, g, b))
+
+            print "v: {}, c: {:5.3f}, r: {:5.3f}, g: {:5.3f}, b: {:5.3f}".format(v, c, r, g, b)
+
             time.sleep(0.1)
         except KeyboardInterrupt:
             break

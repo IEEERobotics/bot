@@ -80,7 +80,7 @@ class CtrlServer(object):
         self.logger = lib.get_logger()
 
         # Testing flag will cause objects to run on simulated hardware
-        if testing:
+        if testing is True or testing == "True":
             self.logger.info("CtrlServer running in test mode")
             lib.set_testing(True)
         elif testing is None:

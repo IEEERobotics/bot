@@ -1,24 +1,24 @@
 #!/bin/bash
 
 echo "Populating filesystem..."
-chown -R root.root fs
-rsync -va fs/* /
+chown -R root.root fs-*
+echo "  common files"
+rsync -va fs-common/* /
+update-rc.d bbb defaults
 
-#cat /dev/null > /etc/udev/rules.d/70-persistent-net.rules
+if [ "$1" == "bot" ]; then
+    echo "  bot-only files"
+    rsync -va fs-bot/* /
+    update-rc.d masquerade defaults
 
-echo
-echo Enabling uplink...
-ifup wlan1
+    echo Enabling uplink...
+    ifup wlan1
+    echo
 
-echo
-echo "Updating packages..."
-
-export DEBIAN_FRONTEND=noninteractive
-DPKG_OPTS=Dpkg::Options::="--force-confold"
-
-apt-get update
-apt-get -y purge udhcpd
-apt-get -y -o ${DPKG_OPTS} install hostapd dnsmasq
-
-update-rc.d masquerade defaults
-
+    echo "Updating packages for hostap..."
+    export DEBIAN_FRONTEND=noninteractive
+    DPKG_OPTS=Dpkg::Options::="--force-confold"
+    apt-get update
+    apt-get -y purge udhcpd
+    apt-get -y -o ${DPKG_OPTS} install hostapd dnsmasq
+fi

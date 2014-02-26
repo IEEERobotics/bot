@@ -1,8 +1,9 @@
 #!/bin/bash
 
-source pwm.sh
-source gpio.sh
-source adc.sh
+dir=$(dirname $0)
+source $dir/pwm.sh
+source $dir/gpio.sh
+source $dir/adc.sh
 
 # Drive motor 0: P9_31 (pwm0/ehr0A), P9_25 (gpio117)
 load_pwm     0

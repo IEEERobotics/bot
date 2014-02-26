@@ -17,6 +17,11 @@ dmcc_bad_motor_def: {
     a_bad_motor: { foo: 1, bar: 2 }
 }
 
+dmcc_inverted: {
+    normal_motor: { board_num: 1, motor_num: 2 },
+    inverted_motor: { board_num: 1, motor_num: 2, invert: True }
+}
+
 turret_servos:
 - {PWM: 2, axis: yaw}  # Turret servo - pan: P9_42 (pwm2/ecap0)
 - {PWM: 7, axis: pitch}  # Turret servo - tilt: P9_28 (pwm7/ecap2)

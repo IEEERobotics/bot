@@ -1,14 +1,17 @@
-drive_motors:  # [deprecated: using DMCC motors instead]
-- {GPIO: 117, PWM: 0, position: front_right}  # Drive motor 0: P9_31 (pwm0/ehr0A), P9_25 (gpio117)
-- {GPIO: 115, PWM: 1, position: front_left}   # Drive motor 1: P9_29 (pwm1/ehr0B), P9_27 (gpio115)
-- {GPIO: 47, PWM: 5, position: back_left}     # Drive motor 2: P8_19 (pwm5/ehr2B), P8_15 (gpio47)
-- {GPIO: 45, PWM: 6, position: back_right}    # Drive motor 3: P8_13 (pwm6/ehr2A), P8_11 (gpio45)
-dmcc_motors: {
+testing: false
+
+dmcc_drive_motors: {
     front_left: { board_num: 0, motor_num: 1 },
     front_right: { board_num: 0, motor_num: 2 },
     back_left: { board_num: 1, motor_num: 1 },
     back_right: { board_num: 1, motor_num: 2 }
 }
+
+dmcc_turret_motors: {
+    left: { board_num: 2, motor_num: 1 },
+    right: { board_num: 2, motor_num: 2 },
+}
+
 turret_servos:
 - {PWM: 2, axis: yaw}  # Turret servo - pan: P9_42 (pwm2/ecap0)
 - {PWM: 7, axis: pitch}  # Turret servo - tilt: P9_28 (pwm7/ecap2)
@@ -58,7 +61,6 @@ test_pwm_base_dir: simulator/pins/pwm/pwm
 test_gpio_base_dir: simulator/pins/gpio/gpio
 test_adc_base_dir: simulator/pins/adc
 fsm_tests: ./planner/tests/input/RobotNormalTest.txt
-testing: false
 server_protocol: tcp
 server_bind_host: "*"  # Special hostname servers bind to, for listening on all interfaces
 server_host: 127.0.0.1  # Default hostname clients connect to

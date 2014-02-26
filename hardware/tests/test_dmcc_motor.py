@@ -61,6 +61,31 @@ class TestDMCCMotor(TestCase):
         motor.power = 50
         assert motor.power == 50
 
+    def test_power_invert(self):
+        """Test the effect of setting inverted power mode"""
+        motor_conf = self.config['dmcc_inverted']
+        motor_set = DMCCMotorSet(motor_conf)
+        normal = motor_set['normal_motor']
+        inverted = motor_set['inverted_motor']
+        normal.power = 25
+        self.assertEqual(normal._power, 25)
+        inverted.power = 25
+        self.assertEqual(inverted._power, -25)
+
+    def test_set_velocity_no_PID(self):
+        """Test setting the motor velocity"""
+        with self.assertRaises(RuntimeError):
+            self.motor_set['front_left'].velocity = 0
+
+    def test_set_velocity(self):
+        """Test setting the motor velocity"""
+        motor = self.motor_set['front_left']
+        motor.setVelocityPID(1000,100,10)
+        motor.velocity = 0
+        assert motor.velocity == 0
+        motor.velocity = 50
+        assert motor.velocity == 50
+
     @expectedFailure
     def test_get_voltage(self):
         """Test getting the supply voltage for a motor"""

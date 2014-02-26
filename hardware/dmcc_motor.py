@@ -1,16 +1,17 @@
-"""Abstraction layer for DMCC-based motors."""
+")""Abstraction layer for DMCC-based motors."""
 
 import lib.lib as lib
 import pyDMCC
 from collections import defaultdict
 
-class DMCCMotorSet(object):
+class DMCCMotorSet(dict):
     """A single interface to a collection of DMCCs and associated motors."""
 
     def __init__(self, motor_config):
         """Initialize a set of DMCCs and their associated motors
 
-        :param motor_config: Config entry mapping motor names to DMCC ids and motor indices
+        :param motor_config: Config entry mapping motor names to DMCC ids and
+        motor indices
 
         Dictionary entries are in the format:
             <motor_name>: { board_num: [0-3], motor_num: [1-2] }
@@ -33,12 +34,18 @@ class DMCCMotorSet(object):
             self.logger.debug("Found %d physical DMCC boards" % len(dmccs))
         else:
             self.logger.debug("Skipping autodetect due to test mode")
-            dmccs = defaultdict(lambda: pyDMCC.DMCC(0, verify=False, bus=None))
+            dmccs = defaultdict(lambda: pyDMCC.DMCC(0, verify=False,
+                                                    bus=None))
 
         self.motors = {}
         for name,conf in motor_config.items():
+            if 'invert' in conf.keys():
+                invert = conf['invert']
+            else:
+                invert = False
             try:
-                self.motors[name] = DMCCMotor( dmccs[conf['board_num']], conf['motor_num'] )
+                self.motors[name] = DMCCMotor(dmccs[conf['board_num']],
+                                              conf['motor_num'], invert )
             except KeyError:
                 self.logger.error("Bad motor definition for motor: '{}'".format(name))
                 raise KeyError
@@ -49,17 +56,21 @@ class DMCCMotorSet(object):
         return self.motors[index]
 
     def __str__(self):
-        return "{} for motors: {}".format(self.__class__.__name__, self.motors.keys())
+        return "{} for motors: {}".format(self.__class__.__name__,
+                                          self.motors.keys())
 
 
 class DMCCMotor(object):
 
-    def __init__(self, dmcc, motor_num):
+    def __init__(self, dmcc, motor_num, invert = False):
         """Wraps an individual pyDMCC motor
 
-        :param dmcc: Controlling dmcc, None when testing
+        :param dmcc: Controlling pyDMCC.DMCC object, None when testing
         :param motor_num: Motor number in motor_num_range.
+        :param invert: Set to True if all values should be inverted
         :type motor_num: int
+
+        Attribute real_motor is the instantiated pyDMCC.Motor
 
         """
         self.config = lib.get_config()
@@ -70,6 +81,18 @@ class DMCCMotor(object):
         self.dmcc = dmcc
         self.real_motor = dmcc.motors[motor_num]
         self.motor_num = motor_num
+        self.invert = invert
+        if invert:
+            self.inversion_multiplier = -1
+        else:
+            self.inversion_multiplier = 1
+
+        if self.is_testing:
+            self._pos_kP = self._pos_kI = self._pos_kD = 0
+            self._vel_kP = self._vel_kI = self._vel_kD = 0
+        else:
+            self._pos_kP, self._pos_kI, self._pos_kD = self.real_motor.position_pid
+            self._vel_kP, self._vel_kI, self._vel_kD = self.real_motor.velocity_pid
 
         self._power = 0  # last set power; DMCC can't read back power (yet!)
         if self.is_testing:
@@ -94,8 +117,11 @@ class DMCCMotor(object):
 
         :returns: The most recently set motor power
 
+        The DMCC boards don't support querying power directly (the I2C
+        register is alway zero), so we have to keep track of this ourselves.
+
         """
-        return self._power
+        return self._power * self.inversion_multiplier
 
     @power.setter
     def power(self, value):
@@ -106,10 +132,15 @@ class DMCCMotor(object):
 
         """
         # NB: don't use logging that involves expensive formatting
+        value *= self.inversion_multiplier
         self.logger.debug("Setting motor %d-%d power to %d",
                 self.dmcc.cape_num, self.motor_num, value)
-        self.motor = value
-        self._power = value  # if someone asks later on
+
+        # We can't query the power setting, even from a physcial DMCC,
+        # so we always have to do our own bookkeeping
+        self._power = value
+        if not self.is_testing:
+            self.real_motor.power = value
 
     @property
     def position(self):
@@ -119,10 +150,10 @@ class DMCCMotor(object):
 
         """
         if self.is_testing:
-            return self._position
-        return DMCC.getQEI(self.board_num, self.motor_num)
-        # TODO: Ensure getQEI() actually returns ticks in position_range
-        # TODO: Ensure setTargetPos() and getQEI() operate on the same units
+            val =  self._position
+        else:
+            val = self.real_motor.position
+        return val * self.inversion_multiplier
 
     @position.setter
     def position(self, value):
@@ -134,12 +165,10 @@ class DMCCMotor(object):
         :returns: Boolean value indicating success.
 
         """
-        value = self.position_range.clamp(value)
+        value *= self.inversion_multiplier
         if self.is_testing:
             self._position = value
-            return True
-        return DMCC.setTargetPos(
-            self.board_num, self.motor_num, value) == 0
+        self.real_motor.position = value
 
     @property
     def velocity(self):
@@ -149,10 +178,10 @@ class DMCCMotor(object):
 
         """
         if self.is_testing:
-            return self._velocity
-        return DMCC.getQEIVel(self.board_num, self.motor_num)
-        # TODO: Ensure getQEIVel() actually returns ticks/sec in velocity_range
-        # TODO: Ensure setTargetVel() and getQEIVel() operate on the same units
+            val = self._velocity
+        else:
+            val = self.real_motor.velocity
+        return val * self.inversion_multiplier
 
     @velocity.setter
     def velocity(self, value):
@@ -164,45 +193,39 @@ class DMCCMotor(object):
         :returns: Boolean value indicating success.
 
         """
-        value = self.velocity_range.clamp(value)
+
+        value *= self.inversion_multiplier
+        self.logger.debug("Setting motor %d-%d velociy to %d",
+                self.dmcc.cape_num, self.motor_num, value)
+        # Verify that we've set meaningful PID constants
+        if self._vel_kP == 0:
+            self.logger.warning("Can't set motor %d-%d velocity: kP not set.",
+                self.dmcc.cape_num, self.motor_num)
+            raise RuntimeError
+
         if self.is_testing:
             self._velocity = value
-            return True
-        return DMCC.setTargetVel(
-            self.board_num, self.motor_num, value) == 0
-
-    def setPID(self, target, P, I, D):
-        """Set PID target parameter (position or velocity) and constants.
-        NOTE: Call specialized methods setXXXPID() instead of this directly.
-
-        :param target: Desired parameter to control (0=position, 1=velocity).
-        :type target: int
-        :param P: Proportional gain constant.
-        :type int:
-        :param I: Integral gain constant.
-        :type int:
-        :param D: Differential gain constant.
-        :type int:
-
-        :returns: Boolean value indicating success.
-
-        """
-        if self.is_testing:
-            return True
-        return DMCC.setPIDConstants(self.board_num, self.motor_num,
-                                    target, P, I, D) == 0
+        else:
+            self.real_motor.velocity = value
 
     def setPositionPID(self, P, I, D):
-        """Set PID constants to control position [see setPID()]."""
-        return self.setPID(0, P, I, D)
+        """Set PID constants to control position."""
+        self._pos_kP = P
+        self._pos_kI = I
+        self._pos_kD = D
+        if not self.is_testing:
+            self.real_motor.position_pid = (P, I, D)
 
     def setVelocityPID(self, P, I, D):
-        """Set PID constants to control velocity [see setPID()]."""
-        return self.setPID(1, P, I, D)
+        """Set PID constants to control velocity."""
+        self._vel_kP = P
+        self._vel_kI = I
+        self._vel_kD = D
+        if not self.is_testing:
+            self.real_motor.velocity_pid = (P, I, D)
 
     def __str__(self):
         """Returns basic motor ID information as a string."""
-        # NOTE: Properties (position, velocity) would be slow to read
         return "{}: {{ DMCC: {} motor_num: {} }}".format(
             self.__class__.__name__, self.dmcc.cape_num, self.motor_num)
 

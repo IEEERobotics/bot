@@ -109,6 +109,21 @@ class TestRotate(test_bot.TestBot):
                     assert MecDriver.min_speed <= motor.speed <= \
                         MecDriver.max_speed
 
+    def test_move_zero(self):
+        self.logger.info("Running test_move_zero()")
+        self.logger.debug("Setting to zero")
+        self.md.move(0,0)
+        self.assertEqual(self.md.speed, 0)
+        self.logger.debug("Setting to 50")
+        self.md.move(50,0)
+        self.assertNotEqual(self.md.speed, 0)
+        self.logger.debug("Setting to zero again")
+        self.md.move(0,0)
+        self.assertEqual(self.md.speed, 0)
+        self.logger.debug("Setting to zero with angle")
+        self.md.move(0,90)
+        self.assertEqual(self.md.speed, 0)
+
     def test_move_forward_strafe(self):
         speed_error_margin = (MecDriver.max_speed -
                               MecDriver.min_speed) * 0.05

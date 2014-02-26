@@ -49,7 +49,7 @@ class MecDriver(driver.Driver):
 
     def set_motor(self, name, value):
         if self.mode == 'power':
-            self.motors[name].power = value 
+            self.motors[name].power = value
         else:
             self.motors[name].velocity = value
 
@@ -167,8 +167,11 @@ class MecDriver(driver.Driver):
 
         # Handle zero speed, prevent divide-by-zero error
         if speed == 0:  # TODO deadband (epsilon) check?
-            for motor in self.motors.itervalues():
-                motor.speed = 0
+            self.logger.debug("Special case for speed == 0")
+            self.set_motor("front_left", 0)
+            self.set_motor("front_right", 0)
+            self.set_motor("back_left", 0)
+            self.set_motor("back_right", 0)
             return
 
         # Calculate motor speeds

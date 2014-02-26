@@ -6,7 +6,14 @@ class ColorSensor(I2CDevice):
 
     # TODO: Make these config items and load in __init__()
     max_c = 65536
-
+    
+    #Base values to be changed by get_baseline 
+    base_v = 0
+    base_clear = 0
+    base_green = 0
+    base_red = 0
+    base_blue = 0
+    
     def __init__(self):
         I2CDevice.__init__(self, 1, 0x29, config='tcs3472_i2c.yaml')
 
@@ -43,17 +50,22 @@ class ColorSensor(I2CDevice):
         print "Read: {:08b}".format(enable.read_byte())
         print
 
+    @property
+    def base_data(self):
+         return self.bv, self.bc,  
+        
+    
     def get_data_normalized(self):
         valid, c, r, g, b = self.read_data()
         # NOTE: It appears that c = r + g + b, so 1/c is a good normalizing factor.
         #       This ensures that normalized values indicate relative proportions.
         #       We could also normalize each by a constant, say, the max value (65535).
         c = float(c)
-        c /= self.max_c #normalize to 0-1
+
         r /= c
         g /= c
         b /= c
-        #c /= self.max_c  # normalize c to [0, 1] range
+        c /= self.max_c  # normalize c to [0, 1] range
         return valid, c, r, g, b  # return valid flag if someone's interested
 
     def read_data(self):
@@ -68,46 +80,61 @@ class ColorSensor(I2CDevice):
         """ Returns what portion of detected color is 
         """
         v, c, r, g, b = self.get_data_normalized()
-        c = float(c)
-        r = (r/c)*100
-        g = (g/c)*100
-        b = (b/c)*100
+        # c = float(c)
+        total = r + g + b
+        r = (r/total)*100
+        g = (g/total)*100
+        b = (b/total)*100
+        return v, c, r, g, b
         
 
     def get_baseline(self):
-        v, c, r, g, b = self.get_data_normalized()
+        base_v, base_c, base_r,\
+                base_g, base_b \
+                = self.get_data_normalized()
+       
         return v, c, r, g, b
-
+    
+    def percent_diff(self):
+        """Returns percent diff
+        for use in color decisions.        
+        """
+    
+    def is_it_green(self,color):
+        """ finds percent difference between baseline
+            and current reading.
+        """
+        
+            
 def read_loop():
     """Instantiate a ColorSensor object and read indefinitely."""
+    print "start"
     colorSensor = ColorSensor()
-    
     #gets base values for all colors.
     bv, bc, br, bg, bb  = colorSensor.get_baseline()
-    self.logger.debug("baseline: bv: {}, bc: {}, br: {},\
-                                        bg: {}, bb: {}".format(bv, bc, br, bg, bb))
+    # self.logger.debug("baseline: bv: {}, bc: {}, br: {}, bg: {}, bb: {}".format(bv, bc, br, bg, bb))
 
-    
+    print "before loop"
     t0 = time.time()
     while True:
         try:
             elapsed = time.time() - t0
             print "[{:8.3f}] ".format(elapsed),
-            #valid, c, r, g, b = colorSensor.read_data()  # raw read
+            v, c, r, g, b = colorSensor.read_data()  # raw read
             #print "v: {}  c: {}, r: {}, g: {} b: {}".format(valid, c, r, g, b)
             # v, c, r, g, b = colorSensor.get_data_normalized()  # read normalized RGB values 
-            
-            #Find out which color has plurality of percentage.
-            if (g > (r+b)):
-                print "green found!"
-                self.logger.debug("Found green at val: v: {}, c: {}, r: {},g: {}, b: {}".format(v, c, r, g, b))
-
+            #v, c, r, g, b = colorSensor.get_percentage()
             print "v: {}, c: {:5.3f}, r: {:5.3f}, g: {:5.3f}, b: {:5.3f}".format(v, c, r, g, b)
-
+            # Find out which color has plurality of percentage.
+            # print "v: {}, c: {:5.3f}, r: {:5.3f}, g: {:5.3f}, b: {:5.3f}".format(v, c, r, g, b)
+            
+                
             time.sleep(0.1)
         except KeyboardInterrupt:
             break
     print "Done."
+    
+    
 
 
 if __name__ == "__main__":

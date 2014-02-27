@@ -24,7 +24,7 @@ secondLineCLDist = 4.0 + 5.0 / (8.0 * 12.0)
 thirdLineCLDist = 2.0 + 10.0 / 12.0 + 15.0 / (16.0 * 12)
 
 targetHeight = 26.9375 / 12 * ft_to_m #Height of the center of the target in meters
-targetX = 0.6096 # X-coordinate of the center of the target
+targetX = 0.5842 # X-coordinate of the center of the target
 
 def getTargetDistance(Xpos, Ypos):
     """Calculate the horizontal distance to the target, from X & Y coordinates"""
@@ -34,7 +34,7 @@ def getTargetDistance(Xpos, Ypos):
 
 def getHorizLaunchAngle(Xpos, Ypos):
     """Calculate the horizontal (pan) angle to the target, from X & Y coordinates"""
-    deflectionAngle = math.atan2(Ypos,(targetX-Xpos))
+    deflectionAngle = math.atan2((targetX-Xpos),Ypos)
     return math.degrees(deflectionAngle)
 
 def getMinElevationAngle(distance):
@@ -103,11 +103,12 @@ def getFiringSolution(Xpos,Ypos):
             z=z0
             elevAngle = elevAngle + 0.25
             print "Elevation Angle ++: : {0:.3f}".format(elevAngle)
+    print "Horizontal Angle:", horizDeflection
     return elevAngle
 
 
 """Testing"""
-Ypos = firstLineCLDist
-Xpos = .2
+Ypos = 60.0/12.0*ft_to_m
+Xpos = 40/12.0*ft_to_m
 angle = getFiringSolution(Xpos, Ypos)
 print "Angle: ", angle

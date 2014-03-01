@@ -8,11 +8,11 @@ class ColorSensor(I2CDevice):
     max_c = 65536
     
     #Base values to be changed by get_baseline 
-    base_v = 0
-    base_clear = 0
-    base_green = 0
-    base_red = 0
-    base_blue = 0
+    bv = 0.0
+    bc = 0.0
+    bg = 0.0
+    br = 0.0
+    bb = 0.0
     
     def __init__(self):
         I2CDevice.__init__(self, 1, 0x29, config='tcs3472_i2c.yaml')
@@ -51,10 +51,15 @@ class ColorSensor(I2CDevice):
         print
 
     @property
-    def base_data(self):
-         return self.bv, self.bc,  
-        
-    
+    def color(self):
+        v, c, r, g, b = self.read_data()
+        color = {"clear":c, \
+                "red":r,\
+                "green":g, \
+                "blue":b}
+        return color
+
+
     def get_data_normalized(self):
         valid, c, r, g, b = self.read_data()
         # NOTE: It appears that c = r + g + b, so 1/c is a good normalizing factor.
@@ -89,21 +94,38 @@ class ColorSensor(I2CDevice):
         
 
     def get_baseline(self):
-        base_v, base_c, base_r,\
-                base_g, base_b \
-                = self.get_data_normalized()
-       
-        return v, c, r, g, b
+
+        self.bv, self.bc, \
+        self.br, self.bg, \
+        self.bb = self.read_data()
     
-    def percent_diff(self):
+    def get_percent_diff(self):
         """Returns percent diff
         for use in color decisions.        
         """
+        diff_c = abs((self.color["clear"] - self.bc)/self.bc)
+        diff_r = abs((self.color["red"] - self.br)/self.br) 
+        diff_g = abs((self.color["green"] - self.bg)/self.bg) 
+        diff_b = abs((self.color["blue"] - self.bb)/self.bb) 
+        
+        # diff_c = abs((self.color["clear"] - self.bc)/self.bc)*100
+        # diff_r = abs((self.color["red"] - self.br)/self.br) * 100
+        # diff_g = abs((self.color["green"] - self.bg)) * 100
+        # diff_b = abs((self.color["blue"] - self.bb)/self.bb) *100
+        
+        
+        return diff_c, diff_r, diff_g, diff_b
     
-    def is_it_green(self,color):
+    def is_green(self):
         """ finds percent difference between baseline
             and current reading.
         """
+        diff_c, diff_r, diff_g, diff_b = self.get_percent_diff()
+        
+        print "diff_c", diff_c, "diff_r",diff_r, "diff_g",diff_g, "diff_b",diff_b 
+        if (abs(diff_g)) > (abs(diff_b) + abs(diff_r)):
+            return True
+
         
             
 def read_loop():
@@ -111,7 +133,16 @@ def read_loop():
     print "start"
     colorSensor = ColorSensor()
     #gets base values for all colors.
-    bv, bc, br, bg, bb  = colorSensor.get_baseline()
+    time.sleep(0.5)
+    colorSensor.get_baseline()
+
+    print "bv: {}, bc: {:5.3f}, br: {:5.3f}, bg: {:5.3f}, bb: {:5.3f}".format(colorSensor.bv, \
+                                                                            colorSensor.bc,\
+                                                                            colorSensor.br,\
+                                                                            colorSensor.bg,\
+                                                                            colorSensor.bb)
+
+
     # self.logger.debug("baseline: bv: {}, bc: {}, br: {}, bg: {}, bb: {}".format(bv, bc, br, bg, bb))
 
     print "before loop"
@@ -120,15 +151,18 @@ def read_loop():
         try:
             elapsed = time.time() - t0
             print "[{:8.3f}] ".format(elapsed),
+            
             v, c, r, g, b = colorSensor.read_data()  # raw read
+            
+            print "v: {}, c: {:5.3f}, r: {:5.3f}, g: {:5.3f}, b: {:5.3f}".format(v, c, r, g, b)
+            if colorSensor.is_green():
+                print "Found green"
             #print "v: {}  c: {}, r: {}, g: {} b: {}".format(valid, c, r, g, b)
             # v, c, r, g, b = colorSensor.get_data_normalized()  # read normalized RGB values 
             #v, c, r, g, b = colorSensor.get_percentage()
-            print "v: {}, c: {:5.3f}, r: {:5.3f}, g: {:5.3f}, b: {:5.3f}".format(v, c, r, g, b)
             # Find out which color has plurality of percentage.
             # print "v: {}, c: {:5.3f}, r: {:5.3f}, g: {:5.3f}, b: {:5.3f}".format(v, c, r, g, b)
             
-                
             time.sleep(0.1)
         except KeyboardInterrupt:
             break

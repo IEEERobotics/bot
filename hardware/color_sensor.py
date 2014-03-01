@@ -103,10 +103,10 @@ class ColorSensor(I2CDevice):
         """Returns percent diff
         for use in color decisions.        
         """
-        diff_c = abs((self.color["clear"] - self.bc)/self.bc)
-        diff_r = abs((self.color["red"] - self.br)/self.br) 
-        diff_g = abs((self.color["green"] - self.bg)/self.bg) 
-        diff_b = abs((self.color["blue"] - self.bb)/self.bb) 
+        diff_c = (self.color["clear"] - self.bc)/self.bc
+        diff_r = (self.color["red"] - self.br)/self.br
+        diff_g = (self.color["green"] - self.bg)/self.bg
+        diff_b = (self.color["blue"] - self.bb)/self.bb
         
         # diff_c = abs((self.color["clear"] - self.bc)/self.bc)*100
         # diff_r = abs((self.color["red"] - self.br)/self.br) * 100
@@ -123,7 +123,7 @@ class ColorSensor(I2CDevice):
         diff_c, diff_r, diff_g, diff_b = self.get_percent_diff()
         
         print "diff_c", diff_c, "diff_r",diff_r, "diff_g",diff_g, "diff_b",diff_b 
-        if (abs(diff_g)) > (abs(diff_b) + abs(diff_r)):
+        if (diff_g) > (diff_b + diff_r):
             return True
 
         
@@ -132,6 +132,7 @@ def read_loop():
     """Instantiate a ColorSensor object and read indefinitely."""
     print "start"
     colorSensor = ColorSensor()
+
     #gets base values for all colors.
     time.sleep(0.5)
     colorSensor.get_baseline()
@@ -167,7 +168,7 @@ def read_loop():
         except KeyboardInterrupt:
             break
     print "Done."
-    
+
     
 
 

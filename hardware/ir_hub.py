@@ -185,6 +185,24 @@ class IRHub(object):
         return self.reading
 
     @lib.api_call
+    def read_binary(self, thresh=200):
+        """Convert 0-255 values to binary.
+
+        0 is black, 1 is white. Note that this is a quick hack.
+        TODO: Make more efficent.
+
+        :param thresh: Cutoff value for white/black (< thesh is white).
+        :type thresh: int
+        :returns: IR readings, converted to white/black binary.
+
+        """
+        readings = self.read_all()
+        for name, reading in readings.iteritems():
+            for i in len(reading):
+                readings[name][i] = 0 if reading[i] > thresh else 1
+        return readings
+
+    @lib.api_call
     def read_cached(self, max_staleness=1):
         """Get cached IR data if it's fresher than param, else read IRs.
 

@@ -185,7 +185,7 @@ class IRHub(object):
         return self.reading
 
     @lib.api_call
-    def read_binary(self, thresh=200):
+    def read_binary(self, thresh=150):
         """Convert 0-255 values to binary.
 
         0 is black, 1 is white. Note that this is a quick hack.

@@ -230,7 +230,9 @@ class MecDriver(driver.Driver):
         Note: I have no idea how to predict where the bot ends up
         during compound movement.
 
-        speed, angular_rate is number between 0, 100.
+        speed is number between 0, 100.
+        angular_rate is number between -100, 100.
+        TODO(napratin, 2/28): Check angular_rate range.
         """
 
         # Speeds should add up to max_speed (100)
@@ -244,14 +246,14 @@ class MecDriver(driver.Driver):
                                                     angular_rate))
 
         # Calculate overall voltage multiplier
-        front_left = translate_speed * sin(angle * pi / 180 + pi / 4) + \
-            angular_rate
-        front_right = translate_speed * cos(angle * pi / 180 + pi / 4) - \
-            angular_rate
-        back_left = translate_speed * cos(angle * pi / 180 + pi / 4) + \
-            angular_rate
-        back_right = translate_speed * sin(angle * pi / 180 + pi / 4) - \
-            angular_rate
+        front_left = translate_speed * \
+            sin(translate_angle * pi / 180 + pi / 4) + angular_rate
+        front_right = translate_speed * \
+            cos(translate_angle * pi / 180 + pi / 4) - angular_rate
+        back_left = translate_speed * \
+            cos(translate_angle * pi / 180 + pi / 4) + angular_rate
+        back_right = translate_speed * \
+            sin(translate_angle * pi / 180 + pi / 4) - angular_rate
 
         # Normalize so that at least one wheel_speed equals maximum wheel_speed
         max_wheel_speed = max([

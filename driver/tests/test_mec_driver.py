@@ -170,6 +170,28 @@ class TestRotate(test_bot.TestBot):
                 for motor in self.md.motors.itervalues():
                     assert MecDriver.min_speed <= motor.speed <= \
                                                   MecDriver.max_speed
+    def test_compound_move(self):
+        # NOTE: This is just a dumb function that calls compound_move()
+        #       It does not verify if the motor powers set are correct.
+        for translate_speed in xrange(MecDriver.min_speed + 1,
+                                      MecDriver.max_speed + 1, 10):
+            for translate_angle in xrange(MecDriver.min_angle,
+                                          MecDriver.max_angle + 1, 10):
+                for angular_rate in xrange(MecDriver.min_speed,
+                                           MecDriver.max_speed + 1, 10):
+                    # Issue compound_move command
+                    self.logger.debug("Set speed: {:3d}, angle: {:3d}, " \
+                        "rate: {:3d}".format(translate_speed, translate_angle,
+                        angular_rate))
+                    self.md.compound_move(translate_speed, translate_angle,
+                        angular_rate)
+                    self.logger.debug("Check speed: {:3d}, angle: {:3d}"
+                        .format(self.md.speed, self.md.angle))
+
+                    # Check for valid duty cycles (speeds)
+                    for motor in self.md.motors.itervalues():
+                        assert MecDriver.min_speed <= motor.speed <= \
+                            MecDriver.max_speed
 
     """
     def test_oscillate(self):

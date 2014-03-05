@@ -8,3 +8,7 @@
 *.egg-info
 *.log
 *.log.[0-9]*
+
+/build
+/dist
+.venv

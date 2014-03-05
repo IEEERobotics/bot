@@ -11,13 +11,13 @@
 
 case "$1" in
 start|reload|force-reload|restart)
-        /bot/setup/setup_all.sh
+        /root/startup/setup_all.sh
         ;;
 stop)
         exit 0
         ;;
 *)
-        echo "Usage: /etc/init.d/bbb {start|stop}"
+        echo "Usage: $0 {start|stop}"
         exit 1
         ;;
 esac

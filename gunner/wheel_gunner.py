@@ -1,5 +1,7 @@
 """Logic for firing using a wheel-based design."""
 
+import time
+
 import gunner
 import hardware.wheel_gun as wgun_mod
 import lib.lib as lib
@@ -14,23 +16,20 @@ class WheelGunner(gunner.Gunner):
 
         # Build WheelGun
         self.gun = wgun_mod.WheelGun()
-    
+
     @lib.api_call
-    def auto_fire(self):
+    def fire(self, x_pos, y_pos):
         """Get location, aim turret, accelerate wheels and advance dart."""
-        # Get the block we're over
-        block = self.localizer.which_block()
-        self.logger.debug("Location: {}".format(block))
-
-        # Get targeting information for the block we're over
-        yaw = self.targ["rows"][block["row"]]["slots"][block["slot"]]["yaw"]
-        ptch = self.targ["rows"][block["row"]]["slots"][block["slot"]]["pitch"]
-        spd = self.targ["rows"][block["row"]]["slots"][block["slot"]]["speed"]
-
-        # Aim turret and fire dart
-        self.aim_turret(yaw, ptch)
-        # TODO(dfarrell07): Wait until turret has moved
-        # TODO: Update to use variable speed once capes are installed
+        # Go ahead and spin up the gun, to get it to speed
         self.gun.spin = 1
+
+        pitch = self.calc_pitch(x_pos, y_pos)
+        yaw = self.calc_yaw(x_pos, y_pos)
+        self.aim_turret(yaw, ptch)
+
+        # Wait for turrent to have moved
+        time.sleep(.2)
+
+        # Actuate motor to push dart into spinning wheels
         self.gun.fire()
         self.logger.info("Fired dart")

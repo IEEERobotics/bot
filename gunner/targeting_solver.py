@@ -106,13 +106,13 @@ def getServoAngle(elevAngle):
     servoAngle = 5 + elevAngle + 12*math.pow(log,2.3)
     return servoAngle
 
-"""Testing"""
-with open('InputFile.csv') as f:
-    for line in f:
-        coords = line.split(",")
-        Xpos = float(coords[0])
-        Ypos = float(coords[1])
-        angle = getFiringSolution(Xpos, Ypos)
-        print "Angle: ", angle
-        servoAngle = getServoAngle(angle)
-        print "Servo Angle: ", servoAngle
+#"""Testing"""
+#with open('InputFile.csv') as f:
+#    for line in f:
+#        coords = line.split(",")
+#        Xpos = float(coords[0])
+#        Ypos = float(coords[1])
+#        angle = getFiringSolution(Xpos, Ypos)
+#        print "Angle: ", angle
+#        servoAngle = getServoAngle(angle)
+#        print "Servo Angle: ", servoAngle

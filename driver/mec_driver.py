@@ -238,7 +238,10 @@ class MecDriver(driver.Driver):
         # Speeds should add up to max_speed (100)
         # TODO: Should this be fabs(rotate_speed)?
         total_speed = translate_speed + angular_rate
-        assert total_speed <= MecDriver.max_speed
+        if total_speed > MecDriver.max_speed:
+            self.logger.warn("Total speed of move exceeds max: {}/{}".format(
+                total_speed, MecDriver.max_speed))
+
         self.logger.debug("translate_speed: {}, " +
                           "translate_angle: {}, " +
                           "angular_rate: {}".format(translate_speed,

@@ -100,12 +100,18 @@ def getFiringSolution(Xpos,Ypos):
     print "Target distance:",targetDistance
     return elevAngle
 
+def getServoAngle(elevAngle):
+    log = math.log10(elevAngle)
+    print log
+    servoAngle = 5 + elevAngle + 12*math.pow(log,2.3)
+    return servoAngle
 
 """Testing"""
-
 with open('InputFile.csv') as f:
     for line in f:
         print line,
 
-#angle = getFiringSolution(Xpos, Ypos)
-#print "Angle: ", angle
+angle = getFiringSolution(Xpos, Ypos)
+print "Angle: ", angle
+servoAngle = getServoAngle(angle)
+print "Servo Angle: ", servoAngle

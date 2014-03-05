@@ -14,7 +14,7 @@ dmcc_turret_motors: {
 
 turret_servos:
 - {PWM: 2, axis: yaw}  # Turret servo - pan: P9_42 (pwm2/ecap0)
-- {PWM: 7, axis: pitch}  # Turret servo - tilt: P9_28 (pwm7/ecap2)
+- {PWM: 4, axis: pitch}  # Turret servo - tilt: P9_16 (pwm4)
 gun: {
     max_trigger_duration: 0.25,  # Maximum duration a trigger pin can be high
     laser_gpio: 8,  # Gun laser: P8_35 (gpio8)

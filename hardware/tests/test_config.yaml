@@ -22,6 +22,10 @@ dmcc_inverted: {
     inverted_motor: { board_num: 1, motor_num: 2, invert: True }
 }
 
+two_motors:
+    - {GPIO: 117, PWM: 0}
+    - {GPIO: 115, PWM: 1}
+
 turret_servos:
 - {PWM: 2, axis: yaw}  # Turret servo - pan: P9_42 (pwm2/ecap0)
 - {PWM: 7, axis: pitch}  # Turret servo - tilt: P9_28 (pwm7/ecap2)

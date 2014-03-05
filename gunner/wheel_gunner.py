@@ -25,7 +25,7 @@ class WheelGunner(gunner.Gunner):
 
         pitch = self.calc_pitch(x_pos, y_pos)
         yaw = self.calc_yaw(x_pos, y_pos)
-        self.aim_turret(yaw, ptch)
+        self.aim_turret(yaw, pitch)
 
         # Wait for turrent to have moved
         time.sleep(.2)

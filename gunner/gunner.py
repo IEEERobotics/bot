@@ -52,7 +52,7 @@ class Gunner(object):
     @lib.api_call
     def calc_yaw(self, x_pos, y_pos):
         """TODO: Clean up"""
-        yaw_angle = targeter.getHorizLaunchAngle(x_pos, y_pos)
+        yaw_angle = targeter.getHorizLaunchAngle(x_pos, y_pos) + 90
         return yaw_angle
     
     @lib.api_call

@@ -17,18 +17,12 @@ Tmax = .3  # Maximum seconds to simulate
 z0 = 0.3  # vertical position of the dart (initially at height of the launcher)
 V = 10.00 # Initial velocity of dart at launch
 
-
-"""This block of variables is the centerline distance for each firing line"""
-firstLineCLDist = 2.0 + 10.0 / 12.0 + 15.0 / (16.0 * 12.0)
-secondLineCLDist = 4.0 + 5.0 / (8.0 * 12.0)
-thirdLineCLDist = 2.0 + 10.0 / 12.0 + 15.0 / (16.0 * 12)
-
-targetHeight = 26.9375 / 12 * ft_to_m #Height of the center of the target in meters
+targetHeight = 0.684215 #Height of the center of the target in meters
 targetX = 0.5842 # X-coordinate of the center of the target
 
 def getTargetDistance(Xpos, Ypos):
     """Calculate the horizontal distance to the target, from X & Y coordinates"""
-    sum_of_squares = math.pow(Xpos,2) + math.pow(Ypos,2)
+    sum_of_squares = math.pow((targetX-Xpos),2) + math.pow(Ypos,2)
     hypoteneuse = math.sqrt(sum_of_squares)
     return hypoteneuse
 
@@ -76,15 +70,14 @@ def getVertLaunchAngle(V, Theta, z, targetDistance):
         #print "Time: {0:.3f}".format(t)
 
         if x >= targetDistance:
-            print "Target Height: ", targetHeight
-            print "Z pos: : {0:.3f}".format(z)
-            print "Target Distance: ", targetDistance
-            print "X pos: : {0:.3f}".format(x)
+            #print "Target Height: ", targetHeight
+            #print "Z pos: : {0:.3f}".format(z)
+            #print "Target Distance: ", targetDistance
+            #print "X pos: : {0:.3f}".format(x)
             break
 
         t += DeltaT
     return z
-
 
 def getFiringSolution(Xpos,Ypos):
     """Returns the horizontal and vertical launch angles , given position
@@ -94,7 +87,7 @@ def getFiringSolution(Xpos,Ypos):
     targetDistance = getTargetDistance(Xpos,Ypos) #horizontal distance to target in m
     horizDeflection = getHorizLaunchAngle(Xpos,Ypos) #pan angle in degrees
     elevAngle = getMinElevationAngle(targetDistance) #lower bounds angle in degrees
-    print "Min Elevation Angle: : {0:.3f}".format(elevAngle)
+    print "Min Vert Angle: : {0:.3f}".format(elevAngle)
 
     z=z0
     while z < targetHeight:
@@ -104,11 +97,15 @@ def getFiringSolution(Xpos,Ypos):
             elevAngle = elevAngle + 0.25
             print "Elevation Angle ++: : {0:.3f}".format(elevAngle)
     print "Horizontal Angle:", horizDeflection
+    print "Target distance:",targetDistance
     return elevAngle
 
 
 """Testing"""
-Ypos = 60.0/12.0*ft_to_m
-Xpos = 40/12.0*ft_to_m
-angle = getFiringSolution(Xpos, Ypos)
-print "Angle: ", angle
+
+with open('InputFile.csv') as f:
+    for line in f:
+        print line,
+
+#angle = getFiringSolution(Xpos, Ypos)
+#print "Angle: ", angle

@@ -2,6 +2,7 @@
 
 import sys
 from time import time
+import numpy as np
 
 import lib.lib as lib
 import hardware.ir_hub as ir_hub_mod
@@ -23,11 +24,54 @@ class Follower(object):
 
         # Build PIDs
         self.front_pid = pid_mod.PID()
+        self.front_error = 0.0
         self.back_pid = pid_mod.PID()
+        self.back_error = 0.0
+        self.error = 0.0
 
         # Initialize other members
+        # IR position values, e.g. [-8.0, -7.0 ..., 8.0]
+        self.ir_pos = dict()
+        # IR aggregate values = sum(ir_pos * readings) / sum(readings)
+        self.ir_agg = dict()
+        for name, array in self.ir_hub.arrays:
+            self.ir_pos[name] = np.float32(np.linspace(
+                -(len(array) / 2), (len(array) / 2), len(array)))
+            # TODO(napratin,3/4): Ensure proper ordering?
+            self.ir_agg[name] = None  # None when no unit is lit
+            self.logger.debug("ir_pos['{}'] = {}"
+                .format(name, self.ir_pos[name]))
+
         self.intersection = False
         self.lost_line = False
+        self.timeLastUpdated = -1.0
+
+    @lib.api_call
+    def update(self):
+        """Read IR values, compute aggregates."""
+        ir_readings = self.ir_hub.read_binary(60)
+        for name, reading in ir_readings:
+            reading_arr = np.int_(reading)  # convert readings to numpy array
+            reading_sum = np.sum(np_reading)  # = no. of units lit
+            if reading_sum > 0:
+                self.ir_agg[name] = (np.sum(self.ir_pos * reading_arr)
+                                    / reading_sum)
+            else:
+                self.ir_agg[name] = None
+        self.timeLastUpdated = time.time()
+    
+    @lib.api_call
+    def get_ir_agg(self):
+        """Return IR aggregates, i.e. sum(pos * readings) / sum(readings)."""
+        return self.ir_agg
+
+    @lib.api_call
+    def get_front_error(self):
+        return self.front_error
+
+    @lib.api_call
+    def get_back_error(self):
+        return self.back_error
 
     @lib.api_call
     def is_start(self):
@@ -74,22 +118,22 @@ class Follower(object):
                 self.logger.warning(self.error)
                 self.logger.warning(self.front_state)
                 self.logger.warning(self.back_state)
-		self.driver.move(0,0)
+                self.driver.move(0,0)
                 return
             # Get the current time of the CPU
             current_time = time()
             # Call front PID
             self.sampling_time = current_time - previous_time
             # Call front PID
-            front_error = self.front_pid.pid(
+            self.front_error = self.front_pid.pid(
                 0, self.front_state, self.sampling_time)
             # Call back PID
-            back_error = self.back_pid.pid(
+            self.back_error = self.back_pid.pid(
                 0, self.back_state, self.sampling_time)
             # Update motors
-            self.motors(front_error, back_error)
+            self.motors(self.front_error, self.back_error)
             # Take the current time set it equal to the previous time
-            previous_time = current_time	
+            previous_time = current_time
 
     @lib.api_call
     def center_on_x(self):
@@ -392,4 +436,4 @@ class Follower(object):
         self.logger.info("post translate_angle = {} ".format(translate_angle))
         self.driver.move(translate_speed, translate_angle) 
         #self.driver.compound_move(
-       #     translate_speed, translate_angle, rotate_speed)
+        #    translate_speed, translate_angle, rotate_speed)

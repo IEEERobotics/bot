@@ -95,23 +95,24 @@ def getFiringSolution(Xpos,Ypos):
         if z < targetHeight:
             z=z0
             elevAngle = elevAngle + 0.25
-            print "Elevation Angle ++: : {0:.3f}".format(elevAngle)
+            #print "Elevation Angle ++: : {0:.3f}".format(elevAngle)
     print "Horizontal Angle:", horizDeflection
-    print "Target distance:",targetDistance
+    #print "Target distance:",targetDistance
     return elevAngle
 
 def getServoAngle(elevAngle):
+    """Returns the servo position required for actuation to set a given launch angle """
     log = math.log10(elevAngle)
-    print log
     servoAngle = 5 + elevAngle + 12*math.pow(log,2.3)
     return servoAngle
 
 """Testing"""
 with open('InputFile.csv') as f:
     for line in f:
-        print line,
-
-angle = getFiringSolution(Xpos, Ypos)
-print "Angle: ", angle
-servoAngle = getServoAngle(angle)
-print "Servo Angle: ", servoAngle
+        coords = line.split(",")
+        Xpos = float(coords[0])
+        Ypos = float(coords[1])
+        angle = getFiringSolution(Xpos, Ypos)
+        print "Angle: ", angle
+        servoAngle = getServoAngle(angle)
+        print "Servo Angle: ", servoAngle

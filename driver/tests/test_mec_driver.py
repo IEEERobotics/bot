@@ -179,7 +179,7 @@ class TestRotate(test_bot.TestBot):
         # Issue compound_move command
         translate_speed = 75
         translate_angle = 45
-        angular_rate = 50 
+        angular_rate = 50
         self.logger.debug("Set speed: {:3d}, angle: {:3d}, " \
             "rate: {:3d}".format(translate_speed, translate_angle,
             angular_rate))

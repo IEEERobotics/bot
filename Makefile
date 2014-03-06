@@ -27,5 +27,6 @@ clean:
 	@find . -name '*.log' -print0 | xargs -0 rm -f
 	@find . -name '*.log.[0-9]*' -print0 | xargs -0 rm -f
 	@find . -name "*.pyc" -print0 | xargs -0 rm -f
+	@rm -rf simulator/pins/*/*
 
 # vim: set noexpandtab:

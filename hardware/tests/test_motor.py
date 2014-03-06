@@ -21,6 +21,8 @@ class TestSpeed(TestBot):
         # Build motor in testing mode
         self.pwm_num = self.config["two_motors"][0]["PWM"]
         self.gpio_num = self.config["two_motors"][0]["GPIO"]
+        self.setup_pwm(self.pwm_num, "1\n", "0\n", "1000\n", "0\n")
+        self.setup_gpio(self.gpio_num)
         self.motor = m_mod.Motor(self.pwm_num, self.gpio_num)
 
     def tearDown(self):
@@ -72,7 +74,7 @@ class TestSpeed(TestBot):
         assert self.motor.speed == 0
 
 
-class TestDirection(TestCase):
+class TestDirection(TestBot):
 
     """Test setting and checking the direction of a motor."""
 
@@ -85,7 +87,12 @@ class TestDirection(TestCase):
         # Build motor in testing mode
         self.pwm_num = self.config["two_motors"][0]["PWM"]
         self.gpio_num = self.config["two_motors"][0]["GPIO"]
+        self.setup_pwm(self.pwm_num, "1\n", "0\n", "1000\n", "0\n")
+        self.setup_gpio(self.gpio_num)
         self.motor = m_mod.Motor(self.pwm_num, self.gpio_num)
+
+    def tearDown(self):
+        pass
 
     def test_forward(self):
         """Test motor in forward direction using text and int syntax."""

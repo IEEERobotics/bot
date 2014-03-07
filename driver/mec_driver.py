@@ -264,15 +264,15 @@ class MecDriver(driver.Driver):
         back_right = translate_speed * sin(angle * pi / 180 + pi / 4) - \
             rotate_speed
 
-        # Normalize so that at least one wheel_speed equals maximum wheel_speed
-        max_wheel_speed = max([
-            fabs(front_left), fabs(front_right), fabs(back_left),
-            fabs(back_right)
-        ])
-        front_left = front_left * translate_speed / max_wheel_speed
-        front_right = front_right * translate_speed / max_wheel_speed
-        back_left = back_left * translate_speed / max_wheel_speed
-        back_right = back_right * translate_speed / max_wheel_speed
+        # # Normalize so that at least one wheel_speed equals maximum wheel_speed
+        # max_wheel_speed = max([
+            # fabs(front_left), fabs(front_right), fabs(back_left),
+            # fabs(back_right)
+        # ])
+        # front_left = front_left * translate_speed / max_wheel_speed
+        # front_right = front_right * translate_speed / max_wheel_speed
+        # back_left = back_left * translate_speed / max_wheel_speed
+        # back_right = back_right * translate_speed / max_wheel_speed
 
         # Set motor directions
         self.motors["front_left"].direction = "forward" if front_left > 0 \

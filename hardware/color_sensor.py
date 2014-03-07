@@ -1,19 +1,21 @@
 import time
 from i2c_device.i2c_device import I2CDevice
 
+
 class ColorSensor(I2CDevice):
+
     """Wrapper class for TCS3472 I2C-based color sensor."""
 
     # TODO: Make these config items and load in __init__()
     max_c = 65536
-    
-    #Base values to be changed by get_baseline 
+
+    #Base values to be changed by get_baseline
     bv = 0.0
     bc = 0.0
     bg = 0.0
     br = 0.0
     bb = 0.0
-    
+
     def __init__(self):
         I2CDevice.__init__(self, 1, 0x29, config='tcs3472_i2c.yaml')
 
@@ -39,9 +41,9 @@ class ColorSensor(I2CDevice):
         print "AVALID: {}".format(status.read('AVALID'))
 
         print "Enabling power via control register:"
-        enable.write('PON','Enable')
+        enable.write('PON', 'Enable')
         print "Enabling ADCs via control register:"
-        enable.write('AEN','Enable')
+        enable.write('AEN', 'Enable')
 
         #enable.write('PON','Disable')
 
@@ -53,18 +55,19 @@ class ColorSensor(I2CDevice):
     @property
     def color(self):
         v, c, r, g, b = self.read_data()
-        color = {"clear":c, \
-                "red":r,\
-                "green":g, \
-                "blue":b}
+        color = {"clear": c,
+                  "red": r,
+                  "green": g,
+                  "blue": b}
         return color
-
 
     def get_data_normalized(self):
         valid, c, r, g, b = self.read_data()
-        # NOTE: It appears that c = r + g + b, so 1/c is a good normalizing factor.
-        #       This ensures that normalized values indicate relative proportions.
-        #       We could also normalize each by a constant, say, the max value (65535).
+        # NOTE: It appears that c = r + g + b
+        # so 1/c is a good normalizing factor.
+        # This ensures that normalized values indicate relative proportions.
+        # We could also normalize each by a constant,
+        # say, the max value (65535).
         c = float(c)
 
         r /= c
@@ -80,9 +83,9 @@ class ColorSensor(I2CDevice):
         g = self.registers['GDATA'].read()
         b = self.registers['BDATA'].read()
         return valid, c, r, g, b
-        
+
     def get_percentage(self):
-        """ Returns what portion of detected color is 
+        """ Returns what portion of detected color is
         """
         v, c, r, g, b = self.get_data_normalized()
         # c = float(c)
@@ -91,14 +94,14 @@ class ColorSensor(I2CDevice):
         g = (g/total)*100
         b = (b/total)*100
         return v, c, r, g, b
-        
 
     def get_baseline(self):
-
+        """Obtains "base" colors to work from
+        """
         self.bv, self.bc, \
         self.br, self.bg, \
         self.bb = self.read_data()
-    
+
     def get_percent_diff(self):
         """Returns percent diff
         for use in color decisions.        
@@ -155,7 +158,12 @@ def read_loop():
             
             v, c, r, g, b = colorSensor.read_data()  # raw read
             
-            print "v: {}, c: {:5.3f}, r: {:5.3f}, g: {:5.3f}, b: {:5.3f}".format(v, c, r, g, b)
+            # print "v: {}, c: {:5.3f}, r: {:5.3f}, g: {:5.3f}, b: {:5.3f}".format(v, c, r, g, b)
+            print "bv: {}, bc: {:5.3f}, br: {:5.3f}, bg: {:5.3f}, bb: {:5.3f}".format(colorSensor.bv, \
+                                                                        colorSensor.bc,\
+                                                                        colorSensor.br,\
+                                                                        colorSensor.bg,\
+                                                                        colorSensor.bb)
             if colorSensor.is_green():
                 print "Found green"
             #print "v: {}  c: {}, r: {}, g: {} b: {}".format(valid, c, r, g, b)

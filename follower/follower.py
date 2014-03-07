@@ -249,7 +249,7 @@ class Follower(object):
         """
         # Get the current IR readings
         if current_ir_reading is None:
-            current_ir_reading = self.ir_hub.read_binary(60)
+            current_ir_reading = self.ir_hub.read_binary(60,False)
         # Heading west
         if self.heading == 0:
             # Forward is on the left side
@@ -407,13 +407,12 @@ class Follower(object):
         # Calculate translate_speed
         # MAX speed - error in the front sensor / total number
         # of states
-        translate_speed =  80 - ( front_error / 16 )
+        translate_speed =  70 - ( front_error / 16 )
         # Calculate rotate_speed
         # Max speed - Translate speed
         rotate_speed = 100 - translate_speed
         # Calculate translate_angle
         translate_angle = back_error * (180 / 16)
-        self.logger.info("pre translate_angle = {} ".format(translate_angle))
         if translate_angle < 0:
             # Swift to the left
             translate_angle = 360 + translate_angle
@@ -433,7 +432,7 @@ class Follower(object):
             # If rotate_speed is greater than 100 set to 100
             rotate_speed = 0
         # Adjust motor speeds
-        self.logger.info("post translate_angle = {} ".format(translate_angle))
+        self.logger.info("post translate_angle = {}, translate_speed = {}   ".format(translate_angle, translate_speed))
         self.driver.move(translate_speed, translate_angle) 
         #self.driver.compound_move(
         #    translate_speed, translate_angle, rotate_speed)

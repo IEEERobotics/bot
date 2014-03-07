@@ -34,55 +34,79 @@
 #define PRU0_ARM_INTERRUPT 19
 
 // front (Trig: P9_25, Echo: P9_27)
-#define TRIG1_CONT  GPIO3
-#define TRIG1_GPIO  21
-#define ECHO1_CONT  GPIO3
-#define ECHO1_GPIO  19
+#define TRIG1_GPIO  GPIO3
+#define TRIG1_PIN  21
+#define ECHO1_GPIO  GPIO3
+#define ECHO1_PIN  19
 
 // back (Trig: P8_11, Echo: P8_15)
-#define TRIG2_CONT  GPIO1
-#define TRIG2_GPIO  13
-#define ECHO2_CONT  GPIO1
-#define ECHO2_GPIO  15
+#define TRIG2_GPIO  GPIO1
+#define TRIG2_PIN  13
+#define ECHO2_GPIO  GPIO1
+#define ECHO2_PIN  15
 
 // left (Trig: P9_30, Echo: P9_24)
-#define TRIG3_CONT  GPIO3
-#define TRIG3_GPIO  16
-#define ECHO3_CONT  GPIO0
-#define ECHO3_GPIO  15
+#define TRIG3_GPIO  GPIO3
+#define TRIG3_PIN  16
+#define ECHO3_GPIO  GPIO0
+#define ECHO3_PIN  15
 
 // right (Trig: P9_29, Echo: P9_31)
-#define TRIG4_CONT  GPIO1
-#define TRIG4_GPIO  15
-#define ECHO4_CONT  GPIO1
-#define ECHO4_GPIO  14
+#define TRIG4_GPIO  GPIO3
+#define TRIG4_PIN  15
+#define ECHO4_GPIO  GPIO3
+#define ECHO4_PIN  14
+
+.macro gpio_output
+.mparam gpio, pin
+    // Enable trigger as output and echo as input
+    // NOTE! OE must be *cleared* for an output, set for input
+    MOV   r3, gpio | GPIO_OE
+    LBBO  r2, r3, 0, 4
+    CLR   r2, pin   // trigger pin (GPIO1_13), set as output
+    SBBO  r2, r3, 0, 4
+.endm
+
+.macro gpio_input
+.mparam gpio, pin
+    MOV   r3, gpio | GPIO_OE
+    LBBO  r2, r3, 0, 4
+    SET   r2, pin   // echo pin (GPIO1_15), set as input
+    SBBO  r2, r3, 0, 4
+.endm
 
 // Initialize hardware
 START:
     // Allow the PRU to access memories outside its own map
     // C4 is the addr of PRU_ICSS_CFG registers [see RG:10.1]
-    LBCO r0, C4, 4, 4  // load 4 bytes from C4+4 (SYSCFG reg)  [RG:10.1.2]
-    CLR r0, r0, 4      // clear bit 4 (enable OCP master ports?)
-    SBCO r0, C4, 4, 4
+    LBCO  r0, C4, 4, 4  // load 4 bytes from C4+4 (SYSCFG reg)  [RG:10.1.2]
+    CLR   r0, r0, 4      // clear bit 4 (enable OCP master ports?)
+    SBCO  r0, C4, 4, 4
 
     // Make constant 24 (c24) point to the beginning of PRU0 data ram
     // PRU_CTRL_REG base is 0x22000 (+20 is CTBIR0)
-    MOV       r0, 0x00000000
-    MOV       r1, 0x22020     // CTBIR0, constant block table index [RG:5.4.6]
-    SBBO      r0, r1, 0, 4    // sets *both* C24 and C25 to 0?
+    MOV   r0, 0x00000000
+    MOV   r1, 0x22020     // CTBIR0, constant block table index [RG:5.4.6]
+    SBBO  r0, r1, 0, 4    // sets *both* C24 and C25 to 0?
 
-    // Enable trigger as output and echo as input
-    // NOTE! OE must be *cleared* for an output, set for input
-    MOV r3, GPIO1 | GPIO_OE
-    LBBO r2, r3, 0, 4
-    CLR r2, 13          // trigger pin (GPIO1_13), set as output
-    SET r2, 15          // echo pin (GPIO1_15), set as input
-    SBBO r2, r3, 0, 4
+    gpio_output TRIG1_GPIO, TRIG1_PIN
+    gpio_input  ECHO1_GPIO, ECHO1_PIN
+    gpio_output TRIG2_GPIO, TRIG2_PIN
+    gpio_input  ECHO2_GPIO, ECHO2_PIN
+    gpio_output TRIG3_GPIO, TRIG3_PIN
+    gpio_input  ECHO3_GPIO, ECHO3_PIN
+    gpio_output TRIG4_GPIO, TRIG4_PIN
+    gpio_input  ECHO4_GPIO, ECHO4_PIN
 
-    // clear data transfer space
-    SBCO r0, c24, 0, 4   // pulse time
-    SBCO r0, c24, 4, 4   // pre-pulse time
-    SBCO r0, c24, 8, 4   // flag
+    MOV   r0, 0   // 4 bytes of data to initialize with
+    MOV   r1, 0   // word counter
+    MOV   r2, 0   // addr counter
+    // clear data transfer space we need
+INIT_DATAMEM:
+    SBCO  r0, c24, r2, 4   // pulse time
+    ADD   r1, r1, 1
+    ADD   r2, r2, 4
+    QBNE  INIT_DATAMEM, r1, 8   // we will return 8 words of data
 
     // Fire the sonar
 TRIGGER:
@@ -149,8 +173,6 @@ SAMPLE_ECHO_DELAY_1US:
 ECHO_COMPLETE:
     // Store the microsecond count in the PRU data ram
     SBCO r4, c24, 0, 4
-
-    SBCO r2, c24, 8, 4  // save pins
 
     // Trigger the PRU0 interrupt (C program recognized the event)
     //   bit [0:3] are interrupt# - 16 (so PRU0_ARM_INT=19 => 3)

@@ -70,6 +70,12 @@ int main (void)
         //printf("      Flag = %d\n", (int) pruData[2]);
         printf("       Distance = %f cm\n", (float) pruData[0] / 58.77);
         printf("       Distance = %f in\n", (float) pruData[0] / 149.3);
+        printf("\n");
+        printf("       Pre-pulse (count) = %d\n", (int) pruData[3]);
+        printf("       Pulse (us) = %d\n", (int) pruData[2]);
+        //printf("      Flag = %d\n", (int) pruData[2]);
+        printf("       Distance = %f cm\n", (float) pruData[2] / 58.77);
+        printf("       Distance = %f in\n", (float) pruData[2] / 149.3);
         i++;
     }
 

@@ -413,7 +413,7 @@ class Follower(object):
         rotate_speed = 100 - translate_speed
         # Calculate translate_angle
         translate_angle = back_error * (180 / 16)
-        self.logger.info("pre translate_angle = {}, time {}  ".format(translate_angle,time.time()))
+        self.logger.info("pre translate_angle = {}, time {}  ".format(translate_angle,time()))
         if translate_angle < 0:
             # Swift to the left
             translate_angle = 360 + translate_angle

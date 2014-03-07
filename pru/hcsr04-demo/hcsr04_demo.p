@@ -33,9 +33,33 @@
 // PRU interrupt for PRU0
 #define PRU0_ARM_INTERRUPT 19
 
+// front (Trig: P9_25, Echo: P9_27)
+#define TRIG1_CONT  GPIO3
+#define TRIG1_GPIO  21
+#define ECHO1_CONT  GPIO3
+#define ECHO1_GPIO  19
+
+// back (Trig: P8_11, Echo: P8_15)
+#define TRIG2_CONT  GPIO1
+#define TRIG2_GPIO  13
+#define ECHO2_CONT  GPIO1
+#define ECHO2_GPIO  15
+
+// left (Trig: P9_30, Echo: P9_24)
+#define TRIG3_CONT  GPIO3
+#define TRIG3_GPIO  16
+#define ECHO3_CONT  GPIO0
+#define ECHO3_GPIO  15
+
+// right (Trig: P9_29, Echo: P9_31)
+#define TRIG4_CONT  GPIO1
+#define TRIG4_GPIO  15
+#define ECHO4_CONT  GPIO1
+#define ECHO4_GPIO  14
+
 // Initialize hardware
 START:
-    // Allow the PRU to access memories outside its own map (just code I found on the interwebs)
+    // Allow the PRU to access memories outside its own map
     // C4 is the addr of PRU_ICSS_CFG registers [see RG:10.1]
     LBCO r0, C4, 4, 4  // load 4 bytes from C4+4 (SYSCFG reg)  [RG:10.1.2]
     CLR r0, r0, 4      // clear bit 4 (enable OCP master ports?)
@@ -87,14 +111,6 @@ WAIT_ECHO:
     // Read the GPIO in register
     LBBO r2, r3, 0, 4    // copy 4 bytes of GPIO1:DATAIN into r2
 
-    // Mask all bits but the desired one
-    //AND r2, r2, 1<<7
-    //MOV r0, 1<<15
-    //AND r2, r2, r0
-
-    // original hcsr04 code had an inverter in front of echo!
-    //QBNE WAIT_ECHO, r2, 0  // Jump if r2 != 0
-
     ADD r4, r4, 1  // keep track of how long it takes to first see the pulse
     QBBC WAIT_ECHO, r2, 15  // loop while bit 15 is low
 
@@ -106,24 +122,19 @@ SAMPLE_ECHO:
     // Read the GPIO in register
     LBBO r2, r3, 0, 4  // load GPIO1:DATAIN into r2
 
-    // Mask all but the desired bit
-    //AND r2, r2, 1<<7
-    //MOV r0, 1<<15
-    //AND r2, r2, r0
-
-    // If the pin is not low, (i.e. not zero because of mask), branch to echo complete
-    //QBNE ECHO_COMPLETE, r2, 0
-   
     //MOV r0, 79
     //QBGE SAMPLE_ECHO_DELAY_1US, r4, 5 // sample at least 5 times
 
     QBBC ECHO_COMPLETE, r2, 15  // break when bit 15 goes low
 
-    // TODO: give up after r4 grows too large (38ms)
+    // Bail if we've waited too long (15us, ~8ft)
+    MOV r0, 15000
+    QBLE ECHO_COMPLETE, r4, r0  // branch when 15000 < r4
 
-    // Delay 1 microsecond (delay itself is less than a microseconds because it takes time to query the GPIO
+    // Delay 1 microsecond between queries
+    // Loop time is less than a 1us sicne it takes time to query the GPIO
     // register due to it not being within the local address space of the PRU
-    MOV r0, 79
+    MOV r0, 79   // loop 79 times (79 * 10ns = 0.79us)
 SAMPLE_ECHO_DELAY_1US:
     SUB r0, r0, 1
     QBNE SAMPLE_ECHO_DELAY_1US, r0, 0
@@ -146,7 +157,8 @@ ECHO_COMPLETE:
     //   bit 5 marks as valid
     MOV r31.b0, PRU0_ARM_INTERRUPT+16
 
-    // Delay 33 milliseconds to allow sonar to stop resonating and for sound burst to decay in environment
+    // Delay 33 milliseconds to allow sonar to stop resonating and for sound
+    // burst to decay in environment
     MOV r0, 3300000
 RESET_DELAY_33MS:
     SUB r0, r0, 1
@@ -154,3 +166,4 @@ RESET_DELAY_33MS:
 
     // Jump back to triggering the sonar
     JMP TRIGGER
+

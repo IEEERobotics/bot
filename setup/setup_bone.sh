@@ -2,9 +2,8 @@
 # Install standard software, do git configuration
 
 # Each should only contain the packages that are added at that level
-base="git python-yaml libzmq-dev python-zmq python-simplejson python-smbus python-virtualenv python-pip"
+base="git python-yaml libzmq-dev python-zmq python-simplejson python-smbus python-virtualenv python-pip python-numpy"
 extra="vim-nox ipython tmux screen nmap tree build-essential python-dev i2c-tools wireless-tools grc"
-# python-numpy
 
 while getopts faubh opt; do
     case $opt in

@@ -28,7 +28,7 @@ two_motors:
 
 turret_servos:
 - {PWM: 2, axis: yaw}  # Turret servo - pan: P9_42 (pwm2/ecap0)
-- {PWM: 7, axis: pitch}  # Turret servo - tilt: P9_28 (pwm7/ecap2)
+- {PWM: 4, axis: pitch}  # Turret servo - tilt: P9_16 (pwm4)
 ultrasonics: {  # locations are [x, y] in meters, assume approx. 30cm x 30cm bot with right = +X axis, top = +Y axis
     front: { gpio: -1, location: [  0.0,  0.15], direction: [ 0.0,  1.0] },
     left:  { gpio: -1, location: [-0.15,     0], direction: [-1.0,  0.0] },

@@ -27,7 +27,7 @@ set_duty     2  1500000  # 1.5ms, standard neutral point
 set_polarity 2 0
 run_pwm      2  # zero the servo on setup
 
-# Turret servo - tilt/pitch: P9_28 (pwm4/EHR1B)
+# Turret servo - tilt/pitch: P9_16 (pwm4/EHR1B)
 load_pwm     4
 set_period   4 20000000  # 20ms, standard servo period
 set_duty     4  1500000  # 1.5ms, standard neutral point

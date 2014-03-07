@@ -111,9 +111,9 @@ class Follower(object):
         # Continue until an error condition
         while True:
             # Assign the current states to the correct heading
-            self.logger.info("time in {}").format(time())
+            self.logger.info("time in {}").format(time()))
             self.assign_states()
-            self.logger.info("time out {}").format(time())
+            self.logger.info("time out {}".format(time()))
             # Check for error conditions
             if self.error != 0:
                 self.update_exit_state()

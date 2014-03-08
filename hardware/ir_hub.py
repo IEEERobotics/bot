@@ -102,6 +102,8 @@ class IRHub(object):
         Note that this applies to all arrays. So, selecting unit n
         implies selecting it for all arrays managed by this abstraction.
 
+        Note that this is on Follower's critical path. Keep it fast.
+
         :param n: IR unit to select, between 0 and num_ir_units-1.
         :type n: int
         :raises ValueError: If n isn't between 0 and num_ir_units-1
@@ -123,6 +125,8 @@ class IRHub(object):
 
         The method updates the cached reading value for the nth unit
         of each array managed by this abstraction.
+
+        Note that this is on Follower's critical path. Keep it fast.
 
         :param n: IR unit to read, between 0 and num_ir_units-1.
         :type n: int
@@ -148,13 +152,14 @@ class IRHub(object):
         Note: Caller should make a copy if a read_all_units() is executed
         while previous values are being used.
 
+        Note that this is on Follower's critical path. Keep it fast.
+
         :returns: Readings from all IR sensor units managed by this object.
 
         """
         # TODO more efficient loop using permutations?
         for unit_n in xrange(self.num_ir_units):
             self.read_nth_units(unit_n)
-        self.logger.debug("IR reading: {}".format(self.reading))
         self.last_read_time = time()
         return self.reading
 
@@ -163,7 +168,9 @@ class IRHub(object):
         """Convert 0-255 values to binary.
 
         0 is black, 1 is white. Note that this is a quick hack.
-        TODO: Make more efficent.
+        TODO: Make more efficent with numpy?
+
+        Note that this is on Follower's critical path. Keep it fast.
 
         :param thresh: Cutoff value for white/black (< thesh is white).
         :type thresh: int

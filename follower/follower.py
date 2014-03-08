@@ -111,9 +111,7 @@ class Follower(object):
         # Continue until an error condition
         while True:
             # Assign the current states to the correct heading
-            self.logger.info("time in {}".format(time()))
             self.assign_states()
-            self.logger.info("time out {}".format(time()))
             # Check for error conditions
             if self.error != 0:
                 self.update_exit_state()
@@ -250,9 +248,11 @@ class Follower(object):
 
         """
         # Get the current IR readings
+        self.logger.info("time in {}".format(time()))
         if current_ir_reading is None:
             current_ir_reading = self.ir_hub.read_binary(60)
         # Heading west
+        self.logger.info("time out {}".format(time()))
         if self.heading == 0:
             # Forward is on the left side
             self.front_state = self.get_position_lr(

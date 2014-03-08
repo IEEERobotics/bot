@@ -249,7 +249,7 @@ class Follower(object):
         """
         # Get the current IR readings
         if current_ir_reading is None:
-            current_ir_reading = self.ir_hub.read_binary(60,False)
+            current_ir_reading = self.ir_hub.read_binary(100,False)
         # Heading west
         if self.heading == 0:
             # Forward is on the left side

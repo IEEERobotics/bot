@@ -409,7 +409,7 @@ class Follower(object):
         # Calculate translate_speed
         # MAX speed - error in the front sensor / total number
         # of states
-        translate_speed =  60 - ( front_error / 16 )
+        translate_speed =  80 - ( front_error / 16 )
         # Calculate rotate_speed
         # Max speed - Translate speed
         rotate_speed = 100 - translate_speed

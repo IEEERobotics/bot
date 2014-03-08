@@ -144,30 +144,17 @@ TRIGGER_DELAY_10US:
     MOV r4, 0  // clear our main counter
 
     // Wait for the echo to go low, i.e. wait for the echo cycle to start
-    MOV r3, ECHO2_GPIO | GPIO_DATAIN
 WAIT_ECHO:
-    // Read the GPIO in register
-    LBBO r2, r3, 0, 4    // copy 4 bytes of GPIO1:DATAIN into r2
-
     ADD r4, r4, 1  // keep track of how long it takes to first see the pulse
 
-    QBBC WAIT_ECHO, r2, ECHO2_PIN  // loop while bit 15 is low
-    //gpio_read ECHO2_GPIO, ECHO2_PIN
-    //QBEQ WAIT_ECHO, r0, 0  // loop while bit is low
+    gpio_read ECHO2_GPIO, ECHO2_PIN  // reads value of pin into r0
+    QBEQ WAIT_ECHO, r0, 0  // loop while bit is low
 
     SBCO r4, c24, 4, 4  // save pre-pulse count
-    MOV r4, 0
-
-    // Set r4 to zero, will be used to count the microseconds of the cho
+    MOV r4, 0           // zero pulse time (us) counter
 SAMPLE_ECHO:
-    // Read the GPIO in register
-    LBBO r2, r3, 0, 4  // load GPIO1:DATAIN into r2
-
-    //MOV r0, 79
-    //QBGE SAMPLE_ECHO_DELAY_1US, r4, 5 // sample at least 5 times
-
-    //QBBC ECHO_COMPLETE, r2, 15  // break when bit 15 goes low
-    QBBC ECHO_COMPLETE, r2, ECHO2_PIN  // break when bit 15 goes low
+    gpio_read ECHO2_GPIO, ECHO2_PIN  // reads value of pin into r0
+    QBEQ ECHO_COMPLETE, r0, 0  // break when bit 15 goes low
 
     // Bail if we've waited too long (15us, ~8ft)
     MOV r0, 15000

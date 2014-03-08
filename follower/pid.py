@@ -20,7 +20,7 @@ class PID(object):
         self.kd = kd
 
     def pid(self, target, process_var, timestep):
-        current_error = (target - process_var)
+        current_error = (target + process_var)
         p_error = self.kp * current_error
         d_error = self.kd * (current_error - self.previous_error) \
             / timestep

@@ -5,10 +5,10 @@
 // Base addresses of the low-level GPIO controllers
 //  GPIO0: 0-31
 //  GPIO1: 32-63, etc
-#define GPIO0              0x44e07000
-#define GPIO1              0x4804c000
-#define GPIO2              0x481ac000
-#define GPIO3              0x481ae000
+#define GPIO0  0x44e07000
+#define GPIO1  0x4804c000
+#define GPIO2  0x481ac000
+#define GPIO3  0x481ae000
 
 // Offset for the control register of the gpio controller
 #define GPIO_CTRL          0x130
@@ -35,27 +35,27 @@
 
 // front (Trig: P9_25, Echo: P9_23)
 #define TRIG1_GPIO  GPIO3
-#define TRIG1_PIN  21
+#define TRIG1_PIN   21
 #define ECHO1_GPIO  GPIO1
-#define ECHO1_PIN  17
+#define ECHO1_PIN   17
 
 // back (Trig: P8_11, Echo: P8_15)
 #define TRIG2_GPIO  GPIO1
-#define TRIG2_PIN  13
+#define TRIG2_PIN   13
 #define ECHO2_GPIO  GPIO1
-#define ECHO2_PIN  15
+#define ECHO2_PIN   15
 
 // left (Trig: P9_30, Echo: P9_24)
 #define TRIG3_GPIO  GPIO3
-#define TRIG3_PIN  16
+#define TRIG3_PIN   16
 #define ECHO3_GPIO  GPIO0
-#define ECHO3_PIN  15
+#define ECHO3_PIN   15
 
 // right (Trig: P9_29, Echo: P9_31)
 #define TRIG4_GPIO  GPIO3
-#define TRIG4_PIN  15
+#define TRIG4_PIN   15
 #define ECHO4_GPIO  GPIO3
-#define ECHO4_PIN  14
+#define ECHO4_PIN   14
 
 .macro gpio_output
 .mparam gpio, pin
@@ -78,30 +78,29 @@
 .macro gpio_low
 .mparam gpio, pin
     SET r2, pin
-    MOV r3, gpio | GPIO_CLEARDATAOUT
+    MOV r0, GPIO_CLEARDATAOUT
+    OR  r3, gpio, r0
     SBBO r2, r3, 0, 4
 .endm
 
 .macro gpio_high
 .mparam gpio, pin
     SET r2, pin
-    MOV r3, gpio | GPIO_SETDATAOUT
+    MOV r0, GPIO_SETDATAOUT
+    OR  r3, gpio, r0
     SBBO r2, r3, 0, 4
 .endm
 
 .macro gpio_read
 .mparam gpio, pin
-    MOV  r1, gpio | GPIO_DATAIN
+    MOV  r1, GPIO_DATAIN
+    OR   r1, r1, gpio
     LBBO r2, r1, 0, 4  // copy 4 bytes from GPIO1:DATAIN into r2
-    MOV  r1, 1<<pin
+    SET  r1, pin
     AND  r0, r2, r1    // select pin value
     LSR  r0, r0, pin
 .endm
 
-#define TRIG_GPIO TRIG2_GPIO
-#define TRIG_PIN TRIG2_PIN
-#define ECHO_GPIO ECHO2_GPIO
-#define ECHO_PIN ECHO2_PIN
 
 // Initialize hardware
 START:
@@ -134,9 +133,23 @@ START:
         ADD   r1, r1, 4
     END_INIT_MEM:
 
+.struct sUltrasonic
+    .u32  trigGPIO
+    .u32  echoGPIO
+    .u8   trigPin
+    .u8   echoPin
+.ends
+
+.assign sUltrasonic, r5, r7.w0, Ultrasonic
+
+MOV  Ultrasonic.trigGPIO, TRIG1_GPIO
+MOV  Ultrasonic.trigPin, TRIG1_PIN
+MOV  Ultrasonic.echoGPIO, ECHO1_GPIO
+MOV  Ultrasonic.echoPin, ECHO1_PIN
+
     // Fire the sonar
 TRIGGER:
-    gpio_high  TRIG_GPIO, TRIG_PIN
+    gpio_high Ultrasonic.trigGPIO, Ultrasonic.trigPin
     // Delay 10 microseconds (200 MHz / 2 instructions = 10 ns per loop, 10 us = 1000 loops)
     MOV r0, 1000
 
@@ -144,21 +157,20 @@ TRIGGER_DELAY_10US:
     SUB r0, r0, 1
     QBNE TRIGGER_DELAY_10US, r0, 0
 
-    gpio_low TRIG_GPIO, TRIG_PIN
-
+    gpio_low Ultrasonic.trigGPIO, Ultrasonic.trigPin
     MOV r4, 0  // clear our main counter
 
     // Wait for the echo to go low, i.e. wait for the echo cycle to start
 WAIT_ECHO:
     ADD r4, r4, 1  // keep track of how long it takes to first see the pulse
 
-    gpio_read ECHO_GPIO, ECHO_PIN  // reads value of pin into r0
+    gpio_read Ultrasonic.echoGPIO, Ultrasonic.echoPin // reads value of pin into r0
     QBEQ WAIT_ECHO, r0, 0  // loop while bit is low
 
     SBCO r4, c24, 4, 4  // save pre-pulse count
     MOV r4, 0           // zero pulse time (us) counter
 SAMPLE_ECHO:
-    gpio_read ECHO_GPIO, ECHO_PIN  // reads value of pin into r0
+    gpio_read Ultrasonic.echoGPIO, Ultrasonic.echoPin // reads value of pin into r0
     QBEQ ECHO_COMPLETE, r0, 0  // break when bit 15 goes low
 
     // Bail if we've waited too long (15us, ~8ft)
@@ -182,6 +194,9 @@ SAMPLE_ECHO_DELAY_1US:
     // When the echo is complete, do this
 ECHO_COMPLETE:
     // Store the microsecond count in the PRU data ram
+
+
+
     SBCO r4, c24, 0, 4
 
     // Trigger the PRU0 interrupt (C program recognized the event)

@@ -80,15 +80,13 @@ class IRAnalog(ir.IRArray):
         self.bus.write_word_data(self.i2c_addr, register, word_value)
 
     def read_adc_result(self):
+        """This is on Follower's critical path. Keep it fast."""
         if i2c_available:
             raw_result = swap_bytes_uint16(
                 self.bus.read_word_data(
                     self.i2c_addr, self.result_addr))
             # raw_result:- D15: alert; D14-D12, D3-D0: reserved; D11-D4: value
             result = (raw_result & self.result_mask) >> self.result_shift
-            if self.ir_verbose_output:
-                self.logger.info("Raw: {0:016b}, result: {1:08b} ({1})".format(
-                    raw_result, result))  # [debug]
             return result
         else:
             return 0

@@ -223,6 +223,43 @@ class IRHub(object):
         return {"readings": self.reading, "time": self.last_read_time,
                 "fresh": fresh}
 
+    @lib.api_call
+    def check_performance(self, num_reads=5):
+        """Time calls to the important read functions to check performance.
+
+        :param num_reads: Number of times to call each function, used for avg.
+        :type num_reads: int
+
+        """
+        # Check performance of read_binary
+        start_time = time()
+        for i in range(num_reads):
+            self.read_binary()
+        read_binary_avg = (time() - start_time) / num_reads
+
+        # Check performance of read_all
+        start_time = time()
+        for i in range(num_reads):
+            self.read_all()
+        read_all_avg = (time() - start_time) / num_reads
+
+        # Check performance of read_nth_units
+        start_time = time()
+        for i in range(num_reads):
+            self.read_nth_units(0)
+        read_nth_units_avg = (time() - start_time) / num_reads
+
+        # Check performance of select_nth_units
+        start_time = time()
+        for i in range(num_reads):
+            self.select_nth_units(0)
+        select_nth_units_avg = (time() - start_time) / num_reads
+
+        return {"read_binary_avg": read_binary_avg, 
+                "read_all_avg": read_all_avg,
+                "read_nth_units_avg": read_nth_units_avg,
+                "select_nth_units_avg": select_nth_units_avg}
+
 
 def live_read_loop(delay=0.25, accurate=False):
     # Reconfiguration (NOTE: Need to do this before instantiating IRHub)

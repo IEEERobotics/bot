@@ -103,9 +103,9 @@ class Follower(object):
         # Get the initial condition
         previous_time = time()
         # Init front_PID
-        self.front_pid.set_k_values(.5, 0, .01)
+        self.front_pid.set_k_values(1, 0, .01)
         # Inti back_PID
-        self.back_pid.set_k_values(.5, 0, .01)
+        self.back_pid.set_k_values(1, 0, .01)
         # Get current heading
         self.heading = heading
         # Continue until an error condition
@@ -413,6 +413,7 @@ class Follower(object):
         rotate_speed = 100 - translate_speed
         # Calculate translate_angle
         translate_angle = back_error * (180 / 16)
+        self.logger.info("pre translate_angle = {}, translate_speed = {}   ".format(translate_angle, translate_speed))
         if translate_angle < 0:
             # Swift to the left
             translate_angle = 360 + translate_angle

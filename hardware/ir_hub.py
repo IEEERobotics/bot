@@ -47,11 +47,6 @@ class IRHub(object):
         # Use accurate reading (ADC) or not (GPIO)
         self.ir_read_adc = config["ir_read_adc"]
 
-        # Verbose output flag
-        self.ir_verbose_output = config["ir_verbose_output"]
-        if self.ir_verbose_output:
-            self.logger.info("Verbose output enabled")
-
         # Build GPIO pins used to select which IR units are active
         if config["testing"]:
             # Get dir of simulated hardware files from config
@@ -112,10 +107,6 @@ class IRHub(object):
         :raises ValueError: If n isn't between 0 and num_ir_units-1
 
         """
-        if n < 0 or n >= self.num_ir_units:
-            self.logger.error("Invalid value of n: {}".format(n))
-            raise ValueError("n must be between 0 and num_ir_units-1")
-
         # Use binary string directly; more efficient
         line_val = "{:04b}".format(n)
 
@@ -138,30 +129,17 @@ class IRHub(object):
         :raises ValueError: If n isn't between 0 and num_ir_units-1
 
         """
-        if n < 0 or n >= self.num_ir_units:
-            self.logger.error("Invalid value of n: {}".format(n))
-            raise ValueError("n must be between 0 and num_ir_units-1")
-
         self.select_nth_units(n)
 
         for name, array in self.arrays.iteritems():
-            if array is None:
-                continue
-
-            if self.ir_verbose_output:
-                # Read both ADC & GPIO and display values
-                adc_result = array.read_adc_result()  # NOTE IRAnalog array
-                gpio_result = array.selected_unit_val
-                self.reading[name][n] = adc_result \
-                    if self.ir_read_adc \
-                    else array.selected_unit_val
-                self.logger.info("IR ({}, {}) ADC: {}, GPIO: {}".format(
-                    name, n, adc_result, gpio_result))
-            else:
+            try:
                 # Read only one, ADC or GPIO
                 self.reading[name][n] = array.read_adc_result() \
                     if self.ir_read_adc \
                     else array.selected_unit_val
+            except AttributeError:
+                # Likely caused by None array that couldn't be built
+                continue
 
     @lib.api_call
     def read_all(self):
@@ -181,7 +159,7 @@ class IRHub(object):
         return self.reading
 
     @lib.api_call
-    def read_binary(self, thresh=150):
+    def read_binary(self, thresh=150, white_on_black=True):
         """Convert 0-255 values to binary.
 
         0 is black, 1 is white. Note that this is a quick hack.
@@ -195,7 +173,10 @@ class IRHub(object):
         readings = self.read_all()
         for name, reading in readings.iteritems():
             for i in range(len(reading)):
-                readings[name][i] = 0 if reading[i] > thresh else 1
+                if white_on_black:
+                    readings[name][i] = 0 if reading[i] > thresh else 1
+                else:
+                    readings[name][i] = 0 if reading[i] < thresh else 1
         return readings
 
     @lib.api_call

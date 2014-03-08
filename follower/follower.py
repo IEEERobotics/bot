@@ -248,11 +248,9 @@ class Follower(object):
 
         """
         # Get the current IR readings
-        self.logger.info("time in {}".format(time()))
         if current_ir_reading is None:
             current_ir_reading = self.ir_hub.read_binary(60)
         # Heading west
-        self.logger.info("time out {}".format(time()))
         if self.heading == 0:
             # Forward is on the left side
             self.front_state = self.get_position_lr(
@@ -409,7 +407,7 @@ class Follower(object):
         # Calculate translate_speed
         # MAX speed - error in the front sensor / total number
         # of states
-        translate_speed =  80 - ( front_error / 16 )
+        translate_speed =  70 - ( front_error / 16 )
         # Calculate rotate_speed
         # Max speed - Translate speed
         rotate_speed = 100 - translate_speed

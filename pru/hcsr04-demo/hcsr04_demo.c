@@ -10,10 +10,11 @@
 #include <unistd.h>
 
 void cleanup(int sig) {
-    printf("Disabling PRU\n");
+    printf("\n");
+    printf("Received signal %d, disabling PRU... ", sig);
     prussdrv_pru_disable (0);
     prussdrv_exit ();
-    printf("Done\n");
+    printf("done!\n");
     exit(0);
 }
 
@@ -22,6 +23,7 @@ int main (void)
 {
 
     signal(SIGINT, cleanup);
+    signal(SIGTERM, cleanup);
 
     /* Initialize the PRU */
     printf("Initializing PRU\n");
@@ -49,34 +51,36 @@ int main (void)
     printf("Executing sonar pru code\n");
     prussdrv_exec_program (0, "hcsr04_demo.bin");
 
-    int i = 0;
+    int count = 0; 
+    int us_addr = 0;
+    int pulse_time = 0;
     while(1)
     {
         // Wait for the PRU interrupt to occur
         prussdrv_pru_wait_event (PRU_EVTOUT_0);
-        //prussdrv_pru_clear_event (PRU0_ARM_INTERRUPT, PRU_EVTOUT_0);
         prussdrv_pru_clear_event (PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);
-        // still something fishy in the interrupt handling causing 
-        // duplicate interrupts... so sleep and reread =(
-        // There's a 33ms delay in the ultrasonic logic, so it should be harmless
+        // still something fishy in the interrupt handling, causing duplicate
+        // interrupts... so (sleep and) reread =(
+        // There's a 33ms delay in the ultrasonic logic, so the extra delay
+        // should be harmless
         //usleep(1);
         prussdrv_pru_wait_event (PRU_EVTOUT_0);
         prussdrv_pru_clear_event (PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);
 
-        // Print out the distance received from the sonar (sound takes 58.77 microseconds to travel 1 cm at sea level in dry air)
-        printf("%04d :\n", i);
-        printf("       Pre-pulse (count) = %d\n", (int) pruData[1]);
-        printf("       Pulse (us) = %d\n", (int) pruData[0]);
-        //printf("      Flag = %d\n", (int) pruData[2]);
-        printf("       Distance = %f cm\n", (float) pruData[0] / 58.77);
-        printf("       Distance = %f in\n", (float) pruData[0] / 149.3);
-        printf("\n");
-        printf("       Pre-pulse (count) = %d\n", (int) pruData[3]);
-        printf("       Pulse (us) = %d\n", (int) pruData[2]);
-        //printf("      Flag = %d\n", (int) pruData[2]);
-        printf("       Distance = %f cm\n", (float) pruData[2] / 58.77);
-        printf("       Distance = %f in\n", (float) pruData[2] / 149.3);
-        i++;
+        // Print out the distance received from the sonar (sound takes 58.77
+        // microseconds to travel 1 cm at sea level in dry air)
+        printf("%04d :\n", count);
+        for(int pru = 0; pru < 4; pru++) {
+            us_addr = pru * 2;
+            printf("       Pre-pulse (count) = %d\n", (int) pruData[us_addr+1]);
+            pulse_time = pruData[us_addr];
+            printf("       Pulse (us) = %d\n", (int) pulse_time);
+            //printf("      Flag = %d\n", (int) pruData[2]);
+            printf("       Distance = %0.2f cm\n", (float) pulse_time / 58.77);
+            printf("       Distance = %0.2f in\n", (float) pulse_time / 149.3);
+            printf("\n");
+        }
+        count++;
     }
 
     return(0);

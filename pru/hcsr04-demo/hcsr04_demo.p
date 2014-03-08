@@ -75,6 +75,29 @@
     SBBO  r2, r3, 0, 4
 .endm
 
+.macro gpio_low
+.mparam gpio, pin
+    SET r2, pin
+    MOV r3, gpio | GPIO_CLEARDATAOUT
+    SBBO r2, r3, 0, 4
+.endm
+
+.macro gpio_high
+.mparam gpio, pin
+    SET r2, pin
+    MOV r3, gpio | GPIO_SETDATAOUT
+    SBBO r2, r3, 0, 4
+.endm
+
+.macro gpio_read
+.mparam gpio, pin
+    MOV  r1, gpio | GPIO_DATAIN
+    LBBO r2, r1, 0, 4  // copy 4 bytes from GPIO1:DATAIN into r2
+    MOV  r1, 1<<pin
+    AND  r0, r2, r1    // select pin value
+    LSR  r0, r0, pin
+.endm
+
 // Initialize hardware
 START:
     // Allow the PRU to access memories outside its own map
@@ -98,23 +121,17 @@ START:
     gpio_output TRIG4_GPIO, TRIG4_PIN
     gpio_input  ECHO4_GPIO, ECHO4_PIN
 
+    // zero the data region we plan to use
     MOV   r0, 0   // 4 bytes of data to initialize with
-    MOV   r1, 0   // word counter
-    MOV   r2, 0   // addr counter
-    // clear data transfer space we need
-INIT_DATAMEM:
-    SBCO  r0, c24, r2, 4   // pulse time
-    ADD   r1, r1, 1
-    ADD   r2, r2, 4
-    QBNE  INIT_DATAMEM, r1, 8   // we will return 8 words of data
+    MOV   r1, 0   // addr counter
+    LOOP END_INIT_MEM, 8  // clear 8 bytes
+        SBCO  r0, c24, r1, 4   // pulse time
+        ADD   r1, r1, 4
+    END_INIT_MEM:
 
     // Fire the sonar
 TRIGGER:
-    // Set trigger pin to high
-    MOV r2, 1<<13
-    MOV r3, GPIO1 | GPIO_SETDATAOUT
-    SBBO r2, r3, 0, 4
-
+    gpio_high  TRIG2_GPIO, TRIG2_PIN
     // Delay 10 microseconds (200 MHz / 2 instructions = 10 ns per loop, 10 us = 1000 loops)
     MOV r0, 1000
 
@@ -122,21 +139,21 @@ TRIGGER_DELAY_10US:
     SUB r0, r0, 1
     QBNE TRIGGER_DELAY_10US, r0, 0
 
-    // Set trigger pin to low
-    MOV r2, 1<<13
-    MOV r3, GPIO1 | GPIO_CLEARDATAOUT
-    SBBO r2, r3, 0, 4
+    gpio_low TRIG2_GPIO, TRIG2_PIN
 
     MOV r4, 0  // clear our main counter
 
     // Wait for the echo to go low, i.e. wait for the echo cycle to start
-    MOV r3, GPIO1 | GPIO_DATAIN
+    MOV r3, ECHO2_GPIO | GPIO_DATAIN
 WAIT_ECHO:
     // Read the GPIO in register
     LBBO r2, r3, 0, 4    // copy 4 bytes of GPIO1:DATAIN into r2
 
     ADD r4, r4, 1  // keep track of how long it takes to first see the pulse
-    QBBC WAIT_ECHO, r2, 15  // loop while bit 15 is low
+
+    QBBC WAIT_ECHO, r2, ECHO2_PIN  // loop while bit 15 is low
+    //gpio_read ECHO2_GPIO, ECHO2_PIN
+    //QBEQ WAIT_ECHO, r0, 0  // loop while bit is low
 
     SBCO r4, c24, 4, 4  // save pre-pulse count
     MOV r4, 0
@@ -149,7 +166,8 @@ SAMPLE_ECHO:
     //MOV r0, 79
     //QBGE SAMPLE_ECHO_DELAY_1US, r4, 5 // sample at least 5 times
 
-    QBBC ECHO_COMPLETE, r2, 15  // break when bit 15 goes low
+    //QBBC ECHO_COMPLETE, r2, 15  // break when bit 15 goes low
+    QBBC ECHO_COMPLETE, r2, ECHO2_PIN  // break when bit 15 goes low
 
     // Bail if we've waited too long (15us, ~8ft)
     MOV r0, 15000

@@ -103,9 +103,9 @@ class Follower(object):
         # Get the initial condition
         previous_time = time()
         # Init front_PID
-        self.front_pid.set_k_values(1, 0, 0)
+        self.front_pid.set_k_values(.5, 0, .01)
         # Inti back_PID
-        self.back_pid.set_k_values(1, 0, 0)
+        self.back_pid.set_k_values(.5, 0, .01)
         # Get current heading
         self.heading = heading
         # Continue until an error condition
@@ -249,7 +249,7 @@ class Follower(object):
         """
         # Get the current IR readings
         if current_ir_reading is None:
-            current_ir_reading = self.ir_hub.read_binary(60,False)
+            current_ir_reading = self.ir_hub.read_binary(100,False)
         # Heading west
         if self.heading == 0:
             # Forward is on the left side
@@ -407,7 +407,7 @@ class Follower(object):
         # Calculate translate_speed
         # MAX speed - error in the front sensor / total number
         # of states
-        translate_speed =  70 - ( front_error / 16 )
+        translate_speed =  70 - ( front_error / 16 )*10
         # Calculate rotate_speed
         # Max speed - Translate speed
         rotate_speed = 100 - translate_speed

@@ -103,9 +103,9 @@ class Follower(object):
         # Get the initial condition
         previous_time = time()
         # Init front_PID
-        self.front_pid.set_k_values(.5, 0, .01)
+        self.front_pid.set_k_values(3, 0, .01)
         # Inti back_PID
-        self.back_pid.set_k_values(.5, 0, .01)
+        self.back_pid.set_k_values(3, 0, .01)
         # Get current heading
         self.heading = heading
         # Continue until an error condition

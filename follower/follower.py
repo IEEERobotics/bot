@@ -409,13 +409,12 @@ class Follower(object):
         # Calculate translate_speed
         # MAX speed - error in the front sensor / total number
         # of states
-        translate_speed =  80 - ( front_error / 16 )
+        translate_speed =  40 - ( front_error / 16 )
         # Calculate rotate_speed
         # Max speed - Translate speed
         rotate_speed = 100 - translate_speed
         # Calculate translate_angle
         translate_angle = back_error * (180 / 16)
-        self.logger.info("pre translate_angle = {}, time {}  ".format(translate_angle,time()))
         if translate_angle < 0:
             # Swift to the left
             translate_angle = 360 + translate_angle
@@ -435,7 +434,7 @@ class Follower(object):
             # If rotate_speed is greater than 100 set to 100
             rotate_speed = 0
         # Adjust motor speeds
-        self.logger.info("post translate_angle = {}  ".format(translate_angle))
+        self.logger.info("post translate_angle = {}, translate_speed = {}   ".format(translate_angle, translate_speed))
         self.driver.move(translate_speed, translate_angle) 
         #self.driver.compound_move(
         #    translate_speed, translate_angle, rotate_speed)

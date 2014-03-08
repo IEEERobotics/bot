@@ -44,9 +44,6 @@ class IRHub(object):
         # Number of IR sensors on an array
         self.num_ir_units = config["irs_per_array"]
 
-        # Pause between each select-read operation to let ADCs settle
-        self.ir_read_delay = config["ir_read_delay"]
-
         # Use accurate reading (ADC) or not (GPIO)
         self.ir_read_adc = config["ir_read_adc"]
 
@@ -146,7 +143,6 @@ class IRHub(object):
             raise ValueError("n must be between 0 and num_ir_units-1")
 
         self.select_nth_units(n)
-        sleep(self.ir_read_delay)  # let ADCs settle
 
         for name, array in self.arrays.iteritems():
             if array is None:

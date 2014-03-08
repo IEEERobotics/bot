@@ -33,11 +33,11 @@
 // PRU interrupt for PRU0
 #define PRU0_ARM_INTERRUPT 19
 
-// front (Trig: P9_25, Echo: P9_27)
+// front (Trig: P9_25, Echo: P9_23)
 #define TRIG1_GPIO  GPIO3
 #define TRIG1_PIN  21
-#define ECHO1_GPIO  GPIO3
-#define ECHO1_PIN  19
+#define ECHO1_GPIO  GPIO1
+#define ECHO1_PIN  17
 
 // back (Trig: P8_11, Echo: P8_15)
 #define TRIG2_GPIO  GPIO1
@@ -98,6 +98,11 @@
     LSR  r0, r0, pin
 .endm
 
+#define TRIG_GPIO TRIG2_GPIO
+#define TRIG_PIN TRIG2_PIN
+#define ECHO_GPIO ECHO2_GPIO
+#define ECHO_PIN ECHO2_PIN
+
 // Initialize hardware
 START:
     // Allow the PRU to access memories outside its own map
@@ -124,14 +129,14 @@ START:
     // zero the data region we plan to use
     MOV   r0, 0   // 4 bytes of data to initialize with
     MOV   r1, 0   // addr counter
-    LOOP END_INIT_MEM, 8  // clear 8 bytes
+    LOOP END_INIT_MEM, 8  // clear 8 words
         SBCO  r0, c24, r1, 4   // pulse time
         ADD   r1, r1, 4
     END_INIT_MEM:
 
     // Fire the sonar
 TRIGGER:
-    gpio_high  TRIG2_GPIO, TRIG2_PIN
+    gpio_high  TRIG_GPIO, TRIG_PIN
     // Delay 10 microseconds (200 MHz / 2 instructions = 10 ns per loop, 10 us = 1000 loops)
     MOV r0, 1000
 
@@ -139,7 +144,7 @@ TRIGGER_DELAY_10US:
     SUB r0, r0, 1
     QBNE TRIGGER_DELAY_10US, r0, 0
 
-    gpio_low TRIG2_GPIO, TRIG2_PIN
+    gpio_low TRIG_GPIO, TRIG_PIN
 
     MOV r4, 0  // clear our main counter
 
@@ -147,13 +152,13 @@ TRIGGER_DELAY_10US:
 WAIT_ECHO:
     ADD r4, r4, 1  // keep track of how long it takes to first see the pulse
 
-    gpio_read ECHO2_GPIO, ECHO2_PIN  // reads value of pin into r0
+    gpio_read ECHO_GPIO, ECHO_PIN  // reads value of pin into r0
     QBEQ WAIT_ECHO, r0, 0  // loop while bit is low
 
     SBCO r4, c24, 4, 4  // save pre-pulse count
     MOV r4, 0           // zero pulse time (us) counter
 SAMPLE_ECHO:
-    gpio_read ECHO2_GPIO, ECHO2_PIN  // reads value of pin into r0
+    gpio_read ECHO_GPIO, ECHO_PIN  // reads value of pin into r0
     QBEQ ECHO_COMPLETE, r0, 0  // break when bit 15 goes low
 
     // Bail if we've waited too long (15us, ~8ft)

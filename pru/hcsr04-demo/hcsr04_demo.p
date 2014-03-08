@@ -136,19 +136,51 @@ START:
 .struct sUltrasonic
     .u32  trigGPIO
     .u32  echoGPIO
+    .u32  dataOffset
     .u8   trigPin
     .u8   echoPin
 .ends
 
-.assign sUltrasonic, r5, r7.w0, Ultrasonic
+.assign sUltrasonic, r5, r8.w0, Ultrasonic
 
-MOV  Ultrasonic.trigGPIO, TRIG1_GPIO
-MOV  Ultrasonic.trigPin, TRIG1_PIN
-MOV  Ultrasonic.echoGPIO, ECHO1_GPIO
-MOV  Ultrasonic.echoPin, ECHO1_PIN
+
+READ_ALL:
+    MOV  Ultrasonic.trigGPIO, TRIG1_GPIO
+    MOV  Ultrasonic.trigPin, TRIG1_PIN
+    MOV  Ultrasonic.echoGPIO, ECHO1_GPIO
+    MOV  Ultrasonic.echoPin, ECHO1_PIN
+    MOV  Ultrasonic.dataOffset, 0
+    CALL READ_SENSOR
+
+    CALL RESET_DELAY
+
+    MOV  Ultrasonic.trigGPIO, TRIG2_GPIO
+    MOV  Ultrasonic.trigPin, TRIG2_PIN
+    MOV  Ultrasonic.echoGPIO, ECHO2_GPIO
+    MOV  Ultrasonic.echoPin, ECHO2_PIN
+    MOV  Ultrasonic.dataOffset, 8
+    CALL READ_SENSOR
+
+    CALL RESET_DELAY
+
+    // Trigger the PRU0 interrupt (C program recognized the event)
+    //   bit [0:3] are interrupt# - 16 (so PRU0_ARM_INT=19 => 3)
+    //   bit 5 marks as valid
+    MOV r31.b0, PRU0_ARM_INTERRUPT+16
+
+    JMP READ_ALL
+
+    // Delay 33 milliseconds to allow sonar to stop resonating and for sound
+    // burst to decay in environment
+RESET_DELAY:
+    MOV r0, 3300000
+DELAY_LOOP:
+    SUB r0, r0, 1
+    QBNE DELAY_LOOP, r0, 0
+    RET
 
     // Fire the sonar
-TRIGGER:
+READ_SENSOR:
     gpio_high Ultrasonic.trigGPIO, Ultrasonic.trigPin
     // Delay 10 microseconds (200 MHz / 2 instructions = 10 ns per loop, 10 us = 1000 loops)
     MOV r0, 1000
@@ -167,7 +199,10 @@ WAIT_ECHO:
     gpio_read Ultrasonic.echoGPIO, Ultrasonic.echoPin // reads value of pin into r0
     QBEQ WAIT_ECHO, r0, 0  // loop while bit is low
 
-    SBCO r4, c24, 4, 4  // save pre-pulse count
+    // save pre-pulse count
+    ADD r0, Ultrasonic.dataOffset, 4
+    SBCO r4, c24, r0, 4  
+
     MOV r4, 0           // zero pulse time (us) counter
 SAMPLE_ECHO:
     gpio_read Ultrasonic.echoGPIO, Ultrasonic.echoPin // reads value of pin into r0
@@ -195,22 +230,8 @@ SAMPLE_ECHO_DELAY_1US:
 ECHO_COMPLETE:
     // Store the microsecond count in the PRU data ram
 
+    SBCO r4, c24, Ultrasonic.dataOffset, 4
 
+    RET
 
-    SBCO r4, c24, 0, 4
-
-    // Trigger the PRU0 interrupt (C program recognized the event)
-    //   bit [0:3] are interrupt# - 16 (so PRU0_ARM_INT=19 => 3)
-    //   bit 5 marks as valid
-    MOV r31.b0, PRU0_ARM_INTERRUPT+16
-
-    // Delay 33 milliseconds to allow sonar to stop resonating and for sound
-    // burst to decay in environment
-    MOV r0, 3300000
-RESET_DELAY_33MS:
-    SUB r0, r0, 1
-    QBNE RESET_DELAY_33MS, r0, 0
-
-    // Jump back to triggering the sonar
-    JMP TRIGGER
 

@@ -50,11 +50,11 @@ class Follower(object):
         self.timeLastUpdated = -1.0
 
     @lib.api_call
-    def get_translate_speed(self)
+    def get_translate_speed(self):
         return self.translate_speed
 
     @lib.api_call
-    def set_translate_speed(self,speed)
+    def set_translate_speed(self,speed):
         self.translate_speed = speed
 
 
@@ -447,10 +447,10 @@ class Follower(object):
         # correct towards line horizontally
         # std is 7 on a range of -15 to 15
         std_angle = 7
-        if(bot_angle > std_angle)
+        if(bot_angle > std_angle):
             translate_angle = self.strafe_error
             self.driver.move(translate_speed, translate_angle) 
-        else
+        else:
             #cap speed between (-100,100)
             rotate_speed = max(-100,min(100,self.rotate_error))
             self.driver.rotate(rotate_speed) 
@@ -487,6 +487,6 @@ class Follower(object):
         self.driver.move(translate_speed, translate_angle) 
         #self.driver.compound_move(
         #    translate_speed, translate_angle, rotate_speed
-""")
+"""
 
 

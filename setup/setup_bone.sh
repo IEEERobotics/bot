@@ -56,7 +56,7 @@ fi
 echo "Populating filesystem..."
 chown -R root.root fs-*
 rsync -va fs-common/* /
-if [ "bot_specific" = true ]; then
+if [ "$bot_specific" = true ]; then
     rsync -va fs-bot/* /
     update-rc.d masquerade defaults
     echo Enabling uplink...

@@ -25,8 +25,8 @@ class Follower(object):
         # Build PIDs
         self.strafe = pid_mod.PID()
         self.front_error = 0.0
-        self.back_pid = pid_mod.PID()
-        self.back_error = 0.0
+        self.rotate_pid = pid_mod.PID()
+        self.rotate_error= 0.0
         self.error = 0.0
 
         # Initialize other members
@@ -66,12 +66,12 @@ class Follower(object):
         return self.ir_agg
 
     @lib.api_call
-    def get_front_error(self):
-        return self.front_error
+    def get_strafe_error(self):
+        return self.strafe_error
 
     @lib.api_call
-    def get_back_error(self):
-        return self.back_error
+    def get_rotate_error(self):
+        return self.rotate_error
 
     @lib.api_call
     def is_start(self):
@@ -104,8 +104,8 @@ class Follower(object):
         previous_time = time()
         # Init front_PID
         self.strafe.set_k_values(4, 0, .01)
-        # Inti back_PID
-        self.back_pid.set_k_values(1, 0, .01)
+        # Inti rotate_PID
+        self.rotate_pid.set_k_values(1, 0, .01)
         # Get current heading
         self.heading = heading
         # Continue until an error condition
@@ -124,16 +124,15 @@ class Follower(object):
             bot_position = (self.front_state + self.back_state)/2
             # Get the current time of the CPU
             current_time = time()
-            # Call front PID
             self.sampling_time = current_time - previous_time
-            # Call front PID
+            # Call PID
             self.strafe_error = self.strafe.pid(
                 0, bot_position, self.sampling_time)
-            # Call back PID
-            self.back_error = self.back_pid.pid(
+            # Call Rotate PID
+            self.rotate_error = self.rotate_pid.pid(
                 0, self.back_state, self.sampling_time)
             # Update motors
-            self.motors(self.strafe_error, self.back_error)
+            self.motors(self.strafe_error, self.rotate_error)
             # Take the current time set it equal to the previous time
             previous_time = current_time
 
@@ -164,10 +163,10 @@ class Follower(object):
         # right is on the right
         self.right_state = self.get_position_rl(
             current_ir_reading["right"])
-        self.logger.warning("front = {}".format(self.front_state))
-        self.logger.warning("back = {}".format(self.back_state))
-        self.logger.warning("left = {}".format(self.left_state))
-        self.logger.warning("right = {}".format(self.right_state))
+        self.logger.info("front = {}".format(self.front_state))
+        self.logger.info("back = {}".format(self.back_state))
+        self.logger.info("left = {}".format(self.left_state))
+        self.logger.info("right = {}".format(self.right_state))
     
     @lib.api_call
     def oscillate(self, heading, osc_time=1):
@@ -424,7 +423,7 @@ class Follower(object):
         return state
 
     @lib.api_call
-    def motors(self, strafe_error, back_error):
+    def motors(self, strafe_error, rotate_error):
         """Used to update the motors speed and angular motion."""
         # Calculate translate_speed
         # MAX speed - error in the front sensor / total number

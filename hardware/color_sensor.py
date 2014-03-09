@@ -115,10 +115,46 @@ class ColorSensor(I2CDevice):
         # diff_r = abs((self.color["red"] - self.br)/self.br) * 100
         # diff_g = abs((self.color["green"] - self.bg)) * 100
         # diff_b = abs((self.color["blue"] - self.bb)/self.bb) *100
-        
-        
+
         return diff_c, diff_r, diff_g, diff_b
-    
+
+    def is_green_percent_method(self):
+        """decides on color based on percentage
+        """
+        
+        diff_c, diff_r, diff_g, diff_b = self.get_percent_diff()
+        
+        # returns true when g has greatest increase.
+        if (diff_g > diff_r) & (diff_g > diff_b):
+            return True
+            
+    def is_green_diff_method(self):
+        """Decides on color based on difference in percentage 
+        of total color increases by set amount.
+        """
+        
+        # Reads in percentages of total color
+        pv, pc, pr, pg, pb = colorSensor.get_percentage()
+        
+        total_color = self.color["red"] \
+                    + self.color["green"] \
+                    + self.color["blue"]
+                    
+        total_base = self.br + self.bg + self.bb
+
+        # Base percentages for each color
+        percent_baseb = self.br / total_base * 100
+        percent_baseg = self.bg / total_base * 100
+        percent_baseb = self.bb / total_base * 100
+        
+        # returns True when the percentage of a color goes up by 0.2 from base percents
+        
+        if (pg - percent_baseg) > 0.2:
+            return True
+
+        
+        
+
     def is_green(self):
         """ finds percent difference between baseline
             and current reading.

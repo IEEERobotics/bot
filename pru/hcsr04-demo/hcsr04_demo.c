@@ -51,7 +51,7 @@ int main (void)
     printf("Executing sonar pru code\n");
     prussdrv_exec_program (0, "hcsr04_demo.bin");
 
-    int count = 0; 
+    int count = 0;
     int us_addr = 0;
     int pulse_time = 0;
     while(1)
@@ -75,7 +75,6 @@ int main (void)
             printf("       Pre-pulse (count) = %d\n", (int) pruData[us_addr+1]);
             pulse_time = pruData[us_addr];
             printf("       Pulse (us) = %d\n", (int) pulse_time);
-            //printf("      Flag = %d\n", (int) pruData[2]);
             printf("       Distance = %0.2f cm\n", (float) pulse_time / 58.77);
             printf("       Distance = %0.2f in\n", (float) pulse_time / 149.3);
             printf("\n");

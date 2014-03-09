@@ -33,45 +33,51 @@
 // PRU interrupt for PRU0
 #define PRU0_ARM_INTERRUPT 19
 
-// front (Trig: P9_25, Echo: P9_23)
+// Echo pins should be in pinmode 0x27 (mode 7 pulldown)
+
+// Front Trig: P9_25
 #define TRIG1_GPIO  GPIO3
 #define TRIG1_PIN   21
+// Front Echo: P9_23 (0x844)
 #define ECHO1_GPIO  GPIO1
 #define ECHO1_PIN   17
 
-// back (Trig: P8_11, Echo: P8_15)
+// Back Trig: P8_11
 #define TRIG2_GPIO  GPIO1
 #define TRIG2_PIN   13
+// Back Echo: P8_15 (0x83c)
 #define ECHO2_GPIO  GPIO1
 #define ECHO2_PIN   15
 
-// left (Trig: P9_30, Echo: P9_24)
+// Left Trig: P9_30
 #define TRIG3_GPIO  GPIO3
 #define TRIG3_PIN   16
-#define ECHO3_GPIO  GPIO0
-#define ECHO3_PIN   15
+// Left Echo: P9_28 (0x99c)
+#define ECHO3_GPIO  GPIO3
+#define ECHO3_PIN   17
 
-// right (Trig: P9_29, Echo: P9_31)
+// Right Trig: P9_29
 #define TRIG4_GPIO  GPIO3
 #define TRIG4_PIN   15
+// Right Echo: P9_31 (0x990)
 #define ECHO4_GPIO  GPIO3
 #define ECHO4_PIN   14
 
 .macro gpio_output
 .mparam gpio, pin
-    // Enable trigger as output and echo as input
-    // NOTE! OE must be *cleared* for an output, set for input
+    // NOTE! OE must be *cleared* for an output
     MOV   r3, gpio | GPIO_OE
     LBBO  r2, r3, 0, 4
-    CLR   r2, pin   // trigger pin (GPIO1_13), set as output
+    CLR   r2, pin
     SBBO  r2, r3, 0, 4
 .endm
 
 .macro gpio_input
 .mparam gpio, pin
+    // NOTE! OE must be *set* for an input
     MOV   r3, gpio | GPIO_OE
     LBBO  r2, r3, 0, 4
-    SET   r2, pin   // echo pin (GPIO1_15), set as input
+    SET   r2, pin
     SBBO  r2, r3, 0, 4
 .endm
 
@@ -151,7 +157,6 @@ READ_ALL:
     MOV  Ultrasonic.echoPin, ECHO1_PIN
     MOV  Ultrasonic.dataOffset, 0
     CALL READ_SENSOR
-
     CALL RESET_DELAY
 
     MOV  Ultrasonic.trigGPIO, TRIG2_GPIO
@@ -160,7 +165,22 @@ READ_ALL:
     MOV  Ultrasonic.echoPin, ECHO2_PIN
     MOV  Ultrasonic.dataOffset, 8
     CALL READ_SENSOR
+    CALL RESET_DELAY
 
+    MOV  Ultrasonic.trigGPIO, TRIG3_GPIO
+    MOV  Ultrasonic.trigPin, TRIG3_PIN
+    MOV  Ultrasonic.echoGPIO, ECHO3_GPIO
+    MOV  Ultrasonic.echoPin, ECHO3_PIN
+    MOV  Ultrasonic.dataOffset, 16
+    CALL READ_SENSOR
+    CALL RESET_DELAY
+
+    MOV  Ultrasonic.trigGPIO, TRIG4_GPIO
+    MOV  Ultrasonic.trigPin, TRIG4_PIN
+    MOV  Ultrasonic.echoGPIO, ECHO4_GPIO
+    MOV  Ultrasonic.echoPin, ECHO4_PIN
+    MOV  Ultrasonic.dataOffset, 24
+    CALL READ_SENSOR
     CALL RESET_DELAY
 
     // Trigger the PRU0 interrupt (C program recognized the event)

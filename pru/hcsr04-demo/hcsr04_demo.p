@@ -192,25 +192,28 @@ TRIGGER_DELAY_10US:
     gpio_low Ultrasonic.trigGPIO, Ultrasonic.trigPin
     MOV r4, 0  // clear our main counter
 
-    // Wait for the echo to go low, i.e. wait for the echo cycle to start
+    // Wait for the echo to go high, i.e. wait for the echo cycle to start
 WAIT_ECHO:
     ADD r4, r4, 1  // keep track of how long it takes to first see the pulse
+
+    MOV r0, 3000
+    QBLE NO_ECHO, r4, r0  // fail when 3000 < r4
 
     gpio_read Ultrasonic.echoGPIO, Ultrasonic.echoPin // reads value of pin into r0
     QBEQ WAIT_ECHO, r0, 0  // loop while bit is low
 
     // save pre-pulse count
     ADD r0, Ultrasonic.dataOffset, 4
-    SBCO r4, c24, r0, 4  
+    SBCO r4, c24, r0, 4
 
     MOV r4, 0           // zero pulse time (us) counter
 SAMPLE_ECHO:
     gpio_read Ultrasonic.echoGPIO, Ultrasonic.echoPin // reads value of pin into r0
     QBEQ ECHO_COMPLETE, r0, 0  // break when bit 15 goes low
 
-    // Bail if we've waited too long (15us, ~8ft)
-    MOV r0, 15000
-    QBLE ECHO_COMPLETE, r4, r0  // branch when 15000 < r4
+    // Bail if we've waited too long (25us, ~14ft)
+    MOV r0, 25000
+    QBLE ECHO_COMPLETE, r4, r0  // branch when 25000 < r4
 
     // Delay 1 microsecond between queries
     // Loop time is less than a 1us sicne it takes time to query the GPIO
@@ -231,7 +234,12 @@ ECHO_COMPLETE:
     // Store the microsecond count in the PRU data ram
 
     SBCO r4, c24, Ultrasonic.dataOffset, 4
-
     RET
 
+// We never saw an echo pulse  =(
+NO_ECHO:
+    MOV r4, 99999
+    ADD r0, Ultrasonic.dataOffset, 4
+    SBCO r4, c24, r0, 4
+    RET
 

@@ -46,4 +46,14 @@ load_gpio 67  # P8_06, back
 load_gpio 68  # P8_08, left
 load_gpio 35  # P8_10, right
 
+# Ultrasonic GPIOs
+load_gpio 117
+load_gpio 49
+load_gpio 45
+load_gpio 47
+load_gpio 112
+load_gpio 15
+load_gpio 111
+load_gpio 110
+
 enable_adcs

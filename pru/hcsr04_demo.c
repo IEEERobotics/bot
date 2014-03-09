@@ -49,7 +49,7 @@ int main (void)
 
     /* Execute example on PRU */
     printf("Executing sonar pru code\n");
-    prussdrv_exec_program (0, "hcsr04_demo.bin");
+    prussdrv_exec_program (0, "ultrasonic.bin");
 
     int count = 0;
     int us_addr = 0;

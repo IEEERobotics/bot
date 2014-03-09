@@ -116,7 +116,7 @@ START:
     CLR   r0, r0, 4      // clear bit 4 (enable OCP master ports?)
     SBCO  r0, C4, 4, 4
 
-    // Make constant 24 (c24) point to the beginning of PRU0 data ram
+    // Make constant 24 (c24) point to the beginning of PRU0 data ram (0x00)
     // PRU_CTRL_REG base is 0x22000 (+20 is CTBIR0)
     MOV   r0, 0x00000000
     MOV   r1, 0x22020     // CTBIR0, constant block table index [RG:5.4.6]

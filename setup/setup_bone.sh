@@ -2,16 +2,11 @@
 # Install standard software, do git configuration
 
 # Each should only contain the packages that are added at that level
-base="git python-yaml libzmq-dev python-zmq python-simplejson python-smbus python-virtualenv python-pip"
+base="git python-yaml libzmq-dev python-zmq python-simplejson python-smbus python-virtualenv python-pip python-numpy"
 extra="vim-nox ipython tmux screen nmap tree build-essential python-dev i2c-tools wireless-tools grc"
-# python-numpy
 
-while getopts faubh opt; do
+while getopts aubh opt; do
     case $opt in
-        f)
-            echo "Option: Force install"
-            force=true
-            ;;
         a)
             echo "Option: Additional packages"
             install_extra=true
@@ -53,7 +48,7 @@ if grep -q AM33XX /proc/cpuinfo; then
     echo "BeagleBone detected!"
 else
     echo "This doesn't look like a BeagleBone!"
-    echo "Aborting (use -u to connect over USB or -f to override)"
+    echo "Aborting (use -u to connect over USB)"
     exit 1
 fi
 
@@ -61,7 +56,7 @@ fi
 echo "Populating filesystem..."
 chown -R root.root fs-*
 rsync -va fs-common/* /
-if [ "bot_specific" = true ]; then
+if [ "$bot_specific" = true ]; then
     rsync -va fs-bot/* /
     update-rc.d masquerade defaults
     echo Enabling uplink...

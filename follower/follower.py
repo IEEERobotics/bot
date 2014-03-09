@@ -28,6 +28,9 @@ class Follower(object):
         self.rotate_pid = pid_mod.PID()
         self.rotate_error= 0.0
         self.error = 0.0
+        
+        # motor variables
+        self.translate_speed =  60
 
         # Initialize other members
         # IR position values, e.g. [-8.0, -7.0 ..., 8.0]
@@ -45,6 +48,15 @@ class Follower(object):
         self.intersection = False
         self.lost_line = False
         self.timeLastUpdated = -1.0
+
+    @lib.api_call
+    def get_translate_speed(self)
+        return self.translate_speed
+
+    @lib.api_call
+    def set_translate_speed(self,speed)
+        self.translate_speed = speed
+
 
     @lib.api_call
     def update(self):
@@ -128,11 +140,16 @@ class Follower(object):
             # Call PID
             self.strafe_error = self.strafe.pid(
                 0, bot_position, self.sampling_time)
+            #calculate difference between array's for approx. pseudo angle 
+            bot_angle = (self.front_state - self.back_state)
             # Call Rotate PID
             self.rotate_error = self.rotate_pid.pid(
-                0, self.back_state, self.sampling_time)
+                0, bot_angle, self.sampling_time)
+            # Report errors from strafe and rotate pid's 
+            self.logger.info(self.strafe_error)
+            self.logger.info(self.rotate_error)
             # Update motors
-            self.motors(self.strafe_error, self.rotate_error)
+            self.motors(bot_angle)
             # Take the current time set it equal to the previous time
             previous_time = current_time
 
@@ -423,17 +440,29 @@ class Follower(object):
         return state
 
     @lib.api_call
-    def motors(self, strafe_error, rotate_error):
+    def motors(self, bot_angle):
         """Used to update the motors speed and angular motion."""
-        # Calculate translate_speed
-        # MAX speed - error in the front sensor / total number
-        # of states
-        translate_speed =  60
+        #If outside standard deviation angle, use rotate to straiten
+        #if within std angle, use move to translate forward and strafe to
+        # correct towards line horizontally
+        # std is 7 on a range of -15 to 15
+        std_angle = 7
+        if(bot_angle > std_angle)
+            translate_angle = self.strafe_error
+            self.driver.move(translate_speed, translate_angle) 
+        else
+            #cap speed between (-100,100)
+            rotate_speed = max(-100,min(100,self.rotate_error))
+            self.driver.rotate(rotate_speed) 
+
+
+
+"""
         # Calculate rotate_speed
         # Max speed - Translate speed
         rotate_speed = 100 - translate_speed
         # Calculate translate_angle
-        translate_angle = (strafe_error + 360)% 360
+        translate_angle = (self.strafe_error + 360)% 360
         self.logger.info("pre translate_angle = {}, translate_speed = {}   ".format(translate_angle, translate_speed))
         if translate_angle < 0:
             # Swift to the left
@@ -457,4 +486,7 @@ class Follower(object):
         self.logger.info("post translate_angle = {}, translate_speed = {}   ".format(translate_angle, translate_speed))
         self.driver.move(translate_speed, translate_angle) 
         #self.driver.compound_move(
-        #    translate_speed, translate_angle, rotate_speed)
+        #    translate_speed, translate_angle, rotate_speed
+""")
+
+

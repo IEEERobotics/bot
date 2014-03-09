@@ -447,7 +447,7 @@ class Follower(object):
         # correct towards line horizontally
         # std is 7 on a range of -15 to 15
         std_angle = 7
-        if(bot_angle > std_angle):
+        if bot_angle < std_angle:
             translate_angle = self.strafe_error
             self.driver.move(translate_speed, translate_angle) 
         else:

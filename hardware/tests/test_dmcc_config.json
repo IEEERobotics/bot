@@ -1,0 +1,11 @@
+{
+    "logging": {
+        "log_file": "test.log",
+        "file_handler_level": "CRITICAL",
+        "stream_handler_level": "CRITICAL"
+    },
+    "dmcc": {
+        "bus": null
+    },
+    "test": 1234
+}

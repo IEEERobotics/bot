@@ -2,6 +2,7 @@
 
 import sys
 from time import time
+import numpy as np
 
 import lib.lib as lib
 import hardware.ir_hub as ir_hub_mod
@@ -23,11 +24,54 @@ class Follower(object):
 
         # Build PIDs
         self.front_pid = pid_mod.PID()
+        self.front_error = 0.0
         self.back_pid = pid_mod.PID()
+        self.back_error = 0.0
+        self.error = 0.0
 
         # Initialize other members
+        # IR position values, e.g. [-8.0, -7.0 ..., 8.0]
+        self.ir_pos = dict()
+        # IR aggregate values = sum(ir_pos * readings) / sum(readings)
+        self.ir_agg = dict()
+        for name, reading in self.ir_hub.reading.iteritems():
+            self.ir_pos[name] = np.float32(np.linspace(
+                -(len(reading) / 2), (len(reading) / 2), len(reading)))
+            # TODO(napratin,3/4): Ensure proper ordering?
+            self.ir_agg[name] = None  # None when no unit is lit
+            self.logger.debug("ir_pos['{}'] = {}"
+                .format(name, self.ir_pos[name]))
+
         self.intersection = False
         self.lost_line = False
+        self.timeLastUpdated = -1.0
+
+    @lib.api_call
+    def update(self):
+        """Read IR values, compute aggregates."""
+        ir_readings = self.ir_hub.read_binary(60)
+        for name, reading in ir_readings.iteritems():
+            reading_arr = np.int_(reading)  # convert readings to numpy array
+            reading_sum = np.sum(np_reading)  # = no. of units lit
+            if reading_sum > 0:
+                self.ir_agg[name] = (np.sum(self.ir_pos * reading_arr)
+                                    / reading_sum)
+            else:
+                self.ir_agg[name] = None
+        self.timeLastUpdated = time.time()
+    
+    @lib.api_call
+    def get_ir_agg(self):
+        """Return IR aggregates, i.e. sum(pos * readings) / sum(readings)."""
+        return self.ir_agg
+
+    @lib.api_call
+    def get_front_error(self):
+        return self.front_error
+
+    @lib.api_call
+    def get_back_error(self):
+        return self.back_error
 
     @lib.api_call
     def is_start(self):
@@ -71,19 +115,23 @@ class Follower(object):
             # Check for error conditions
             if self.error != 0:
                 self.update_exit_state()
+                self.logger.warning(self.error)
+                self.logger.warning(self.front_state)
+                self.logger.warning(self.back_state)
+                self.driver.move(0,0)
                 return
             # Get the current time of the CPU
             current_time = time()
             # Call front PID
             self.sampling_time = current_time - previous_time
             # Call front PID
-            front_error = self.front_pid.pid(
+            self.front_error = self.front_pid.pid(
                 0, self.front_state, self.sampling_time)
             # Call back PID
-            back_error = self.back_pid.pid(
+            self.back_error = self.back_pid.pid(
                 0, self.back_state, self.sampling_time)
             # Update motors
-            self.motors(front_error, back_error)
+            self.motors(self.front_error, self.back_error)
             # Take the current time set it equal to the previous time
             previous_time = current_time
 
@@ -201,7 +249,7 @@ class Follower(object):
         """
         # Get the current IR readings
         if current_ir_reading is None:
-            current_ir_reading = self.ir_hub.read_all()
+            current_ir_reading = self.ir_hub.read_binary(60)
         # Heading west
         if self.heading == 0:
             # Forward is on the left side
@@ -303,13 +351,13 @@ class Follower(object):
         for index, value in enumerate(readings):
             if(value == 1):
                self.hit_position.append(index)
-        if len(self.hit_position) > 3:
+        if len(self.hit_position) > 4:
             # Error: Intersection detected
             return 17
         if len(self.hit_position) == 0:
             # Error: No line detected
             return 16
-        if len(self.hit_position) == 3:
+        if len(self.hit_position) == 4:
             # Error: Bot at large error
             return 18
         state = self.hit_position[0] * 2
@@ -334,13 +382,13 @@ class Follower(object):
         for index, value in enumerate(readings):
             if(value == 1):
                self.hit_position.append(index)
-        if len(self.hit_position) > 3:
+        if len(self.hit_position) > 4:
             # Error: Intersection detected
             return 17
         if len(self.hit_position) == 0:
             # Error: No line detected
             return 16
-        if len(self.hit_position) == 3:
+        if len(self.hit_position) == 4:
             # Error: Bot at large error
             return 18
         state = self.hit_position[0] * 2
@@ -353,20 +401,22 @@ class Follower(object):
         state = (state - 15) * -1
         return state
 
+    @lib.api_call
     def motors(self, front_error, back_error):
         """Used to update the motors speed and angular motion."""
         # Calculate translate_speed
         # MAX speed - error in the front sensor / total number
         # of states
-        translate_speed =  100 - ( front_error / 16 )
+        translate_speed =  80 - ( front_error / 16 )
         # Calculate rotate_speed
         # Max speed - Translate speed
         rotate_speed = 100 - translate_speed
         # Calculate translate_angle
         translate_angle = back_error * (180 / 16)
+        self.logger.info("pre translate_angle = {} ".format(translate_angle))
         if translate_angle < 0:
             # Swift to the left
-            translate_angle = 360 - translate_angle
+            translate_angle = 360 + translate_angle
         else:
             # swift to the right
             translate_angle = translate_angle   
@@ -382,6 +432,8 @@ class Follower(object):
         elif rotate_speed < 0:
             # If rotate_speed is greater than 100 set to 100
             rotate_speed = 0
-        # Adjust motor speeds 
-        mec_driver_mod.compound_move(
-            translate_speed, translate_angle, rotate_speed)
+        # Adjust motor speeds
+        self.logger.info("post translate_angle = {} ".format(translate_angle))
+        self.driver.move(translate_speed, translate_angle) 
+        #self.driver.compound_move(
+        #    translate_speed, translate_angle, rotate_speed)

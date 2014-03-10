@@ -1,126 +1,111 @@
 """Test cases for DMCC motor abstraction class."""
 
-import hardware.dmcc_motor as dm_mod
+from hardware.dmcc_motor import DMCCMotorSet, DMCCMotor
 import lib.lib as lib
 import tests.test_bot as test_bot
+from os import path
+from unittest import TestCase, expectedFailure
+import pyDMCC
 
-# Build logger
-logger = lib.get_logger()  # TODO: TestBot should have a logger member
+class TestDMCCMotorSet(TestCase):
 
+    """Test motor set."""
 
-class TestDMCCMotor(test_bot.TestBot):
+    def setUp(self):
+        config = path.dirname(path.realpath(__file__))+"/test_config.yaml"
+        self.config = lib.get_config(config)
+        self.logger = lib.get_logger()
+        self.logger.info("Running {}()".format(self._testMethodName))
+
+    def test_instantiate(self):
+        conf = {'a_motor': { 'board_num': 0, 'motor_num': 1 }}
+        motor_set = DMCCMotorSet(conf)
+        self.assertIsInstance(motor_set['a_motor'], DMCCMotor)
+
+    def test_multiple_config(self):
+        drive_conf = self.config['dmcc_drive_motors']
+        drive_motor_set = DMCCMotorSet(drive_conf)
+        turret_conf = self.config['dmcc_turret_motors']
+        turret_motor_set = DMCCMotorSet(turret_conf)
+        self.assertEqual(len(drive_motor_set.motors),4)
+        self.assertEqual(len(turret_motor_set.motors),2)
+
+    def test_bad_config(self):
+        motor_conf = self.config['dmcc_bad_motor_def']
+        with self.assertRaises(KeyError):
+            drive_motor_set = DMCCMotorSet(motor_conf)
+
+class TestDMCCMotor(TestCase):
 
     """Test motor functions."""
 
     def setUp(self):
         """Setup test hardware files and build motor object."""
-        # Run general bot test setup
-        super(TestDMCCMotor, self).setUp()
+        config = path.dirname(path.realpath(__file__))+"/test_config.yaml"
+        self.config = lib.get_config(config)
+        self.logger = lib.get_logger()
         self.logger.info("Running {}()".format(self._testMethodName))
+        motor_conf = self.config['dmcc_drive_motors']
+        self.motor_set = DMCCMotorSet(motor_conf)
 
-        # Build motor in testing mode
-        board_num = self.config['dmcc_motors']['front_left']['board_num']
-        motor_num = self.config['dmcc_motors']['front_left']['motor_num']
-        self.motor = dm_mod.DMCCMotor(board_num, motor_num)
+    def test_instantiate(self):
+        motor = self.motor_set['front_left']
+        self.assertIsInstance(motor, DMCCMotor)
+        self.assertIsInstance(motor.real_motor, pyDMCC.Motor)
 
-    def tearDown(self):
-        """Restore testing flag state in config file."""
-        # Run general bot test tear down
-        super(TestDMCCMotor, self).tearDown()
+    def test_set_power(self):
+        """Test setting the motor power"""
+        motor = self.motor_set['front_left']
+        motor.power = 0
+        assert motor.power == 0
+        motor.power = 50
+        assert motor.power == 50
 
-    def _test_limits(self, prop, prop_range):
-        """Test setting a given property to min, max, under, over."""
-        assert hasattr(self.motor, prop), \
-            "Can't test non-existent property \"{}\"!".format(prop)
-        assert (hasattr(prop_range, 'min') and hasattr(prop_range, 'max')), \
-            "Invalid property range: {} (min/max missing)".format(prop_range)
-        self.logger.debug("[init] {}: {}".format(
-            prop, getattr(self.motor, prop)))
+    def test_power_invert(self):
+        """Test the effect of setting inverted power mode"""
+        motor_conf = self.config['dmcc_inverted']
+        motor_set = DMCCMotorSet(motor_conf)
+        normal = motor_set['normal_motor']
+        inverted = motor_set['inverted_motor']
+        normal.power = 25
+        self.assertEqual(normal._power, 25)
+        inverted.power = 25
+        self.assertEqual(inverted._power, -25)
 
-        # Min
-        setattr(self.motor, prop, prop_range.min)
-        self.logger.debug("[min] {}: {}".format(
-            prop, getattr(self.motor, prop)))
-        assert getattr(self.motor, prop) == prop_range.min
+    def test_set_velocity_no_PID(self):
+        """Test setting the motor velocity"""
+        with self.assertRaises(RuntimeError):
+            self.motor_set['front_left'].velocity = 0
 
-        # Max
-        setattr(self.motor, prop, prop_range.max)
-        self.logger.debug("[max] {}: {}".format(
-            prop, getattr(self.motor, prop)))
-        assert getattr(self.motor, prop) == prop_range.max
+    def test_set_velocity(self):
+        """Test setting the motor velocity"""
+        motor = self.motor_set['front_left']
+        motor.setVelocityPID(1000,100,10)
+        motor.velocity = 0
+        assert motor.velocity == 0
+        motor.velocity = 50
+        assert motor.velocity == 50
 
-        # Under min; should use min
-        setattr(self.motor, prop, prop_range.min - 1)
-        self.logger.debug("[under] {}: {}".format(
-            prop, getattr(self.motor, prop)))
-        assert getattr(self.motor, prop) == prop_range.min
+    @expectedFailure
+    def test_get_voltage(self):
+        """Test getting the supply voltage for a motor"""
+        print self.dmcc_motor.dmcc.i2c
+        assert self.dmcc_motor.voltage == 0
 
-        # Over max; should use max
-        setattr(self.motor, prop, prop_range.max + 1)
-        self.logger.debug("[over] {}: {}".format(
-            prop, getattr(self.motor, prop)))
-        assert getattr(self.motor, prop) == prop_range.max
-
-    def _test_sweep(self, prop, prop_range, num_steps=25):
-        """Test a series of increasing property values from min to max."""
-        assert hasattr(self.motor, prop), \
-            "Can't test non-existent property \"{}\"!".format(prop)
-        assert (hasattr(prop_range, 'min') and hasattr(prop_range, 'max')), \
-            "Invalid property range: {} (min/max missing)".format(prop_range)
-        self.logger.debug("[init] {}: {}".format(
-            prop, getattr(self.motor, prop)))
-
-        prop_step = (prop_range.max - prop_range.min) / num_steps
-        for value in range(prop_range.min, prop_range.max, prop_step):
-            setattr(self.motor, prop, value)
-            assert getattr(self.motor, prop) == value
-        self.logger.debug("[final] {}: {}".format(
-            prop, getattr(self.motor, prop)))
-
-    def test_power_stop(self):
-        """Test stopping the motor by setting power to zero."""
-        self.motor.power = 0
-        self.logger.debug("[zero] motor power: {}".format(self.motor.power))
-        assert self.motor.power == 0
-
-    def test_power_limits(self):
-        """Test setting the motor's power to min, max, under, over."""
-        self._test_limits('power', dm_mod.DMCCMotor.power_range)
-
-    def test_power_sweep(self):
-        """Test a series of increasing power values from min to max."""
-        self._test_sweep('power', dm_mod.DMCCMotor.power_range)
-
-    def test_position_limits(self):
-        """Test setting the motor's position to min, max, under, over."""
-        self._test_limits('position', dm_mod.DMCCMotor.position_range)
-
-    def test_position_sweep(self):
-        """Test a series of increasing position values from min to max."""
-        self._test_sweep('position', dm_mod.DMCCMotor.position_range)
-
-    def test_velocity_limits(self):
-        """Test setting the motor's velocity to min, max, under, over."""
-        self._test_limits('velocity', dm_mod.DMCCMotor.velocity_range)
-
-    def test_velocity_sweep(self):
-        """Test a series of increasing velocity values from min to max."""
-        self._test_sweep('velocity', dm_mod.DMCCMotor.velocity_range)
-
-    def test_position_PID(self):
-        """Test setting PID constants to control position."""
-        assert self.motor.setPositionPID(-5000, -100, -500)
-        target_position = 5000
-        self.motor.position = target_position
-        self.logger.debug("[PID] position: {}".format(self.motor.position))
-        assert self.motor.position == target_position
-        self.motor.position = 0  # set back to zero
-
-    def test_velocity_PID(self):
-        """Test setting PID constants to control velocity."""
-        assert self.motor.setVelocityPID(-5000, -100, -500)
-        target_velocity = 1000
-        self.motor.velocity = target_velocity
-        self.logger.debug("[PID] velocity: {}".format(self.motor.velocity))
-        assert self.motor.velocity == target_velocity
-        self.motor.velocity = 0  # set back to zero
+#    def test_position_PID(self):
+#        """Test setting PID constants to control position."""
+#        assert self.motor.setPositionPID(-5000, -100, -500)
+#        target_position = 5000
+#        self.motor.position = target_position
+#        self.logger.debug("[PID] position: {}".format(self.motor.position))
+#        assert self.motor.position == target_position
+#        self.motor.position = 0  # set back to zero
+#
+#    def test_velocity_PID(self):
+#        """Test setting PID constants to control velocity."""
+#        assert self.motor.setVelocityPID(-5000, -100, -500)
+#        target_velocity = 1000
+#        self.motor.velocity = target_velocity
+#        self.logger.debug("[PID] velocity: {}".format(self.motor.velocity))
+#        assert self.motor.velocity == target_velocity
+#        self.motor.velocity = 0  # set back to zero

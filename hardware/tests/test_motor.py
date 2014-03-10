@@ -4,27 +4,29 @@ from random import randint
 
 import lib.lib as lib
 import hardware.motor as m_mod
-import tests.test_bot as test_bot
+from tests.test_bot import TestBot
+from unittest import TestCase
+from os import path
 
-
-class TestSpeed(test_bot.TestBot):
+class TestSpeed(TestBot):
 
     """Test setting and checking the speed of a motor."""
 
     def setUp(self):
         """Setup test hardware files and build motor object."""
-        # Run general bot test setup
-        super(TestSpeed, self).setUp()
+
+        config = path.dirname(path.realpath(__file__))+"/test_config.yaml"
+        self.config = lib.get_config(config)
 
         # Build motor in testing mode
-        self.pwm_num = self.config["drive_motors"][0]["PWM"]
-        self.gpio_num = self.config["drive_motors"][0]["GPIO"]
+        self.pwm_num = self.config["two_motors"][0]["PWM"]
+        self.gpio_num = self.config["two_motors"][0]["GPIO"]
+        self.setup_pwm(self.pwm_num, "1\n", "0\n", "1000\n", "0\n")
+        self.setup_gpio(self.gpio_num)
         self.motor = m_mod.Motor(self.pwm_num, self.gpio_num)
 
     def tearDown(self):
-        """Restore testing flag state in config file."""
-        # Run general bot test tear down
-        super(TestSpeed, self).tearDown()
+        pass
 
     def test_off(self):
         """Test turning the motor off."""
@@ -72,24 +74,25 @@ class TestSpeed(test_bot.TestBot):
         assert self.motor.speed == 0
 
 
-class TestDirection(test_bot.TestBot):
+class TestDirection(TestBot):
 
     """Test setting and checking the direction of a motor."""
 
     def setUp(self):
         """Setup test hardware files and build motor object."""
-        # Run general bot test setup
-        super(TestDirection, self).setUp()
+
+        config = path.dirname(path.realpath(__file__))+"/test_config.yaml"
+        self.config = lib.get_config(config)
 
         # Build motor in testing mode
-        self.pwm_num = self.config["drive_motors"][0]["PWM"]
-        self.gpio_num = self.config["drive_motors"][0]["GPIO"]
+        self.pwm_num = self.config["two_motors"][0]["PWM"]
+        self.gpio_num = self.config["two_motors"][0]["GPIO"]
+        self.setup_pwm(self.pwm_num, "1\n", "0\n", "1000\n", "0\n")
+        self.setup_gpio(self.gpio_num)
         self.motor = m_mod.Motor(self.pwm_num, self.gpio_num)
 
     def tearDown(self):
-        """Restore testing flag state in config file."""
-        # Run general bot test tear down
-        super(TestDirection, self).tearDown()
+        pass
 
     def test_forward(self):
         """Test motor in forward direction using text and int syntax."""
@@ -119,23 +122,19 @@ class TestDirection(test_bot.TestBot):
         assert self.motor.direction == "forward"
 
 
-class TestNoDirection(test_bot.TestBot):
+class TestNoDirection(TestCase):
 
     """Test a motor with no GPIO pin, and therefore no in-code direction."""
 
     def setUp(self):
         """Setup test hardware files and build motor object."""
-        # Run general bot test setup
-        super(TestNoDirection, self).setUp()
+
+        config = path.dirname(path.realpath(__file__))+"/test_config.yaml"
+        self.config = lib.get_config(config)
 
         # Build motor in testing mode
-        self.pwm_num = self.config["drive_motors"][0]["PWM"]
+        self.pwm_num = self.config["two_motors"][0]["PWM"]
         self.motor = m_mod.Motor(self.pwm_num)
-
-    def tearDown(self):
-        """Restore testing flag state in config file."""
-        # Run general bot test tear down
-        super(TestNoDirection, self).tearDown()
 
     def test_set_dir(self):
         """Test setting a direction for a motor that should have no direction.

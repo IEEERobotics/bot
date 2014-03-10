@@ -6,6 +6,9 @@ import unittest
 
 import lib.lib as lib
 
+def additional_tests():
+    return unittest.defaultTestLoader.discover("..")
+
 
 class TestBot(unittest.TestCase):
 
@@ -14,7 +17,7 @@ class TestBot(unittest.TestCase):
     def setUp(self):
         """Get config, set simulation pins to known state, set test flag."""
         # Load config and logger
-        self.config = lib.get_config()
+        self.config = lib.get_config("config.yaml")
         self.logger = lib.get_logger()
 
         # Set testing flag in config
@@ -22,23 +25,12 @@ class TestBot(unittest.TestCase):
         lib.set_testing(True)
 
         # Write known values to all simulated hardware files
-        self.setup_drive_motors()
         self.setup_turret_servos()
         self.setup_lasor()
         self.setup_gun_motors()
         self.setup_gun_trigger()
         self.setup_ir_select_gpios()
         self.setup_ir_analog_input_gpios()
-
-    def setup_drive_motors(self):
-        """Set driving motor simulation files to known state."""
-        run = "0\n"
-        duty_ns = "250000\n"
-        period_ns = "1000000\n"
-        polarity = "0\n"
-        for motor in self.config["drive_motors"]:
-            self.setup_pwm(motor["PWM"], run, duty_ns, period_ns, polarity)
-            self.setup_gpio(motor["GPIO"])
 
     def setup_turret_servos(self):
         """Set turret servo simulation files to known state."""

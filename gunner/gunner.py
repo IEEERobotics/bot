@@ -1,8 +1,8 @@
 """Handle aiming and firing darts."""
 
 import lib.lib as lib
-import localizer.us_localizer as l_mod
 import hardware.turret as t_mod
+import targeting_solver as targeter
 
 
 class Gunner(object):
@@ -25,9 +25,6 @@ class Gunner(object):
         # Load and store targeting dict
         self.targ = lib.load_targeting(self.config["targeting"])
 
-        # Load and store ultrasonic localizer
-        self.localizer = l_mod.USLocalizer()
-
         # Build turrent hardware abstraction
         self.turret = t_mod.Turret()
 
@@ -42,6 +39,19 @@ class Gunner(object):
         raise NotImplementedError("Subclass must override this method.")
 
     @lib.api_call
+    def calc_pitch(self, x_pos, y_pos):
+        """TODO: Clean up"""
+        angle = targeter.getFiringSolution(x_pos, y_pos)
+        pitch_angle = targeter.getServoAngle(angle)
+        return pitch_angle
+    
+    @lib.api_call
+    def calc_yaw(self, x_pos, y_pos):
+        """TODO: Clean up"""
+        yaw_angle = targeter.getHorizLaunchAngle(x_pos, y_pos) + 90
+        return yaw_angle
+    
+    @lib.api_call
     def aim_turret(self, yaw, pitch):
         """Aim the robot's turret such that firing will be successful.
 
@@ -49,15 +59,6 @@ class Gunner(object):
         :param pitch: Angle on pitch axis to set turret servo.
 
         """
-        try:
-            assert 0 <= yaw <= 180
-        except AssertionError:
-            raise AssertionError("Yaw is out of bounds: {}".format(yaw))
-        try:
-            assert 0 <= pitch <= 180
-        except AssertionError:
-            raise AssertionError("Pitch is out of bounds: {}".format(pitch))
-
         self.logger.debug("Aiming turret to ({}, {})".format(yaw, pitch))
         self.turret.yaw = yaw
         self.turret.pitch = pitch

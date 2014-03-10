@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source slots.sh
+dir=$(dirname $0)
+source $dir/slots.sh
 
 pwm_sysfs=/sys/class/pwm
 

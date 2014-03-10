@@ -10,7 +10,6 @@ from time import sleep
 
 import lib.lib as lib
 import interface.cli as cli_mod
-import planner.fsm_planner as pfsm_mod
 
 # Build parser and argument groups
 description="start CLI, Planner, CtrlServer, unit tests or PEP8 scan"
@@ -52,7 +51,7 @@ if args.pep8:
 
 if args.tests:
     print "Running unit tests"
-    os.system("python -m unittest discover")
+    os.system("python -m unittest discover -v")
 
 if args.server:
     # Fail if starting the server on the bot and not root
@@ -72,8 +71,9 @@ if args.server:
     sleep(.3)
 
 if args.auto:
+    import planner.fsm_planner
     print "Starting autonomous solver"
-    planner = pfsm_mod.Robot()
+    planner = planner.fsm_planner.Robot()
 
 if args.cli:
     # Build addresses of remote resources

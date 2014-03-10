@@ -44,9 +44,6 @@ class IRHub(object):
         # Number of IR sensors on an array
         self.num_ir_units = config["irs_per_array"]
 
-        # Pause between each select-read operation to let ADCs settle
-        self.ir_read_delay = config["ir_read_delay"]
-
         # Use accurate reading (ADC) or not (GPIO)
         self.ir_read_adc = config["ir_read_adc"]
 
@@ -146,7 +143,6 @@ class IRHub(object):
             raise ValueError("n must be between 0 and num_ir_units-1")
 
         self.select_nth_units(n)
-        sleep(self.ir_read_delay)  # let ADCs settle
 
         for name, array in self.arrays.iteritems():
             if array is None:
@@ -185,6 +181,24 @@ class IRHub(object):
         return self.reading
 
     @lib.api_call
+    def read_binary(self, thresh=150):
+        """Convert 0-255 values to binary.
+
+        0 is black, 1 is white. Note that this is a quick hack.
+        TODO: Make more efficent.
+
+        :param thresh: Cutoff value for white/black (< thesh is white).
+        :type thresh: int
+        :returns: IR readings, converted to white/black binary.
+
+        """
+        readings = self.read_all()
+        for name, reading in readings.iteritems():
+            for i in range(len(reading)):
+                readings[name][i] = 0 if reading[i] > thresh else 1
+        return readings
+
+    @lib.api_call
     def read_cached(self, max_staleness=1):
         """Get cached IR data if it's fresher than param, else read IRs.
 
@@ -204,6 +218,43 @@ class IRHub(object):
             fresh = True
         return {"readings": self.reading, "time": self.last_read_time,
                 "fresh": fresh}
+
+    @lib.api_call
+    def check_performance(self, num_reads=5):
+        """Time calls to the important read functions to check performance.
+
+        :param num_reads: Number of times to call each function, used for avg.
+        :type num_reads: int
+
+        """
+        # Check performance of read_binary
+        start_time = time()
+        for i in range(num_reads):
+            self.read_binary()
+        read_binary_avg = (time() - start_time) / num_reads
+
+        # Check performance of read_all
+        start_time = time()
+        for i in range(num_reads):
+            self.read_all()
+        read_all_avg = (time() - start_time) / num_reads
+
+        # Check performance of read_nth_units
+        start_time = time()
+        for i in range(num_reads):
+            self.read_nth_units(0)
+        read_nth_units_avg = (time() - start_time) / num_reads
+
+        # Check performance of select_nth_units
+        start_time = time()
+        for i in range(num_reads):
+            self.select_nth_units(0)
+        select_nth_units_avg = (time() - start_time) / num_reads
+
+        return {"read_binary_avg": read_binary_avg, 
+                "read_all_avg": read_all_avg,
+                "read_nth_units_avg": read_nth_units_avg,
+                "select_nth_units_avg": select_nth_units_avg}
 
 
 def live_read_loop(delay=0.25, accurate=False):

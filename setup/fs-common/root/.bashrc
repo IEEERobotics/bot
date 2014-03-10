@@ -155,3 +155,6 @@ export PINS=/sys/kernel/debug/pinctrl/44e10800.pinmux/pins
 export PINMUX=/sys/kernel/debug/pinctrl/44e10800.pinmux/pinmux-pins
 export PINGROUPS=/sys/kernel/debug/pinctrl/44e10800.pinmux/pingroups
 
+# Additional C libraries (prussdrv, etc)
+export LD_LIBRARY_PATH=/usr/local/lib
+

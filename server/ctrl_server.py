@@ -6,6 +6,7 @@ import os
 from inspect import getmembers, ismethod
 from simplejson.decoder import JSONDecodeError
 import zmq
+import signal
 
 new_path = [os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")]
 sys.path = new_path + sys.path
@@ -74,6 +75,8 @@ class CtrlServer(object):
         :type config_file: string
 
         """
+        # Register signal handler, shut down cleanly (think motors)
+        signal.signal(signal.SIGINT, self.signal_handler)
 
         # Load configuration and logger
         self.config = lib.get_config(config_file)
@@ -110,6 +113,12 @@ class CtrlServer(object):
 
         # Don't spawn pub_server until told to
         self.pub_server = None
+
+    def signal_handler(self, signal, frame):
+        self.logger.info("Caught SIGINT (Ctrl+C), closing cleanly")
+        self.clean_up()
+        self.logger.info("Cleaned up bot, exiting...")
+        sys.exit(0)
 
     def assign_subsystems(self):
         """Instantiates and stores references to bot subsystems.
@@ -289,6 +298,8 @@ class CtrlServer(object):
 
     def clean_up(self):
         """Tear down ZMQ socket."""
+        self.systems["driver"].move(0, 0)
+        self.systems["gun"].set_wheel_speed(0)
         self.ctrl_sock.close()
         self.context.term()
 

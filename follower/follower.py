@@ -57,7 +57,6 @@ class Follower(object):
     def set_translate_speed(self,speed):
         self.translate_speed = speed
 
-
     @lib.api_call
     def update(self):
         """Read IR values, compute aggregates."""
@@ -108,7 +107,7 @@ class Follower(object):
     @lib.api_call
     def is_end_of_line(self):
         return False  # TODO: Use IR sensors (only one array sees the line?)
-
+ 
     @lib.api_call
     def follow(self, heading):
         """Follow line along given heading"""
@@ -146,8 +145,13 @@ class Follower(object):
             self.rotate_error = self.rotate_pid.pid(
                 0, bot_angle, self.sampling_time)
             # Report errors from strafe and rotate pid's 
-            self.logger.info(self.strafe_error)
-            self.logger.info(self.rotate_error)
+            self.logger.info("FS: {}, BS {}, StrafeErr: {}, RotErr: {}",
+                self.front_state,
+                self.back_state,
+                self.left_state,
+                self.right_state,
+                self.strafe_error,
+                self.rotate_err)
             # Update motors
             self.motors(bot_angle)
             # Take the current time set it equal to the previous time

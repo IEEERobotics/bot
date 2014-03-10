@@ -275,9 +275,9 @@ class MecDriver(driver.Driver):
     @lib.api_call
     def drive(self, speed, angle, duration):
         """Moves at given speed and angle for set duration (in seconds)."""
-        move(speed, angle)  # start moving
+        self.move(speed, angle)  # start moving
         sleep(duration)  # wait for desired duration (in seconds)
-        move(0, 0)  # stop
+        self.move(0, 0)  # stop
 
     @lib.api_call
     def jerk(self, speed=30, angle=0, duration=3):

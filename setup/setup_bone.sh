@@ -2,7 +2,7 @@
 # Install standard software, do git configuration
 
 # Each should only contain the packages that are added at that level
-base="git python-yaml libzmq-dev python-zmq python-simplejson python-smbus python-virtualenv python-pip python-numpy python-dev build-essential vim-tiny less"
+base="git python-yaml libzmq-dev python-zmq python-simplejson python-smbus python-virtualenv python-pip python-numpy python-dev build-essential vim vim-tiny less"
 extra="vim-nox ipython tmux screen nmap tree i2c-tools wireless-tools grc"
 
 while getopts aubh opt; do
@@ -60,6 +60,9 @@ echo "========================"
 chown -R root.root fs-*
 rsync -va fs-common/* /
 chmod 600 /root/.ssh/id_rsa
+# We need to customize uEnv.txt for each install
+ROOT_UUID=$(blkid -t LABEL=rootfs -o value -s UUID)
+sed 's/{{ROOT_UUID}}/'$ROOT_UUID'/' /boot/uboot/uEnv_template.txt > /boot/uboot/uEnv.txt
 
 if [ "$bot_specific" = true ]; then
     rsync -va fs-bot/* /
@@ -69,7 +72,6 @@ if [ "$bot_specific" = true ]; then
     echo Enabling uplink...
     ifup wlan1
 fi
-
 
 echo "=================="
 echo "Testing network..."

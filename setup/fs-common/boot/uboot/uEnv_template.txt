@@ -13,12 +13,12 @@ fdt_high=0xffffffff
 ##Note: On the BeagleBone Black, there is also an uEnv.txt in the eMMC, so if these changes do not seem to be makeing a difference...
 
 ##BeagleBone Black:
-##Disable HDMI/eMMC
+##Disable HDMI
 optargs=capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN
 
 console=ttyO0,115200n8
 
-mmcroot=/dev/mmcblk0p2 ro
+mmcroot=UUID={{ROOT_UUID}} ro
 mmcrootfstype=ext4 rootwait fixrtc
 
 loadkernel=load mmc ${mmcdev}:${mmcpart} 0x80300000 ${kernel_file}

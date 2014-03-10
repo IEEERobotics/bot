@@ -188,8 +188,6 @@ class MecDriver(driver.Driver):
 
         # Find largest motor speed,
         # use that to normalize multipliers and maintain maximum efficiency
-        # TODO This needs to be debugged and re-enabled; currently speeds are
-        # being set much higher than expected (use test_mec_driver to verify)
         max_wheel_speed = max(
             [fabs(front_left), fabs(front_right),
                 fabs(back_left), fabs(back_right)]

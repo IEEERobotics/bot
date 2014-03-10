@@ -114,9 +114,9 @@ class Follower(object):
         # Get the initial condition
         previous_time = time()
         # Init front_PID
-        self.strafe.set_k_values(4, 0, .01)
+        self.strafe.set_k_values(8, 0, .1)
         # Inti rotate_PID
-        self.rotate_pid.set_k_values(1, 0, .01)
+        self.rotate_pid.set_k_values(4, 0, 0)
         # Get current heading
         self.heading = heading
         # Continue until an error condition
@@ -145,13 +145,13 @@ class Follower(object):
             self.rotate_error = self.rotate_pid.pid(
                 0, bot_angle, self.sampling_time)
             # Report errors from strafe and rotate pid's 
-            self.logger.info("FS: {}, BS {}, StrafeErr: {}, RotErr: {}",
+            self.logger.info("FS: {}, BS {}, LS {}, RS {}, StrafeErr: {}, RotErr: {}".format(
                 self.front_state,
                 self.back_state,
                 self.left_state,
                 self.right_state,
                 self.strafe_error,
-                self.rotate_err)
+                self.rotate_error))
             # Update motors
             self.motors(bot_angle)
             # Take the current time set it equal to the previous time
@@ -451,13 +451,15 @@ class Follower(object):
         # correct towards line horizontally
         # std is 7 on a range of -15 to 15
         std_angle = 7
-        if bot_angle < std_angle:
-            translate_angle = self.strafe_error
-            self.driver.move(translate_speed, translate_angle) 
+        if abs(bot_angle) < std_angle:
+            translate_angle = self.strafe_error%360
+            self.driver.move(self.translate_speed, translate_angle) 
         else:
             #cap speed between (-100,100)
             rotate_speed = max(-100,min(100,self.rotate_error))
+            self.logger.info("rotate_speed = {}".format(rotate_speed))
             self.driver.rotate(rotate_speed) 
+            
 
 
 

@@ -101,6 +101,10 @@ class ColorSensor(I2CDevice):
         self.bv, self.bc, \
         self.br, self.bg, \
         self.bb = self.read_data()
+        try:
+            assert (self.br != 0, self.bg != 0, self.bb != 0)
+        except AssertionError:
+            raise AssertionError("Baselines colors are zero.")
 
     def get_percent_diff(self):
         """Returns percent diff
@@ -123,6 +127,17 @@ class ColorSensor(I2CDevice):
         # returns true when g has greatest increase.
         if (diff_r > diff_g) & (diff_r > diff_b):
             return True
+            
+    def is_blue_percent_method(self):
+        """decides on color based on percentage.
+        (current winning candidate).
+        """
+
+        diff_c, diff_r, diff_g, diff_b = self.get_percent_diff()
+
+        # returns true when b has greatest increase.
+        if (diff_b > diff_r) & (diff_b > diff_g):
+            return True
 
     def is_green_percent_method(self):
         """decides on color based on percentage.
@@ -130,10 +145,11 @@ class ColorSensor(I2CDevice):
         """
 
         diff_c, diff_r, diff_g, diff_b = self.get_percent_diff()
-        
+
         # returns true when g has greatest increase.
         if (diff_g > diff_r) & (diff_g > diff_b):
             return True
+
 
     def is_green_diff_method(self):
         """Decides on color based on difference in percentage 

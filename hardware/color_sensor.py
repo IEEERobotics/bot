@@ -90,9 +90,9 @@ class ColorSensor(I2CDevice):
         v, c, r, g, b = self.get_data_normalized()
         # c = float(c)
         total = r + g + b
-        r = (r/total)*100
-        g = (g/total)*100
-        b = (b/total)*100
+        r = (r / total) * 100
+        g = (g / total) * 100
+        b = (b / total) * 100
         return v, c, r, g, b
 
     def get_baseline(self):
@@ -106,67 +106,70 @@ class ColorSensor(I2CDevice):
         """Returns percent diff
         for use in color decisions.        
         """
-        diff_c = (self.color["clear"] - self.bc)/self.bc
-        diff_r = (self.color["red"] - self.br)/self.br
-        diff_g = (self.color["green"] - self.bg)/self.bg
-        diff_b = (self.color["blue"] - self.bb)/self.bb
-        
-        # diff_c = abs((self.color["clear"] - self.bc)/self.bc)*100
-        # diff_r = abs((self.color["red"] - self.br)/self.br) * 100
-        # diff_g = abs((self.color["green"] - self.bg)) * 100
-        # diff_b = abs((self.color["blue"] - self.bb)/self.bb) *100
 
+        diff_c = (self.color["clear"] - self.bc) / self.bc
+
+        diff_r = (self.color["red"] - self.br) / self.br
+        diff_g = (self.color["green"] - self.bg) / self.bg
+        diff_b = (self.color["blue"] - self.bb) / self.bb
         return diff_c, diff_r, diff_g, diff_b
-
-    def is_green_percent_method(self):
-        """decides on color based on percentage
+        
+    def is_red_percent_method(self):
+        """decides on color based on percentage.
+        (current winning candidate).
         """
         
+        diff_c, diff_r, diff_g, diff_b = self.get_percent_diff()
+        # returns true when g has greatest increase.
+        if (diff_r > diff_g) & (diff_r > diff_b):
+            return True
+
+    def is_green_percent_method(self):
+        """decides on color based on percentage.
+        (current winning candidate).
+        """
+
         diff_c, diff_r, diff_g, diff_b = self.get_percent_diff()
         
         # returns true when g has greatest increase.
         if (diff_g > diff_r) & (diff_g > diff_b):
             return True
-            
+
     def is_green_diff_method(self):
         """Decides on color based on difference in percentage 
         of total color increases by set amount.
+        Note: This is a terrible method.
         """
-        
+
         # Reads in percentages of total color
-        pv, pc, pr, pg, pb = colorSensor.get_percentage()
-        
+        pv, pc, pr, pg, pb = self.get_percentage()
+
         total_color = self.color["red"] \
                     + self.color["green"] \
                     + self.color["blue"]
-                    
+
         total_base = self.br + self.bg + self.bb
 
         # Base percentages for each color
-        percent_baseb = self.br / total_base * 100
+        percent_baser = self.br / total_base * 100
         percent_baseg = self.bg / total_base * 100
         percent_baseb = self.bb / total_base * 100
-        
-        # returns True when the percentage of a color goes up by 0.2 from base percents
-        
-        if (pg - percent_baseg) > 0.2:
-            return True
 
-        
-        
+        # returns True when the percentage of a color goes up by 0.2 from base percentages
+
+        if (pg - percent_baseg) > 2:
+            return True
 
     def is_green(self):
         """ finds percent difference between baseline
             and current reading.
         """
         diff_c, diff_r, diff_g, diff_b = self.get_percent_diff()
-        
-        print "diff_c", diff_c, "diff_r",diff_r, "diff_g",diff_g, "diff_b",diff_b 
+
+        # print "diff_c", diff_c, "diff_r",diff_r, "diff_g",diff_g, "diff_b",diff_b 
         if (diff_g) > (diff_b + diff_r):
             return True
 
-        
-            
 def read_loop():
     """Instantiate a ColorSensor object and read indefinitely."""
     print "start"
@@ -190,18 +193,20 @@ def read_loop():
     while True:
         try:
             elapsed = time.time() - t0
-            print "[{:8.3f}] ".format(elapsed),
-            
-            v, c, r, g, b = colorSensor.read_data()  # raw read
-            
+            # print "[{:8.3f}] ".format(elapsed)
             # print "v: {}, c: {:5.3f}, r: {:5.3f}, g: {:5.3f}, b: {:5.3f}".format(v, c, r, g, b)
-            print "bv: {}, bc: {:5.3f}, br: {:5.3f}, bg: {:5.3f}, bb: {:5.3f}".format(colorSensor.bv, \
-                                                                        colorSensor.bc,\
-                                                                        colorSensor.br,\
-                                                                        colorSensor.bg,\
-                                                                        colorSensor.bb)
-            if colorSensor.is_green():
-                print "Found green"
+
+            # if colorSensor.is_green():
+                # print "Found green"
+            if colorSensor.is_green_percent_method():
+                print "Found green, Percent method"
+                
+            if colorSensor.is_red_percent_method():
+                print "Found red, percent method"
+
+            # if colorSensor.is_green_diff_method():
+                # print "diff method"
+
             #print "v: {}  c: {}, r: {}, g: {} b: {}".format(valid, c, r, g, b)
             # v, c, r, g, b = colorSensor.get_data_normalized()  # read normalized RGB values 
             #v, c, r, g, b = colorSensor.get_percentage()

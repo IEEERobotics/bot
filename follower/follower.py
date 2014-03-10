@@ -111,12 +111,13 @@ class Follower(object):
     @lib.api_call
     def follow(self, heading):
         """Follow line along given heading"""
-        # Get the initial condition
+        # Get the initial conditioni
+        self.heading = heading;
         previous_time = time()
         # Init front_PID
         self.strafe.set_k_values(8, 0, .1)
         # Inti rotate_PID
-        self.rotate_pid.set_k_values(4, 0, 0)
+        self.rotate_pid.set_k_values(6   0, 0)
         # Get current heading
         self.heading = heading
         # Continue until an error condition
@@ -172,7 +173,7 @@ class Follower(object):
     @lib.api_call
     def report_states(self):
         # for debug of IR sensor state
-        current_ir_reading = self.ir_hub.read_binary(100,False)
+        current_ir_reading = self.ir_hub.read_binary(100,True)
         self.front_state = self.get_position_lr(
             current_ir_reading["front"])
         # Back is on the back side
@@ -452,7 +453,7 @@ class Follower(object):
         # std is 7 on a range of -15 to 15
         std_angle = 7
         if abs(bot_angle) < std_angle:
-            translate_angle = self.strafe_error%360
+            translate_angle = (self.strafe_error - self.heading + 180)%360
             self.driver.move(self.translate_speed, translate_angle) 
         else:
             #cap speed between (-100,100)

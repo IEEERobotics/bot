@@ -506,4 +506,16 @@ class Follower(object):
         #    translate_speed, translate_angle, rotate_speed
 """
 
+    @lib.api_call
+    def get_out_of_box(self):
+      """Used to get the bot out of the box"""
+      
+      hit_position = {};
+      current_ir_reading = self.ir_hub.read_binary(100,False)
+      for index, value in enumerate(current_ir_reading["back"]):
+          if(value == 1):
+             hit_position.append(index)
+      if(len(hit_position) != 0):
+        return;
+
 

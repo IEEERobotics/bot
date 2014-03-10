@@ -109,7 +109,7 @@ class Follower(object):
         return False  # TODO: Use IR sensors (only one array sees the line?)
  
     @lib.api_call
-    def follow(self, heading):
+    def follow(self, heading, on_x=False):
         """Follow line along given heading"""
         # Get the initial conditioni
         self.heading = heading;
@@ -123,7 +123,7 @@ class Follower(object):
         # Continue until an error condition
         while True:
             # Assign the current states to the correct heading
-            self.assign_states()
+            self.assign_states(on_x)
             # Check for error conditions
             if self.error != 0:
                 self.update_exit_state()
@@ -284,11 +284,11 @@ class Follower(object):
                     return {"line_found": False,
                             "time_elapsed": time() - start_time}
     
-    def assign_states(self, current_ir_reading=None):
-        """Take 4x16 bit arrays and assigns the array to proper orientations.
-
+    def assign_states(self, on_x,current_ir_reading=None):
+        """ on_x=True flag does not allow intersection errors
+            once left&right arrays clear intersection, on_x = false.
+        Take 4x16 bit arrays and assigns the array to proper orientations.
         Note that the proper orientations are front, back, left and right.
-
         """
         # Get the current IR readings
         if current_ir_reading is None:

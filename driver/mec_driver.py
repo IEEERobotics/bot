@@ -14,7 +14,7 @@ class MecDriver(driver.Driver):
 
     min_speed = 0
     max_speed = 100
-    min_angle = 0
+    min_angle = -360
     max_angle = 360
     min_rotate_speed = -100
     max_rotate_speed = 100

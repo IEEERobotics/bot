@@ -27,7 +27,7 @@ class Follower(object):
         self.front_error = 0.0
         self.rotate_pid = pid_mod.PID()
         self.rotate_error= 0.0
-        self.error = 0.0
+        self.error = "NONE"
         
         # motor variables
         self.translate_speed =  60
@@ -125,16 +125,16 @@ class Follower(object):
             # Assign the current states to the correct heading
             self.assign_states(on_x)
             # Check for error conditions
-            if self.error != 0:
+            if self.error != "NONE":
                 self.update_exit_state()
-                self.logger.info("Error: {},".format( self.erro ))
+                self.logger.info("Error: {}".format( self.error ))
                 self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
                     self.front_state,
                     self.back_state,
                     self.left_state,
                     self.right_state))
                 self.driver.move(0,0)
-                return
+                return self.error
             # average states.
             bot_position = (self.front_state + self.back_state)/2
             # Get the current time of the CPU
@@ -359,38 +359,38 @@ class Follower(object):
 
         #Check for error conditions
         if((self.front_state > 15) or (self.back_state > 15) or
-            (self.right_state < 16) or (self.left_state < 16)):
+            (self.right_state < 16) and (self.left_state < 16)):
             
             if((self.right_state < 16) and (self.left_state < 16))and not on_x:
                 # Found Intersection because left and right lit up
                 # if on_x=True, ignore this error
-                self.error = 1
+                self.error = "ON_INTERSECTION" 
             if((self.front_state == 17) ):
                 # Found large object on front array. Ignore back array lightups.
-                self.error = 5
+                self.error = "LARGE_OBJECT" 
             elif((self.front_state == 16) and (self.back_state == 16)):
                 # Front and back lost line
-                self.error = 2
+                self.error = "LOST_LINE" 
             elif(self.front_state == 16):
                 # Front lost line
-                self.error = 3
+                self.error = "FRONT_LOST" 
             elif(self.back_state == 16):
                 # Back lost line
-                self.error = 4
+                self.error = "BACK_LOST" 
         else: #no errors
-            self.error = 0
+            self.error = "NONE" 
 
     def update_exit_state(self):
-        if(self.error == 1):
+        if(self.error == "ON_INTERSECTION"):
             self.intersection = True
-        elif(self.error == 2):
+        elif(self.error == "LOST_LINE"):
             self.lost_line = True
-        elif(self.error == 3):
+        elif(self.error == "FRONT_LOST"):
             self.lost_line = True
-        elif(self.error == 4):
+        elif(self.error == "BACK_LOST"):
             self.lost_line = True
-        elif(self.error == 5):
-            self.lost_line = True
+    #    elif(self.error == 5):
+    #        self.lost_line = True
 
     def get_position_lr(self, readings):
         """Reading the IR sensors from left to right.

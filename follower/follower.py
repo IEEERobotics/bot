@@ -23,11 +23,14 @@ class Follower(object):
         self.driver = mec_driver_mod.MecDriver()
 
         # Build PIDs
-        self.front_pid = pid_mod.PID()
+        self.strafe = pid_mod.PID()
         self.front_error = 0.0
-        self.back_pid = pid_mod.PID()
-        self.back_error = 0.0
+        self.rotate_pid = pid_mod.PID()
+        self.rotate_error= 0.0
         self.error = 0.0
+        
+        # motor variables
+        self.translate_speed =  60
 
         # Initialize other members
         # IR position values, e.g. [-8.0, -7.0 ..., 8.0]
@@ -45,6 +48,14 @@ class Follower(object):
         self.intersection = False
         self.lost_line = False
         self.timeLastUpdated = -1.0
+
+    @lib.api_call
+    def get_translate_speed(self):
+        return self.translate_speed
+
+    @lib.api_call
+    def set_translate_speed(self,speed):
+        self.translate_speed = speed
 
     @lib.api_call
     def update(self):
@@ -66,12 +77,12 @@ class Follower(object):
         return self.ir_agg
 
     @lib.api_call
-    def get_front_error(self):
-        return self.front_error
+    def get_strafe_error(self):
+        return self.strafe_error
 
     @lib.api_call
-    def get_back_error(self):
-        return self.back_error
+    def get_rotate_error(self):
+        return self.rotate_error
 
     @lib.api_call
     def is_start(self):
@@ -96,16 +107,17 @@ class Follower(object):
     @lib.api_call
     def is_end_of_line(self):
         return False  # TODO: Use IR sensors (only one array sees the line?)
-
+ 
     @lib.api_call
     def follow(self, heading):
         """Follow line along given heading"""
-        # Get the initial condition
+        # Get the initial conditioni
+        self.heading = heading;
         previous_time = time()
         # Init front_PID
-        self.front_pid.set_k_values(1, 0, 0)
-        # Inti back_PID
-        self.back_pid.set_k_values(1, 0, 0)
+        self.strafe.set_k_values(8, 0, .1)
+        # Inti rotate_PID
+        self.rotate_pid.set_k_values(6   0, 0)
         # Get current heading
         self.heading = heading
         # Continue until an error condition
@@ -120,18 +132,29 @@ class Follower(object):
                 self.logger.warning(self.back_state)
                 self.driver.move(0,0)
                 return
+            # average states.
+            bot_position = (self.front_state + self.back_state)/2
             # Get the current time of the CPU
             current_time = time()
-            # Call front PID
             self.sampling_time = current_time - previous_time
-            # Call front PID
-            self.front_error = self.front_pid.pid(
-                0, self.front_state, self.sampling_time)
-            # Call back PID
-            self.back_error = self.back_pid.pid(
-                0, self.back_state, self.sampling_time)
+            # Call PID
+            self.strafe_error = self.strafe.pid(
+                0, bot_position, self.sampling_time)
+            #calculate difference between array's for approx. pseudo angle 
+            bot_angle = (self.front_state - self.back_state)
+            # Call Rotate PID
+            self.rotate_error = self.rotate_pid.pid(
+                0, bot_angle, self.sampling_time)
+            # Report errors from strafe and rotate pid's 
+            self.logger.info("FS: {}, BS {}, LS {}, RS {}, StrafeErr: {}, RotErr: {}".format(
+                self.front_state,
+                self.back_state,
+                self.left_state,
+                self.right_state,
+                self.strafe_error,
+                self.rotate_error))
             # Update motors
-            self.motors(self.front_error, self.back_error)
+            self.motors(bot_angle)
             # Take the current time set it equal to the previous time
             previous_time = current_time
 
@@ -147,6 +170,26 @@ class Follower(object):
     def center_on_red(self):
         return True  # TODO: Actually center on red_block
 
+    @lib.api_call
+    def report_states(self):
+        # for debug of IR sensor state
+        current_ir_reading = self.ir_hub.read_binary(100,True)
+        self.front_state = self.get_position_lr(
+            current_ir_reading["front"])
+        # Back is on the back side
+        self.back_state = self.get_position_rl(
+            current_ir_reading["back"])
+        # Left is on the left
+        self.left_state = self.get_position_lr(
+            current_ir_reading["left"])
+        # right is on the right
+        self.right_state = self.get_position_rl(
+            current_ir_reading["right"])
+        self.logger.info("front = {}".format(self.front_state))
+        self.logger.info("back = {}".format(self.back_state))
+        self.logger.info("left = {}".format(self.left_state))
+        self.logger.info("right = {}".format(self.right_state))
+    
     @lib.api_call
     def oscillate(self, heading, osc_time=1):
         """Oscillate sideways, increasing in amplitude until line is found"""
@@ -240,7 +283,7 @@ class Follower(object):
                 if time() - start_time > max_time:
                     return {"line_found": False,
                             "time_elapsed": time() - start_time}
-
+    
     def assign_states(self, current_ir_reading=None):
         """Take 4x16 bit arrays and assigns the array to proper orientations.
 
@@ -249,9 +292,9 @@ class Follower(object):
         """
         # Get the current IR readings
         if current_ir_reading is None:
-            current_ir_reading = self.ir_hub.read_binary(60)
-        # Heading west
-        if self.heading == 0:
+            current_ir_reading = self.ir_hub.read_binary(100,False)
+        # Heading east
+        if self.heading == 270:
             # Forward is on the left side
             self.front_state = self.get_position_lr(
                 current_ir_reading["left"])
@@ -264,8 +307,8 @@ class Follower(object):
             # Right is on the front
             self.right_state = self.get_position_rl(
                 current_ir_reading["front"])
-        # Heading east
-        elif self.heading == 180:
+        # Heading west
+        elif self.heading == 90:
             # Forward is on the right side
             self.front_state = self.get_position_lr(
                 current_ir_reading["right"])
@@ -279,7 +322,7 @@ class Follower(object):
             self.right_state = self.get_position_rl(
                 current_ir_reading["back"])
         # Heading south
-        elif self.heading == 270:
+        elif self.heading == 180:
             # Forward is on the front side
             self.front_state = self.get_position_lr(
                 current_ir_reading["front"])
@@ -292,8 +335,8 @@ class Follower(object):
             # right is on the right
             self.right_state = self.get_position_rl(
                 current_ir_reading["right"])
-            # Heading north
-        elif self.heading == 90:
+        # Heading north
+        elif self.heading == 0:
             # Forward is on the right side
             self.front_state = self.get_position_lr(
                 current_ir_reading["back"])
@@ -402,18 +445,32 @@ class Follower(object):
         return state
 
     @lib.api_call
-    def motors(self, front_error, back_error):
+    def motors(self, bot_angle):
         """Used to update the motors speed and angular motion."""
-        # Calculate translate_speed
-        # MAX speed - error in the front sensor / total number
-        # of states
-        translate_speed =  80 - ( front_error / 16 )
+        #If outside standard deviation angle, use rotate to straiten
+        #if within std angle, use move to translate forward and strafe to
+        # correct towards line horizontally
+        # std is 7 on a range of -15 to 15
+        std_angle = 7
+        if abs(bot_angle) < std_angle:
+            translate_angle = (self.strafe_error - self.heading + 180)%360
+            self.driver.move(self.translate_speed, translate_angle) 
+        else:
+            #cap speed between (-100,100)
+            rotate_speed = max(-100,min(100,self.rotate_error))
+            self.logger.info("rotate_speed = {}".format(rotate_speed))
+            self.driver.rotate(rotate_speed) 
+            
+
+
+
+"""
         # Calculate rotate_speed
         # Max speed - Translate speed
         rotate_speed = 100 - translate_speed
         # Calculate translate_angle
-        translate_angle = back_error * (180 / 16)
-        self.logger.info("pre translate_angle = {} ".format(translate_angle))
+        translate_angle = (self.strafe_error + 360)% 360
+        self.logger.info("pre translate_angle = {}, translate_speed = {}   ".format(translate_angle, translate_speed))
         if translate_angle < 0:
             # Swift to the left
             translate_angle = 360 + translate_angle
@@ -433,7 +490,10 @@ class Follower(object):
             # If rotate_speed is greater than 100 set to 100
             rotate_speed = 0
         # Adjust motor speeds
-        self.logger.info("post translate_angle = {} ".format(translate_angle))
+        self.logger.info("post translate_angle = {}, translate_speed = {}   ".format(translate_angle, translate_speed))
         self.driver.move(translate_speed, translate_angle) 
         #self.driver.compound_move(
-        #    translate_speed, translate_angle, rotate_speed)
+        #    translate_speed, translate_angle, rotate_speed
+"""
+
+

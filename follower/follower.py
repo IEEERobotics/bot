@@ -117,7 +117,7 @@ class Follower(object):
         # Init front_PID
         self.strafe.set_k_values(8, 0, .1)
         # Inti rotate_PID
-        self.rotate_pid.set_k_values(6   0, 0)
+        self.rotate_pid.set_k_values(6 ,  0, 0)
         # Get current heading
         self.heading = heading
         # Continue until an error condition
@@ -127,9 +127,12 @@ class Follower(object):
             # Check for error conditions
             if self.error != 0:
                 self.update_exit_state()
-                self.logger.warning(self.error)
-                self.logger.warning(self.front_state)
-                self.logger.warning(self.back_state)
+                self.logger.info("Error: {},".format( self.erro ))
+                self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
+                    self.front_state,
+                    self.back_state,
+                    self.left_state,
+                    self.right_state))
                 self.driver.move(0,0)
                 return
             # average states.
@@ -349,14 +352,21 @@ class Follower(object):
             # Right is on the back
             self.right_state = self.get_position_rl(
                 current_ir_reading["left"])
+
+        #Clear on_x flag if off line on side arrays
+        if(on_x and ((self.right_state > 15) or (self.left_state > 15))):
+            on_x = False
+
+        #Check for error conditions
         if((self.front_state > 15) or (self.back_state > 15) or
             (self.right_state < 16) or (self.left_state < 16)):
-            if((self.right_state < 16) or (self.left_state < 16) or 
-                (self.front_state == 17) or (self.back_state == 17)):
-                # Found Intersection
+            
+            if((self.right_state < 16) and (self.left_state < 16))and not on_x:
+                # Found Intersection because left and right lit up
+                # if on_x=True, ignore this error
                 self.error = 1
-            elif((self.back_state == 18) or (self.front_state == 18)):
-                # at high angle
+            if((self.front_state == 17) ):
+                # Found large object on front array. Ignore back array lightups.
                 self.error = 5
             elif((self.front_state == 16) and (self.back_state == 16)):
                 # Front and back lost line
@@ -367,7 +377,7 @@ class Follower(object):
             elif(self.back_state == 16):
                 # Back lost line
                 self.error = 4
-        else:
+        else: #no errors
             self.error = 0
 
     def update_exit_state(self):
@@ -394,16 +404,16 @@ class Follower(object):
         for index, value in enumerate(readings):
             if(value == 1):
                self.hit_position.append(index)
-        if len(self.hit_position) > 4:
+        if len(self.hit_position) >= 4:
             # Error: Intersection detected
             return 17
         if len(self.hit_position) == 0:
             # Error: No line detected
             return 16
-        if len(self.hit_position) == 4:
-            # Error: Bot at large error
-            return 18
+
         state = self.hit_position[0] * 2
+        #Use first two hit irs to determine position on array
+        #Ignores extra bits as noise.
         if len(self.hit_position) > 1:
             if self.hit_position[1] > 0:
                 state = state + 1
@@ -425,16 +435,16 @@ class Follower(object):
         for index, value in enumerate(readings):
             if(value == 1):
                self.hit_position.append(index)
-        if len(self.hit_position) > 4:
+        if len(self.hit_position) >= 4:
             # Error: Intersection detected
             return 17
         if len(self.hit_position) == 0:
             # Error: No line detected
             return 16
-        if len(self.hit_position) == 4:
-            # Error: Bot at large error
-            return 18
+
         state = self.hit_position[0] * 2
+        #Use first two hit irs to determine position on array
+        #Ignores extra bits as noise.
         if len(self.hit_position) > 1:
             if(self.hit_position[1] > 0):
                 state = state + 1

@@ -117,7 +117,7 @@ class Follower(object):
         # Init front_PID
         self.strafe.set_k_values(8, 0, .1)
         # Inti rotate_PID
-        self.rotate_pid.set_k_values(6   0, 0)
+        self.rotate_pid.set_k_values(6, 0, 0)
         # Get current heading
         self.heading = heading
         # Continue until an error condition
@@ -464,48 +464,20 @@ class Follower(object):
 
 
 
-"""
-        # Calculate rotate_speed
-        # Max speed - Translate speed
-        rotate_speed = 100 - translate_speed
-        # Calculate translate_angle
-        translate_angle = (self.strafe_error + 360)% 360
-        self.logger.info("pre translate_angle = {}, translate_speed = {}   ".format(translate_angle, translate_speed))
-        if translate_angle < 0:
-            # Swift to the left
-            translate_angle = 360 + translate_angle
-        else:
-            # swift to the right
-            translate_angle = translate_angle   
-        if translate_speed > 100:
-            # If translate_speed is greater than 100 set to 100
-            translate_speed = 100
-        elif translate_speed < 0:
-            # If translate_speed is greater than 100 set to 100
-            translate_speed = 0
-        if rotate_speed > 100:
-            # If rotate_speed is greater than 100 set to 100
-            rotate_speed = 100
-        elif rotate_speed < 0:
-            # If rotate_speed is greater than 100 set to 100
-            rotate_speed = 0
-        # Adjust motor speeds
-        self.logger.info("post translate_angle = {}, translate_speed = {}   ".format(translate_angle, translate_speed))
-        self.driver.move(translate_speed, translate_angle) 
-        #self.driver.compound_move(
-        #    translate_speed, translate_angle, rotate_speed
-"""
 
     @lib.api_call
-    def get_out_of_box(self):
-      """Used to get the bot out of the box"""
-      
-      hit_position = {};
-      current_ir_reading = self.ir_hub.read_binary(100,False)
-      for index, value in enumerate(current_ir_reading["back"]):
-          if(value == 1):
-             hit_position.append(index)
-      if(len(hit_position) != 0):
-        return;
+#    def get_out_of_box(self):
+#      """Used to get the bot out of the box"""
+#      last_count = 0
+#      while True:
+#      count = 0
+#      ir_reading = self.ir_hub.read_binary(100,False)
+#      for value in ir_reading["back"]:
+#          if(value == 1):
+#              count += 1
+#      if((len(count) != 0) and (last_count != 0)):
+#          return
+#          self.drive.jerk()
+#          last_count = len(count) 
 
 

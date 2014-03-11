@@ -22,7 +22,7 @@ class Follower(object):
     
     #Variables for read_binary calls
     Threshold = 100
-    White_Black = True  #True= white line, False= black line
+    White_Black = False  #True= white line, False= black line
 
     def __init__(self):
         # Build logger
@@ -52,7 +52,7 @@ class Follower(object):
                 -(len(reading) / 2), (len(reading) / 2), len(reading)))
             # TODO(napratin,3/4): Ensure proper ordering?
             self.ir_agg[name] = None  # None when no unit is lit
-            self.logger.debug("ir_pos['{}'] = {}"
+            self.logger.info("ir_pos['{}'] = {}"
                 .format(name, self.ir_pos[name]))
 
         self.intersection = False
@@ -192,10 +192,11 @@ class Follower(object):
         # First, turn until line leaves one side of arrays, then starts on the
         # next side. 
         # Use a rotate_pid with a good pd term to catch the arrays on the next line
-        self.rotate_pid.set_k_values(6, 3, 0)
+        self.rotate_pid.set_k_values(3, 1, 0.1)
         # small deviation from center of array allowable for rotation finish
         small_angle = Follower.No_Line #start with No_Line to get off front line
         previous_time = time()
+        off_line = False  #starts on line, need to move off
 
         while True:
             # Get front array for turning
@@ -207,9 +208,10 @@ class Follower(object):
                  self.front_state = self.get_position_rl(
                     current_ir_reading["front"])
            
-            if( self.front_state >=  Follower.No_Line):
+            if( self.front_state >=  Follower.No_Line) and not off_line:
                 small_angle = 0 # approach 0
                 off_line = True
+                self.logger.info("Rotate off_line")
             elif (abs(self.front_state) < 3) and off_line:
                 return "DONE"
 
@@ -222,7 +224,7 @@ class Follower(object):
                 small_angle, self.front_state,  self.sampling_time)
             #cap (-100, 100)
             speed =  max(-100,min(100,self.rotate_error))
-            self.logger.debug("rot_err= {}, speed= {}".format(self.rotate_error,speed))
+            self.logger.info("rot_err= {}, speed= {}".format(self.rotate_error,speed))
             # sign turns in correct direction
             self.driver.rotate(sign*speed) 
            

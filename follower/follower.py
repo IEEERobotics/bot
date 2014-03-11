@@ -181,6 +181,8 @@ class Follower(object):
     def rotate_on_x(self,direction="left",speed=70):
         #After center_on_x, rotate in the commanded directions
         #by 90 degrees. 
+        No_Line = Follower.No_Line
+
         if(direction=="left"):
             sign = -1
         elif(direction=="right"):

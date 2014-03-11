@@ -168,7 +168,22 @@ class Follower(object):
         return True  # TODO: Actually center on intersection
 
     @lib.api_call
-    def rotate_on_x(self):
+    def rotate_on_x(self,direction="left"):
+        #After center_on_x, rotate in the commanded directions
+        #by 90 degrees. 
+        if(direction=="left"):
+            sign = -1
+        elif(direction=="right"):
+            sign = 1
+        else:
+            self.logger.error("Bad param direction, please use left or right")
+
+        # First, turn until line leaves one side of arrays, then starts on the
+        # next side. 
+        # Use a rotate_pid with a good pd term to catch the arrays on the next line
+        self.rotate_pid.set_k_values(6, 3, 0)
+ 
+ 
         return
 
 
@@ -482,21 +497,19 @@ class Follower(object):
 
 
 
-    @lib.api_call
-    def get_out_of_box(self):
-      """Used to get the bot out of the box"""
-      last_count = 0
-      while True:
-        count = 0
-        ir_reading = self.ir_hub.read_binary(100,False)
-        for value in ir_reading["back"]:
-            if(value == 1):
-                count += 1
-        if((count != 0) and (last_count != 0)):
-            self.driver.move(0,0)
-            return "DONE"
-        self.driver.move(70,0)
-        self.logger.info("count = {}".format(count))
-        last_count = count 
+#    @lib.api_call
+#    def get_out_of_box(self):
+#      """Used to get the bot out of the box"""
+#      last_count = 0
+#      while True:
+#      count = 0
+#      ir_reading = self.ir_hub.read_binary(100,False)
+#      for value in ir_reading["back"]:
+#          if(value == 1):
+#              count += 1
+#      if((len(count) != 0) and (last_count != 0)):
+#          return
+#          self.drive.jerk()
+#          last_count = len(count) 
 
 

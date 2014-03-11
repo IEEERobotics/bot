@@ -178,7 +178,7 @@ class Follower(object):
         return True  # TODO: Actually center on intersection
 
     @lib.api_call
-    def rotate_on_x(self,direction="left",speed=70):
+    def rotate_on_x(self,direction="left",speed=70,time=2):
         #After center_on_x, rotate in the commanded directions
         #by 90 degrees. 
         if(direction=="left"):
@@ -189,6 +189,15 @@ class Follower(object):
             self.logger.error("Bad param direction, please use left or right")
             return
 
+        # sign turns in correct direction
+        self.driver.rotate(sign*speed) 
+
+        sleep(time)
+
+        self.driver.move(0,0)
+
+        return
+"""
         # First, turn until line leaves one side of arrays, then starts on the
         # next side. 
         # Use a rotate_pid with a good pd term to catch the arrays on the next line
@@ -230,7 +239,7 @@ class Follower(object):
            
  
         return
-
+"""
 
     @lib.api_call
     def center_on_blue(self):

@@ -137,7 +137,7 @@ class MecDriver(driver.Driver):
         # Set motor directions, based on http://goo.gl/B1KEUV
         # Also see MecanumWheelDirection.png
         # Only 2 wheels need to be turned on for each direction, but using all
-        # 4 wheels in a conventional differential drive configuration for
+        # 4 wheels in a conventional differential
         # rotation works fine
 
 
@@ -280,6 +280,6 @@ class MecDriver(driver.Driver):
         self.move(0, 0)  # stop
 
     @lib.api_call
-    def jerk(self, speed=30, angle=0, duration=3):
+    def jerk(self, speed=80, angle=0, duration=.25):
         """Makes small forward jump - a thin wrapper over drive()."""
         self.drive(speed, angle, duration)

@@ -27,7 +27,7 @@ class Follower(object):
         self.front_error = 0.0
         self.rotate_pid = pid_mod.PID()
         self.rotate_error= 0.0
-        self.error = 0.0
+        self.error = "NONE"
         
         # motor variables
         self.translate_speed =  60
@@ -109,7 +109,7 @@ class Follower(object):
         return False  # TODO: Use IR sensors (only one array sees the line?)
  
     @lib.api_call
-    def follow(self, heading):
+    def follow(self, heading, on_x=False):
         """Follow line along given heading"""
         # Get the initial conditioni
         self.heading = heading;
@@ -117,21 +117,28 @@ class Follower(object):
         # Init front_PID
         self.strafe.set_k_values(8, 0, .1)
         # Inti rotate_PID
+<<<<<<< HEAD
         self.rotate_pid.set_k_values(6, 0, 0)
+=======
+        self.rotate_pid.set_k_values(6 ,  0, 0)
+>>>>>>> 8e6cf55b40efe77c210a41d47994be03d878ca7a
         # Get current heading
         self.heading = heading
         # Continue until an error condition
         while True:
             # Assign the current states to the correct heading
-            self.assign_states()
+            self.assign_states(on_x)
             # Check for error conditions
-            if self.error != 0:
+            if self.error != "NONE":
                 self.update_exit_state()
-                self.logger.warning(self.error)
-                self.logger.warning(self.front_state)
-                self.logger.warning(self.back_state)
+                self.logger.info("Error: {}".format( self.error ))
+                self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
+                    self.front_state,
+                    self.back_state,
+                    self.left_state,
+                    self.right_state))
                 self.driver.move(0,0)
-                return
+                return self.error
             # average states.
             bot_position = (self.front_state + self.back_state)/2
             # Get the current time of the CPU
@@ -284,11 +291,11 @@ class Follower(object):
                     return {"line_found": False,
                             "time_elapsed": time() - start_time}
     
-    def assign_states(self, current_ir_reading=None):
-        """Take 4x16 bit arrays and assigns the array to proper orientations.
-
+    def assign_states(self, on_x,current_ir_reading=None):
+        """ on_x=True flag does not allow intersection errors
+            once left&right arrays clear intersection, on_x = false.
+        Take 4x16 bit arrays and assigns the array to proper orientations.
         Note that the proper orientations are front, back, left and right.
-
         """
         # Get the current IR readings
         if current_ir_reading is None:
@@ -349,38 +356,45 @@ class Follower(object):
             # Right is on the back
             self.right_state = self.get_position_rl(
                 current_ir_reading["left"])
+
+        #Clear on_x flag if off line on side arrays
+        if(on_x and ((self.right_state > 15) or (self.left_state > 15))):
+            on_x = False
+
+        #Check for error conditions
         if((self.front_state > 15) or (self.back_state > 15) or
-            (self.right_state < 16) or (self.left_state < 16)):
-            if((self.right_state < 16) or (self.left_state < 16) or 
-                (self.front_state == 17) or (self.back_state == 17)):
-                # Found Intersection
-                self.error = 1
-            elif((self.back_state == 18) or (self.front_state == 18)):
-                # at high angle
-                self.error = 5
+            (self.right_state < 16) and (self.left_state < 16)):
+            
+            if((self.right_state < 16) and (self.left_state < 16))and not on_x:
+                # Found Intersection because left and right lit up
+                # if on_x=True, ignore this error
+                self.error = "ON_INTERSECTION" 
+            if((self.front_state == 17) ):
+                # Found large object on front array. Ignore back array lightups.
+                self.error = "LARGE_OBJECT" 
             elif((self.front_state == 16) and (self.back_state == 16)):
                 # Front and back lost line
-                self.error = 2
+                self.error = "LOST_LINE" 
             elif(self.front_state == 16):
                 # Front lost line
-                self.error = 3
+                self.error = "FRONT_LOST" 
             elif(self.back_state == 16):
                 # Back lost line
-                self.error = 4
-        else:
-            self.error = 0
+                self.error = "BACK_LOST" 
+        else: #no errors
+            self.error = "NONE" 
 
     def update_exit_state(self):
-        if(self.error == 1):
+        if(self.error == "ON_INTERSECTION"):
             self.intersection = True
-        elif(self.error == 2):
+        elif(self.error == "LOST_LINE"):
             self.lost_line = True
-        elif(self.error == 3):
+        elif(self.error == "FRONT_LOST"):
             self.lost_line = True
-        elif(self.error == 4):
+        elif(self.error == "BACK_LOST"):
             self.lost_line = True
-        elif(self.error == 5):
-            self.lost_line = True
+    #    elif(self.error == 5):
+    #        self.lost_line = True
 
     def get_position_lr(self, readings):
         """Reading the IR sensors from left to right.
@@ -394,16 +408,16 @@ class Follower(object):
         for index, value in enumerate(readings):
             if(value == 1):
                self.hit_position.append(index)
-        if len(self.hit_position) > 4:
+        if len(self.hit_position) >= 4:
             # Error: Intersection detected
             return 17
         if len(self.hit_position) == 0:
             # Error: No line detected
             return 16
-        if len(self.hit_position) == 4:
-            # Error: Bot at large error
-            return 18
+
         state = self.hit_position[0] * 2
+        #Use first two hit irs to determine position on array
+        #Ignores extra bits as noise.
         if len(self.hit_position) > 1:
             if self.hit_position[1] > 0:
                 state = state + 1
@@ -425,16 +439,16 @@ class Follower(object):
         for index, value in enumerate(readings):
             if(value == 1):
                self.hit_position.append(index)
-        if len(self.hit_position) > 4:
+        if len(self.hit_position) >= 4:
             # Error: Intersection detected
             return 17
         if len(self.hit_position) == 0:
             # Error: No line detected
             return 16
-        if len(self.hit_position) == 4:
-            # Error: Bot at large error
-            return 18
+
         state = self.hit_position[0] * 2
+        #Use first two hit irs to determine position on array
+        #Ignores extra bits as noise.
         if len(self.hit_position) > 1:
             if(self.hit_position[1] > 0):
                 state = state + 1

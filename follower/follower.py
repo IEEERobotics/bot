@@ -43,6 +43,13 @@ class Follower(object):
         # motor variables
         self.translate_speed =  60
 
+        #state variables
+        self.front_state = No_Line
+        self.back_state = No_Line
+        self.left_state = No_Line
+        self.right_state = No_Line
+
+        # post error vars
         self.intersection = False
         self.lost_line = False
         self.timeLastUpdated = -1.0

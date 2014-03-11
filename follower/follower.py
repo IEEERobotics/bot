@@ -117,11 +117,7 @@ class Follower(object):
         # Init front_PID
         self.strafe.set_k_values(8, 0, .1)
         # Inti rotate_PID
-<<<<<<< HEAD
         self.rotate_pid.set_k_values(6, 0, 0)
-=======
-        self.rotate_pid.set_k_values(6 ,  0, 0)
->>>>>>> 8e6cf55b40efe77c210a41d47994be03d878ca7a
         # Get current heading
         self.heading = heading
         # Continue until an error condition

@@ -44,10 +44,10 @@ class Follower(object):
         self.translate_speed =  60
 
         #state variables
-        self.front_state = No_Line
-        self.back_state = No_Line
-        self.left_state = No_Line
-        self.right_state = No_Line
+        self.front_state = Follower.No_Line
+        self.back_state = Follower.No_Line
+        self.left_state = Follower.No_Line
+        self.right_state = Follower.No_Line
 
         # post error vars
         self.intersection = False

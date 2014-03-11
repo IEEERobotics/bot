@@ -106,11 +106,16 @@ class CLI(cmd.Cmd):
                             else:
                                 value = int(value)
                         except ValueError:
-                            # It wasn't an int or float, assume string
+                            # It wasn't an int or float, assume string or bool
+                            # Check if bool
+                            if value == "True":
+                                value = True
+                            elif value == "False":
+                                value = False
                             # If user gave key:'value', strip '' chars
-                            if value.startswith("'") and value.endswith("'"):
+                            elif value.startswith("'") and value.endswith("'"):
                                 value = value[1:-1]
-                            # It's already type string, no need to cast
+                            # Either bool or string at this point
                         param_dict[key] = value
                 except IndexError:
                     print "Bad parameter list"

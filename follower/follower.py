@@ -201,7 +201,7 @@ class Follower(object):
 
         while True:
             # Get front array for turning
-            current_ir_reading = read_binary(Threshold,White_Black)
+            current_ir_reading = self.ir_hub.read_binary(Threshold,White_Black)
             if(direction=="left"):
                 self.front_state = self.get_position_lr(
                     current_ir_reading["front"])

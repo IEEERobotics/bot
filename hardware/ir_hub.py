@@ -207,9 +207,9 @@ class IRHub(object):
         for name, reading in readings.iteritems():
             for i in range(len(reading)):
                 if white_on_black == True:
-                    readings[name][i] = 0 if reading[i] > thresh else 1
+                    readings[name][i] = 0 if reading[i] > self._thresh else 1
                 else:
-                    readings[name][i] = 0 if reading[i] < thresh else 1
+                    readings[name][i] = 0 if reading[i] < self._thresh else 1
         return readings
 
     @lib.api_call

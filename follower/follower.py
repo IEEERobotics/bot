@@ -482,19 +482,21 @@ class Follower(object):
 
 
 
-#    @lib.api_call
-#    def get_out_of_box(self):
-#      """Used to get the bot out of the box"""
-#      last_count = 0
-#      while True:
-#      count = 0
-#      ir_reading = self.ir_hub.read_binary(100,False)
-#      for value in ir_reading["back"]:
-#          if(value == 1):
-#              count += 1
-#      if((len(count) != 0) and (last_count != 0)):
-#          return
-#          self.drive.jerk()
-#          last_count = len(count) 
+    @lib.api_call
+    def get_out_of_box(self):
+      """Used to get the bot out of the box"""
+      last_count = 0
+      while True:
+        count = 0
+        ir_reading = self.ir_hub.read_binary(100,False)
+        for value in ir_reading["back"]:
+            if(value == 1):
+                count += 1
+        if((count != 0) and (last_count != 0)):
+            self.driver.move(0,0)
+            return "DONE"
+        self.driver.move(70,0)
+        self.logger.info("count = {}".format(count))
+        last_count = count 
 
 

@@ -421,7 +421,7 @@ class Follower(object):
         if((self.front_state > 15) or (self.back_state > 15) or
             (self.right_state < No_Line) and (self.left_state < No_Line)):
             
-            if((self.right_state < No_Line) and (self.left_state < No_Line))and not on_x:
+            if((self.right_state < 16) and (self.left_state < 16))and not self.on_x:
                 # Found Intersection because left and right lit up
                 # if on_x=True, ignore this error
                 self.error = "ON_INTERSECTION" 
@@ -531,23 +531,51 @@ class Follower(object):
             self.logger.info("rotate_speed = {}".format(rotate_speed))
             self.driver.rotate(rotate_speed) 
             
+    @lib.api_call
+    def get_out_of_box(self):
+      """Used to get the bot out of the box"""
+      last_count = 0
+      while True:
+        count = 0
+        ir_reading = self.ir_hub.read_binary(100,False)
+        for value in ir_reading["back"]:
+            if(value == 1):
+                count += 1
+        if((count != 0) and (last_count != 0)):
+            self.driver.move(0,0)
+            return "DONE"
+        self.driver.move(70,0)
+        self.logger.info("count = {}".format(count))
+        last_count = count 
 
 
-
-
-#    @lib.api_call
-#    def get_out_of_box(self):
-#      """Used to get the bot out of the box"""
-#      last_count = 0
-#      while True:
-#      count = 0
-#      ir_reading = self.ir_hub.read_binary(Threshold,White_Black)
-#      for value in ir_reading["back"]:
-#          if(value == 1):
-#              count += 1
-#      if((len(count) != 0) and (last_count != 0)):
-#          return
-#          self.drive.jerk()
-#          last_count = len(count) 
-
-
+    @lib.api_call
+    def center_on_intersetion(self, heading = 180):
+        """Used to center on the intersetion"""
+        center_rotate_pid = pid_mod.PID()
+        previous_time = time();
+        self.heading = heading
+        while True:
+            current_time = time()
+            # Init front_PID
+            center_rotate_pid.set_k_values(3.75, 0, .75)
+            # Assig states
+            self.assign_states()
+            # Check for error conditions
+            self.sampling_time = current_time - previous_time
+            # Call PID`
+            bot_angle = (self.front_state - self.back_state)
+            # Call Rotate PID
+            self.logger.info("bot_angle = {}".format(bot_angle))
+            rotate_error = center_rotate_pid.pid(
+                0, bot_angle, self.sampling_time)
+            # Report errors from strafe and rotate pid's 
+            if(abs(bot_angle) < 3):
+              self.driver.move(0,0)
+              break
+            self.logger.info("rotate_error = {}".format(rotate_error))
+            rotate_speed = max(-100,min(100,rotate_error))
+            self.driver.rotate(rotate_speed)
+            # Take the current time set it equal to the previous time
+            previous_time = current_time
+ 

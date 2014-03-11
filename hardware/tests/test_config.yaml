@@ -1,5 +1,5 @@
 testing: True
-logging: {log_file: test.log, file_handler_level: DEBUG, stream_handler_level: CRITICAL}  # Logging options
+logging: {log_file: logs/test.log, file_handler_level: DEBUG, stream_handler_level: CRITICAL}
 
 dmcc_drive_motors: {
     front_left: { board_num: 0, motor_num: 1 },
@@ -22,6 +22,17 @@ dmcc_inverted: {
     inverted_motor: { board_num: 1, motor_num: 2, invert: True }
 }
 
+ultrasonics: {
+    pru_num: 0,
+    pru_file: "ultrasonic.p",
+    sensors: {
+        front: { offset: 0, xy: [  0.0,  0.15], dir: [ 0.0,  1.0] },
+        back:  { offset: 8, xy: [  0.0, -0.15], dir: [ 0.0, -1.0] },
+        left:  { offset: 16, xy: [-0.15,     0], dir: [-1.0,  0.0] },
+        right: { offset: 24, xy: [ 0.15,   0.0], dir: [ 1.0,  0.0] }
+    }
+}
+
 two_motors:
     - {GPIO: 117, PWM: 0}
     - {GPIO: 115, PWM: 1}
@@ -29,12 +40,7 @@ two_motors:
 turret_servos:
 - {PWM: 2, axis: yaw}  # Turret servo - pan: P9_42 (pwm2/ecap0)
 - {PWM: 4, axis: pitch}  # Turret servo - tilt: P9_16 (pwm4)
-ultrasonics: {  # locations are [x, y] in meters, assume approx. 30cm x 30cm bot with right = +X axis, top = +Y axis
-    front: { gpio: -1, location: [  0.0,  0.15], direction: [ 0.0,  1.0] },
-    left:  { gpio: -1, location: [-0.15,     0], direction: [-1.0,  0.0] },
-    back:  { gpio: -1, location: [  0.0, -0.15], direction: [ 0.0, -1.0] },
-    right: { gpio: -1, location: [ 0.15,   0.0], direction: [ 1.0,  0.0] },
-}
+
 ir_select_gpios: [44, 26, 46, 65]  # GPIOs to select IR sensor units: [P8_12 (gpio44), P8_14 (gpio26), P8_16 (gpio46), P8_18 (gpio65)]
 ir_analog_input_gpios: {front: 39, back: 35, left: 67, right: 68}  # GPIO pins to read selected IR sensor units: P8_04 (gpio39), P8_06 (gpio35), P8_08 (gpio67), P8_10 (gpio68)
 ir_analog_adc_config: {  # ADC configuration

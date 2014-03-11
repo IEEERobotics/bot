@@ -263,12 +263,12 @@ class MecDriver(driver.Driver):
                 fabs(back_left), fabs(back_right)]
         )
         
-        speed = translate_speed + angular_rate
+        total_speed = translate_speed + angular_rate
 
-        front_left = front_left * speed / max_wheel_speed
-        front_right = front_right * speed / max_wheel_speed
-        back_left = back_left * speed / max_wheel_speed
-        back_right = back_right * speed / max_wheel_speed
+        front_left = front_left * total_speed / max_wheel_speed
+        front_right = front_right * total_speed / max_wheel_speed
+        back_left = back_left * total_speed / max_wheel_speed
+        back_right = back_right * total_speed / max_wheel_speed
 
         self.logger.debug(
             ("post-scale: front_left: {:6.2f}, front_right: {:6.2f},"

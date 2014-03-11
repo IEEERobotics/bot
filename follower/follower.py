@@ -48,6 +48,7 @@ class Follower(object):
         self.intersection = False
         self.lost_line = False
         self.timeLastUpdated = -1.0
+        self.on_x = False
 
     @lib.api_call
     def get_translate_speed(self):
@@ -111,8 +112,9 @@ class Follower(object):
     @lib.api_call
     def follow(self, heading, on_x=False):
         """Follow line along given heading"""
+        self.on_x = on_x
         # Get the initial conditioni
-        self.heading = heading;
+        self.heading = heading
         previous_time = time()
         # Init front_PID
         self.strafe.set_k_values(8, 0, .1)
@@ -123,7 +125,7 @@ class Follower(object):
         # Continue until an error condition
         while True:
             # Assign the current states to the correct heading
-            self.assign_states(on_x)
+            self.assign_states()
             # Check for error conditions
             if self.error != "NONE":
                 self.update_exit_state()
@@ -164,6 +166,11 @@ class Follower(object):
     @lib.api_call
     def center_on_x(self):
         return True  # TODO: Actually center on intersection
+
+    @lib.api_call
+    def rotate_on_x(self):
+        return
+
 
     @lib.api_call
     def center_on_blue(self):
@@ -287,7 +294,7 @@ class Follower(object):
                     return {"line_found": False,
                             "time_elapsed": time() - start_time}
     
-    def assign_states(self, on_x,current_ir_reading=None):
+    def assign_states(self, current_ir_reading=None):
         """ on_x=True flag does not allow intersection errors
             once left&right arrays clear intersection, on_x = false.
         Take 4x16 bit arrays and assigns the array to proper orientations.
@@ -354,8 +361,8 @@ class Follower(object):
                 current_ir_reading["left"])
 
         #Clear on_x flag if off line on side arrays
-        if(on_x and ((self.right_state > 15) or (self.left_state > 15))):
-            on_x = False
+        if(self.on_x and ((self.right_state > 15) or (self.left_state > 15))):
+            self.on_x = False
 
         #Check for error conditions
         if((self.front_state > 15) or (self.back_state > 15) or

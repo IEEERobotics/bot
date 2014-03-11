@@ -256,15 +256,22 @@ class MecDriver(driver.Driver):
         back_right = translate_speed * \
             sin(translate_angle * pi / 180 + pi / 4) - angular_rate
 
-        # # Normalize so that at least one wheel_speed equals maximum wheel_speed
-        # max_wheel_speed = max([
-            # fabs(front_left), fabs(front_right), fabs(back_left),
-            # fabs(back_right)
-        # ])
-        # front_left = front_left * translate_speed / max_wheel_speed
-        # front_right = front_right * translate_speed / max_wheel_speed
-        # back_left = back_left * translate_speed / max_wheel_speed
-        # back_right = back_right * translate_speed / max_wheel_speed
+        # Find largest motor speed,
+        # use that to normalize multipliers and maintain maximum efficiency
+        max_wheel_speed = max(
+            [fabs(front_left), fabs(front_right),
+                fabs(back_left), fabs(back_right)]
+        )
+
+        front_left = front_left * speed / max_wheel_speed
+        front_right = front_right * speed / max_wheel_speed
+        back_left = back_left * speed / max_wheel_speed
+        back_right = back_right * speed / max_wheel_speed
+
+        self.logger.debug(
+            ("post-scale: front_left: {:6.2f}, front_right: {:6.2f},"
+                " back_left: {:6.2f}, back_right: {:6.2f}").format(
+                    front_left, front_right, back_left, back_right))
 
         # Set motor speeds
         self.set_motor("front_left", front_left)

@@ -134,11 +134,17 @@ class Follower(object):
         # Get current heading
         self.heading = heading
         # Continue until an error condition
+        count_object=0 
+
         while True:
             # Assign the current states to the correct heading
             self.assign_states()
             # Check for error conditions
             if self.error != "NONE":
+                #require two succesive large_object readings to exit
+                if self.error=="LARGE_OBJECT" and count_object<1:
+                    count_object += 1
+                    continue
                 self.update_exit_state()
                 self.logger.info("Error: {}".format( self.error ))
                 self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
@@ -148,6 +154,7 @@ class Follower(object):
                     self.right_state))
                 self.driver.move(0,0)
                 return self.error
+            
             # average states.
             bot_position = (self.front_state + self.back_state)/2
             # Get the current time of the CPU
@@ -370,6 +377,9 @@ class Follower(object):
         Take 4x16 bit arrays and assigns the array to proper orientations.
         Note that the proper orientations are front, back, left and right.
         """
+        # Keep prev back state to ignore large objects on back array
+        prev_back_state = self.back_state
+
         # Get the current IR readings
         if current_ir_reading is None:
             current_ir_reading = self.ir_hub.read_binary(Follower.Threshold,Follower.White_Black)
@@ -443,9 +453,12 @@ class Follower(object):
                 # if on_x=True, ignore this error
                 self.error = "ON_INTERSECTION" 
             if((self.front_state == Follower.Large_Object) ):
-                # Found large object on front array. Ignore back array lightups.
+                # Found large object on front array. 
                 self.error = "LARGE_OBJECT" 
-            elif((self.front_state == Follower.No_Line) and (self.back_state == Follower.No_Line)):
+            if( self.back_state == Follower.Large_Object):
+                # Ignore large objects on back array by using prev back state
+                self.back_state == prev_back_state
+            if((self.front_state == Follower.No_Line) and (self.back_state == Follower.No_Line)):
                 # Front and back lost line
                 self.error = "LOST_LINE" 
             elif(self.front_state == Follower.No_Line):

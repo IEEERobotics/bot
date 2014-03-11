@@ -1,11 +1,20 @@
 import time
 from i2c_device.i2c_device import I2CDevice
 
+
 class ColorSensor(I2CDevice):
+
     """Wrapper class for TCS3472 I2C-based color sensor."""
 
     # TODO: Make these config items and load in __init__()
     max_c = 65536
+
+    #Base values to be changed by get_baseline
+    bv = 0.0
+    bc = 0.0
+    bg = 0.0
+    br = 0.0
+    bb = 0.0
 
     def __init__(self):
         I2CDevice.__init__(self, 1, 0x29, config='tcs3472_i2c.yaml')
@@ -32,9 +41,9 @@ class ColorSensor(I2CDevice):
         print "AVALID: {}".format(status.read('AVALID'))
 
         print "Enabling power via control register:"
-        enable.write('PON','Enable')
+        enable.write('PON', 'Enable')
         print "Enabling ADCs via control register:"
-        enable.write('AEN','Enable')
+        enable.write('AEN', 'Enable')
 
         #enable.write('PON','Disable')
 
@@ -43,17 +52,28 @@ class ColorSensor(I2CDevice):
         print "Read: {:08b}".format(enable.read_byte())
         print
 
+    @property
+    def color(self):
+        v, c, r, g, b = self.read_data()
+        color = {"clear": c,
+                  "red": r,
+                  "green": g,
+                  "blue": b}
+        return color
+
     def get_data_normalized(self):
         valid, c, r, g, b = self.read_data()
-        # NOTE: It appears that c = r + g + b, so 1/c is a good normalizing factor.
-        #       This ensures that normalized values indicate relative proportions.
-        #       We could also normalize each by a constant, say, the max value (65535).
+        # NOTE: It appears that c = r + g + b
+        # so 1/c is a good normalizing factor.
+        # This ensures that normalized values indicate relative proportions.
+        # We could also normalize each by a constant,
+        # say, the max value (65535).
         c = float(c)
-        c /= self.max_c #normalize to 0-1
+
         r /= c
         g /= c
         b /= c
-        #c /= self.max_c  # normalize c to [0, 1] range
+        c /= self.max_c  # normalize c to [0, 1] range
         return valid, c, r, g, b  # return valid flag if someone's interested
 
     def read_data(self):
@@ -63,38 +83,158 @@ class ColorSensor(I2CDevice):
         g = self.registers['GDATA'].read()
         b = self.registers['BDATA'].read()
         return valid, c, r, g, b
-        
+
     def get_percentage(self):
-        """ Returns what portion of detected color is 
+        """ Returns what portion of detected color is
         """
         v, c, r, g, b = self.get_data_normalized()
-        c = float(c)
-        r = (r/c)*100
-        g = (r/g)*100
-        b = (r/b)*100
-        
+        # c = float(c)
+        total = r + g + b
+        r = (r / total) * 100
+        g = (g / total) * 100
+        b = (b / total) * 100
+        return v, c, r, g, b
 
     def get_baseline(self):
-        v, c, r, g, b = self.get_data_normalized()
-        return v, c, r, g, b
+        """Obtains "base" colors to work from
+        """
+        self.bv, self.bc, \
+        self.br, self.bg, \
+        self.bb = self.read_data()
+        try:
+            assert (self.br != 0, self.bg != 0, self.bb != 0)
+        except AssertionError:
+            raise AssertionError("Baselines colors are zero.")
+
+    def get_percent_diff(self):
+        """Returns percent diff
+        for use in color decisions.        
+        """
+
+        diff_c = (self.color["clear"] - self.bc) / self.bc
+
+        diff_r = (self.color["red"] - self.br) / self.br
+        diff_g = (self.color["green"] - self.bg) / self.bg
+        diff_b = (self.color["blue"] - self.bb) / self.bb
+        return diff_c, diff_r, diff_g, diff_b
+        
+    def is_red_percent_method(self):
+        """decides on color based on percentage.
+        (current winning candidate).
+        """
+        
+        diff_c, diff_r, diff_g, diff_b = self.get_percent_diff()
+        # returns true when g has greatest increase.
+        if (diff_r > diff_g) & (diff_r > diff_b):
+            return True
+            
+    def is_blue_percent_method(self):
+        """decides on color based on percentage.
+        (current winning candidate).
+        """
+
+        diff_c, diff_r, diff_g, diff_b = self.get_percent_diff()
+
+        # returns true when b has greatest increase.
+        if (diff_b > diff_r) & (diff_b > diff_g):
+            return True
+
+    def is_green_percent_method(self):
+        """decides on color based on percentage.
+        (current winning candidate).
+        """
+
+        diff_c, diff_r, diff_g, diff_b = self.get_percent_diff()
+
+        # returns true when g has greatest increase.
+        if (diff_g > diff_r) & (diff_g > diff_b):
+            return True
+
+
+    def is_green_diff_method(self):
+        """Decides on color based on difference in percentage 
+        of total color increases by set amount.
+        Note: This is a terrible method.
+        """
+
+        # Reads in percentages of total color
+        pv, pc, pr, pg, pb = self.get_percentage()
+
+        total_color = self.color["red"] \
+                    + self.color["green"] \
+                    + self.color["blue"]
+
+        total_base = self.br + self.bg + self.bb
+
+        # Base percentages for each color
+        percent_baser = self.br / total_base * 100
+        percent_baseg = self.bg / total_base * 100
+        percent_baseb = self.bb / total_base * 100
+
+        # returns True when the percentage of a color goes up by 0.2 from base percentages
+
+        if (pg - percent_baseg) > 2:
+            return True
+
+    def is_green(self):
+        """ finds percent difference between baseline
+            and current reading.
+        """
+        diff_c, diff_r, diff_g, diff_b = self.get_percent_diff()
+
+        # print "diff_c", diff_c, "diff_r",diff_r, "diff_g",diff_g, "diff_b",diff_b 
+        if (diff_g) > (diff_b + diff_r):
+            return True
 
 def read_loop():
     """Instantiate a ColorSensor object and read indefinitely."""
+    print "start"
     colorSensor = ColorSensor()
+
+    #gets base values for all colors.
+    time.sleep(0.5)
+    colorSensor.get_baseline()
+
+    print "bv: {}, bc: {:5.3f}, br: {:5.3f}, bg: {:5.3f}, bb: {:5.3f}".format(colorSensor.bv, \
+                                                                            colorSensor.bc,\
+                                                                            colorSensor.br,\
+                                                                            colorSensor.bg,\
+                                                                            colorSensor.bb)
+
+
+    # self.logger.debug("baseline: bv: {}, bc: {}, br: {}, bg: {}, bb: {}".format(bv, bc, br, bg, bb))
+
+    print "before loop"
     t0 = time.time()
     while True:
         try:
             elapsed = time.time() - t0
-            print "[{:8.3f}] ".format(elapsed),
-            #valid, c, r, g, b = colorSensor.read_data()  # raw read
+            # print "[{:8.3f}] ".format(elapsed)
+            # print "v: {}, c: {:5.3f}, r: {:5.3f}, g: {:5.3f}, b: {:5.3f}".format(v, c, r, g, b)
+
+            # if colorSensor.is_green():
+                # print "Found green"
+            if colorSensor.is_green_percent_method():
+                print "Found green, Percent method"
+                
+            if colorSensor.is_red_percent_method():
+                print "Found red, percent method"
+
+            # if colorSensor.is_green_diff_method():
+                # print "diff method"
+
             #print "v: {}  c: {}, r: {}, g: {} b: {}".format(valid, c, r, g, b)
             # v, c, r, g, b = colorSensor.get_data_normalized()  # read normalized RGB values 
-            print "v: {}, c: {:5.3f}, r: {:5.3f}, g: {:5.3f}, b: {:5.3f}".format(v, c, r, g, b)
+            #v, c, r, g, b = colorSensor.get_percentage()
+            # Find out which color has plurality of percentage.
+            # print "v: {}, c: {:5.3f}, r: {:5.3f}, g: {:5.3f}, b: {:5.3f}".format(v, c, r, g, b)
             
             time.sleep(0.1)
         except KeyboardInterrupt:
             break
     print "Done."
+
+    
 
 
 if __name__ == "__main__":

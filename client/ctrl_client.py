@@ -163,6 +163,9 @@ class CtrlClient(object):
             print "Ping failed: {}".format(reply)
         return reply_time
 
+    def stop_full(self):
+        self.call("ctrl", "stop_full", {})
+
     def clean_up(self):
         """Tear down ZMQ socket."""
         self.ctrl_sock.close()

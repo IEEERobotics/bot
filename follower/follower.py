@@ -197,7 +197,7 @@ class Follower(object):
         small_angle = No_Line #start with No_Line to get off front line
         previous_time = time()
 
-        while True
+        while True:
             # Get front array for turning
             current_ir_reading = read_binary(Threshold,White_Black)
             if(direction=="left"):

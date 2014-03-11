@@ -193,10 +193,11 @@ class Follower(object):
         # next side. 
         # Use a rotate_pid with a good pd term to catch the arrays on the next line
         self.rotate_pid.set_k_values(6, 3, 0)
+        # small deviation from center of array allowable for rotation finish
+        small_angle = No_Line #start with No_Line to get off front line
+        previous_time = time()
 
         while True
-            # Start turning in correct direction
-            self.driver.rotate(sign*speed) 
             # Get front array for turning
             current_ir_reading = read_binary(Threshold,White_Black)
             if(direction=="left"):
@@ -205,10 +206,21 @@ class Follower(object):
             elif(direction=="right"):
                  self.front_state = self.get_position_rl(
                     current_ir_reading["front"])
-            
-            if self.front_state < No_Line and self.front_state >= 5
+           
+            if( self.front_state >=  No_line)
+                small_angle = 5 #small deviation
 
-            
+            #if self.front_state < No_Line and self.front_state >= small_angle
+            # Get the current time of the CPU
+            current_time = time()
+            self.sampling_time = current_time - previous_time
+            # Call PID
+            self.rotate_error = self.rotate_pid.pid(
+                small_angle, self.front_state,  self.sampling_time)
+ 
+            # sign turns in correct direction
+            self.driver.rotate(sign*speed) 
+           
  
         return
 

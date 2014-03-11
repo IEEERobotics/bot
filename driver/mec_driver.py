@@ -262,6 +262,8 @@ class MecDriver(driver.Driver):
             [fabs(front_left), fabs(front_right),
                 fabs(back_left), fabs(back_right)]
         )
+        
+        speed = translate_speed + angular_rate
 
         front_left = front_left * speed / max_wheel_speed
         front_right = front_right * speed / max_wheel_speed

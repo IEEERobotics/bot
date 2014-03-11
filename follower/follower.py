@@ -207,7 +207,7 @@ class Follower(object):
                  self.front_state = self.get_position_rl(
                     current_ir_reading["front"])
            
-            if( self.front_state >=  No_line):
+            if( self.front_state >=  No_Line):
                 small_angle = 0 # approach 0
                 off_line = True
             elif (abs(self.front_state) < 3) and off_line:

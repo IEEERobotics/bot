@@ -43,19 +43,6 @@ class Follower(object):
         # motor variables
         self.translate_speed =  60
 
-        # Initialize other members
-        # IR position values, e.g. [-8.0, -7.0 ..., 8.0]
-        self.ir_pos = dict()
-        # IR aggregate values = sum(ir_pos * readings) / sum(readings)
-        self.ir_agg = dict()
-        for name, reading in self.ir_hub.reading.iteritems():
-            self.ir_pos[name] = np.float32(np.linspace(
-                -(len(reading) / 2), (len(reading) / 2), len(reading)))
-            # TODO(napratin,3/4): Ensure proper ordering?
-            self.ir_agg[name] = None  # None when no unit is lit
-            self.logger.info("ir_pos['{}'] = {}"
-                .format(name, self.ir_pos[name]))
-
         self.intersection = False
         self.lost_line = False
         self.timeLastUpdated = -1.0

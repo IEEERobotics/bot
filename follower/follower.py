@@ -207,8 +207,11 @@ class Follower(object):
                  self.front_state = self.get_position_rl(
                     current_ir_reading["front"])
            
-            if( self.front_state >=  No_line)
-                small_angle = 5 #small deviation
+            if( self.front_state >=  No_line):
+                small_angle = 0 # approach 0
+                off_line = True
+            elif (abs(self.front_state) < 3) and off_line:
+                return "DONE"
 
             #if self.front_state < No_Line and self.front_state >= small_angle
             # Get the current time of the CPU
@@ -217,7 +220,9 @@ class Follower(object):
             # Call PID
             self.rotate_error = self.rotate_pid.pid(
                 small_angle, self.front_state,  self.sampling_time)
- 
+            #cap (-100, 100)
+            speed =  max(-100,min(100,self.rotate_error))
+            self.logger.debug("rot_err= {}, speed= {}".format(self.rotate_error,speed))
             # sign turns in correct direction
             self.driver.rotate(sign*speed) 
            

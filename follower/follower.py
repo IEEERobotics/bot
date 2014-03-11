@@ -189,14 +189,6 @@ class Follower(object):
         return "Done"
 
     @lib.api_call
-    def center_on_blue(self):
-        return True  # TODO: Actually center on blue block
-
-    @lib.api_call
-    def center_on_red(self):
-        return True  # TODO: Actually center on red_block
-
-    @lib.api_call
     def report_states(self):
         # for debug of IR sensor state
         current_ir_reading = self.ir_hub.read_binary(Follower.Threshold,Follower.White_Black)
@@ -547,4 +539,23 @@ class Follower(object):
             self.driver.rotate(rotate_speed)
             # Take the current time set it equal to the previous time
             previous_time = current_time
+
+
+    @lib.api_call
+    def center_on_blue_block(self, heading=180):
+    # Assumes Front array (from heading) is on blue block
+    
+
+
+
+
+
+    @lib.api_call
+    def center_on_red(self):
+        return True  # TODO: Actually center on red_block
+
+
+
+
+
  

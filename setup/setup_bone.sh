@@ -59,7 +59,9 @@ echo "Populating filesystem..."
 echo "========================"
 chown -R root.root fs-*
 rsync -va fs-common/* /
+chmod 755 /root/.ssh
 chmod 600 /root/.ssh/id_rsa
+chmod 644 /root/.ssh/authorized_keys
 # We need to customize uEnv.txt for each install
 ROOT_UUID=$(blkid -t LABEL=rootfs -o value -s UUID)
 sed 's/{{ROOT_UUID}}/'$ROOT_UUID'/' /boot/uboot/uEnv_template.txt > /boot/uboot/uEnv.txt

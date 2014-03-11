@@ -181,8 +181,6 @@ class Follower(object):
     def rotate_on_x(self,direction="left",speed=70):
         #After center_on_x, rotate in the commanded directions
         #by 90 degrees. 
-        No_Line = Follower.No_Line
-
         if(direction=="left"):
             sign = -1
         elif(direction=="right"):
@@ -196,12 +194,12 @@ class Follower(object):
         # Use a rotate_pid with a good pd term to catch the arrays on the next line
         self.rotate_pid.set_k_values(6, 3, 0)
         # small deviation from center of array allowable for rotation finish
-        small_angle = No_Line #start with No_Line to get off front line
+        small_angle = Follower.No_Line #start with No_Line to get off front line
         previous_time = time()
 
         while True:
             # Get front array for turning
-            current_ir_reading = self.ir_hub.read_binary(Threshold,White_Black)
+            current_ir_reading = self.ir_hub.read_binary(Follower.Threshold,Follower.White_Black)
             if(direction=="left"):
                 self.front_state = self.get_position_lr(
                     current_ir_reading["front"])
@@ -209,7 +207,7 @@ class Follower(object):
                  self.front_state = self.get_position_rl(
                     current_ir_reading["front"])
            
-            if( self.front_state >=  No_Line):
+            if( self.front_state >=  Follower.No_Line):
                 small_angle = 0 # approach 0
                 off_line = True
             elif (abs(self.front_state) < 3) and off_line:
@@ -243,7 +241,7 @@ class Follower(object):
     @lib.api_call
     def report_states(self):
         # for debug of IR sensor state
-        current_ir_reading = self.ir_hub.read_binary(Threshold,White_Black)
+        current_ir_reading = self.ir_hub.read_binary(Follower.Threshold,Follower.White_Black)
         self.front_state = self.get_position_lr(
             current_ir_reading["front"])
         # Back is on the back side
@@ -362,7 +360,7 @@ class Follower(object):
         """
         # Get the current IR readings
         if current_ir_reading is None:
-            current_ir_reading = self.ir_hub.read_binary(Threshold,White_Black)
+            current_ir_reading = self.ir_hub.read_binary(Follower.Threshold,Follower.White_Black)
         # Heading east
         if self.heading == 270:
             # Forward is on the left side
@@ -426,22 +424,22 @@ class Follower(object):
 
         #Check for error conditions
         if((self.front_state > 15) or (self.back_state > 15) or
-            (self.right_state < No_Line) and (self.left_state < No_Line)):
+            (self.right_state < Follower.No_Line) and (self.left_state < Follower.No_Line)):
             
             if((self.right_state < 16) and (self.left_state < 16))and not self.on_x:
                 # Found Intersection because left and right lit up
                 # if on_x=True, ignore this error
                 self.error = "ON_INTERSECTION" 
-            if((self.front_state == Large_Object) ):
+            if((self.front_state == Follower.Large_Object) ):
                 # Found large object on front array. Ignore back array lightups.
                 self.error = "LARGE_OBJECT" 
-            elif((self.front_state == No_Line) and (self.back_state == No_Line)):
+            elif((self.front_state == Follower.No_Line) and (self.back_state == Follower.No_Line)):
                 # Front and back lost line
                 self.error = "LOST_LINE" 
-            elif(self.front_state == No_Line):
+            elif(self.front_state == Follower.No_Line):
                 # Front lost line
                 self.error = "FRONT_LOST" 
-            elif(self.back_state == No_Line):
+            elif(self.back_state == Follower.No_Line):
                 # Back lost line
                 self.error = "BACK_LOST" 
         else: #no errors
@@ -473,10 +471,10 @@ class Follower(object):
                self.hit_position.append(index)
         if len(self.hit_position) >= 4:
             # Error: Large Object detected
-            return Large_Object
+            return Follower.Large_Object
         if len(self.hit_position) == 0:
             # Error: No line detected
-            return No_Line
+            return Follower.No_Line
 
         state = self.hit_position[0] * 2
         #Use first two hit irs to determine position on array
@@ -486,7 +484,7 @@ class Follower(object):
                 state = state + 1
             if abs(self.hit_position[0] - self.hit_position[1]) > 1:
                 # Error: Discontinuity in sensors
-                return Noise
+                return Follower.Noise
         state = state - 15
         return state
 
@@ -504,10 +502,10 @@ class Follower(object):
                self.hit_position.append(index)
         if len(self.hit_position) >= 4:
             # Error: Large Object detected
-            return Large_Object
+            return Follower.Large_Object
         if len(self.hit_position) == 0:
             # Error: No line detected
-            return No_Line
+            return Follower.No_Line
 
         state = self.hit_position[0] * 2
         #Use first two hit irs to determine position on array
@@ -517,7 +515,7 @@ class Follower(object):
                 state = state + 1
             if(abs(self.hit_position[0] - self.hit_position[1]) > 1):
                 # Error: Discontinuity in sensors
-                return Noise
+                return Follower.Noise
         state = (state - 15) * -1
         return state
 

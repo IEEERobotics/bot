@@ -179,13 +179,13 @@ class Follower(object):
         return True  # TODO: Actually center on intersection
 
     @lib.api_call
-    def rotate_on_x(self,direction="left",speed=70,time=2):
+    def rotate_on_x(self,direction="left",speed=100,time=0.7):
         #After center_on_x, rotate in the commanded directions
         #by 90 degrees. 
         if(direction=="left"):
-            sign = -1
-        elif(direction=="right"):
             sign = 1
+        elif(direction=="right"):
+            sign = -1
         else:
             self.logger.error("Bad param direction, please use left or right")
             return "DONE"

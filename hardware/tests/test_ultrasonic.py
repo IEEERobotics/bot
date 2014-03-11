@@ -40,8 +40,15 @@ class TestUltrasonic(TestCase):
         self.assertEqual(inches['back'], 3/149.3)
         self.assertEqual(inches['right'], 7/149.3)
 
+    def test_meters(self):
+        us = Ultrasonic()
+        us.pru_mem = struct.pack('IIIIIIII', 1,2,3,4,5,6,7,8)
+        inches = us.read_meters()
+        self.assertEqual(inches['front'], 1/5877.0)
+        self.assertEqual(inches['left'], 5/5877.0)
+
     def test_dists(self):
         us = Ultrasonic()
         us.pru_mem = struct.pack('IIIIIIII', 1,2,3,4,5,6,7,8)
         dists = us.read_dists()
-        self.assertEqual(dists['back'], 3/149.3 + 0.15)
+        self.assertEqual(dists['back'], 3/5877.0 + 0.15)

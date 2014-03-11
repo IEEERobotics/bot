@@ -72,14 +72,22 @@ class Ultrasonic(dict):
 
     def read_dists(self):
         """Convert the distance from the sensor to distance from center """
-        inches = self.read_inches()
+        meters = self.read_meters()
         dists = {}
-        for sensor in inches:
-            dists[sensor] = inches[sensor] \
+        for sensor in meters:
+            dists[sensor] = meters[sensor] \
                  + self.sensors[sensor]['xy'][0] * self.sensors[sensor]['dir'][0] \
                  + self.sensors[sensor]['xy'][1] * self.sensors[sensor]['dir'][1]
         self.logger.debug("Dists: {}".format(dists))
         return dists
+
+    def read_meters(self):
+        times = self.read_times()
+        # approx 5877 microseconds per meter
+        meters = { sensor:times[sensor]/5877.0 for sensor,t in times.items()}
+        self.logger.debug("Meters: {}".format(meters))
+        return meters
+
 
     def read_inches(self):
         times = self.read_times()

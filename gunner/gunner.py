@@ -22,9 +22,6 @@ class Gunner(object):
         # Load and store configuration dict
         self.config = lib.get_config()
 
-        # Load and store targeting dict
-        self.targ = lib.load_targeting(self.config["targeting"])
-
         # Build turrent hardware abstraction
         self.turret = t_mod.Turret()
 

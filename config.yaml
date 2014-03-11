@@ -32,7 +32,7 @@ gun: {
 # offset is the PRU data memory offset containing the sensor result
 ultrasonics: {
     pru_num: 0,
-    pru_file: "ultrasonic.bin",
+    pru_file: "pru/ultrasonic.bin",
     sensors: {
         front: { offset: 0, xy: [  0.0,  0.15], dir: [ 0.0,  1.0] },
         back:  { offset: 8, xy: [  0.0, -0.15], dir: [ 0.0, -1.0] },

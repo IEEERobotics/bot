@@ -277,7 +277,21 @@ class CLI(cmd.Cmd):
         print "sub"
         print "\tPrint messages subscribed to. Ctrl+c to exit."
 
-    def do_exit_ctrl(self, raw_args):
+    def do_stop(self, raw_args):
+        """Stop all drive and gun motors, put turret in save state.
+
+        :param raw_args: Mandatory param for Cmd handler, not used.
+        :type raw_args: string
+
+        """
+        self.ctrl_client.stop_full()
+
+    def help_stop(self):
+        """Provide help message for stop command."""
+        print "stop"
+        print "\tStop all drive and gun motors, put turret in safe state."
+
+    def do_kill(self, raw_args):
         """Send message to CtrlServer, asking it to exit.
 
         :param raw_args: Mandatory param for Cmd handler, not used.
@@ -286,9 +300,9 @@ class CLI(cmd.Cmd):
         """
         self.ctrl_client.exit_server()
 
-    def help_exit_ctrl(self):
-        """Provide help message for exit_ctrl command."""
-        print "exit_ctrl"
+    def help_kill(self):
+        """Provide help message for kill command."""
+        print "kill"
         print "\tAsk the CtrlServer to exit."
 
     def do_die(self, raw_args):

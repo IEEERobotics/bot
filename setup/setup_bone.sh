@@ -2,7 +2,7 @@
 # Install standard software, do git configuration
 
 # Each should only contain the packages that are added at that level
-base="git python-yaml libzmq-dev python-zmq python-simplejson python-smbus python-virtualenv python-pip python-numpy python-dev build-essential"
+base="git python-yaml libzmq-dev python-zmq python-simplejson python-smbus python-virtualenv python-pip python-numpy python-dev build-essential vim vim-tiny less"
 extra="vim-nox ipython tmux screen nmap tree i2c-tools wireless-tools grc"
 
 while getopts aubh opt; do
@@ -59,7 +59,12 @@ echo "Populating filesystem..."
 echo "========================"
 chown -R root.root fs-*
 rsync -va fs-common/* /
+chmod 755 /root/.ssh
 chmod 600 /root/.ssh/id_rsa
+chmod 644 /root/.ssh/authorized_keys
+# We need to customize uEnv.txt for each install
+ROOT_UUID=$(blkid -t LABEL=rootfs -o value -s UUID)
+sed 's/{{ROOT_UUID}}/'$ROOT_UUID'/' /boot/uboot/uEnv_template.txt > /boot/uboot/uEnv.txt
 
 if [ "$bot_specific" = true ]; then
     rsync -va fs-bot/* /
@@ -70,15 +75,21 @@ if [ "$bot_specific" = true ]; then
     ifup wlan1
 fi
 
-
 echo "=================="
 echo "Testing network..."
 echo "=================="
 if  /bin/ping -c1 -w1 google.com; then
     echo "Network is live"
 else
-    echo "Aborting setup due to lack of connectivty!"
-    exit 1
+    echo "No network connection detected, attempting to route via USB..."
+    route add default gw 192.168.7.1
+    echo "nameserver 8.8.8.8" > /etc/resolv.conf
+    if  /bin/ping -c1 -w1 google.com; then
+        echo "Network is temporarily live for install"
+    else
+        echo "Aborting setup due to lack of connectivty!"
+        exit 1
+    fi
 fi
 echo
 

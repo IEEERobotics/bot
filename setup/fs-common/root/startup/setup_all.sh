@@ -1,6 +1,7 @@
 #!/bin/bash
 
 dir=$(dirname $0)
+source $dir/slots.sh
 source $dir/pwm.sh
 source $dir/gpio.sh
 source $dir/adc.sh
@@ -46,4 +47,15 @@ load_gpio 67  # P8_06, back
 load_gpio 68  # P8_08, left
 load_gpio 35  # P8_10, right
 
+# Ultrasonic GPIOs
+load_gpio 117  # P9_25 front trigger
+load_gpio 49   # P9_23 front echo
+load_gpio 45   # P8_11 back trigger
+load_gpio 47   # P8_15 back echo
+load_gpio 112  # P9_30 left trigger
+load_gpio 113  # P9_28 left echo
+load_gpio 111  # P9_29 right trigger
+load_gpio 110  # P9_31 right echo
+
 enable_adcs
+load_slot BB-BONE-PRU-01

@@ -188,8 +188,6 @@ class MecDriver(driver.Driver):
 
         # Find largest motor speed,
         # use that to normalize multipliers and maintain maximum efficiency
-        # TODO This needs to be debugged and re-enabled; currently speeds are
-        # being set much higher than expected (use test_mec_driver to verify)
         max_wheel_speed = max(
             [fabs(front_left), fabs(front_right),
                 fabs(back_left), fabs(back_right)]
@@ -277,9 +275,9 @@ class MecDriver(driver.Driver):
     @lib.api_call
     def drive(self, speed, angle, duration):
         """Moves at given speed and angle for set duration (in seconds)."""
-        move(speed, angle)  # start moving
+        self.move(speed, angle)  # start moving
         sleep(duration)  # wait for desired duration (in seconds)
-        move(0, 0)  # stop
+        self.move(0, 0)  # stop
 
     @lib.api_call
     def jerk(self, speed=30, angle=0, duration=3):

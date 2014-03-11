@@ -14,6 +14,13 @@ class Follower(object):
 
     """Follows a line, detects intersections and stop conditions."""
 
+    #Class variables
+    #Array_Conditions
+    Large_Object = 17  #the array sees a large object
+    No_Line = 16 #the array see no line
+    Noise = 19 #white values not next to each other
+
+
     def __init__(self):
         # Build logger
         self.logger = lib.get_logger()
@@ -168,7 +175,7 @@ class Follower(object):
         return True  # TODO: Actually center on intersection
 
     @lib.api_call
-    def rotate_on_x(self,direction="left"):
+    def rotate_on_x(self,direction="left",speed=70):
         #After center_on_x, rotate in the commanded directions
         #by 90 degrees. 
         if(direction=="left"):
@@ -182,7 +189,17 @@ class Follower(object):
         # next side. 
         # Use a rotate_pid with a good pd term to catch the arrays on the next line
         self.rotate_pid.set_k_values(6, 3, 0)
- 
+
+        off_line = False #have not yet left front line
+        while True
+            # Start turning in correct direction
+            self.driver.rotate(sign*speed) 
+            # Get front array for turning
+            self.front_state = self.get_position_lr(
+                    current_ir_reading["left"])
+            if front_state == 16
+                off_line = True
+            
  
         return
 
@@ -427,7 +444,7 @@ class Follower(object):
             if(value == 1):
                self.hit_position.append(index)
         if len(self.hit_position) >= 4:
-            # Error: Intersection detected
+            # Error: Large Object detected
             return 17
         if len(self.hit_position) == 0:
             # Error: No line detected
@@ -458,7 +475,7 @@ class Follower(object):
             if(value == 1):
                self.hit_position.append(index)
         if len(self.hit_position) >= 4:
-            # Error: Intersection detected
+            # Error: Large Object detected
             return 17
         if len(self.hit_position) == 0:
             # Error: No line detected

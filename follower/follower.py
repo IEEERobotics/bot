@@ -2,6 +2,7 @@
 
 import sys
 from time import time
+from time import sleep
 import numpy as np
 
 import lib.lib as lib
@@ -187,7 +188,7 @@ class Follower(object):
             sign = 1
         else:
             self.logger.error("Bad param direction, please use left or right")
-            return
+            return "DONE"
 
         # sign turns in correct direction
         self.driver.rotate(sign*speed) 
@@ -196,8 +197,8 @@ class Follower(object):
 
         self.driver.move(0,0)
 
-        return
-"""
+        return "Done"
+    """
         # First, turn until line leaves one side of arrays, then starts on the
         # next side. 
         # Use a rotate_pid with a good pd term to catch the arrays on the next line
@@ -239,7 +240,7 @@ class Follower(object):
            
  
         return
-"""
+    """
 
     @lib.api_call
     def center_on_blue(self):

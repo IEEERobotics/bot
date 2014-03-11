@@ -35,6 +35,13 @@ set_duty     4  1500000  # 1.5ms, standard neutral point
 set_polarity 4 0
 run_pwm      4  # zero the servo on setup
 
+# Color sensor LED (50%): P8_19 (pwm5/EHR2A)
+load_pwm     5
+set_period   5 20000000
+set_duty     5 10000000 
+set_polarity 5 0
+run_pwm      5  
+
 # IR sensor array MUX select lines
 load_gpio 44  # P8_12
 load_gpio 26  # P8_14

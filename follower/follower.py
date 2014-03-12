@@ -557,6 +557,7 @@ class Follower(object):
         previous_time = time();
         self.heading = heading
         while True:
+            center_rotate_pid.integral_error = 0
             while True:
                 current_time = time()
                 # Init front_PID
@@ -580,6 +581,7 @@ class Follower(object):
                 self.driver.rotate(rotate_speed)
                 # Take the current time set it equal to the previous time
                 previous_time = current_time
+            side_to_side_strafe.integral_error = 0
             while True:
                 current_time = time()
                 # Init front_PID

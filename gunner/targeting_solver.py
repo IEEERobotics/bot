@@ -1,5 +1,6 @@
 import math
 from os import path
+import lib.lib as lib
 
 # Note: Units for calculations are Kg, m, s
 ft_to_m = .3048 #conversion factor from feet to meters
@@ -22,6 +23,8 @@ V = 7.4439 # Initial velocity of dart at launch
 
 targetHeight = 0.684215 #Height of the center of the target in meters
 targetX = 0.5842 # X-coordinate of the center of the target
+
+logger = lib.get_logger()
 
 def getTargetDistance(Xpos, Ypos):
     """Calculate the horizontal distance to the target, from X & Y coordinates"""
@@ -89,6 +92,8 @@ def getFiringSolution(Xpos,Ypos, offset, velocity):
     Ypos is forward-back, 0 at the edge with the target, in meters
     offset is in degrees, measured as the skew from y axis
     Velocity is the initial dart velocity in m/s """
+    if velocity < 1:
+        logger.error("Velocity too low, must be greater than 1")
     V = velocity
     targetDistance = getTargetDistance(Xpos,Ypos) #horizontal distance to target in m
     horizDeflection = getHorizLaunchAngle(Xpos,Ypos) #pan angle in degrees

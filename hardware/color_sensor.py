@@ -108,7 +108,7 @@ class ColorSensor(I2CDevice):
         self.br, self.bg, \
         self.bb = self.read_data()
         try:
-            assert (self.br != 0, self.bg != 0, self.bb != 0)
+            assert (self.br != 0 and self.bg != 0 and self.bb != 0)
         except AssertionError:
             raise AssertionError("Baselines colors are zero.")
 
@@ -144,7 +144,7 @@ class ColorSensor(I2CDevice):
         elif color == "blue":
             if (diff_b > diff_g) and (diff_b > diff_r):
                 return True
-        else
+        else:
             return "Error: Unknown color"
             
         return False
@@ -241,11 +241,8 @@ def read_loop():
 
             # if colorSensor.is_green():
                 # print "Found green"
-            if colorSensor.is_green_percent_method():
+            if colorSensor.detects_color("green"):
                 print "Found green, Percent method"
-
-            if colorSensor.is_red_percent_method():
-                print "Found red, percent method"
 
             # if colorSensor.is_green_diff_method():
                 # print "diff method"

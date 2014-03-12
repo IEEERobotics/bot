@@ -42,6 +42,7 @@ class Follower(object):
         
         # motor variables
         self.translate_speed =  60
+        self.prev_rate = 0
 
         #state variables
         self.front_state = Follower.No_Line
@@ -198,7 +199,7 @@ class Follower(object):
             return "DONE"
 
         # sign turns in correct direction
-        self.driver.rotate(sign*speed) 
+        self.rotate(sign*speed) 
 
         sleep(time)
 
@@ -400,12 +401,12 @@ class Follower(object):
                 # Found Intersection because left and right lit up
                 # if on_x=True, ignore this error
                 self.error = "ON_INTERSECTION" 
-            if((self.front_state == Follower.Large_Object) ):
+            elif((self.front_state == Follower.Large_Object) ):
                 # Found large object on front array. 
                 self.error = "LARGE_OBJECT" 
             if( self.back_state == Follower.Large_Object):
                 # Ignore large objects on back array by using prev back state
-                self.back_state == prev_back_state
+                self.back_state = prev_back_state
             if((self.front_state == Follower.No_Line) and (self.back_state == Follower.No_Line)):
                 # Front and back lost line
                 self.error = "LOST_LINE" 
@@ -414,7 +415,8 @@ class Follower(object):
                 self.error = "FRONT_LOST" 
             elif(self.back_state == Follower.No_Line):
                 # Back lost line
-                self.error = "BACK_LOST" 
+                self.error = "BACK_LOST"
+            #Ignore Noise conditions 
         else: #no errors
             self.error = "NONE" 
 
@@ -507,7 +509,7 @@ class Follower(object):
             #cap speed between (-100,100)
             rotate_speed = max(-100,min(100,self.rotate_error))
             self.logger.info("rotate_speed = {}".format(rotate_speed))
-            self.driver.rotate(rotate_speed) 
+            self.rotate(rotate_speed) 
             
     @lib.api_call
     def get_out_of_box(self):
@@ -526,7 +528,14 @@ class Follower(object):
         self.logger.info("count = {}".format(count))
         last_count = count 
 
-
+    #Prevent rapid sign changes in rotate calls
+    def rotate(self, rate):
+        if(self.prev_rate*rate < 0):
+            self.driver.move(0.0)
+            sleep(0.2)
+        self.prev_rate = rate
+        self.driver.rotate(rate)
+        return
 
     @lib.api_call
     def center_on_intersection(self, heading = 180):
@@ -597,7 +606,7 @@ class Follower(object):
                   break
                 self.logger.info("rotate_error = {}".format(rotate_error))
                 rotate_speed = max(-100,min(100,rotate_error))
-                self.driver.rotate(rotate_speed)
+                self.rotate(rotate_speed)
                 # Take the current time set it equal to the previous time
                 previous_time = current_time
             side_to_side_strafe.integral_error = 0

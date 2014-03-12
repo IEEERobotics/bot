@@ -36,3 +36,6 @@ class TestTargetingSolver(TestCase):
         self.assertAlmostEqual(horiz_servo_angle, 13.942, places=2)
         self.assertAlmostEqual(vert_servo_angle, 63, places=0)
 
+    def test_getFiringSolution_bad_velocity(self):
+        with self.assertRaises(ValueError):
+            targeting.getFiringSolution(.3572,.9144, 0, .5)

@@ -124,6 +124,10 @@ class Follower(object):
         self.timeLastUpdated = -1.0
         self.strafe_error = 0.0
         self.rotate_error = 0.0
+        
+        #reset pids
+        self.strafe.clear_error()
+        self.rotate_pid.clear_error()
         return 
  
     @lib.api_call

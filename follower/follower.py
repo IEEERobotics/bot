@@ -35,7 +35,7 @@ class Follower(object):
 
         # Build PIDs
         self.strafe = pid_mod.PID()
-        self.front_error = 0.0
+        self.strafe_error = 0.0
         self.rotate_pid = pid_mod.PID()
         self.rotate_error= 0.0
         self.error = "NONE"
@@ -104,10 +104,28 @@ class Follower(object):
     @lib.api_call
     def is_on_red(self):
         return True  # TODO: Use color sensor
+
+    def reset_errors(self):
+        self.error = "NONE"
+        #state variables
+        self.front_state = Follower.No_Line
+        self.back_state = Follower.No_Line
+        self.left_state = Follower.No_Line
+        self.right_state = Follower.No_Line
+
+        # post error vars
+        self.intersection = False
+        self.lost_line = False
+        self.timeLastUpdated = -1.0
+        self.strafe_error = 0.0
+        self.rotate_error = 0.0
+        return 
  
     @lib.api_call
     def follow(self, heading, on_x=False):
         """Follow line along given heading"""
+        #reset errors
+        self.reset_errors()
         self.on_x = on_x
         # Get the initial conditioni
         self.heading = heading

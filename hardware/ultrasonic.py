@@ -55,6 +55,7 @@ class Ultrasonic(dict):
                 self.pru_mem = mmap.mmap(f.fileno(), 32, offset=PRU_ADDR)
         except IOError as e:
             self.logger.warning("Could not open /dev/mem: {}".format(e))
+            self.pru_mem = struct.pack('IIIIIIII', 1,2,3,4,5,6,7,8)
 
         # Initialize the PRU driver (not sure what this does?)
         pypruss.init()

@@ -105,6 +105,7 @@ class WheelGun(object):
 
     wheel_power = property(get_wheel_power, set_wheel_power)
 
+    @lib.api_call
     def get_wheel_velocity(self):
         """Get the angular velocity of the wheel motors.
 
@@ -117,6 +118,7 @@ class WheelGun(object):
 
     wheel_velocity = property(get_wheel_velocity)
 
+    @lib.api_call
     def get_dart_velocity(self):
         """Return the initial velocity of the dart when it leaves the gun
 
@@ -127,9 +129,10 @@ class WheelGun(object):
             return self._dart_velocity
         return self.wheel_velocity * self.wheel_radius * self.ticks_per_rev
 
-    def set_dart_velocity(self, val):
+    @lib.api_call
+    def set_dart_velocity(self, velocity):
         """Setter used purely for testing"""
-        self._dart_velocity = val
+        self._dart_velocity = velocity
 
 
     dart_velocity = property(get_dart_velocity,set_dart_velocity)

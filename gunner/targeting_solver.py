@@ -1,4 +1,6 @@
 import math
+from os import path
+
 # Note: Units for calculations are Kg, m, s
 ft_to_m = .3048 #conversion factor from feet to meters
 
@@ -15,7 +17,8 @@ degrees = 13 # Minimum starting angle
 DeltaT = .0001  # The time step
 Tmax = .3  # Maximum seconds to simulate
 z0 = 0.3  # vertical position of the dart (initially at height of the launcher)
-V = 10.00 # Initial velocity of dart at launch
+V = 1.185 # Initial velocity of dart at launch
+#.0127 m = firing wheel radius
 
 targetHeight = 0.684215 #Height of the center of the target in meters
 targetX = 0.5842 # X-coordinate of the center of the target
@@ -106,13 +109,13 @@ def getServoAngle(elevAngle):
     servoAngle = 5 + elevAngle + 12*math.pow(log,2.3)
     return servoAngle
 
-#"""Testing"""
-#with open('InputFile.csv') as f:
-#    for line in f:
-#        coords = line.split(",")
-#        Xpos = float(coords[0])
-#        Ypos = float(coords[1])
-#        angle = getFiringSolution(Xpos, Ypos)
-#        print "Angle: ", angle
-#        servoAngle = getServoAngle(angle)
-#        print "Servo Angle: ", servoAngle
+"""Testing"""
+with open('./tests/targetting_test_input.txt') as f:
+    for line in f:
+        coords = line.split(",")
+        Xpos = float(coords[0])
+        Ypos = float(coords[1])
+        angle = getFiringSolution(Xpos, Ypos)
+        print "Angle: ", angle
+        servoAngle = getServoAngle(angle)
+        print "Servo Angle: ", servoAngle

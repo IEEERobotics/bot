@@ -22,21 +22,30 @@ class ColorSensor(I2CDevice):
 
     def __init__(self):
         """Initialized I2C device, LED brightness PWM pin."""
-        I2CDevice.__init__(self, 1, 0x29, config='tcs3472_i2c.yaml')
-        enable = self.registers['ENABLE']
-        id = self.registers['ID']
-        status = self.registers['STATUS']
-        enable.write('PON', 'Enable')
-        enable.write('AEN', 'Enable')
-        enable = self.registers['ENABLE']  # TODO: Is this needed?
-
         self.logger = lib.get_logger()
         self.config = lib.get_config()
 
-        self.pwm_num = self.config["color_sensor"]["LED_PWM"]
-        self.pwm = pwm_mod.PWM(self.pwm_num)
-        # Duty cycle = 50% (from 20msec)
-        self.pwm.duty = 1000000
+        # Handle off-bone runs
+        self.testing = self.config["testing"]
+        if not self.testing:
+            self.logger.debug("Running in non-test mode")
+
+            # Setup I2C
+            I2CDevice.__init__(self, 1, 0x29, config='tcs3472_i2c.yaml')
+            enable = self.registers['ENABLE']
+            id = self.registers['ID']
+            status = self.registers['STATUS']
+            enable.write('PON', 'Enable')
+            enable.write('AEN', 'Enable')
+            enable = self.registers['ENABLE']  # TODO: Is this needed?
+
+            # Setup PWM pin for dimming LED
+            self.pwm_num = self.config["color_sensor"]["LED_PWM"]
+            self.pwm = pwm_mod.PWM(self.pwm_num)
+            # Duty cycle = 50% (from 20msec)
+            self.pwm.duty = 1000000
+        else:
+            self.logger.debug("Running in test mode")
 
     @property
     def color(self):
@@ -78,12 +87,15 @@ class ColorSensor(I2CDevice):
         :returns: Validity, Clear (magnitude), Red, Green, Blue.
         
         """
-        valid = self.registers['STATUS'].read('AVALID')
-        c = self.registers['CDATA'].read()
-        r = self.registers['RDATA'].read()
-        g = self.registers['GDATA'].read()
-        b = self.registers['BDATA'].read()
-        return valid, c, r, g, b
+        if not self.testing:
+            valid = self.registers['STATUS'].read('AVALID')
+            c = self.registers['CDATA'].read()
+            r = self.registers['RDATA'].read()
+            g = self.registers['GDATA'].read()
+            b = self.registers['BDATA'].read()
+            return valid, c, r, g, b
+        else:
+            return 1, 1, 1, 1, 1
 
     def get_percentage(self):
         """Calculates percentages of total color for each color.

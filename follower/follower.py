@@ -2,6 +2,7 @@
 
 import sys
 from time import time
+from time import sleep
 import numpy as np
 
 import lib.lib as lib
@@ -42,19 +43,13 @@ class Follower(object):
         # motor variables
         self.translate_speed =  60
 
-        # Initialize other members
-        # IR position values, e.g. [-8.0, -7.0 ..., 8.0]
-        self.ir_pos = dict()
-        # IR aggregate values = sum(ir_pos * readings) / sum(readings)
-        self.ir_agg = dict()
-        for name, reading in self.ir_hub.reading.iteritems():
-            self.ir_pos[name] = np.float32(np.linspace(
-                -(len(reading) / 2), (len(reading) / 2), len(reading)))
-            # TODO(napratin,3/4): Ensure proper ordering?
-            self.ir_agg[name] = None  # None when no unit is lit
-            self.logger.info("ir_pos['{}'] = {}"
-                .format(name, self.ir_pos[name]))
+        #state variables
+        self.front_state = Follower.No_Line
+        self.back_state = Follower.No_Line
+        self.left_state = Follower.No_Line
+        self.right_state = Follower.No_Line
 
+        # post error vars
         self.intersection = False
         self.lost_line = False
         self.timeLastUpdated = -1.0
@@ -81,12 +76,7 @@ class Follower(object):
             else:
                 self.ir_agg[name] = None
         self.timeLastUpdated = time.time()
-    
-    @lib.api_call
-    def get_ir_agg(self):
-        """Return IR aggregates, i.e. sum(pos * readings) / sum(readings)."""
-        return self.ir_agg
-
+   
     @lib.api_call
     def get_strafe_error(self):
         return self.strafe_error
@@ -114,10 +104,6 @@ class Follower(object):
     @lib.api_call
     def is_on_red(self):
         return True  # TODO: Use color sensor
-
-    @lib.api_call
-    def is_end_of_line(self):
-        return False  # TODO: Use IR sensors (only one array sees the line?)
  
     @lib.api_call
     def follow(self, heading, on_x=False):
@@ -133,11 +119,17 @@ class Follower(object):
         # Get current heading
         self.heading = heading
         # Continue until an error condition
+        count_object=0 
+
         while True:
             # Assign the current states to the correct heading
             self.assign_states()
             # Check for error conditions
             if self.error != "NONE":
+                #require two succesive large_object readings to exit
+                if self.error=="LARGE_OBJECT" and count_object<1:
+                    count_object += 1
+                    continue
                 self.update_exit_state()
                 self.logger.info("Error: {}".format( self.error ))
                 self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
@@ -147,6 +139,7 @@ class Follower(object):
                     self.right_state))
                 self.driver.move(0,0)
                 return self.error
+            
             # average states.
             bot_position = (self.front_state + self.back_state)/2
             # Get the current time of the CPU
@@ -173,72 +166,27 @@ class Follower(object):
             # Take the current time set it equal to the previous time
             previous_time = current_time
 
-    @lib.api_call
-    def center_on_x(self):
-        return True  # TODO: Actually center on intersection
 
     @lib.api_call
-    def rotate_on_x(self,direction="left",speed=70):
+    def rotate_on_x(self,direction="left",speed=100,time=0.7):
         #After center_on_x, rotate in the commanded directions
         #by 90 degrees. 
         if(direction=="left"):
-            sign = -1
-        elif(direction=="right"):
             sign = 1
+        elif(direction=="right"):
+            sign = -1
         else:
             self.logger.error("Bad param direction, please use left or right")
-            return
+            return "DONE"
 
-        # First, turn until line leaves one side of arrays, then starts on the
-        # next side. 
-        # Use a rotate_pid with a good pd term to catch the arrays on the next line
-        self.rotate_pid.set_k_values(3, 1, 0.1)
-        # small deviation from center of array allowable for rotation finish
-        small_angle = Follower.No_Line #start with No_Line to get off front line
-        previous_time = time()
-        off_line = False  #starts on line, need to move off
+        # sign turns in correct direction
+        self.driver.rotate(sign*speed) 
 
-        while True:
-            # Get front array for turning
-            current_ir_reading = self.ir_hub.read_binary(Follower.Threshold,Follower.White_Black)
-            if(direction=="left"):
-                self.front_state = self.get_position_lr(
-                    current_ir_reading["front"])
-            elif(direction=="right"):
-                 self.front_state = self.get_position_rl(
-                    current_ir_reading["front"])
-           
-            if( self.front_state >=  Follower.No_Line) and not off_line:
-                small_angle = 0 # approach 0
-                off_line = True
-                self.logger.info("Rotate off_line")
-            elif (abs(self.front_state) < 3) and off_line:
-                return "DONE"
+        sleep(time)
 
-            #if self.front_state < No_Line and self.front_state >= small_angle
-            # Get the current time of the CPU
-            current_time = time()
-            self.sampling_time = current_time - previous_time
-            # Call PID
-            self.rotate_error = self.rotate_pid.pid(
-                small_angle, self.front_state,  self.sampling_time)
-            #cap (-100, 100)
-            speed =  max(-100,min(100,self.rotate_error))
-            self.logger.info("rot_err= {}, speed= {}".format(self.rotate_error,speed))
-            # sign turns in correct direction
-            self.driver.rotate(sign*speed) 
-           
- 
-        return
+        self.driver.move(0,0)
 
-
-    @lib.api_call
-    def center_on_blue(self):
-        return True  # TODO: Actually center on blue block
-
-    @lib.api_call
-    def center_on_red(self):
-        return True  # TODO: Actually center on red_block
+        return "Done"
 
     @lib.api_call
     def report_states(self):
@@ -360,6 +308,9 @@ class Follower(object):
         Take 4x16 bit arrays and assigns the array to proper orientations.
         Note that the proper orientations are front, back, left and right.
         """
+        # Keep prev back state to ignore large objects on back array
+        prev_back_state = self.back_state
+
         # Get the current IR readings
         if current_ir_reading is None:
             current_ir_reading = self.ir_hub.read_binary(Follower.Threshold,Follower.White_Black)
@@ -433,9 +384,12 @@ class Follower(object):
                 # if on_x=True, ignore this error
                 self.error = "ON_INTERSECTION" 
             if((self.front_state == Follower.Large_Object) ):
-                # Found large object on front array. Ignore back array lightups.
+                # Found large object on front array. 
                 self.error = "LARGE_OBJECT" 
-            elif((self.front_state == Follower.No_Line) and (self.back_state == Follower.No_Line)):
+            if( self.back_state == Follower.Large_Object):
+                # Ignore large objects on back array by using prev back state
+                self.back_state == prev_back_state
+            if((self.front_state == Follower.No_Line) and (self.back_state == Follower.No_Line)):
                 # Front and back lost line
                 self.error = "LOST_LINE" 
             elif(self.front_state == Follower.No_Line):
@@ -585,4 +539,23 @@ class Follower(object):
             self.driver.rotate(rotate_speed)
             # Take the current time set it equal to the previous time
             previous_time = current_time
+
+
+    @lib.api_call
+    def center_on_blue_block(self, heading=180):
+    # Assumes Front array (from heading) is on blue block
+    
+
+
+
+
+
+    @lib.api_call
+    def center_on_red(self):
+        return True  # TODO: Actually center on red_block
+
+
+
+
+
  

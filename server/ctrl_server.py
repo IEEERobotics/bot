@@ -296,10 +296,17 @@ class CtrlServer(object):
             self.logger.warning(err_msg)
             return err_msg
 
-    def clean_up(self):
-        """Tear down ZMQ socket."""
+    @lib.api_call
+    def stop_full(self):
+        """Stop all drive and gun motors, set turret to safe state."""
         self.systems["driver"].move(0, 0)
         self.systems["gun"].set_wheel_speed(0)
+        self.systems["turret"].pitch = 90
+        self.systems["turret"].yaw = 90
+
+    def clean_up(self):
+        """Tear down ZMQ socket."""
+        self.stop_full()
         self.ctrl_sock.close()
         self.context.term()
 

@@ -106,11 +106,16 @@ class CLI(cmd.Cmd):
                             else:
                                 value = int(value)
                         except ValueError:
-                            # It wasn't an int or float, assume string
+                            # It wasn't an int or float, assume string or bool
+                            # Check if bool
+                            if value == "True":
+                                value = True
+                            elif value == "False":
+                                value = False
                             # If user gave key:'value', strip '' chars
-                            if value.startswith("'") and value.endswith("'"):
+                            elif value.startswith("'") and value.endswith("'"):
                                 value = value[1:-1]
-                            # It's already type string, no need to cast
+                            # Either bool or string at this point
                         param_dict[key] = value
                 except IndexError:
                     print "Bad parameter list"
@@ -276,6 +281,20 @@ class CLI(cmd.Cmd):
         """Provide help message for sub command."""
         print "sub"
         print "\tPrint messages subscribed to. Ctrl+c to exit."
+
+    def do_stop(self, raw_args):
+        """Stop all drive and gun motors, put turret in save state.
+
+        :param raw_args: Mandatory param for Cmd handler, not used.
+        :type raw_args: string
+
+        """
+        self.ctrl_client.stop_full()
+
+    def help_stop(self):
+        """Provide help message for stop command."""
+        print "stop"
+        print "\tStop all drive and gun motors, put turret in safe state."
 
     def do_kill(self, raw_args):
         """Send message to CtrlServer, asking it to exit.

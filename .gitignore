@@ -12,3 +12,5 @@
 /build
 /dist
 .venv
+
+.ycm_extra_conf.py

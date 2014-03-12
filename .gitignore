@@ -8,6 +8,8 @@
 *.egg-info
 *.log
 *.log.[0-9]*
+*.o
+*.bin
 
 /build
 /dist

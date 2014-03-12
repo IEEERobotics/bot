@@ -92,7 +92,7 @@ class Follower(object):
     @lib.api_call
     def wait_for_start(self):
         """Poll color senor unti green start signal lights up."""
-       return self.color.watch_for_green() 
+        return self.color.watch_for_green() 
 
     @lib.api_call
     def is_on_line(self):

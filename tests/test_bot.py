@@ -26,8 +26,7 @@ class TestBot(unittest.TestCase):
 
         # Write known values to all simulated hardware files
         self.setup_turret_servos()
-        self.setup_lasor()
-        self.setup_gun_motors()
+        self.setup_laser()
         self.setup_gun_trigger()
         self.setup_ir_select_gpios()
         self.setup_ir_analog_input_gpios()
@@ -41,14 +40,9 @@ class TestBot(unittest.TestCase):
         for servo in self.config["turret_servos"]:
             self.setup_pwm(servo["PWM"], run, duty_ns, period_ns, polarity)
 
-    def setup_lasor(self):
+    def setup_laser(self):
         """Set gun lasor simulation files to known state."""
         self.setup_gpio(self.config["gun"]["laser_gpio"])
-
-    def setup_gun_motors(self):
-        """Set gun motor GPIO simulation files to known state."""
-        for gpio_num in self.config["gun"]["motor_gpios"].itervalues():
-            self.setup_gpio(gpio_num)
 
     def setup_gun_trigger(self):
         """Set gun trigger GPIO simulation files to known state."""

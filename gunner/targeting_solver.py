@@ -94,6 +94,7 @@ def getFiringSolution(Xpos,Ypos, offset, velocity):
     Velocity is the initial dart velocity in m/s """
     if velocity < 1:
         logger.error("Velocity too low, must be greater than 1")
+        raise ValueError
     V = velocity
     targetDistance = getTargetDistance(Xpos,Ypos) #horizontal distance to target in m
     horizDeflection = getHorizLaunchAngle(Xpos,Ypos) #pan angle in degrees

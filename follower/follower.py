@@ -574,7 +574,17 @@ class Follower(object):
     @lib.api_call
     def center_on_blue_block(self, heading=180):
         # Assumes Front array (from heading) is on blue block
-        return False 
+        self.heading = heading
+        # Assign the current states to the correct heading
+        self.assign_states()
+        # Move forward until off block
+        direction = 180 - heading
+        while self.front_state == Large_Object
+            self.driver.move(60,direction)
+            self.assign_states()
+        #After off block, use center on line to straigten
+        center_on_line(heading)
+        return "DONE CENTER ON BLUE BLOCK"
 
 
 

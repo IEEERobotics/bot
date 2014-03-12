@@ -408,7 +408,9 @@ class Follower(object):
             (self.right_state < Follower.No_Line) and (self.left_state < Follower.No_Line)):
             
             # Intersection preceds Large Object
-            if((self.right_state < 16) and (self.left_state < 16))and not self.on_x:
+            if ((not (self.right_state == Follower.No_Line) and 
+                not (self.left_state == Follower.No_Line)) and 
+                    not self.on_x):
                 # Found Intersection because left and right lit up
                 # if on_x=True, ignore this error
                 self.error = "ON_INTERSECTION" 

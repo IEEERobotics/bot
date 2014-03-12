@@ -534,7 +534,7 @@ class Follower(object):
                 self.driver.move(0,0)
                 break
             # Cap at 0 and 100
-            translate_speed =  max(0,min(100,abs(rotate_error)))
+            translate_speed =  max(0,min(100,abs(position_error)))
             if(position_error >= 0):
                 translate_angle = 0
             else:
@@ -557,57 +557,60 @@ class Follower(object):
         previous_time = time();
         self.heading = heading
         while True:
-            current_time = time()
-            # Init front_PID
-            center_rotate_pid.set_k_values(3.75, 0, .75)
-            # Assig states
-            self.assign_states()
-            # Check for error conditions
-            self.sampling_time = current_time - previous_time
-            # Call PID`
-            bot_angle = (self.front_state - self.back_state)
-            # Call Rotate PID
-            self.logger.info("bot_angle = {}".format(bot_angle))
-            rotate_error = center_rotate_pid.pid(
-                0, bot_angle, self.sampling_time)
-            # Report errors from strafe and rotate pid's 
-            if(abs(bot_angle) < 3):
-              self.driver.move(0,0)
-              break
-            self.logger.info("rotate_error = {}".format(rotate_error))
-            rotate_speed = max(-100,min(100,rotate_error))
-            self.driver.rotate(rotate_speed)
-            # Take the current time set it equal to the previous time
-            previous_time = current_time
-        while True:
-            current_time = time()
-            # Init front_PID
-            side_to_side_strafe.set_k_values(3.75, 0, .75)
-            # Assig states
-            self.assign_states()
-            # Call PID`
-            bot_position = (self.front_state + self.back_state)/2
-            # Call Rotate PID
-            self.logger.info("bot_position = {}".format(bot_position))
-            position_error = side_to_side_strafe.pid(
-                0, bot_position, self.sampling_time)
-            # Report errors from strafe and rotate pid's 
-            if(abs(bot_position) < 3):
-                self.driver.move(0,0)
-                break
-            # Cap at 0 and 100
-            translate_speed =  max(0,min(100,abs(rotate_error)))
-            if(position_error >= 0):
-                translate_angle = 90
-            else:
-                translate_angle = 270
-            if(abs(bot_position) < 3):
-              return
-            self.logger.info("translate_speed = {}".format(translate_speed))
-            self.logger.info("translate_angle = {}".format(translate_angle))
-            self.driver.move(translate_speed, translate_angle)
-            # Take the current time set it equal to the previous time
-            previous_time = current_time
+            while True:
+                current_time = time()
+                # Init front_PID
+                center_rotate_pid.set_k_values(3.75, 0, .75)
+                # Assig states
+                self.assign_states()
+                # Check for error conditions
+                self.sampling_time = current_time - previous_time
+                # Call PID`
+                bot_angle = (self.front_state - self.back_state)
+                # Call Rotate PID
+                self.logger.info("bot_angle = {}".format(bot_angle))
+                rotate_error = center_rotate_pid.pid(
+                    0, bot_angle, self.sampling_time)
+                # Report errors from strafe and rotate pid's 
+                if(abs(bot_angle) < 3):
+                  self.driver.move(0,0)
+                  break
+                self.logger.info("rotate_error = {}".format(rotate_error))
+                rotate_speed = max(-100,min(100,rotate_error))
+                self.driver.rotate(rotate_speed)
+                # Take the current time set it equal to the previous time
+                previous_time = current_time
+            while True:
+                current_time = time()
+                # Init front_PID
+                side_to_side_strafe.set_k_values(3.75, 0, .75)
+                # Assig states
+                self.assign_states()
+                # Call PID`
+                bot_position = (self.front_state + self.back_state)/2
+                # Call Rotate PID
+                self.logger.info("bot_position = {}".format(bot_position))
+                position_error = side_to_side_strafe.pid(
+                    0, bot_position, self.sampling_time)
+                # Report errors from strafe and rotate pid's 
+                if(abs(bot_position) < 3):
+                    self.driver.move(0,0)
+                    break
+                # Cap at 0 and 100
+                translate_speed =  max(0,min(100,abs(position_error)))
+                if(position_error >= 0):
+                    translate_angle = 90
+                else:
+                    translate_angle = 270
+                if(abs(bot_position) < 3):
+                  return
+                self.logger.info("translate_speed = {}".format(translate_speed))
+                self.logger.info("translate_angle = {}".format(translate_angle))
+                self.driver.move(translate_speed, translate_angle)
+                # Take the current time set it equal to the previous time
+                previous_time = current_time
+            if((abs(self.front_state) < 3) and (abs(self.back_state < 3))):
+                return "Done"
 
     @lib.api_call
     def center_on_blue_block(self, heading=180):

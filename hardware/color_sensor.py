@@ -1,5 +1,8 @@
 import time
+
+import pybbb.bbb.pwm as pwm_mod
 from i2c_device.i2c_device import I2CDevice
+import lib.lib as lib
 
 
 class ColorSensor(I2CDevice):
@@ -51,6 +54,11 @@ class ColorSensor(I2CDevice):
         print "Register: ", enable
         print "Read: {:08b}".format(enable.read_byte())
         print
+        
+        self.config = lib.get_config()
+        self.pwm_num = self.config["color_sensor"]["LED_PWM"]
+        self.pwm = pwm_mod.PWM(self.pwm_num)
+        self.pwm.duty = 1000000
 
     @property
     def color(self):

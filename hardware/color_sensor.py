@@ -144,7 +144,7 @@ class ColorSensor(I2CDevice):
         elif color == "blue":
             if (diff_b > diff_g) and (diff_b > diff_r):
                 return True
-        else
+        else:
             return "Error: Unknown color"
             
         return False

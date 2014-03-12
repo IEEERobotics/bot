@@ -14,11 +14,11 @@ g = 9.81  # Acceleration due to gravity
 D = .5 * rho * Cd * A # Force of Drag, without velocity term
 
 degrees = 13 # Minimum starting angle
-DeltaT = .0001  # The time step
+DeltaT = .001  # The time step
 Tmax = .3  # Maximum seconds to simulate
 z0 = 0.3  # vertical position of the dart (initially at height of the launcher)
-V = 1.185 # Initial velocity of dart at launch
-#.0127 m = firing wheel radius
+V = 7.4439 # Initial velocity of dart at launch
+#radius = .0127 firing wheel radius in meters
 
 targetHeight = 0.684215 #Height of the center of the target in meters
 targetX = 0.5842 # X-coordinate of the center of the target
@@ -82,11 +82,14 @@ def getVertLaunchAngle(V, Theta, z, targetDistance):
         t += DeltaT
     return z
 
-def getFiringSolution(Xpos,Ypos):
+def getFiringSolution(Xpos,Ypos, offset, velocity):
     """Returns the horizontal and vertical launch angles , given position
     Facing the target from the arena,
-    Xpos is left-right, 0 at the left edge
-    Ypos is forward-back, 0 at the edge with the target"""
+    Xpos is left-right, 0 at the left edge, in meters
+    Ypos is forward-back, 0 at the edge with the target, in meters
+    offset is in degrees, measured as the skew from y axis
+    Velocity is the initial dart velocity in m/s """
+    V = velocity
     targetDistance = getTargetDistance(Xpos,Ypos) #horizontal distance to target in m
     horizDeflection = getHorizLaunchAngle(Xpos,Ypos) #pan angle in degrees
     elevAngle = getMinElevationAngle(targetDistance) #lower bounds angle in degrees
@@ -94,28 +97,36 @@ def getFiringSolution(Xpos,Ypos):
 
     z=z0
     while z < targetHeight:
-        z = getVertLaunchAngle(V, elevAngle, z,targetDistance)
+        z = getVertLaunchAngle(V, elevAngle, z0,targetDistance)
+        #print "Z", z
         if z < targetHeight:
-            z=z0
-            elevAngle = elevAngle + 0.25
+            elevAngle = elevAngle + 0.01
             #print "Elevation Angle ++: : {0:.3f}".format(elevAngle)
-    print "Horizontal Angle:", horizDeflection
+    #print "Vertical Angle:", elevAngle
+    #print "Horizontal Angle:", horizDeflection
     #print "Target distance:",targetDistance
-    return elevAngle
+
+    #calculate servo positions based on desired launch angle and bot orientation
+    vert_servo_angle = getServoAngle(elevAngle)
+    horiz_servo_angle = horizDeflection - offset
+
+    return vert_servo_angle, horiz_servo_angle
 
 def getServoAngle(elevAngle):
-    """Returns the servo position required for actuation to set a given launch angle """
+    """Returns the servo position required for actuation to set a given vertical launch angle """
     log = math.log10(elevAngle)
     servoAngle = 5 + elevAngle + 12*math.pow(log,2.3)
     return servoAngle
 
-"""Testing"""
-with open('./tests/targetting_test_input.txt') as f:
-    for line in f:
-        coords = line.split(",")
-        Xpos = float(coords[0])
-        Ypos = float(coords[1])
-        angle = getFiringSolution(Xpos, Ypos)
-        print "Angle: ", angle
-        servoAngle = getServoAngle(angle)
-        print "Servo Angle: ", servoAngle
+
+
+#with open('./tests/targetting_test_input.txt') as f:
+#    for line in f:
+#        coords = line.split(",")
+#        Xpos = float(coords[0])
+#        Ypos = float(coords[1])
+#        offset = 0
+#        angle = getFiringSolution(Xpos, Ypos, offset)
+#        print "Angle: ", angle
+#        servoAngle = getServoAngle(angle)
+#        print "Servo Angle: ", servoAngle

@@ -544,7 +544,7 @@ class Follower(object):
     @lib.api_call
     def center_on_blue_block(self, heading=180):
     # Assumes Front array (from heading) is on blue block
-    
+        return False 
 
 
 

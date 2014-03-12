@@ -59,21 +59,6 @@ class TestWriteConfig(test_bot.TestBot):
         assert updated_config["logging"]["log_file"] == orig_log_file
 
 
-class TestLoadTargeting(test_bot.TestBot):
-
-    """Test loading the targeting file defined in config.yaml"""
-
-    def test_type(self):
-        """Load targeting file with default settings, assert it's a dict."""
-        targ = lib.load_targeting()
-        assert type(targ) is dict
-
-    def test_invalid(self):
-        """Pass an invalid path to targeting file."""
-        with self.assertRaises(IOError):
-            targ = lib.load_targeting("fake_targ.yaml")
-
-
 class TestSetTesting(test_bot.TestBot):
 
     """Test setting the testing flag in config.yaml"""

@@ -1,11 +1,6 @@
 """Abstraction layer for ultrasonic sensors"""
 
-import numpy as np
-
-import pybbb.bbb.gpio as gpio_mod
-
 import lib.lib as lib
-
 
 class US(object):
 

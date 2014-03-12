@@ -47,6 +47,9 @@ class IRHub(object):
         # Use accurate reading (ADC) or not (GPIO)
         self.ir_read_adc = config["ir_read_adc"]
 
+        # Threshold for black/white conversation from analog to binary
+        self._thresh = config["ir_thresh"]
+
         # Build GPIO pins used to select which IR units are active
         if config["testing"]:
             # Get dir of simulated hardware files from config
@@ -164,26 +167,49 @@ class IRHub(object):
         return self.reading
 
     @lib.api_call
-    def read_binary(self, thresh=150, white_on_black=True):
+    def get_thresh(self):
+        """Getter for threshold used for analog to binary conversion.
+
+        Note that the only reason we wrap this instance var in getters/setters
+        is to allow export via API using decorators.
+
+        """
+        return self._thresh
+
+    @lib.api_call
+    def set_thresh(self, thresh):
+        """Setter for threshold used for analog to binary conversion.
+
+        Note that the only reason we wrap this instance var in getters/setters
+        is to allow export via API using decorators.
+
+        """
+        self._thresh = thresh
+
+    thresh = property(get_thresh, set_thresh)
+
+    @lib.api_call
+    def read_binary(self, white_on_black=True):
         """Convert 0-255 values to binary.
 
-        0 is black, 1 is white. Note that this is a quick hack.
-        TODO: Make more efficent with numpy?
+        Assuming white_on_black is correct, 1 will be the line and 0 not.
 
         Note that this is on Follower's critical path. Keep it fast.
 
-        :param thresh: Cutoff value for white/black (< thesh is white).
-        :type thresh: int
+        TODO: Make faster with numpy?
+
+        :param white_on_black: Sets background color and line color.
+        :type white_on_black: boolean
         :returns: IR readings, converted to white/black binary.
 
         """
         readings = self.read_all()
         for name, reading in readings.iteritems():
             for i in range(len(reading)):
-                if white_on_black == True:
-                    readings[name][i] = 0 if reading[i] > thresh else 1
+                if white_on_black:
+                    readings[name][i] = 0 if reading[i] > self._thresh else 1
                 else:
-                    readings[name][i] = 0 if reading[i] < thresh else 1
+                    readings[name][i] = 0 if reading[i] < self._thresh else 1
         return readings
 
     @lib.api_call

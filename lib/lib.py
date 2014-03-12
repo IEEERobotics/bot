@@ -91,25 +91,6 @@ def load_strategy(strat_file=None):
         return yaml.load(strat_fd)
 
 
-def load_targeting(targ_file=None):
-    """Load the YAML targeting info for each possible block position.
-
-    :param targ_file: Name of targeting file to load.
-    :returns: Dict description of targeting information for each block.
-
-    """
-    if targ_file is None:
-        config = get_config()
-        targ_file = config["targeting"]
-
-    # Build valid path from CWD to targeting file
-    qual_targ_file = targ_file
-
-    # Open and read targeting file
-    with open(qual_targ_file) as targ_fd:
-        return yaml.load(targ_fd)
-
-
 def set_testing(state, config_file=None):
     """Set the testing flag in config to the given boolean value.
 

@@ -15,11 +15,12 @@ class Turret(object):
 
         # Load config
         config = lib.get_config()
+        self.config = config['turret']
 
         # Build and store abstraction of servos for x and y axis movement
         self.servos = {}
-        for servo in config["turret_servos"]:
-            self.servos[servo["axis"]] = s_mod.Servo(servo["PWM"])
+        for servo, conf in self.config['servos'].items():
+            self.servos[servo] = s_mod.Servo(conf['PWM'])
 
     def __str__(self):
         """Represent turret in a human-readable way."""
@@ -42,6 +43,13 @@ class Turret(object):
         :param angle: Angle in degrees to set turret to on yaw-axis.
 
         """
+        # TODO: move min/max clampig logic to Servo class
+        axis_min = self.config['servos']['yaw']['min']
+        axis_max = self.config['servos']['yaw']['max']
+        if not (axis_min <= angle <= axis_max):
+            self.logger.warning("Clamping yaw angle to bounds {} => [{},{}]".format(
+                angle, axis_min, axis_max))
+            angle = max(axis_min, min(axis_max, angle))
         self.servos["yaw"].position = angle
 
     yaw = property(get_yaw, set_yaw)
@@ -62,6 +70,12 @@ class Turret(object):
         :param angle: Angle in degrees to set turret to on pitch-axis.
 
         """
+        axis_min = self.config['servos']['pitch']['min']
+        axis_max = self.config['servos']['pitch']['max']
+        if not (axis_min <= angle <= axis_max):
+            self.logger.warning("Clamping pitch angle to bounds {} => [{},{}]".format(
+                angle, axis_min, axis_max))
+            angle = max(axis_min, min(axis_max, angle))
         self.servos["pitch"].position = angle
 
     pitch = property(get_pitch, set_pitch)

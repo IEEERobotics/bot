@@ -15,6 +15,7 @@ class TestAngle(test_bot.TestBot):
         """Setup test hardware files and build turret object."""
         # Run general bot test setup
         super(TestAngle, self).setUp()
+        self.turret_conf = lib.get_config()['turret'] 
 
         # Build turret in testing mode
         self.turret = t_mod.Turret()
@@ -24,90 +25,36 @@ class TestAngle(test_bot.TestBot):
         # Run general bot test tear down
         super(TestAngle, self).tearDown()
 
-    def test_yaw_0(self):
-        """Test setting the yaw angle to min value."""
-        self.turret.yaw = 0
-        assert self.turret.yaw == 0
-
-    def test_yaw_180(self):
-        """Test setting the yaw angle to max value."""
-        self.turret.yaw = 180
-        assert self.turret.yaw == 180
-
-    def test_yaw_90(self):
+    def test_yaw_good_angle(self):
         """Test setting the yaw angle to middle value."""
         self.turret.yaw = 90
-        assert self.turret.yaw == 90
+        self.assertEqual(self.turret.yaw, 90)
 
-    def test_pitch_0(self):
+    def test_pitch_good_angle(self):
         """Test setting the pitch angle to min value."""
-        self.turret.pitch = 0
-        assert self.turret.pitch == 0
-
-    def test_pitch_180(self):
-        """Test setting the pitch angle to max value."""
-        self.turret.pitch = 180
-        assert self.turret.pitch == 180
-
-    def test_pitch_90(self):
-        """Test setting the pitch angle to middle value."""
         self.turret.pitch = 90
-        assert self.turret.pitch == 90
-
-    def test_series_yaw(self):
-        """Test a series of yaw angles."""
-        for angle in range(0, 180, 18):
-            self.turret.yaw = angle
-            assert self.turret.yaw == angle
-
-    def test_series_pitch(self):
-        """Test a series of pitch angles."""
-        for angle in range(0, 180, 18):
-            self.turret.pitch = angle
-            assert self.turret.pitch == angle
-
-    def test_series_yaw_pitch(self):
-        """Test a series of yaw and pitch angles."""
-        for angle in range(0, 180, 18):
-            self.turret.yaw = angle
-            self.turret.pitch = angle
-            assert self.turret.yaw == angle
-            assert self.turret.pitch == angle
-
-    def test_manually_confirm(self):
-        """Test a series of random angles, read the simulated HW to confirm."""
-        for i in range(10):
-            # Generate random yaw and pitch angles
-            test_val = {}
-            for servo in self.config["turret_servos"]:
-                test_val[servo["axis"]] = randint(0, 180)
-
-            # Set yaw and pitch angles
-            self.turret.yaw = test_val["yaw"]
-            self.turret.pitch = test_val["pitch"]
-
-            # Check yaw and pitch angles
-            for servo in self.config["turret_servos"]:
-                duty = int(self.get_pwm(servo["PWM"])["duty_ns"])
-                angle = int(round(((duty - 1000000) / 1000000.) * 180))
-                assert test_val[servo["axis"]] == angle
+        self.assertEqual(self.turret.pitch, 90)
 
     def test_yaw_over_max(self):
         """Test setting the yaw angle to greater than the max value."""
         self.turret.yaw = 181
-        assert self.turret.yaw == 180
+        max = self.config['turret']['servos']['yaw']['max']
+        self.assertEqual(self.turret.yaw, max)
 
     def test_yaw_under_min(self):
         """Test setting the yaw angle to less than the min value."""
         self.turret.yaw = -1
-        assert self.turret.yaw == 0
+        min = self.config['turret']['servos']['yaw']['min']
+        self.assertEqual(self.turret.yaw, min)
 
     def test_pitch_over_max(self):
         """Test setting the pitch angle to greater than the max value."""
+        max = self.config['turret']['servos']['pitch']['max']
         self.turret.pitch = 181
-        assert self.turret.pitch == 180
+        self.assertEqual(self.turret.pitch, max)
 
     def test_pitch_under_min(self):
         """Test setting the pitch angle to less than the min value."""
+        min = self.config['turret']['servos']['pitch']['min']
         self.turret.pitch = -1
-        assert self.turret.pitch == 0
+        self.assertEqual(self.turret.pitch, min)

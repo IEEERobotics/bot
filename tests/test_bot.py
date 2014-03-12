@@ -37,8 +37,8 @@ class TestBot(unittest.TestCase):
         duty_ns = "15000000\n"
         period_ns = "20000000\n"
         polarity = "0\n"
-        for servo in self.config["turret_servos"]:
-            self.setup_pwm(servo["PWM"], run, duty_ns, period_ns, polarity)
+        for servo_conf in self.config["turret"]["servos"].values():
+            self.setup_pwm(servo_conf["PWM"], run, duty_ns, period_ns, polarity)
 
     def setup_laser(self):
         """Set gun lasor simulation files to known state."""

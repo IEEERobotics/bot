@@ -3,11 +3,11 @@
 import time
 from unittest import TestCase, expectedFailure
 
-import tests.test_bot as test_bot
+from tests.test_bot import TestBot
 import hardware.wheel_gun as wheel_gun
 
 
-class TestWheelGun(test_bot.TestBot):
+class TestWheelGun(TestBot):
 
     """Test wheel-based gun functions.
 
@@ -164,7 +164,7 @@ class TestFire(TestWheelGun):
         self.check_trigger_gpios(0)
 
 
-class TestWheelSpeed(test_bot.TestBot):
+class TestWheelSpeed(TestBot):
 
     """Test updating wheel rotation speed."""
 
@@ -181,20 +181,24 @@ class TestWheelSpeed(test_bot.TestBot):
         # Run general bot test tear down
         super(TestWheelSpeed, self).tearDown()
 
-    def test_power_off(self):
-        """Test zero wheel rotation."""
-        self.gun.wheel_power = 0
+    def test_stop(self):
+        """Test stopping wheel rotation."""
+        self.gun.wheel_power = 5
+        self.gun.stop()
         self.assertEqual(self.gun.wheel_power, 0)
 
-    def test_power_full(self):
+    def test_spin_up(self):
         """Test turning the wheels to 100% duty cycle."""
-        self.gun.wheel_power = 100
-        self.assertEqual(self.gun.wheel_power, 100)
+        self.gun.wheel_power = 0
+        self.gun.spin_up()
+        self.assertGreater(self.gun.wheel_power, 0)
 
-    def test_power_half(self):
-        """Test the wheels at half speed."""
-        self.gun.wheel_power = 50
-        self.assertEqual(self.gun.wheel_power, 50)
+    def test_set_good_power(self):
+        """Test the wheels at a reasonable speed."""
+        self.gun.wheel_power = 25
+        self.assertEqual(self.gun.wheel_power, 25)
+        self.gun.wheel_power = 75
+        self.assertEqual(self.gun.wheel_power, 75)
 
     def test_power_over_max(self):
         """Test power over max power. Should use maximum."""
@@ -206,22 +210,47 @@ class TestWheelSpeed(test_bot.TestBot):
         self.gun.wheel_power = -1
         self.assertEqual(self.gun.wheel_power, 0)
 
-class TestDartVelocity(test_bot.TestBot):
-
+class TestWheelVelocity(TestBot):
     def setUp(self):
         """Setup test hardware files and build wheel gunner object."""
-        # Run general bot test setup
-        super(TestDartVelocity, self).setUp()
-
-        # Build wheel gunner
+        super(TestWheelVelocity, self).setUp()
         self.gun = wheel_gun.WheelGun()
 
     def tearDown(self):
         """Restore testing flag state in config file."""
-        # Run general bot test tear down
+        super(TestWheelVelocity, self).tearDown()
+
+    def test_set_wheel_velocity(self):
+        self.gun.wheel_velocity = 0  # normal ang vel is up to 150 tick/s?
+        self.assertEqual(self.gun.wheel_velocity, 0)
+
+        self.gun.wheel_velocity = 50  # normal ang vel is up to 150 tick/s?
+        self.assertEqual(self.gun.wheel_velocity, 50)
+
+class TestDartVelocity(TestBot):
+
+    def setUp(self):
+        """Setup test hardware files and build wheel gunner object."""
+        super(TestDartVelocity, self).setUp()
+        self.gun = wheel_gun.WheelGun()
+
+    def tearDown(self):
+        """Restore testing flag state in config file."""
         super(TestDartVelocity, self).tearDown()
 
-    def test_dart_velocity(self):
-        vel = self.gun.get_dart_velocity()
-        self.assertIsNotNone(vel)
+    def test_dart_velocity_sane(self):
+        """Test that reasonable wheel speeds produce reasonable velocities.
+
+        A reasonable range of nerf velocities would be 5-25 /ms 
+        """
+        self.gun.wheel_velocity = 150  # normal ang vel is up to 150 tick/s?
+        vel1 = self.gun.get_dart_velocity()
+        self.assertGreater(vel1, 3)
+        self.assertLess(vel1, 50)  
+
+        self.gun.wheel_velocity = 75
+        vel2 = self.gun.get_dart_velocity()
+        self.assertGreater(vel2, 3)
+        self.assertGreater(vel1, vel2)
+
 

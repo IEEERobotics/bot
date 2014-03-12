@@ -2,6 +2,7 @@
 
 import time
 import lib.lib as lib
+from math import pi
 
 from pybbb.bbb import gpio
 from hardware.dmcc_motor import DMCCMotorSet
@@ -21,10 +22,11 @@ class WheelGun(object):
         self.max_trigger_duration = float(
             self.config['gun']['max_trigger_duration'])  # 0.25 secs.
 
-        # 0.5" radius,  0.99895" diameter  25.373mm diameter
+        # 0.99895" (25.373mm) diameter
         self.wheel_radius =  0.012687  # meters
-        self.ticks_per_rev = 64  # TODO: move DMCCMotor?
+        self.ticks_per_rev = 48 # CPR on motor shaft per Pololu specs
         self._dart_velocity = None  # shadow velocity for testing
+        self._wheel_velocity = None  # shadow velocity for testing
 
         motor_config = self.config['gun']['dmcc_wheel_motors']
         self.wheel_motors = DMCCMotorSet(motor_config)
@@ -73,6 +75,7 @@ class WheelGun(object):
 
     laser = property(get_laser, set_laser)
 
+
     @lib.api_call
     def get_wheel_power(self):
         """Get the power of the wheel motors.
@@ -96,7 +99,8 @@ class WheelGun(object):
 
         """
         if not (0 <= power <= 100):
-            self.logger.warning("Invalid spin power: {}".format(power))
+            self.logger.warning("Clamping invalid power  {} => [{},{}]".format(
+                power, 0, 100))
             power = max(0,min(100,power))
 
         self.logger.debug("Setting wheel power: {}".format(power))
@@ -105,18 +109,29 @@ class WheelGun(object):
 
     wheel_power = property(get_wheel_power, set_wheel_power)
 
+
     @lib.api_call
     def get_wheel_velocity(self):
-        """Get the angular velocity of the wheel motors.
+        """Get the average angular velocity of the two wheel motors.
+
+        :returns: velocity (ticks/s)
 
         """
+        if self._wheel_velocity:
+            return self._wheel_velocity
         left = self.wheel_motors['left'].velocity
         right = self.wheel_motors['right'].velocity
         if not (left == right):
             self.logger.warning("Wheel velocities not equal! Left: {}, Right: {}".format(left, right))
         return (left + right)/2.0
 
-    wheel_velocity = property(get_wheel_velocity)
+    @lib.api_call
+    def set_wheel_velocity(self, velocity):
+        """Setter for testing """
+        self._wheel_velocity = velocity
+
+    wheel_velocity = property(get_wheel_velocity, set_wheel_velocity)
+
 
     @lib.api_call
     def get_dart_velocity(self):
@@ -127,18 +142,32 @@ class WheelGun(object):
         """
         if self._dart_velocity:
             return self._dart_velocity
-        return self.wheel_velocity * self.wheel_radius * self.ticks_per_rev
+
+        # radians/s =  2*pi * ticks/s * (rev/tick)
+        # TODO: make this (and ticks_per_rev) a property of DMCCMotor?
+        angular_velocity = 2 * pi * self.wheel_velocity / self.ticks_per_rev
+        # FIXME: This should be returning about 10-15 m/s at high speed
+        #        Use gun fire test script to determine actual value for ticks/rev
+        velocity = self.wheel_radius * angular_velocity
+        return velocity
 
     @lib.api_call
     def set_dart_velocity(self, velocity):
         """Setter used purely for testing"""
         self._dart_velocity = velocity
 
-
     dart_velocity = property(get_dart_velocity,set_dart_velocity)
 
     @lib.api_call
-    def fire(self, advance_duration=0.3, delay=0.25, retract_duration=0.11):
+    def spin_up(self):
+        self.set_wheel_power(100)
+
+    @lib.api_call
+    def stop(self):
+        self.set_wheel_power(0)
+
+    @lib.api_call
+    def fire(self, advance_duration=0.25, delay=0.25, retract_duration=0.11):
         """Fire a single dart by advancing it, and then reload.
 
         :param advance_duration: Time in seconds to push the trigger forwards.

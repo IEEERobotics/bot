@@ -7,55 +7,30 @@ import gunner.gunner as gunner
 import tests.test_bot as test_bot
 from unittest import TestCase
 
-class TestAimTurret(test_bot.TestBot):
+class TestAim(test_bot.TestBot):
 
     """Test changing the yaw and pitch angles of the turret."""
 
     def setUp(self):
         """Setup test hardware files and build gunner object."""
         # Run general bot test setup
-        super(TestAimTurret, self).setUp()
+        super(TestAim, self).setUp()
 
         # Build wheel gunner
         self.gunner = gunner.Gunner()
+        self.gunner.gun.dart_velocity = 10
 
     def tearDown(self):
         """Restore testing flag state in config file."""
         # Run general bot test tear down
-        super(TestAimTurret, self).tearDown()
+        super(TestAim, self).tearDown()
 
     def test_aim(self):
-        pitch = 30
-        yaw = 60
-        self.gunner.aim_turret(pitch, yaw)
-        self.assertEqual(self.gunner.turret.pitch, pitch)
-        self.assertEqual(self.gunner.turret.yaw, yaw)
-
-    def test_get_turret(self):
-        self.gunner.get_turret()
-
-class TestLocalize(test_bot.TestBot):
-
-    def setUp(self):
-        """Setup test hardware files and build wheel gunner object."""
-        super(TestLocalize, self).setUp()
-        # Build wheel gunner
-        self.gunner = gunner.Gunner()
-
-    def test_dumb_localize(self):
-        dists = {'front': 0.3, 'left': 0.5, 'back': 2.4384, 'right': 0.7192}
-        x, y, theta = self.gunner.dumb_localize(dists)
-        self.assertEqual(y, 0.3)
-        self.assertEqual(x, 0.5)
-        self.assertEqual(theta, 0.0)
+        self.gunner.aim()
 
 class TestFire(test_bot.TestBot):
 
-    """Test firing a dart.
-
-    TODO(dfarrell07): Write test_manually_confirm test to check HW state.
-
-    """
+    """Test firing a dart. """
 
     def setUp(self):
         """Setup test hardware files and build wheel gunner object."""
@@ -76,3 +51,26 @@ class TestFire(test_bot.TestBot):
 
         """
         self.gunner.fire()
+
+class TestLocalize(test_bot.TestBot):
+
+    def setUp(self):
+        """Setup test hardware files and build wheel gunner object."""
+        super(TestLocalize, self).setUp()
+        # Build wheel gunner
+        self.gunner = gunner.Gunner()
+        self.gunner.ultrasonics.read_dists = lambda: {'front': 0.3, 'left': 0.5, 'back': 2.4384, 'right': 0.7192}
+
+    def test_localize(self):
+        x, y, theta = self.gunner.localize()
+        self.assertEqual(y, 0.3)
+        self.assertEqual(x, 0.5)
+        self.assertEqual(theta, 0.0)
+
+    def test_dumb_localizer(self):
+        dists = {'front': 0.3, 'left': 0.5, 'back': 2.4384, 'right': 0.7192}
+        x, y, theta = self.gunner.dumb_localizer(dists)
+        self.assertEqual(y, 0.3)
+        self.assertEqual(x, 0.5)
+        self.assertEqual(theta, 0.0)
+

@@ -35,7 +35,7 @@ class DMCCMotorSet(dict):
         else:
             self.logger.debug("Skipping autodetect due to test mode")
             dmccs = defaultdict(lambda: pyDMCC.DMCC(0, verify=False,
-                                                    bus=None))
+                bus=None, logger=self.logger))
 
         self.motors = {}
         for name,conf in motor_config.items():

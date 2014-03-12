@@ -1,3 +1,4 @@
+"""Controls activity related to RGB color sensor."""
 import time
 
 import pybbb.bbb.pwm as pwm_mod
@@ -20,48 +21,30 @@ class ColorSensor(I2CDevice):
     bb = 0.0
 
     def __init__(self):
+        """Initialized I2C device, LED brightness PWM pin."""
         I2CDevice.__init__(self, 1, 0x29, config='tcs3472_i2c.yaml')
-
-        # TODO: Instantiate GPIO pin for LED control
-        # TODO: Convert all print stmts. to logger.debug() calls
-        print "ColorSensor:", self
-        print
-
         enable = self.registers['ENABLE']
-        print "Register: ", enable
-        print "Raw: {:08b}".format(enable.read_byte())
-        print "AEN: {}".format(enable.read('AEN'))
-        print
-
         id = self.registers['ID']
-        print "Register: ", id
-        print "Read: {:#010x}".format(id.read_byte())
-        print
-
         status = self.registers['STATUS']
-        print "Register: ", status
-        print "Raw: {:08b}".format(status.read_byte())
-        print "AVALID: {}".format(status.read('AVALID'))
-
-        print "Enabling power via control register:"
         enable.write('PON', 'Enable')
-        print "Enabling ADCs via control register:"
         enable.write('AEN', 'Enable')
-
-        #enable.write('PON','Disable')
-
         enable = self.registers['ENABLE']  # TODO: Is this needed?
-        print "Register: ", enable
-        print "Read: {:08b}".format(enable.read_byte())
-        print
-        
+
+        self.logger = lib.get_logger()
         self.config = lib.get_config()
+
         self.pwm_num = self.config["color_sensor"]["LED_PWM"]
         self.pwm = pwm_mod.PWM(self.pwm_num)
+        # Duty cycle = 50% (from 20msec)
         self.pwm.duty = 1000000
 
     @property
     def color(self):
+        """Actual color currently being viewed.
+        
+        :returns: dict containing color components.
+        
+        """
         v, c, r, g, b = self.read_data()
         color = {"clear": c,
                   "red": r,
@@ -70,6 +53,11 @@ class ColorSensor(I2CDevice):
         return color
 
     def get_data_normalized(self):
+        """Finds normalized color readings, compared to overall color viewing.
+        
+        :returns: Validity, Clear (magnitude), red, green, blue
+
+        """
         valid, c, r, g, b = self.read_data()
         # NOTE: It appears that c = r + g + b
         # so 1/c is a good normalizing factor.
@@ -85,6 +73,11 @@ class ColorSensor(I2CDevice):
         return valid, c, r, g, b  # return valid flag if someone's interested
 
     def read_data(self):
+        """Reads in raw data directly from color_sensor.
+        
+        :returns: Validity, Clear (magnitude), Red, Green, Blue.
+        
+        """
         valid = self.registers['STATUS'].read('AVALID')
         c = self.registers['CDATA'].read()
         r = self.registers['RDATA'].read()
@@ -93,10 +86,12 @@ class ColorSensor(I2CDevice):
         return valid, c, r, g, b
 
     def get_percentage(self):
-        """ Returns what portion of detected color is
+        """Calculates percentages of total color for each color.
+        
+        :returns: Validity, Clear (magnitude), Red, Green, Blue.
+
         """
         v, c, r, g, b = self.get_data_normalized()
-        # c = float(c)
         total = r + g + b
         r = (r / total) * 100
         g = (g / total) * 100
@@ -104,7 +99,10 @@ class ColorSensor(I2CDevice):
         return v, c, r, g, b
 
     def get_baseline(self):
-        """Obtains "base" colors to work from
+        """Obtains "base" colors to work from.
+
+        :raises AssertionError: When Color sensor saw nothing.
+
         """
         self.bv, self.bc, \
         self.br, self.bg, \
@@ -115,58 +113,79 @@ class ColorSensor(I2CDevice):
             raise AssertionError("Baselines colors are zero.")
 
     def get_percent_diff(self):
-        """Returns percent diff
-        for use in color decisions.        
+        """Calculates percent difference from baseline.
+        
+        :returns: percent differences of brightness, and colors.
+        
         """
-
         diff_c = (self.color["clear"] - self.bc) / self.bc
-
         diff_r = (self.color["red"] - self.br) / self.br
         diff_g = (self.color["green"] - self.bg) / self.bg
         diff_b = (self.color["blue"] - self.bb) / self.bb
         return diff_c, diff_r, diff_g, diff_b
+
+    def detects_color(self, color):
+        """Checks to see if given color is present.
         
-    def is_red_percent_method(self):
-        """decides on color based on percentage.
-        (current winning candidate).
+        :param color: Color to check for.
+        :type color: string
+        
+        :returns: True if color found. False otherwise.
+
         """
-        
         diff_c, diff_r, diff_g, diff_b = self.get_percent_diff()
-        # returns true when g has greatest increase.
-        if (diff_r > diff_g) & (diff_r > diff_b):
-            return True
+
+        if color == "green":
+            if (diff_g > diff_r) and (diff_g > diff_b):
+                return True
+        elif color == "red":
+            if (diff_r > diff_g) and (diff_r > diff_b):
+                return True
+        elif color == "blue":
+            if (diff_b > diff_g) and (diff_b > diff_r):
+                return True
+        else
+            return "Error: Unknown color"
             
-    def is_blue_percent_method(self):
-        """decides on color based on percentage.
-        (current winning candidate).
+        return False
+
+    def watch_for_color(self, color, timeout=60):
+        """Waits for given color to be found.
+        
+        :param color: Color to wait for.
+        :type color: string
+        :param timeout: Maximum time in seconds for which it will wait.
+        :type timeout: float
+        :returns: True when color is eventually found. False if never found.
         """
+        start_time = time.time()
+        
+        while time.time() - start_time < timeout:
+            if detects_color(color):
+                return True
+        return False
 
-        diff_c, diff_r, diff_g, diff_b = self.get_percent_diff()
+    def detects_color_diff_method(self, color, thresh=0.2):
+        """Finds color based on the total % of total color that is seen. 
+        
+        Each percentage is a fraction of the total color (r+g+b)
+        as seen by the color sensor. The percentages all add up 
+        to 100.
 
-        # returns true when b has greatest increase.
-        if (diff_b > diff_r) & (diff_b > diff_g):
-            return True
+        Note: This is experimental and not recommended for use.
+        
+        :param color: Color to search for.
+        :type color: string
+        :param thresh: Difference in percentage expected.
+        :type thresh: float
+        :returns: True if color is found. False otherwise.
 
-    def is_green_percent_method(self):
-        """decides on color based on percentage.
-        (current winning candidate).
         """
-
-        diff_c, diff_r, diff_g, diff_b = self.get_percent_diff()
-
-        # returns true when g has greatest increase.
-        if (diff_g > diff_r) & (diff_g > diff_b):
-            return True
-
-
-    def is_green_diff_method(self):
-        """Decides on color based on difference in percentage 
-        of total color increases by set amount.
-        Note: This is a terrible method.
-        """
-
         # Reads in percentages of total color
-        pv, pc, pr, pg, pb = self.get_percentage()
+        pv, pc, \
+        percent_red,\
+        percent_green, \
+        percent_blue = self.get_percentage()
 
         total_color = self.color["red"] \
                     + self.color["green"] \
@@ -179,20 +198,20 @@ class ColorSensor(I2CDevice):
         percent_baseg = self.bg / total_base * 100
         percent_baseb = self.bb / total_base * 100
 
-        # returns True when the percentage of a color goes up by 0.2 from base percentages
+        # returns True when the percentage of a color goes up by thresh
+        if color == "green":
+            if percent_green - percent_baseg > thresh:
+                return True
+        elif color == "red":
+            if percent_red - percent_baser > thresh:
+                return True
+        elif color == "blue":
+            if percent_blue - percent_baseb > thresh:
+                return True
+        else:
+            return "Error: Unknown color"
+        return False
 
-        if (pg - percent_baseg) > 2:
-            return True
-
-    def is_green(self):
-        """ finds percent difference between baseline
-            and current reading.
-        """
-        diff_c, diff_r, diff_g, diff_b = self.get_percent_diff()
-
-        # print "diff_c", diff_c, "diff_r",diff_r, "diff_g",diff_g, "diff_b",diff_b 
-        if (diff_g) > (diff_b + diff_r):
-            return True
 
 def read_loop():
     """Instantiate a ColorSensor object and read indefinitely."""
@@ -224,7 +243,7 @@ def read_loop():
                 # print "Found green"
             if colorSensor.is_green_percent_method():
                 print "Found green, Percent method"
-                
+
             if colorSensor.is_red_percent_method():
                 print "Found red, percent method"
 
@@ -236,13 +255,11 @@ def read_loop():
             #v, c, r, g, b = colorSensor.get_percentage()
             # Find out which color has plurality of percentage.
             # print "v: {}, c: {:5.3f}, r: {:5.3f}, g: {:5.3f}, b: {:5.3f}".format(v, c, r, g, b)
-            
+
             time.sleep(0.1)
         except KeyboardInterrupt:
             break
     print "Done."
-
-    
 
 
 if __name__ == "__main__":

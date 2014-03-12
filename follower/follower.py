@@ -430,7 +430,7 @@ class Follower(object):
                 #Ignore Noise conditions 
                 self.front_state = prev_front_state
                 self.back_state = prev_back_state
-                self.error = "NONE"
+                # self.error = "NONE"
         else: #no errors
             self.error = "NONE" 
 

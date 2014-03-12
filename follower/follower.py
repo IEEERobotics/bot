@@ -579,11 +579,11 @@ class Follower(object):
         self.assign_states()
         # Move forward until off block
         direction = 180 - heading
-        while self.front_state == Large_Object
+        while self.front_state == Follower.Large_Object:
             self.driver.move(60,direction)
             self.assign_states()
         #After off block, use center on line to straigten
-        center_on_line(heading)
+        self.center_on_line(heading)
         return "DONE CENTER ON BLUE BLOCK"
 
 

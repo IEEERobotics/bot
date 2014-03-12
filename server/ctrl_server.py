@@ -136,6 +136,7 @@ class CtrlServer(object):
         systems["follower"] = self.follower
         systems["driver"] = self.follower.driver
         systems["turret"] = self.gunner.turret
+        systems["ultrasonics"] = self.gunner.ultrasonics
         systems["gun"] = self.gunner.gun
         systems["ir_hub"] = self.follower.ir_hub
         self.logger.debug("Systems: {}".format(systems))

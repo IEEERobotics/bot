@@ -71,6 +71,7 @@ class Ultrasonic(dict):
         pypruss.exec_program(us_config['pru_num'], us_config['pru_file'])
         self.sensors = us_config['sensors']
 
+    @lib.api_call
     def read_dists(self):
         """Convert the distance from the sensor to distance from center """
         meters = self.read_meters()
@@ -82,6 +83,7 @@ class Ultrasonic(dict):
         self.logger.debug("Dists: {}".format(dists))
         return dists
 
+    @lib.api_call
     def read_meters(self):
         times = self.read_times()
         # approx 5877 microseconds per meter
@@ -90,6 +92,7 @@ class Ultrasonic(dict):
         return meters
 
 
+    @lib.api_call
     def read_inches(self):
         times = self.read_times()
         # approx 149.3 microseconds per inch

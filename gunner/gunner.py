@@ -39,6 +39,10 @@ class Gunner(object):
         self.turret.pitch = pitch
         self.turret.yaw = yaw
 
+    @lib.api_call
+    def get_turret(self):
+        return self.turret.pitch, self.turret.yaw
+
     def localize(self, dists):
         """Localize based on range measurement from center of bot"""
         # TODO: Handle skewed bot when not square to the course (e.g. on the arc line)

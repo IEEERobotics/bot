@@ -31,6 +31,9 @@ class TestAimTurret(test_bot.TestBot):
         self.assertEqual(self.gunner.turret.pitch, pitch)
         self.assertEqual(self.gunner.turret.yaw, yaw)
 
+    def test_get_turret(self):
+        self.gunner.get_turret()
+
 class TestLocalize(test_bot.TestBot):
 
     def setUp(self):

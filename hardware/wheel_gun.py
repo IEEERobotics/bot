@@ -138,7 +138,7 @@ class WheelGun(object):
     dart_velocity = property(get_dart_velocity,set_dart_velocity)
 
     @lib.api_call
-    def fire(self, advance_duration=0.1, delay=0.25, retract_duration=0.11):
+    def fire(self, advance_duration=0.3, delay=0.25, retract_duration=0.11):
         """Fire a single dart by advancing it, and then reload.
 
         :param advance_duration: Time in seconds to push the trigger forwards.

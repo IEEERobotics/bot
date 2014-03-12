@@ -22,7 +22,6 @@ class Follower(object):
     Noise = 19 #white values not next to each other
     
     #Variables for read_binary calls
-    Threshold = 100
     White_Black = False  #True= white line, False= black line
 
     def __init__(self):
@@ -31,6 +30,7 @@ class Follower(object):
 
         # Build subsystems
         self.ir_hub = ir_hub_mod.IRHub()
+        self.ir_hub.thrsh = 100
         self.driver = mec_driver_mod.MecDriver()
 
         # Build PIDs
@@ -66,7 +66,7 @@ class Follower(object):
     @lib.api_call
     def update(self):
         """Read IR values, compute aggregates."""
-        ir_readings = self.ir_hub.read_binary(60)
+        ir_readings = self.ir_hub.read_binary(False)
         for name, reading in ir_readings.iteritems():
             reading_arr = np.int_(reading)  # convert readings to numpy array
             reading_sum = np.sum(np_reading)  # = no. of units lit
@@ -191,7 +191,7 @@ class Follower(object):
     @lib.api_call
     def report_states(self):
         # for debug of IR sensor state
-        current_ir_reading = self.ir_hub.read_binary(Follower.Threshold,Follower.White_Black)
+        current_ir_reading = self.ir_hub.read_binary(Follower.White_Black)
         self.front_state = self.get_position_lr(
             current_ir_reading["front"])
         # Back is on the back side
@@ -301,7 +301,7 @@ class Follower(object):
                 if time() - start_time > max_time:
                     return {"line_found": False,
                             "time_elapsed": time() - start_time}
-    
+    @lib.api_call
     def assign_states(self, current_ir_reading=None):
         """ on_x=True flag does not allow intersection errors
             once left&right arrays clear intersection, on_x = false.
@@ -310,10 +310,9 @@ class Follower(object):
         """
         # Keep prev back state to ignore large objects on back array
         prev_back_state = self.back_state
-
         # Get the current IR readings
         if current_ir_reading is None:
-            current_ir_reading = self.ir_hub.read_binary(Follower.Threshold,Follower.White_Black)
+            current_ir_reading = self.ir_hub.read_binary(False)
         # Heading east
         if self.heading == 270:
             # Forward is on the left side
@@ -498,7 +497,7 @@ class Follower(object):
       last_count = 0
       while True:
         count = 0
-        ir_reading = self.ir_hub.read_binary(100,False)
+        ir_reading = self.ir_hub.read_binary(False)
         for value in ir_reading["back"]:
             if(value == 1):
                 count += 1

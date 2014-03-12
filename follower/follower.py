@@ -575,4 +575,18 @@ class Follower(object):
     @lib.api_call
     def center_on_blue_block(self, heading=180):
         # Assumes Front array (from heading) is on blue block
-        return
+        return False 
+
+
+
+
+
+    @lib.api_call
+    def center_on_red(self):
+        return True  # TODO: Actually center on red_block
+
+
+
+
+
+ 

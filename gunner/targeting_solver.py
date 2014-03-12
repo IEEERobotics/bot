@@ -93,7 +93,7 @@ def getFiringSolution(Xpos,Ypos, offset, velocity):
     targetDistance = getTargetDistance(Xpos,Ypos) #horizontal distance to target in m
     horizDeflection = getHorizLaunchAngle(Xpos,Ypos) #pan angle in degrees
     elevAngle = getMinElevationAngle(targetDistance) #lower bounds angle in degrees
-    print "Min Vert Angle: : {0:.3f}".format(elevAngle)
+    #print "Min Vert Angle: : {0:.3f}".format(elevAngle)
 
     z=z0
     while z < targetHeight:

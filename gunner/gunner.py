@@ -50,7 +50,8 @@ class Gunner(object):
     def ratio_localizer(self, dists_from_center):
         """Localize based on range measurement from center of bot"""
 
-        x_size = 1.2065  # in meters, official spec: 47.5"
+        #x_size = 1.2065  # in meters, official spec: 47.5"
+        x_size = 1.1786  # in meters, practice course: 46.4"
         y_size = 2.4257  # in meters, official spec: 95.5"
 
         # bot will have left side facing target
@@ -103,7 +104,7 @@ class Gunner(object):
 
         # We need to be up to speed before reading the dart velocity
         self.gun.spin_up()
-        time.sleep(0.1)
+        time.sleep(1.0)
 
         x_pos, y_pos, theta = self.localize()
         if not self.validate_pose(x_pos, y_pos, theta):
@@ -114,6 +115,7 @@ class Gunner(object):
 
         self.logger.debug("Getting firing solution using dart_vel: %0.2f", dart_velocity)
         pitch, yaw = targeting.getFiringSolution(x_pos, y_pos, theta, dart_velocity)
+        yaw += 90
         self.logger.info("Aiming turret to (pitch: {}, yaw: {})".format(pitch, yaw))
         self.turret.pitch = pitch
         self.turret.yaw = yaw

@@ -104,7 +104,7 @@ class Gunner(object):
 
         # We need to be up to speed before reading the dart velocity
         self.gun.spin_up()
-        time.sleep(0.1)
+        time.sleep(1.0)
 
         x_pos, y_pos, theta = self.localize()
         if not self.validate_pose(x_pos, y_pos, theta):
@@ -115,9 +115,10 @@ class Gunner(object):
 
         self.logger.debug("Getting firing solution using dart_vel: %0.2f", dart_velocity)
         pitch, yaw = targeting.getFiringSolution(x_pos, y_pos, theta, dart_velocity)
+        yaw += 90
         self.logger.info("Aiming turret to (pitch: {}, yaw: {})".format(pitch, yaw))
         self.turret.pitch = pitch
-        self.turret.yaw = yaw + 90
+        self.turret.yaw = yaw
 
         # Allow turrent time to move
         # TODO: make config param so we can zero during testing

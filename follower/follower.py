@@ -750,6 +750,7 @@ class Follower(object):
         direction = 180 - heading
         while self.error == Follower.Large_Object:
             self.driver.move(60,direction)
+            sleep(0.25)
             self.assign_states()
         #After off block, use center on line to straigten
         self.center_on_line(heading)

@@ -6,9 +6,13 @@ Can open a window to display detected target; this is disabled by default.
 """
 # TODO: Update documentation to better reflect overall function
 
+import lib.lib as lib
+
+import sys
+import numpy as np
 import cv2
 import cv
-import numpy as np
+
 
 # TODO: Remove these parameter definitions as they are already in cv2 or cv2.cv
 # Define camera parameters
@@ -70,28 +74,32 @@ def angle_cos(p0, p1, p2):
 class TargetLocator(object):
     """A visual target locator for IEEE SECon 2014 hardware comp."""
 
-    width, height = (320, 240)  # default image size
-    auto_exposure = 5.0  # NOTE: this auto-exposure value should be calibrated
+    default_device = 0  # device number (0 is first), or recorded video file
+    default_width, default_height = (320, 240)  # default image size
+    default_auto_exposure = 5.0  # NOTE: needs to be calibrated
 
-    def __init__(self):
-        # Open default camera [API: cv]
-        self.capture = cv.CaptureFromCAM(0)
+    min_contour_area = 1000  # minimum pixel area contours to be considered
 
-        # Set camera parameters [API: cv]
-        cv.SetCaptureProperty(
-            self.capture, CV_CAP_PROP_FRAME_WIDTH, self.width)
-        cv.SetCaptureProperty(
-            self.capture, CV_CAP_PROP_FRAME_HEIGHT, self.height)
-        cv.SetCaptureProperty(
-            self.capture, CV_CAP_PROP_AUTO_EXPOSURE, self.auto_exposure)
+    def __init__(self, device=default_device):
+        # * Load system configuration
+        self.config = lib.get_config()
 
-        # Initialize other members
+        # * Get and store logger object
+        self.logger = lib.get_logger()
+
+        # * Initialize members
+        # ** Inpute device (will be set later in __init__)
+        self.capture = None
+        self.width = 0
+        self.height = 0
+        self.auto_exposure = 1.0
+
+        # ** Image processing
         self.imageIn = None  # input image
-        self.location = None  # target location
         self.res = None  # result/output image (TODO: use separate imageOut)
         self.squares = []  # list of squares found
 
-        # Morphology kernel
+        # *** Morphology kernel
         self.kernel_rect = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
         self.kernel_fat_cross = np.uint8([
             [0, 0, 1, 1, 1, 0, 0],
@@ -100,7 +108,7 @@ class TargetLocator(object):
             [1, 1, 1, 1, 1, 1, 1],
             [1, 1, 1, 1, 1, 1, 1],
             [0, 0, 1, 1, 1, 0, 0],
-            [0, 0, 1, 1, 1, 0, 0]])  # custom morphology kernel: fat cross
+            [0, 0, 1, 1, 1, 0, 0]])  # custom morph kernel: fat cross
         self.kernel_inv_cross = np.uint8([
             [1, 1, 1, 0, 1, 1, 1],
             [1, 1, 1, 0, 1, 1, 1],
@@ -108,14 +116,62 @@ class TargetLocator(object):
             [0, 0, 0, 0, 0, 0, 0],
             [1, 1, 1, 0, 1, 1, 1],
             [1, 1, 1, 0, 1, 1, 1],
-            [1, 1, 1, 0, 1, 1, 1]])  # custom morphology kernel: inverted cross
+            [1, 1, 1, 0, 1, 1, 1]])  # custom morph kernel: inverted cross
 
         self.kernel = self.kernel_inv_cross  # pick kernel that works best
-        #print "__init__(): Kernel:\n{}".format(self.kernel)  # TODO use logger
+        self.logger.debug("Morph. kernel: {}".format(self.kernel))
 
+        # ** Final output
+        self.location = None  # target location
+
+        # Open default input device (camera)
+        if self.open_device(device):
+            self.logger.info("Opened device: {}".format(device))
+        else:
+            self.logger.error("Failed to open device: {}".format(device))
+
+        # Set initial camera parameters (NOTE: may crash with recorded video)
+        self.set_frame_size()  # use defaults
+        self.set_auto_exposure()  # use defaults
+
+    def open_device(self, device=0):
+        # Open input device [API: cv]
+        self.capture = cv.CaptureFromCAM(0)
+        return self.capture is not None
+
+    def close_device(self):
+        self.capture = None
+        #del self.capture  # NOTE: is this required?
+
+    def get_frame_size(self):
+        return self.width, self.height  # NOTE: query device?
+
+    def set_frame_size(self, width=default_width, height=default_height):
+        # Set camera frame size [API: cv]
+        if self.capture is not None:
+            self.width = width
+            self.height = height
+            cv.SetCaptureProperty(
+                self.capture, CV_CAP_PROP_FRAME_WIDTH, self.width)
+            cv.SetCaptureProperty(
+                self.capture, CV_CAP_PROP_FRAME_HEIGHT, self.height)
+
+    def get_auto_exposure(self):
+        return self.auto_exposure  # NOTE: query device?
+
+    def set_auto_exposure(self, value=default_auto_exposure):
+        # Set camera's auto-exposure value [API: cv]
+        if self.capture is not None:
+            self.auto_exposure = value
+            cv.SetCaptureProperty(
+                self.capture, CV_CAP_PROP_AUTO_EXPOSURE, self.auto_exposure)
+
+    # TODO: @lib.api_call?
     def find_target(self):
         """Find target location in current camera image."""
-        # TODO: Make this a lib.api_call
+        if self.capture is None:
+            return self.location  # no input, can't do anything!
+
         # Capture camera frame [API: cv]
         img = cv.QueryFrame(self.capture)
         self.imageIn = np.asarray(img[:, :], dtype=np.uint8)
@@ -123,6 +179,9 @@ class TargetLocator(object):
 
         # Call appropriate internal work-horse method
         self._find_target_squares(img)
+        if self.location is not None:
+            self.logger.info(
+                "Target @ (%6.2f, %6.2f)", self.location[0], self.location[1])
 
         # Return location (NOTE: must be set by internal method)
         return self.location
@@ -177,10 +236,32 @@ class TargetLocator(object):
         # Squares is the array that has the pixel locations of the vertices
         self.squares = self.find_squares(self.res)
         if self.squares:
-            print "_find_target_squares(): {} squares: {}".format(
-                len(self.squares), self.squares)  # TODO: use logger
+            self.logger.debug("%d squares", len(self.squares))
+            #print "Squares: {}".format(self.squares)  # [verbose]
 
-        # TODO: Process squares array and set self.location to (x, y) pair;
+            # Process squares array and set self.location to (x, y) pair
+            centroids = []
+            for square in self.squares:
+                # TODO: Reject this square if aspect ratio is too skewed
+                centroid = np.mean(square, axis=0)
+                centroids.append(centroid)  # TODO: faster numpy way?
+            centroids = np.array(centroids)
+            #print "Centroids:", centroids  # [verbose]
+            mean_centroid = np.mean(centroids, axis=0)  # 2D mean
+            sd_centroid = np.std(centroids, axis=0)  # 2D standard deviation
+            #print "Mean:", mean_centroid, ", s.d.:", sd_centroid  # [verbose]
+
+            good_centroids = centroids[np.all(
+                np.abs(centroids - mean_centroid) <= (1.2 * sd_centroid),
+                axis=1)]
+            #print "Good:", good_centroids  # [verbose]
+
+            # TODO: Reject all if s.d. is greater than half of mean side length
+
+            if good_centroids.size > 0:
+                self.location = np.mean(good_centroids, axis=0)
+                return  # don't fall-through and return None!
+
         self.location = None  # None if target not found
 
     def find_squares(self, img):
@@ -205,10 +286,10 @@ class TargetLocator(object):
                 # Iterate over contours, find ones which look like squares
                 for cnt in contours:
                     cnt_len = cv2.arcLength(cnt, True)
-                    cnt = cv2.approxPolyDP(cnt, 0.02*cnt_len, True)
+                    cnt = cv2.approxPolyDP(cnt, 0.02 * cnt_len, True)
                     if (len(cnt) == 4 and
-                            cv2.contourArea(cnt) > 1000 and
-                            cv2.isContourConvex(cnt)):
+                            cv2.contourArea(cnt) > self.min_contour_area and
+                            cv2.isContourConvex(cnt)):  # TODO: max area?
                         cnt = cnt.reshape(-1, 2)
                         max_cos = np.max(
                             [angle_cos(cnt[i], cnt[(i+1) % 4], cnt[(i+2) % 4])
@@ -225,23 +306,28 @@ class TargetLocator(object):
         # Display squares found in image (NOTE: this draws on res image)
         if self.squares:
             cv2.drawContours(self.res, self.squares, -1, (0, 255, 0), 3)
-        # TOOD: Paint target, if located
+            # Paint target, if located
+            if self.location is not None:
+                cv2.circle(
+                    self.res, (int(self.location[0]), int(self.location[1])),
+                    3, (0, 255, 255), -1)
         cv2.imshow("Output", self.res)  # NOTE: someone needs to call waitKey
 
     def clean_up(self):
-        del self.capture  # NOTE: is this required?
+        self.close_device()
 
 
-def runTargetLocator(gui=False):
+def runTargetLocator(device=TargetLocator.default_device, gui=False):
     """A standalone driver for testing TargetLocator."""
 
-    targetLocator = TargetLocator()
+    targetLocator = TargetLocator(device)
     print "run(): Starting main loop Ctrl+C here or Esc on image to quit..."
     while True:
         try:
             loc = targetLocator.find_target()
             if loc is not None:
-                print "run(): Target found at: {}".format(loc)
+                x, y = loc[0], loc[1]  # test unpacking
+                #print "run(): (x, y) = ({:6.2f}, {:6.2f})".format(x, y)
 
             if gui:
                 targetLocator.display_input()
@@ -263,4 +349,6 @@ def runTargetLocator(gui=False):
 
 
 if __name__ == "__main__":
-    runTargetLocator(gui=True)
+    runTargetLocator(
+        sys.argv[1] if len(sys.argv) > 1 else TargetLocator.default_device,
+        gui=True)

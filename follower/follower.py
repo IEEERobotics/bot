@@ -367,6 +367,10 @@ class Follower(object):
                 self.back_state = prev_back_state
 
             # Lost Lines Superscede other conditions
+            self.logger.info("FS:{},BS:{},PF:{},PB:{},NL:{}".format(
+                self.front_state, self.back_state,
+                prev_front_state, prev_back_state,
+                Follower.No_Line))
             if((self.front_state == Follower.No_Line) and (self.back_state == Follower.No_Line)):
                 # Front and back lost line
                 self.error = "LOST_LINE" 

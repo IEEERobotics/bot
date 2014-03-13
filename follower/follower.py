@@ -343,10 +343,57 @@ class Follower(object):
         # Get the current IR readings
         if current_ir_reading is None:
             current_ir_reading = self.ir_hub.read_binary(Follower.White_Black)
+
+        #using heading, make front/back/left/right state assignments
+        self.determine_states(current_ir_reading)
+        
+        #Clear on_x flag if off line on side arrays
+        if(self.on_x and ((self.right_state > 15) or (self.left_state > 15))):
+            self.on_x = False
+
+        #Check for error conditions
+        if((self.front_state > 15) or (self.back_state > 15) or
+            (self.right_state < Follower.No_Line) and (self.left_state < Follower.No_Line)):
+            
+            # Intersection preceds Large Object
+            if ((not (self.right_state == Follower.No_Line) and 
+                not (self.left_state == Follower.No_Line)) and 
+                    not self.on_x):
+                # Found Intersection because left and right lit up
+                # if on_x=True, ignore this error
+                self.error = "ON_INTERSECTION" 
+            elif((self.front_state == Follower.Large_Object) ):
+                # Found large object on front array. 
+                self.error = "LARGE_OBJECT" 
+
+            if( self.back_state == Follower.Large_Object):
+                # Ignore large objects on back array by using prev back state
+                self.back_state = prev_back_state
+
+            # Lost Lines Superscede other conditions
+            if((self.front_state == Follower.No_Line) and (self.back_state == Follower.No_Line)):
+                # Front and back lost line
+                self.error = "LOST_LINE" 
+            elif(self.front_state == Follower.No_Line):
+                # Front lost line
+                self.error = "FRONT_LOST" 
+            elif(self.back_state == Follower.No_Line):
+                # Back lost line
+                self.error = "BACK_LOST"
+            else:
+                #Ignore Noise conditions 
+                self.front_state = prev_front_state
+                self.back_state = prev_back_state
+                # self.error = "NONE"
+        else: #no errors
+            self.error = "NONE" 
+        return self.front_state, self.back_state, self.left_state, self.right_state
+
+
+    def determine_states(self ,current_ir_reading):
         if self.heading is None:
             self.heading = 180 #use implicit default value for testing
             self.logger.info("Using Test Heading = 180")
-
         # Heading east
         if self.heading == 270:
             # Forward is on the left side
@@ -403,48 +450,7 @@ class Follower(object):
             # Right is on the back
             self.right_state = self.get_position_rl(
                 current_ir_reading["left"])
-
-        #Clear on_x flag if off line on side arrays
-        if(self.on_x and ((self.right_state > 15) or (self.left_state > 15))):
-            self.on_x = False
-
-        #Check for error conditions
-        if((self.front_state > 15) or (self.back_state > 15) or
-            (self.right_state < Follower.No_Line) and (self.left_state < Follower.No_Line)):
-            
-            # Intersection preceds Large Object
-            if ((not (self.right_state == Follower.No_Line) and 
-                not (self.left_state == Follower.No_Line)) and 
-                    not self.on_x):
-                # Found Intersection because left and right lit up
-                # if on_x=True, ignore this error
-                self.error = "ON_INTERSECTION" 
-            elif((self.front_state == Follower.Large_Object) ):
-                # Found large object on front array. 
-                self.error = "LARGE_OBJECT" 
-
-            if( self.back_state == Follower.Large_Object):
-                # Ignore large objects on back array by using prev back state
-                self.back_state = prev_back_state
-
-            # Lost Lines Superscede other conditions
-            if((self.front_state == Follower.No_Line) and (self.back_state == Follower.No_Line)):
-                # Front and back lost line
-                self.error = "LOST_LINE" 
-            elif(self.front_state == Follower.No_Line):
-                # Front lost line
-                self.error = "FRONT_LOST" 
-            elif(self.back_state == Follower.No_Line):
-                # Back lost line
-                self.error = "BACK_LOST"
-            else:
-                #Ignore Noise conditions 
-                self.front_state = prev_front_state
-                self.back_state = prev_back_state
-                # self.error = "NONE"
-        else: #no errors
-            self.error = "NONE" 
-        return self.front_state, self.back_state, self.left_state, self.right_state
+        
 
 
     def update_exit_state(self):

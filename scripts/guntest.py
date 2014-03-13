@@ -10,6 +10,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('power', type=int)
 parser.add_argument('-l', '--left', action='store_true', default=False)
 parser.add_argument('-r', '--right', action='store_true', default=False)
+parser.add_argument('-p', '--period', type=float, default=1.0)
 args = parser.parse_args()
 
 import signal
@@ -45,7 +46,7 @@ right.power = power
 t0 = time()
 print "Press <control-c> to stop"
 
-period = 2.0
+period = args.period
 left_last_pos = 0
 right_last_pos = 0
 while True:

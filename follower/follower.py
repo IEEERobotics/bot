@@ -70,7 +70,7 @@ class Follower(object):
     @lib.api_call
     def update(self):
         """Read IR values, compute aggregates."""
-        ir_readings = self.ir_hub.read_binary(False)
+        ir_readings = self.ir_hub.read_binary(Follower.White_Black)
         for name, reading in ir_readings.iteritems():
             reading_arr = np.int_(reading)  # convert readings to numpy array
             reading_sum = np.sum(np_reading)  # = no. of units lit
@@ -342,7 +342,7 @@ class Follower(object):
         prev_back_state = self.back_state
         # Get the current IR readings
         if current_ir_reading is None:
-            current_ir_reading = self.ir_hub.read_binary(False)
+            current_ir_reading = self.ir_hub.read_binary(Follower.White_Black)
         if self.heading is None:
             self.heading = 180 #use implicit default value for testing
             self.logger.info("Using Test Heading = 180")
@@ -542,7 +542,7 @@ class Follower(object):
       last_count = 0
       while True:
         count = 0
-        ir_reading = self.ir_hub.read_binary(False)
+        ir_reading = self.ir_hub.read_binary(Follower.White_Black)
         for value in ir_reading["back"]:
             if(value == 1):
                 count += 1

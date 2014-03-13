@@ -182,11 +182,7 @@ class Follower(object):
             self.rotate_error = self.rotate_pid.pid(
                 0, bot_angle, self.sampling_time)
             # Report errors from strafe and rotate pid's 
-            self.logger.info("FS: {}, BS {}, LS {}, RS {}, StrafeErr: {}, RotErr: {}".format(
-                self.front_state,
-                self.back_state,
-                self.left_state,
-                self.right_state,
+            self.logger.info(" StrafeErr: {}, RotErr: {}".format(
                 self.strafe_error,
                 self.rotate_error))
             # Update motors
@@ -387,7 +383,13 @@ class Follower(object):
                 # self.error = "NONE"
         else: #no errors
             self.error = "NONE" 
-        return self.front_state, self.back_state, self.left_state, self.right_state
+
+            self.logger.info("FS: {}, BS {}, LS {}, RS {}".format(
+                self.front_state,
+                self.back_state,
+                self.left_state,
+                self.right_state))
+            return self.front_state, self.back_state, self.left_state, self.right_state
 
 
     def determine_states(self ,current_ir_reading):
@@ -582,7 +584,7 @@ class Follower(object):
             # Assig states
             self.assign_states()
             # Check for error conditions
-            if(self.error != "NONE"):
+            if(self.error != "NONE" and self.error != "ON_INTERSECTION"):
                 self.update_exit_state()
                 self.logger.info("Error: {}".format( self.error ))
                 self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
@@ -634,7 +636,7 @@ class Follower(object):
                 # Assig states
                 self.assign_states()
                 # Check for error conditions
-                if(self.error != "NONE"):
+                if(self.error != "NONE" and self.error != "ON_INTERSECTION"):
                     self.update_exit_state()
                     self.logger.info("Error: {}".format( self.error ))
                     self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
@@ -671,7 +673,7 @@ class Follower(object):
                 # Assig states
                 self.assign_states()
                  # Check for error conditions
-                if(self.error != "NONE"):
+                if(self.error != "NONE" and self.error != "ON_INTERSECTION"):
                     self.update_exit_state()
                     self.logger.info("Error: {}".format( self.error ))
                     self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 

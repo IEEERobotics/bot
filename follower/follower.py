@@ -585,7 +585,9 @@ class Follower(object):
             # Assig states
             self.assign_states()
             # Check for error conditions
-            if(self.error != "NONE" and self.error != "ON_INTERSECTION"):
+            if ((self.error != "NONE" and self.error != "ON_INTERSECTION")
+                or (self.left_state == Follower.No_Line 
+                    or self.right_state == Follower.No_Line)):
                 self.update_exit_state()
                 self.logger.info("Error: {}".format( self.error ))
                 self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
@@ -608,7 +610,7 @@ class Follower(object):
             # Cap at 0 and 100
             translate_speed =  max(0,min(100,abs(position_error)))
             # use sign and heading to determin which direction to strafe
-            if(position_error <= 0):
+            if(position_error >= 0):
                 translate_angle = (0 + self.heading)%360
             else:
                 translate_angle = (180 + self.heading)%360

@@ -119,13 +119,21 @@ class ColorSensor(I2CDevice):
         :raises AssertionError: When Color sensor saw nothing.
 
         """
-        self.bv, self.bc, \
-        self.br, self.bg, \
-        self.bb = self.read_data()
+        
+        # Repeatedly attempts baseline if zeros are found.
+        # Note: if this doesn't work on the first try, something
+        # is usually wrong.
+        while True:
+            self.bv, self.bc, \
+            self.br, self.bg, \
+            self.bb = self.read_data()
+            if self.br != 0 and self.bg != 0 and self.bb != 0:
+                break
+
         try:
             assert (self.bc != 0 and self.br != 0 and self.bg != 0 and self.bb != 0)
         except AssertionError:
-            raise AssertionError("Baselines colors are zero.")
+            self.logger.error("Baseline colors zero, color sensor won't work!")
 
     def get_percent_diff(self):
         """Calculates percent difference from baseline.
@@ -253,13 +261,14 @@ def read_loop():
     while True:
         try:
             elapsed = time.time() - t0
-            # print "[{:8.3f}] ".format(elapsed)
-            # print "v: {}, c: {:5.3f}, r: {:5.3f}, g: {:5.3f}, b: {:5.3f}".format(v, c, r, g, b)
-
-            # if colorSensor.is_green():
-                # print "Found green"
-            if colorSensor.detects_color("green"):
-                print "Found green, Percent method"
+            print "[{:8.3f}] ".format(elapsed)
+            print "bv: {}, bc: {:5.3f}, br: {:5.3f}, bg: {:5.3f}, bb: {:5.3f}".format(colorSensor.bv, \
+                                                                            colorSensor.color["clear"],\
+                                                                            colorSensor.color["red"],\
+                                                                            colorSensor.color["green"],\
+                                                                            colorSensor.color["blue"])
+            # if colorSensor.detects_color("green"):
+                # print "Found green, Percent method"
 
             # if colorSensor.is_green_diff_method():
                 # print "diff method"

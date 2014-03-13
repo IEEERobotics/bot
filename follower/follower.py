@@ -573,14 +573,16 @@ class Follower(object):
     @lib.api_call
     def center_on_intersection(self, heading = 180):
         """center on intersection"""
-        side_to_side_strafe = pid_mod.PID()
-        self.center_on_line(heading)
-        previous_time = time();
+        # first use center on line
         self.heading = heading
+        self.center_on_line(heading)
+        
+        #then correct forwards/backwards
+        side_to_side_strafe = pid_mod.PID()
+        # Init front_PID
+        side_to_side_strafe.set_k_values(3.75, 0, .75)
+        previous_time = time();
         while True:
-            current_time = time()
-            # Init front_PID
-            side_to_side_strafe.set_k_values(3.75, 0, .75)
             # Assig states
             self.assign_states()
             # Check for error conditions
@@ -594,22 +596,22 @@ class Follower(object):
                     self.right_state))
                 self.driver.move(0,0)
                 return self.error
-           # Call PID`
+            # setup pid
             bot_position = (self.left_state + self.right_state)/2
-            # Call Rotate PID
+            current_time = time()
+            # Call PID
             self.logger.info("bot_position = {}".format(bot_position))
             position_error = side_to_side_strafe.pid(
                 0, bot_position, self.sampling_time)
-            # Report errors from strafe and rotate pid's 
             if(abs(bot_position) < 3):
                 self.driver.move(0,0)
                 break
             # Cap at 0 and 100
             translate_speed =  max(0,min(100,abs(position_error)))
-            if(position_error >= 0):
-                translate_angle = 0
+            if(position_error <= 0):
+                translate_angle = (0 + self.heading)%360
             else:
-                translate_angle = 180
+                translate_angle = (180 + self.heading)%360
             if(abs(bot_position) < 3):
               return
             self.logger.info("translate_speed = {}".format(translate_speed))

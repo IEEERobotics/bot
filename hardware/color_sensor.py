@@ -25,8 +25,6 @@ class ColorSensor(I2CDevice):
         self.logger = lib.get_logger()
         self.config = lib.get_config()
 
-        self.get_baseline()
-
         # Handle off-bone runs
         self.testing = self.config["testing"]
         if not self.testing:
@@ -48,6 +46,9 @@ class ColorSensor(I2CDevice):
             self.pwm.duty = 1000000
         else:
             self.logger.debug("Running in test mode")
+
+        # Gets base values for comparisons to future readings.
+        self.get_baseline()
 
     @property
     def color(self):
@@ -177,7 +178,7 @@ class ColorSensor(I2CDevice):
         start_time = time.time()
         
         while time.time() - start_time < timeout:
-            if detects_color(color):
+            if self.detects_color(color):
                 return True
         return False
 

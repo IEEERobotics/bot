@@ -23,10 +23,10 @@ class ColorSensor(I2CDevice):
     def __init__(self):
         """Initialized I2C device, LED brightness PWM pin."""
         self.logger = lib.get_logger()
-        self.config = lib.get_config()
+        self.bot_config = lib.get_config()
 
         # Handle off-bone runs
-        self.testing = self.config["testing"]
+        self.testing = self.bot_config["testing"]
         if not self.testing:
             self.logger.debug("Running in non-test mode")
 
@@ -40,7 +40,7 @@ class ColorSensor(I2CDevice):
             enable = self.registers['ENABLE']  # TODO: Is this needed?
 
             # Setup PWM pin for dimming LED
-            self.pwm_num = self.config["color_sensor"]["LED_PWM"]
+            self.pwm_num = self.bot_config["color_sensor"]["LED_PWM"]
             self.pwm = pwm_mod.PWM(self.pwm_num)
             # Duty cycle = 50% (from 20msec)
             self.pwm.duty = 1000000

@@ -17,7 +17,7 @@ class TestPosition(test_bot.TestBot):
         super(TestPosition, self).setUp()
 
         # Build servo in testing mode
-        self.pwm_num = self.config["turret_servos"][0]["PWM"]
+        self.pwm_num = self.config['turret']['servos']['yaw']['PWM']
         self.servo = s_mod.Servo(self.pwm_num)
 
     def tearDown(self):

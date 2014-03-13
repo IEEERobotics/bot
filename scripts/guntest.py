@@ -3,13 +3,14 @@
 import os, sys
 from pprint import pprint
 import pyDMCC
-from time import sleep
+from time import sleep, time
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('speed', type=int)
+parser.add_argument('power', type=int)
 parser.add_argument('-l', '--left', action='store_true', default=False)
 parser.add_argument('-r', '--right', action='store_true', default=False)
+parser.add_argument('-p', '--period', type=float, default=1.0)
 args = parser.parse_args()
 
 import signal
@@ -24,25 +25,43 @@ def cleanup(signum, frame):
 
 signal.signal(signal.SIGINT, cleanup)
 
-print "Autodetecting DMCCs..."
+print "Autodetecting DMCCs...",
 dmccs = pyDMCC.autodetect()
+print "  found:", len(dmccs)
 
-print "  ...found:", len(dmccs)
+gun_dmcc = dmccs[2]  # Wheel gun motors are always on 2
+left = gun_dmcc.motors[2]
+right = gun_dmcc.motors[1]
 
-power = args.speed
+# Reset the QEI position counters
+left.reset()
+right.reset()
+
+# NOTE: One power must always be inverted!!
+power = args.power
 print "Setting power to:", power
-
-dmcc = dmccs[1]
-right = dmcc.motors[1]
-left = dmcc.motors[2]
-
-right.power = power
 left.power = -power
+right.power = power
 
+t0 = time()
 print "Press <control-c> to stop"
-while True:
-    sleep(0.2)
-    print "Voltage: {:0.2f}, Left: {:3d} ({:3d} mA), Right: {:3d} ({:3d} mA)".format(
-           dmcc.voltage, left.velocity, left.current, right.velocity, right.current )
-    
 
+period = args.period
+left_last_pos = 0
+right_last_pos = 0
+while True:
+    sleep(period)
+    left_pos = left.position
+    right_pos = right.position
+    left_delta = left_pos - left_last_pos
+    right_delta = right_pos - right_last_pos
+    left_last_pos = left_pos
+    right_last_pos = right_pos
+    #print "[{:0.3f}] Voltage: {:0.2f}, Current: {:3d} | {:3d}, Position: {:6d} | {:6d}, Velocity: {:3d} | {:3d}".format(
+    #       time()-t0, dmcc.voltage, left.current, right.current, left.position, right.position, left.velocity, right.velocity)
+    print "{:7.3f} DMCC : Voltage: {:0.2f}".format(time()-t0, gun_dmcc.voltage)
+    print "       Left : Current: {:3d}, Position: {:6d}, Velocity: {:3d}, Calc_vel: {:0.1f}".format(
+           left.current, left_pos, left.velocity, left_delta/period)
+    print "       Right: Current: {:3d}, Position: {:6d}, Velocity: {:3d}, Calc_vel: {:0.1f}".format(
+           right.current, right_pos, right.velocity, right_delta/period)
+     

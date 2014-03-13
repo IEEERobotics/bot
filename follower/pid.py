@@ -18,6 +18,10 @@ class PID(object):
         self.kp = kp
         self.ki = ki
         self.kd = kd
+    
+    def clear_error(self):
+        self.previous_error = 0
+        self.integeral_error = 0
 
     def pid(self, target, process_var, timestep):
         current_error = (target - process_var)

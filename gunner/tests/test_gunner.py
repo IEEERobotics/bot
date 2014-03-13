@@ -3,101 +3,122 @@
 from random import randint
 
 import lib.lib as lib
-import gunner.gunner as g_mod
-import hardware.turret as t_mod
+import gunner.gunner as gunner
 import tests.test_bot as test_bot
+from unittest import TestCase
 
-
-class TestAimTurret(test_bot.TestBot):
+class TestAim(test_bot.TestBot):
 
     """Test changing the yaw and pitch angles of the turret."""
 
     def setUp(self):
         """Setup test hardware files and build gunner object."""
         # Run general bot test setup
-        super(TestAimTurret, self).setUp()
+        super(TestAim, self).setUp()
 
         # Build wheel gunner
-        self.gunner = g_mod.Gunner()
+        self.gunner = gunner.Gunner()
+        self.gunner.gun.dart_velocity = 10
+        self.gunner.ultrasonics.read_dists = lambda: {'front': 0.3, 'left': 0.5, 'back': 2.4384, 'right': 0.7192}
 
     def tearDown(self):
         """Restore testing flag state in config file."""
         # Run general bot test tear down
-        super(TestAimTurret, self).tearDown()
+        super(TestAim, self).tearDown()
 
-    def test_series_yaw_pitch(self):
-        """Test a series of yaw and pitch angles."""
-        for angle in range(0, 180, 18):
-            self.gunner.aim_turret(angle, angle)
-            assert self.gunner.turret.yaw == angle, "{} != {}".format(
-                                                    self.gunner.turret.yaw,
-                                                    angle)
-            assert self.gunner.turret.pitch == angle
+    def test_aim(self):
+        self.gunner.aim()
 
-    def test_manually_confirm(self):
-        """Test a series of random angles, read the simulated HW to confirm."""
-        for i in range(10):
-            # Generate random yaw and pitch angles
-            test_val = {}
-            for servo in self.config["turret_servos"]:
-                test_val[servo["axis"]] = randint(0, 180)
+class TestFire(test_bot.TestBot):
 
-            # Set yaw and pitch angles
-            self.gunner.aim_turret(test_val["yaw"], test_val["pitch"])
-
-            # Check yaw and pitch angles
-            for servo in self.config["turret_servos"]:
-                duty = int(self.get_pwm(servo["PWM"])["duty_ns"])
-                angle = int(round(((duty - 1000000) / 1000000.) * 180))
-                assert test_val[servo["axis"]] == angle
-
-    def test_yaw_over_max(self):
-        """Test setting the yaw angle to greater than the max value."""
-        with self.assertRaises(AssertionError):
-            self.gunner.aim_turret(181, 90)
-
-    def test_yaw_under_min(self):
-        """Test setting the yaw angle to less than the min value."""
-        with self.assertRaises(AssertionError):
-            self.gunner.aim_turret(-1, 90)
-
-    def test_pitch_over_max(self):
-        """Test setting the pitch angle to greater than the max value."""
-        with self.assertRaises(AssertionError):
-            self.gunner.aim_turret(90, 181)
-
-    def test_pitch_under_min(self):
-        """Test setting the pitch angle to less than the min value."""
-        with self.assertRaises(AssertionError):
-            self.gunner.aim_turret(90, -1)
-
-
-class TestAutoFire(test_bot.TestBot):
-
-    """Test firing a dart.
-
-    TODO(dfarrell07): Write test_manually_confirm test to check HW state.
-
-    """
+    """Test firing a dart. """
 
     def setUp(self):
         """Setup test hardware files and build wheel gunner object."""
         # Run general bot test setup
-        super(TestAutoFire, self).setUp()
-
+        super(TestFire, self).setUp()
         # Build wheel gunner
-        self.gunner = g_mod.Gunner()
+        self.gunner = gunner.Gunner()
+        self.gunner.ultrasonics.read_dists = lambda: {'front': 0.3, 'left': 0.5, 'back': 2.4384, 'right': 0.7192}
+        self.gunner.gun.dart_velocity = 10
 
     def tearDown(self):
         """Restore testing flag state in config file."""
         # Run general bot test tear down
-        super(TestAutoFire, self).tearDown()
+        super(TestFire, self).tearDown()
 
-    def test_auto_fire(self):
+    def test_fire(self):
         """Simply execute the fire method.
 
-        TODO(dfarrell07): Flesh out this test.
-
         """
-        with self.assertRaises(NotImplementedError):
-            self.gunner.auto_fire()
+        self.gunner.fire()
+
+class TestLocalize(test_bot.TestBot):
+
+    def setUp(self):
+        """Setup test hardware files and build wheel gunner object."""
+        super(TestLocalize, self).setUp()
+        # Build wheel gunner
+        self.gunner = gunner.Gunner()
+        self.good_dists = {'front': 0.7065, 'back': 0.5, 'left': 1.0, 'right': 1.4257}
+        self.gunner.ultrasonics.read_dists = lambda: self.good_dists
+        self.logger.info("Running: {}".format(self._testMethodName))
+
+    def test_localize(self):
+        x, y, theta = self.gunner.localize()
+        self.assertAlmostEqual(y, 1.0, places=2)
+        self.assertAlmostEqual(x, 0.5, places=2)
+        self.assertAlmostEqual(theta, 0.0, places=2)
+
+    def test_dumb_localizer(self):
+        # test distance, a valid firing location in the -x, -y quadrant
+        dists = self.good_dists
+        x, y, theta = self.gunner.dumb_localizer(dists)
+        self.assertEqual(y, 1.0)
+        self.assertEqual(x, 0.5)
+        self.assertEqual(theta, 0.0)
+
+    def test_ratio_localizer(self):
+        # test distance, a valid firing location in the -x, -y quadrant
+        dists = self.good_dists
+        x, y, theta = self.gunner.ratio_localizer(dists)
+        self.assertAlmostEqual(y, 1.0, places=2)
+        self.assertAlmostEqual(x, 0.5, places=2)
+        self.assertAlmostEqual(theta, 0.0, places=2)
+
+    def test_valid(self):
+        # test distance, a valid firing location in the -x, -y quadrant
+        dists = self.good_dists
+        x, y, theta = self.gunner.ratio_localizer(dists)
+        valid = self.gunner.validate_pose(x,y,theta)
+        self.assertTrue(valid)
+
+    def test_ratio_localizer_too_short_front(self):
+        # front sensor reads short, making x total invalid
+        dists = self.good_dists
+        dists['front'] = 0.3
+        with self.assertRaises(ValueError):
+           self.gunner.ratio_localizer(dists)
+
+    def test_ratio_localizer_short_left(self):
+        # short front moves us out of valid firing range
+        dists = self.good_dists
+        dists['left'] = 0.5
+        x, y, theta = self.gunner.ratio_localizer(dists)
+        valid = self.gunner.validate_pose(x,y,theta)
+        self.assertFalse(valid)
+
+    def test_ratio_localizer_angles(self):
+        # good values for -x,-y quadrant with rotation
+        dists = {'front': 0.7715, 'back': 0.55, 'left': 1.1, 'right': 1.5827}
+        x, y, theta = self.gunner.ratio_localizer(dists)
+        valid = self.gunner.validate_pose(x,y,theta)
+        self.assertTrue(valid)
+        self.assertLess(theta, 0)
+
+        dists = {'front': 0.55, 'back': 0.7715, 'left': 1.1, 'right': 1.5827}
+        x, y, theta = self.gunner.ratio_localizer(dists)
+        valid = self.gunner.validate_pose(x,y,theta)
+        self.assertTrue(valid)
+        self.assertGreater(theta, 0)
+

@@ -623,6 +623,17 @@ class Follower(object):
                 # Assig states
                 self.assign_states()
                 # Check for error conditions
+                if(self.error != "NONE")
+                   self.update_exit_state()
+                    self.logger.info("Error: {}".format( self.error ))
+                    self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
+                        self.front_state,
+                        self.back_state,
+                        self.left_state,
+                        self.right_state))
+                    self.driver.move(0,0)
+                    return self.error
+
                 current_time = time()
                 self.sampling_time = current_time - previous_time
                 # Call PID`
@@ -648,6 +659,18 @@ class Follower(object):
                 side_to_side_strafe.set_k_values(.75, .5, 1.75)
                 # Assig states
                 self.assign_states()
+                 # Check for error conditions
+                if(self.error != "NONE")
+                   self.update_exit_state()
+                    self.logger.info("Error: {}".format( self.error ))
+                    self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
+                        self.front_state,
+                        self.back_state,
+                        self.left_state,
+                        self.right_state))
+                    self.driver.move(0,0)
+                    return self.error
+
                 # Call PID`
                 current_time = time()
                 bot_position = (self.front_state + self.back_state)/2
@@ -685,7 +708,7 @@ class Follower(object):
         self.assign_states()
         # Move forward until off block
         direction = 180 - heading
-        while self.front_state == Follower.Large_Object:
+        while self.error == Follower.Large_Object:
             self.driver.move(60,direction)
             self.assign_states()
         #After off block, use center on line to straigten

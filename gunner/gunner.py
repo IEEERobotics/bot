@@ -117,7 +117,7 @@ class Gunner(object):
         pitch, yaw = targeting.getFiringSolution(x_pos, y_pos, theta, dart_velocity)
         self.logger.info("Aiming turret to (pitch: {}, yaw: {})".format(pitch, yaw))
         self.turret.pitch = pitch
-        self.turret.yaw = yaw
+        self.turret.yaw = yaw + 90
 
         # Allow turrent time to move
         # TODO: make config param so we can zero during testing

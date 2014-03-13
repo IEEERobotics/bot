@@ -50,7 +50,8 @@ class Gunner(object):
     def ratio_localizer(self, dists_from_center):
         """Localize based on range measurement from center of bot"""
 
-        x_size = 1.2065  # in meters, official spec: 47.5"
+        #x_size = 1.2065  # in meters, official spec: 47.5"
+        x_size = 1.1786  # in meters, practice course: 46.4"
         y_size = 2.4257  # in meters, official spec: 95.5"
 
         # bot will have left side facing target

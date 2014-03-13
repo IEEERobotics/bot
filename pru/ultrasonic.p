@@ -240,7 +240,8 @@ SAMPLE_ECHO:
     // Delay 1 microsecond between queries
     // Loop time is less than a 1us sicne it takes time to query the GPIO
     // register due to it not being within the local address space of the PRU
-    MOV r0, 78   // loop 79 times (79 * 10ns = 0.79us)
+    //MOV r0, 78   // loop 78 times (78 * 10ns = 780ns)
+    MOV r0, 76
 SAMPLE_ECHO_DELAY_1US:
     SUB r0, r0, 1
     QBNE SAMPLE_ECHO_DELAY_1US, r0, 0

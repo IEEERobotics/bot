@@ -25,6 +25,8 @@ class ColorSensor(I2CDevice):
         self.logger = lib.get_logger()
         self.config = lib.get_config()
 
+        self.get_baseline()
+
         # Handle off-bone runs
         self.testing = self.config["testing"]
         if not self.testing:
@@ -120,7 +122,7 @@ class ColorSensor(I2CDevice):
         self.br, self.bg, \
         self.bb = self.read_data()
         try:
-            assert (self.br != 0 and self.bg != 0 and self.bb != 0)
+            assert (self.bc != 0 and self.br != 0 and self.bg != 0 and self.bb != 0)
         except AssertionError:
             raise AssertionError("Baselines colors are zero.")
 
@@ -136,6 +138,7 @@ class ColorSensor(I2CDevice):
         diff_b = (self.color["blue"] - self.bb) / self.bb
         return diff_c, diff_r, diff_g, diff_b
 
+    @lib.api_call
     def detects_color(self, color):
         """Checks to see if given color is present.
         
@@ -161,6 +164,7 @@ class ColorSensor(I2CDevice):
             
         return False
 
+    @lib.api_call
     def watch_for_color(self, color, timeout=60):
         """Waits for given color to be found.
         

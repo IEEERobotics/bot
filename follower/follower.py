@@ -629,9 +629,8 @@ class Follower(object):
         side_to_side_strafe = pid_mod.PID()
         self.heading = heading
         while True:
-            center_rotate_pid.integral_error = 0
+            center_rotate_pid.clear_errors()
             previous_time = time();
-            center_rotate_pid.previous_error = 0
             while True:
                 # Init front_PID
                 center_rotate_pid.set_k_values(2.75, .4, .75)
@@ -651,7 +650,7 @@ class Follower(object):
 
                 current_time = time()
                 self.sampling_time = current_time - previous_time
-                # Call PID`
+                # 
                 bot_angle = (self.front_state - self.back_state)
                 # Call Rotate PID
                 self.logger.info("bot_angle = {}".format(bot_angle))
@@ -666,12 +665,13 @@ class Follower(object):
                 self.rotate(rotate_speed)
                 # Take the current time set it equal to the previous time
                 previous_time = current_time
-            side_to_side_strafe.integral_error = 0
-            side_to_side_strafe.previous_error = 0
+            
+
+            side_to_side_strafe.clear_errors()
             previous_time = time();
+            # Init front_PID
+            side_to_side_strafe.set_k_values(.75, .5, 1.75)
             while True:
-                # Init front_PID
-                side_to_side_strafe.set_k_values(.75, .5, 1.75)
                 # Assig states
                 self.assign_states()
                  # Check for error conditions
@@ -685,11 +685,14 @@ class Follower(object):
                         self.right_state))
                     self.driver.move(0,0)
                     return self.error
-
-                # Call PID`
+                #if angle off, break to rotate again
+                bot_angle = (self.front_state - self.back_state)
+                if(bot_angle >= 4)
+                    break
+                # calculate PID terms`
                 current_time = time()
                 bot_position = (self.front_state + self.back_state)/2
-                # Call Rotate PID
+                # Call side_to_side PID
                 self.logger.info("bot_position = {}".format(bot_position))
                 self.sampling_time = current_time - previous_time;
                 position_error = side_to_side_strafe.pid(
@@ -700,10 +703,11 @@ class Follower(object):
                     break
                 # Cap at 0 and 100
                 translate_speed =  max(0,min(100,abs(position_error)))
+                #use sign and heading to determine which side to strafe to
                 if(position_error >= 0):
-                    translate_angle = 90
+                    translate_angle = (-90 + self.heading)%360
                 else:
-                    translate_angle = 270
+                    translate_angle = (-270 + self.heading)%360
                 if(abs(bot_position) < 3):
                   return
                 self.logger.info("position_error = {}".format(position_error))
@@ -712,8 +716,10 @@ class Follower(object):
                 self.driver.move(translate_speed, translate_angle)
                 # Take the current time set it equal to the previous time
                 previous_time = current_time
+
             if((abs(self.front_state) < 4) and (abs(self.back_state < 4))):
                 return "Done"
+        #end top while loop
 
     @lib.api_call
     def center_on_blue_block(self, heading=180):

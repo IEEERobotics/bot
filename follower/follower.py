@@ -384,12 +384,12 @@ class Follower(object):
         else: #no errors
             self.error = "NONE" 
 
-            self.logger.info("FS: {}, BS {}, LS {}, RS {}".format(
-                self.front_state,
-                self.back_state,
-                self.left_state,
-                self.right_state))
-            return self.front_state, self.back_state, self.left_state, self.right_state
+        self.logger.info("FS: {}, BS {}, LS {}, RS {}".format(
+            self.front_state,
+            self.back_state,
+            self.left_state,
+            self.right_state))
+        return self.front_state, self.back_state, self.left_state, self.right_state
 
 
     def determine_states(self ,current_ir_reading):

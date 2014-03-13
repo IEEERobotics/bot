@@ -78,18 +78,40 @@ class TargetLocator(object):
         self.capture = cv.CaptureFromCAM(0)
 
         # Set camera parameters [API: cv]
-        cv.SetCaptureProperty(self.capture,
-                CV_CAP_PROP_FRAME_WIDTH, self.width)
-        cv.SetCaptureProperty(self.capture,
-                CV_CAP_PROP_FRAME_HEIGHT, self.height)
-        cv.SetCaptureProperty(self.capture,
-                CV_CAP_PROP_AUTO_EXPOSURE, self.auto_exposure)
+        cv.SetCaptureProperty(
+            self.capture, CV_CAP_PROP_FRAME_WIDTH, self.width)
+        cv.SetCaptureProperty(
+            self.capture, CV_CAP_PROP_FRAME_HEIGHT, self.height)
+        cv.SetCaptureProperty(
+            self.capture, CV_CAP_PROP_AUTO_EXPOSURE, self.auto_exposure)
 
         # Initialize other members
         self.imageIn = None  # input image
         self.location = None  # target location
         self.res = None  # result/output image (TODO: use separate imageOut)
         self.squares = []  # list of squares found
+
+        # Morphology kernel
+        self.kernel_rect = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+        self.kernel_fat_cross = np.uint8([
+            [0, 0, 1, 1, 1, 0, 0],
+            [0, 0, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1],
+            [0, 0, 1, 1, 1, 0, 0],
+            [0, 0, 1, 1, 1, 0, 0]])  # custom morphology kernel: fat cross
+        self.kernel_inv_cross = np.uint8([
+            [1, 1, 1, 0, 1, 1, 1],
+            [1, 1, 1, 0, 1, 1, 1],
+            [1, 1, 1, 0, 1, 1, 1],
+            [0, 0, 0, 0, 0, 0, 0],
+            [1, 1, 1, 0, 1, 1, 1],
+            [1, 1, 1, 0, 1, 1, 1],
+            [1, 1, 1, 0, 1, 1, 1]])  # custom morphology kernel: inverted cross
+
+        self.kernel = self.kernel_inv_cross  # pick kernel that works best
+        #print "__init__(): Kernel:\n{}".format(self.kernel)  # TODO use logger
 
     def find_target(self):
         """Find target location in current camera image."""
@@ -142,22 +164,21 @@ class TargetLocator(object):
         mask1 = cv2.inRange(hsv, lower_red, upper_red)
         mask2 = cv2.inRange(hsv, lower_red1, upper_red1)
 
-        # Perform an OR operation to get the FINAL MASK
+        # Perform an OR operation to get the FINAL MASK, morph to smooth
         mask3 = np.bitwise_or(mask1, mask2)
-	ker=cv2.getStructuringElement(cv2.MORPH_RECT,(3,3))
-#	mask=cv2.morphologyEx(mask3, cv2.MORPH_CLOSE, ker)
-	mask=cv2.dilate(mask3,ker,iterations=1)
+        mask = cv2.morphologyEx(mask3, cv2.MORPH_CLOSE, self.kernel)
+        #mask = cv2.dilate(mask3, self.kernel, iterations=1)
 
         # Bitwise-AND mask and original image to extract the target
         self.res = cv2.bitwise_and(
-	np.asarray(img[:, :]), np.asarray(img[:, :]),
-	mask=np.asarray(mask[:, :]))
+            np.asarray(img[:, :]), np.asarray(img[:, :]),
+            mask=np.asarray(mask[:, :]))
 
         # Squares is the array that has the pixel locations of the vertices
         self.squares = self.find_squares(self.res)
         if self.squares:
             print "_find_target_squares(): {} squares: {}".format(
-                    len(self.squares), self.squares)  # TODO: use logger
+                len(self.squares), self.squares)  # TODO: use logger
 
         # TODO: Process squares array and set self.location to (x, y) pair;
         self.location = None  # None if target not found
@@ -174,12 +195,12 @@ class TargetLocator(object):
                     binary = cv2.dilate(binary, None)
                     # NOTE: We should probably dilate after threshold as well
                 else:
-                    retval, binary = cv2.threshold(gray,
-                            thrs, 255, cv2.THRESH_BINARY)
+                    retval, binary = cv2.threshold(
+                        gray, thrs, 255, cv2.THRESH_BINARY)
 
                 # Find contours (NOTE: repeating this many times can be slow)
-                contours, hierarchy = cv2.findContours(binary,
-                        cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+                contours, hierarchy = cv2.findContours(
+                    binary, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
                 # Iterate over contours, find ones which look like squares
                 for cnt in contours:

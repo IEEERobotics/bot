@@ -22,21 +22,33 @@ class ColorSensor(I2CDevice):
 
     def __init__(self):
         """Initialized I2C device, LED brightness PWM pin."""
-        I2CDevice.__init__(self, 1, 0x29, config='tcs3472_i2c.yaml')
-        enable = self.registers['ENABLE']
-        id = self.registers['ID']
-        status = self.registers['STATUS']
-        enable.write('PON', 'Enable')
-        enable.write('AEN', 'Enable')
-        enable = self.registers['ENABLE']  # TODO: Is this needed?
-
         self.logger = lib.get_logger()
-        self.config = lib.get_config()
+        self.bot_config = lib.get_config()
 
-        self.pwm_num = self.config["color_sensor"]["LED_PWM"]
-        self.pwm = pwm_mod.PWM(self.pwm_num)
-        # Duty cycle = 50% (from 20msec)
-        self.pwm.duty = 1000000
+        # Handle off-bone runs
+        self.testing = self.bot_config["testing"]
+        if not self.testing:
+            self.logger.debug("Running in non-test mode")
+
+            # Setup I2C
+            I2CDevice.__init__(self, 1, 0x29, config='tcs3472_i2c.yaml')
+            enable = self.registers['ENABLE']
+            id = self.registers['ID']
+            status = self.registers['STATUS']
+            enable.write('PON', 'Enable')
+            enable.write('AEN', 'Enable')
+            enable = self.registers['ENABLE']  # TODO: Is this needed?
+
+            # Setup PWM pin for dimming LED
+            self.pwm_num = self.bot_config["color_sensor"]["LED_PWM"]
+            self.pwm = pwm_mod.PWM(self.pwm_num)
+            # Duty cycle = 50% (from 20msec)
+            self.pwm.duty = 1000000
+        else:
+            self.logger.debug("Running in test mode")
+
+        # Gets base values for comparisons to future readings.
+        self.get_baseline()
 
     @property
     def color(self):
@@ -78,12 +90,15 @@ class ColorSensor(I2CDevice):
         :returns: Validity, Clear (magnitude), Red, Green, Blue.
         
         """
-        valid = self.registers['STATUS'].read('AVALID')
-        c = self.registers['CDATA'].read()
-        r = self.registers['RDATA'].read()
-        g = self.registers['GDATA'].read()
-        b = self.registers['BDATA'].read()
-        return valid, c, r, g, b
+        if not self.testing:
+            valid = self.registers['STATUS'].read('AVALID')
+            c = self.registers['CDATA'].read()
+            r = self.registers['RDATA'].read()
+            g = self.registers['GDATA'].read()
+            b = self.registers['BDATA'].read()
+            return valid, c, r, g, b
+        else:
+            return 1, 1, 1, 1, 1
 
     def get_percentage(self):
         """Calculates percentages of total color for each color.
@@ -116,9 +131,9 @@ class ColorSensor(I2CDevice):
                 break
 
         try:
-            assert (self.br != 0 and self.bg != 0 and self.bb != 0)
+            assert (self.bc != 0 and self.br != 0 and self.bg != 0 and self.bb != 0)
         except AssertionError:
-            raise AssertionError("Baselines colors are zero.")
+            self.logger.error("Baseline colors zero, color sensor won't work!")
 
     def get_percent_diff(self):
         """Calculates percent difference from baseline.
@@ -132,6 +147,7 @@ class ColorSensor(I2CDevice):
         diff_b = (self.color["blue"] - self.bb) / self.bb
         return diff_c, diff_r, diff_g, diff_b
 
+    @lib.api_call
     def detects_color(self, color):
         """Checks to see if given color is present.
         
@@ -157,6 +173,7 @@ class ColorSensor(I2CDevice):
             
         return False
 
+    @lib.api_call
     def watch_for_color(self, color, timeout=60):
         """Waits for given color to be found.
         
@@ -169,7 +186,7 @@ class ColorSensor(I2CDevice):
         start_time = time.time()
         
         while time.time() - start_time < timeout:
-            if detects_color(color):
+            if self.detects_color(color):
                 return True
         return False
 

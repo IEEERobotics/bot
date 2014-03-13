@@ -624,7 +624,7 @@ class Follower(object):
                 self.assign_states()
                 # Check for error conditions
                 if(self.error != "NONE"):
-                   self.update_exit_state()
+                    self.update_exit_state()
                     self.logger.info("Error: {}".format( self.error ))
                     self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
                         self.front_state,
@@ -661,7 +661,7 @@ class Follower(object):
                 self.assign_states()
                  # Check for error conditions
                 if(self.error != "NONE"):
-                   self.update_exit_state()
+                    self.update_exit_state()
                     self.logger.info("Error: {}".format( self.error ))
                     self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
                         self.front_state,

@@ -12,7 +12,7 @@ new_path = [os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")]
 sys.path = new_path + sys.path
 
 import lib.lib as lib
-from gunner.wheel_gunner import WheelGunner
+from gunner.gunner import Gunner
 from follower.follower import Follower
 import pub_server as pub_server_mod
 import lib.messages as msgs
@@ -127,7 +127,7 @@ class CtrlServer(object):
 
         """
 
-        self.gunner = WheelGunner()
+        self.gunner = Gunner()
         self.follower = Follower()
 
         systems = {}
@@ -136,6 +136,7 @@ class CtrlServer(object):
         systems["follower"] = self.follower
         systems["driver"] = self.follower.driver
         systems["turret"] = self.gunner.turret
+        systems["ultrasonics"] = self.gunner.ultrasonics
         systems["gun"] = self.gunner.gun
         systems["ir_hub"] = self.follower.ir_hub
         systems["color_sensor"] = self.follower.color
@@ -301,7 +302,7 @@ class CtrlServer(object):
     def stop_full(self):
         """Stop all drive and gun motors, set turret to safe state."""
         self.systems["driver"].move(0, 0)
-        self.systems["gun"].set_wheel_speed(0)
+        self.systems["gun"].wheel_power = 0
         self.systems["turret"].pitch = 90
         self.systems["turret"].yaw = 90
 

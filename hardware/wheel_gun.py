@@ -1,10 +1,11 @@
 """Encapsulates functionality required to fire a wheel-based gun."""
 
 import time
-
-from pybbb.bbb import gpio as gpio_mod
-
 import lib.lib as lib
+from math import pi
+
+from pybbb.bbb import gpio
+from hardware.dmcc_motor import DMCCMotorSet
 
 
 class WheelGun(object):
@@ -21,43 +22,39 @@ class WheelGun(object):
         self.max_trigger_duration = float(
             self.config['gun']['max_trigger_duration'])  # 0.25 secs.
 
+        # 0.99895" (25.373mm) diameter
+        self.wheel_radius =  0.012687  # meters
+        self.ticks_per_rev = 48 # CPR on motor shaft per Pololu spec, verified
+        self.dmcc_to_tps = 20.4 # dmcc reported velocity must be scaled
+        self._dart_velocity = None  # shadow velocity for testing
+        self._wheel_velocity = None  # shadow velocity for testing
+
+        motor_config = self.config['gun']['dmcc_wheel_motors']
+        self.wheel_motors = DMCCMotorSet(motor_config)
+
         # Build GPIOs to control laser, motors and triggers
-        self.motor_gpios = dict()
         self.trigger_gpios = dict()
         self.laser_gpio = None
         if self.config["testing"]:
             # Get dir of simulated hardware files from config
-            gpio_test_dir_base = self.config["test_gpio_base_dir"]
+            gpio_test_dir = self.config['test_gpio_base_dir']
 
             # Build GPIO pins in test mode
             # NOTE: Simulated directories and files must already exist
             #   The unittest superclass will build them.
-            self.laser_gpio = gpio_mod.GPIO(
-                self.config['gun']['laser_gpio'],
-                gpio_test_dir_base)
-            self.motor_gpios['left'] = gpio_mod.GPIO(
-                self.config['gun']['motor_gpios']['left'],
-                gpio_test_dir_base)
-            self.motor_gpios['right'] = gpio_mod.GPIO(
-                self.config['gun']['motor_gpios']['right'],
-                gpio_test_dir_base)
-            self.trigger_gpios['retract'] = gpio_mod.GPIO(
-                self.config['gun']['trigger_gpios']['retract'],
-                gpio_test_dir_base)
-            self.trigger_gpios['advance'] = gpio_mod.GPIO(
-                self.config['gun']['trigger_gpios']['advance'],
-                gpio_test_dir_base)
+            self.laser_gpio = gpio.GPIO(
+                self.config['gun']['laser_gpio'], gpio_test_dir)
+            self.trigger_gpios['retract'] = gpio.GPIO(
+                self.config['gun']['trigger_gpios']['retract'], gpio_test_dir)
+            self.trigger_gpios['advance'] = gpio.GPIO(
+                self.config['gun']['trigger_gpios']['advance'], gpio_test_dir)
         else:
             # Build GPIO pins in live (normal) mode
-            self.laser_gpio = gpio_mod.GPIO(
+            self.laser_gpio = gpio.GPIO(
                 self.config['gun']['laser_gpio'])  # gpio8
-            self.motor_gpios['left'] = gpio_mod.GPIO(
-                self.config['gun']['motor_gpios']['left'])  # gpio78
-            self.motor_gpios['right'] = gpio_mod.GPIO(
-                self.config['gun']['motor_gpios']['right'])  # gpio76
-            self.trigger_gpios['retract'] = gpio_mod.GPIO(
+            self.trigger_gpios['retract'] = gpio.GPIO(
                 self.config['gun']['trigger_gpios']['retract'])  # gpio74
-            self.trigger_gpios['advance'] = gpio_mod.GPIO(
+            self.trigger_gpios['advance'] = gpio.GPIO(
                 self.config['gun']['trigger_gpios']['advance'])  # gpio72
 
     @lib.api_call
@@ -79,70 +76,97 @@ class WheelGun(object):
 
     laser = property(get_laser, set_laser)
 
-    @lib.api_call
-    def get_spin(self):
-        """Getter for motor spin status.
 
-        Note that this is for using a single GPIO to spin the motors
-        all the way up or all the way down. Once the capes are installed
-        we'll be able to set a variable speed.
+    @lib.api_call
+    def get_wheel_power(self):
+        """Get the power of the wheel motors.
+
+        This can be mapped roughly to a velocity, though not linearly.
 
         """
-        if self.motor_gpios["left"].value != self.motor_gpios["right"].value:
-            self.logger.warning(
-                "Left and right gun motor GPIOs are not equal.")
-            return {"left": self.motor_gpios["left"].value,
-                    "right": self.motor_gpios["right"].value}
-
-        return self.motor_gpios["left"].value
+        left = self.wheel_motors['left'].power
+        right = self.wheel_motors['right'].power
+        if not (left == right):
+            self.logger.warning("Wheel powers not equal! Left: {}, Right: {}".format(left, right))
+        return (left + right)/2.0
 
     @lib.api_call
-    def set_spin(self, state=0):
-        """Setter for gun motors (1=up, 0=down).
+    def set_wheel_power(self, power=0):
+        """Sets the power of the wheel motors.
 
-        :param state: Set gear motors to spin (1) or not (0).
+        This can be mapped roughly to a velocity, though not linearly.
+
+        :param power: power setting (0-100) for the motors
 
         """
-        if not (state == 0 or state == 1):
-            self.logger.warning("Invalid spin state: {}".format(state))
-        else:
-            self.motor_gpios['left'].value = state
-            self.motor_gpios['right'].value = state
+        if not (0 <= power <= 100):
+            self.logger.warning("Clamping invalid power  {} => [{},{}]".format(
+                power, 0, 100))
+            power = max(0,min(100,power))
 
-    spin = property(get_spin, set_spin)
+        self.logger.debug("Setting wheel power: {}".format(power))
+        self.wheel_motors['left'].power = power
+        self.wheel_motors['right'].power = power
+
+    wheel_power = property(get_wheel_power, set_wheel_power)
+
 
     @lib.api_call
-    def get_wheel_speed(self):
-        """Getter for wheel rotation speed. Speed is % of max.
+    def get_wheel_velocity(self):
+        """Get the average angular velocity of the two wheel motors.
 
-        Note that this will not be complete until the capes are installed.
+        :returns: velocity (ticks/s)
 
         """
-        # TODO: Implement once capes are installed
-        return -1
+        if self._wheel_velocity:
+            return self._wheel_velocity
+        left = self.wheel_motors['left'].velocity
+        right = self.wheel_motors['right'].velocity
+        if not (left == right):
+            self.logger.warning("Wheel velocities not equal! Left: {}, Right: {}".format(left, right))
+        return self.dmcc_to_tps * (left + right)/2.0
 
     @lib.api_call
-    def set_wheel_speed(self, speed=100):
-        """Setter for updates to wheel rotation speed.
+    def set_wheel_velocity(self, velocity):
+        """Setter for testing """
+        self._wheel_velocity = velocity
 
-        Note that this will not be complete until the capes are installed.
+    wheel_velocity = property(get_wheel_velocity, set_wheel_velocity)
 
-        :param speed: Desired speed of wheel rotation (% of max).
-        :type speed: int
+
+    @lib.api_call
+    def get_dart_velocity(self):
+        """Return the initial velocity of the dart when it leaves the gun
+
+        :returns: dart_velocity (m/s)
 
         """
-        try:
-            assert 0 <= speed <= 100
-        except AssertionError:
-            self.logger.error("Speed {} is out of bounds".format(speed))
-            raise AssertionError("Speed is out of bounds")
-        # TODO: Implement once capes are installed
-        return
+        if self._dart_velocity:
+            return self._dart_velocity
 
-    wheel_speed = property(get_wheel_speed, set_wheel_speed)
+        # [radians/s] = [rad/rev] * [ticks/s] / [tick/rev]
+        angular_velocity = (2 * pi) * self.wheel_velocity / self.ticks_per_rev
+        velocity = self.wheel_radius * angular_velocity
+        self.logger.debug("Calculated dart velocity: {:0.3f}".format(velocity))
+        return velocity
 
     @lib.api_call
-    def fire(self, advance_duration=0.1, delay=0.25, retract_duration=0.11):
+    def set_dart_velocity(self, velocity):
+        """Setter used purely for testing"""
+        self._dart_velocity = velocity
+
+    dart_velocity = property(get_dart_velocity,set_dart_velocity)
+
+    @lib.api_call
+    def spin_up(self):
+        self.set_wheel_power(100)
+
+    @lib.api_call
+    def stop(self):
+        self.set_wheel_power(0)
+
+    @lib.api_call
+    def fire(self, advance_duration=0.25, delay=0.25, retract_duration=0.11):
         """Fire a single dart by advancing it, and then reload.
 
         :param advance_duration: Time in seconds to push the trigger forwards.
@@ -177,30 +201,10 @@ class WheelGun(object):
             self.logger.warning("Invalid delay: {}".format(delay))
             return False
 
+        self.logger.debug("Advancing trigger")
         self.trigger_gpios['advance'].pulse(advance_duration)
         time.sleep(delay)
+        self.logger.debug("Retracting trigger")
         self.trigger_gpios['retract'].pulse(retract_duration)
         return True
 
-    @lib.api_call
-    def fire_burst(self, count=3, delay=2):
-        """Fire a number of darts consecutively.
-
-        :param count: Number of darts to fire.
-        :type count: int
-        :param delay: Delay in seconds between firing each dart.
-        :type delay: float
-
-        """
-        if count <= 0:
-            self.logger.warning("Invalid count: {}".format(count))
-            return False
-
-        if delay <= 0.0:
-            self.logger.warning("Invalid delay: {}".format(delay))
-            return False
-
-        for i in xrange(count):
-            self.fire()
-            time.sleep(delay)
-        return True

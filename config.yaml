@@ -7,24 +7,24 @@ dmcc_drive_motors: {
     back_right: { board_num: 1, motor_num: 2, invert: True }
 }
 
-dmcc_turret_motors: {
-    left: { board_num: 2, motor_num: 1 },
-    right: { board_num: 2, motor_num: 2 },
+
+turret: {
+    servos: {
+        yaw:   { PWM: 2, min: 20, max: 160 }, # Pan : P9_42 (pwm2/ecap0)
+        pitch: { PWM: 4, min: 20, max: 180 }  # Tilt: P9_16 (pwm4)
+    }
 }
 
-turret_servos:
-- {PWM: 2, axis: yaw}  # Turret servo - pan: P9_42 (pwm2/ecap0)
-- {PWM: 4, axis: pitch}  # Turret servo - tilt: P9_16 (pwm4)
 gun: {
     max_trigger_duration: 0.25,  # Maximum duration a trigger pin can be high
     laser_gpio: 8,  # Gun laser: P8_35 (gpio8)
-    motor_gpios: {
-        left: 78,  # Gun motor - left: P8_37 (gpio78)
-        right: 76  # Gun motor - right: P8_39 (gpio76)
-    },
     trigger_gpios: {
         retract: 74,  # Gun trigger - retract: P8_41 (gpio74)
         advance: 72   # Gun trigger - advance: P8_43 (gpio72)
+    },
+    dmcc_wheel_motors: {
+        right: { board_num: 2, motor_num: 1 },
+        left: { board_num: 2, motor_num: 2, invert: True },
     }
 }
 

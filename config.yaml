@@ -7,7 +7,6 @@ dmcc_drive_motors: {
     back_right: { board_num: 1, motor_num: 2, invert: True }
 }
 
-
 turret: {
     servos: {
         yaw:   { PWM: 2, min: 20, max: 160 }, # Pan : P9_42 (pwm2/ecap0)
@@ -38,6 +37,25 @@ ultrasonics: {
         back:  { offset: 8, xy: [  0.0, -0.15], dir: [ 0.0, -1.0] },
         left:  { offset: 16, xy: [-0.15,     0], dir: [-1.0,  0.0] },
         right: { offset: 24, xy: [ 0.15,   0.0], dir: [ 1.0,  0.0] }
+    }
+}
+
+course: {
+    ncsu: &ncsu {
+        x_size: 1.1786,  # in meters, ncsu course: 46.4"
+        y_size: 2.4257  # in meters, official spec: 95.5"
+    },
+    official: &official {
+        x_size: 1.2065,  # in meters, official spec: 47.5"
+        y_size: 2.4257  # in meters, official spec: 95.5"
+    },
+    default: *ncsu,
+    # bonding box of valid firing locations (for gunner)
+    firing_box: { 
+        y_min: 0.889,  # 35"
+        y_max: 1.524,  # 60"
+        x_min: 0.3,  # ~12"
+        x_max: 1.07   # 42"
     }
 }
 

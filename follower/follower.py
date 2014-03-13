@@ -736,7 +736,7 @@ class Follower(object):
         # Assign the current states to the correct heading
         self.assign_states()
         # Check for error conditions
-        if(self.error != "NONE"):
+        if(self.error != "NONE" and self.error!="LARGE_OBJECT"):
             self.update_exit_state()
             self.logger.info("Error: {}".format( self.error ))
             self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 

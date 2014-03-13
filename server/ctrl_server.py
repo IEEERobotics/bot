@@ -14,6 +14,7 @@ sys.path = new_path + sys.path
 import lib.lib as lib
 from gunner.gunner import Gunner
 from follower.follower import Follower
+from hardware.color_sensor import ColorSensor
 import pub_server as pub_server_mod
 import lib.messages as msgs
 
@@ -129,6 +130,7 @@ class CtrlServer(object):
 
         self.gunner = Gunner()
         self.follower = Follower()
+        self.color_sensor = ColorSensor()
 
         systems = {}
         systems["ctrl"] = self
@@ -139,7 +141,7 @@ class CtrlServer(object):
         systems["ultrasonics"] = self.gunner.ultrasonics
         systems["gun"] = self.gunner.gun
         systems["ir_hub"] = self.follower.ir_hub
-        systems["color_sensor"] = self.follower.color
+        systems["color_sensor"] = self.color_sensor
         self.logger.debug("Systems: {}".format(systems))
         return systems
 

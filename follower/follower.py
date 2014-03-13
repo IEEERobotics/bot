@@ -537,7 +537,7 @@ class Follower(object):
             self.rotate(rotate_speed) 
             
     @lib.api_call
-    def get_out_of_box(self):
+    def smart_jerk(self):
       """Used to get the bot out of the box"""
       last_count = 0
       while True:

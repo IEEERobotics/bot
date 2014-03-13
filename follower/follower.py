@@ -578,9 +578,9 @@ class Follower(object):
         self.center_on_line(heading)
         
         #then correct forwards/backwards
-        side_to_side_strafe = pid_mod.PID()
+        forw_to_back_strafe = pid_mod.PID()
         # Init front_PID
-        side_to_side_strafe.set_k_values(3.75, 0, .75)
+        forw_to_back_strafe.set_k_values(3.75, 0, .75)
         previous_time = time();
         while True:
             # Assig states
@@ -601,13 +601,14 @@ class Follower(object):
             current_time = time()
             # Call PID
             self.logger.info("bot_position = {}".format(bot_position))
-            position_error = side_to_side_strafe.pid(
+            position_error = forw_to_back_strafe.pid(
                 0, bot_position, self.sampling_time)
             if(abs(bot_position) < 3):
                 self.driver.move(0,0)
                 break
             # Cap at 0 and 100
             translate_speed =  max(0,min(100,abs(position_error)))
+            # use sign and heading to determin which direction to strafe
             if(position_error <= 0):
                 translate_angle = (0 + self.heading)%360
             else:

@@ -636,8 +636,8 @@ class Follower(object):
             center_rotate_pid.clear_error()
             previous_time = time();
             # Init front_PID
-           center_rotate_pid.set_k_values(2.75, .4, .75)
-           while True:
+            center_rotate_pid.set_k_values(2.75, .4, .75)
+            while True:
                 # kill momentum before reading
                 self.driver.move(0, 0)
                 # Assig states

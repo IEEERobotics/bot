@@ -23,7 +23,7 @@ class Follower(object):
     Noise = 19 #white values not next to each other
     
     #Variables for read_binary calls
-    White_Black = False  #True= white line, False= black line
+    White_Black = True #False  #True= white line, False= black line
 
     def __init__(self):
         # Build logger
@@ -47,6 +47,7 @@ class Follower(object):
         self.prev_rate = 0
 
         #state variables
+        self.heading = None #must be initialize by callee
         self.front_state = Follower.No_Line
         self.back_state = Follower.No_Line
         self.left_state = Follower.No_Line
@@ -342,6 +343,10 @@ class Follower(object):
         # Get the current IR readings
         if current_ir_reading is None:
             current_ir_reading = self.ir_hub.read_binary(False)
+        if self.heading is None:
+            self.heading = 180 #use implicit default value for testing
+            self.logger.info("Using Test Heading = 180")
+
         # Heading east
         if self.heading == 270:
             # Forward is on the left side
@@ -439,6 +444,8 @@ class Follower(object):
                 # self.error = "NONE"
         else: #no errors
             self.error = "NONE" 
+        return self.front_state, self.back_state, self.left_state, self.right_state
+
 
     def update_exit_state(self):
         if(self.error == "ON_INTERSECTION"):

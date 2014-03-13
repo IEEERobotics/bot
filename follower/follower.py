@@ -351,26 +351,7 @@ class Follower(object):
         if((self.front_state > 15) or (self.back_state > 15) or
             (self.right_state < Follower.No_Line) and (self.left_state < Follower.No_Line)):
             
-            # Intersection preceds Large Object
-            if ((not (self.right_state == Follower.No_Line) and 
-                not (self.left_state == Follower.No_Line)) and 
-                    not self.on_x):
-                # Found Intersection because left and right lit up
-                # if on_x=True, ignore this error
-                self.error = "ON_INTERSECTION" 
-            elif((self.front_state == Follower.Large_Object) ):
-                # Found large object on front array. 
-                self.error = "LARGE_OBJECT" 
-
-            if( self.back_state == Follower.Large_Object):
-                # Ignore large objects on back array by using prev back state
-                self.back_state = prev_back_state
-
             # Lost Lines Superscede other conditions
-            self.logger.info("FS:{},BS:{},PF:{},PB:{},NL:{}".format(
-                self.front_state, self.back_state,
-                prev_front_state, prev_back_state,
-                Follower.No_Line))
             if((self.front_state == Follower.No_Line) and (self.back_state == Follower.No_Line)):
                 # Front and back lost line
                 self.error = "LOST_LINE" 
@@ -380,11 +361,25 @@ class Follower(object):
             elif(self.back_state == Follower.No_Line):
                 # Back lost line
                 self.error = "BACK_LOST"
+            # Intersection preceds Large Object
+            elif ((not (self.right_state == Follower.No_Line) and 
+                not (self.left_state == Follower.No_Line)) and 
+                    not self.on_x):
+                # Found Intersection because left and right lit up
+                # if on_x=True, ignore this error
+                self.error = "ON_INTERSECTION" 
+            elif((self.front_state == Follower.Large_Object) ):
+                # Found large object on front array. 
+                self.error = "LARGE_OBJECT" 
             else:
-                #Ignore Noise conditions 
-                self.front_state = prev_front_state
-                self.back_state = prev_back_state
-                # self.error = "NONE"
+                if( self.back_state == Follower.Large_Object):
+                    # Ignore large objects on back array by using prev back state
+                    self.back_state = prev_back_state
+                else:
+                    #Ignore Noise conditions 
+                    self.front_state = prev_front_state
+                    self.back_state = prev_back_state
+                    # self.error = "NONE"
         else: #no errors
             self.error = "NONE" 
 

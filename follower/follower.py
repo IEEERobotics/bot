@@ -630,7 +630,7 @@ class Follower(object):
         side_to_side_strafe = pid_mod.PID()
         self.heading = heading
         while True:
-            center_rotate_pid.clear_errors()
+            center_rotate_pid.clear_error()
             previous_time = time();
             while True:
                 # Init front_PID
@@ -668,7 +668,7 @@ class Follower(object):
                 previous_time = current_time
             
 
-            side_to_side_strafe.clear_errors()
+            side_to_side_strafe.clear_error()
             previous_time = time();
             # Init front_PID
             side_to_side_strafe.set_k_values(.75, .5, 1.75)

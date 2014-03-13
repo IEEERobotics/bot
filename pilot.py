@@ -10,7 +10,7 @@ class Pilot:
     """Autonomous control client based on comprehensive state machine."""
 
     State = lib.Enum(('START', 'SMART_JERK', 'FIND_LINE', 'OSCILLATE',
-                      'FOLLOW', 'CENTER_ON_X', 'CHOOSE_DIR_X',
+                      'FOLLOW', 'CENTER_ON_X', 'ROTATE_ON_X',
                       'CENTER_ON_BLUE', 'AIM', 'FIRE',
                       'CHOOSE_DIR_BLUE', 'TURN_BACK',
                       'CENTER_ON_RED', 'FINISH'))
@@ -59,7 +59,7 @@ class Pilot:
 
             # TODO: Require different systems to expose the desired API calls
             if self.state == self.State.START:
-                self.logger.info("Warting for start")
+                self.logger.info("Waiting for start")
                 # NOTE: follower must wrap color_sensor and expose is_* methods
                 result = self.call('color_sensor', 'watch_for_color',
                     {"color": "green"})
@@ -67,25 +67,21 @@ class Pilot:
                     self.logger.info("Start signal found")
                     self.state = self.State.SMART_JERK
             elif self.state == self.State.SMART_JERK:
-                self.logger.info("Leaving box")
                 self.call('follower', 'smart_jerk')  # takes time
                 # Follower currently either finds the line or panics
                 #self.state = self.State.FIND_LINE
                 self.state = self.State.FOLLOW
 #           elif self.state == self.State.FIND_LINE:
-#               self.logger.info("Found line")
 #               if self.call('follower', 'is_on_line') == True:  # on line
 #                   self.state = self.State.FOLLOW
 #               else:
 #                   self.logger.info("Lost line, trying to recover")
 #                   self.state = self.State.OSCILLATE
 #           elif self.state == self.State.OSCILLATE:
-#               self.logger.info("Trying to recover line")
 #               self.call('follower', 'oscillate',
 #                   { 'heading' : self.heading })  # may succeed or fail
 #               self.state = self.State.FIND_LINE
             elif self.state == self.State.FOLLOW:
-                self.logger.info("Following line")
                 self.call('follower', 'follow', { 'heading' : self.heading })
                 # When follower is done following, one of the following is true
                 if self.call('follower', 'is_on_x') == True:  # intersection
@@ -97,9 +93,9 @@ class Pilot:
                 elif self.call('follower', 'is_on_red') == True:  # red block
                     self.logger.info("Found red block")
                     self.state = self.State.CENTER_ON_RED
-                elif self.call('follower', 'is_end_of_line') == True:  # EOL
-                    self.logger.info("At end of line")
-                    self.state = self.State.TURN_BACK
+#               elif self.call('follower', 'is_end_of_line') == True:  # EOL
+#                   self.logger.info("At end of line")
+#                   self.state = self.State.TURN_BACK
                 elif self.call('follower', 'is_on_line') == False:  # at sea
                     self.logger.warn("Lost line!")
                     self.state = self.State.FIND_LINE
@@ -107,12 +103,12 @@ class Pilot:
                     # Something wrong? Remain in FOLLOW state to try again
                     self.logger.error("Unknown follower.follow result!")
             elif self.state == self.State.CENTER_ON_X:
-                self.logger.info("Centering on X")
-                self.call('follower', 'center_on_x')  # takes time
-                self.state = self.State.CHOOSE_DIR_X  # assume centering worked
-            elif self.state == self.State.CHOOSE_DIR_X:
-                self.logger.info("Turning left at X")
+                self.call('follower', 'center_on_intersection')  # takes time
+                self.state = self.State.ROTATE_ON_X  # assume centering worked
+                sys.exit(0)
+            elif self.state == self.State.ROTATE_ON_X:
                 self.heading = (self.heading + 90) % 360  # always turn left
+                self.call('follower', 'rotate_on_x')
                 self.state = self.State.FOLLOW
             elif self.state == self.State.CENTER_ON_BLUE:
                 self.logger.info("Centering on blue block")
@@ -133,10 +129,10 @@ class Pilot:
                 self.logger.info("Turning around from blue block")
                 self.heading = (self.heading + 180) % 360  # turn around
                 self.state = self.State.FOLLOW
-            elif self.state == self.State.TURN_BACK:
-                self.logger.info("Turning around from end of line")
-                self.heading = (self.heading + 180) % 360  # turn around
-                self.state = self.State.FOLLOW
+#           elif self.state == self.State.TURN_BACK:
+#               self.logger.info("Turning around from end of line")
+#               self.heading = (self.heading + 180) % 360  # turn around
+#               self.state = self.State.FOLLOW
             elif self.state == self.State.CENTER_ON_RED:
                 self.call('follower', 'center_on_red')
                 self.state = self.State.FINISH

@@ -129,11 +129,7 @@ class ColorSensor(I2CDevice):
             self.bb = self.read_data()
             if self.br != 0 and self.bg != 0 and self.bb != 0:
                 break
-
-        try:
-            assert (self.bc != 0 and self.br != 0 and self.bg != 0 and self.bb != 0)
-        except AssertionError:
-            self.logger.error("Baseline colors zero, color sensor won't work!")
+            self.logger.error("Baseline not found on first attempt.")
 
     def get_percent_diff(self):
         """Calculates percent difference from baseline.

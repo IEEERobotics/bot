@@ -24,7 +24,8 @@ class WheelGun(object):
 
         # 0.99895" (25.373mm) diameter
         self.wheel_radius =  0.012687  # meters
-        self.ticks_per_rev = 48 # CPR on motor shaft per Pololu specs
+        self.ticks_per_rev = 48 # CPR on motor shaft per Pololu spec, verified
+        self.dmcc_to_tps = 20.4 # dmcc reported velocity must be scaled
         self._dart_velocity = None  # shadow velocity for testing
         self._wheel_velocity = None  # shadow velocity for testing
 
@@ -123,7 +124,7 @@ class WheelGun(object):
         right = self.wheel_motors['right'].velocity
         if not (left == right):
             self.logger.warning("Wheel velocities not equal! Left: {}, Right: {}".format(left, right))
-        return (left + right)/2.0
+        return self.dmcc_to_tps * (left + right)/2.0
 
     @lib.api_call
     def set_wheel_velocity(self, velocity):
@@ -143,12 +144,10 @@ class WheelGun(object):
         if self._dart_velocity:
             return self._dart_velocity
 
-        # radians/s =  2*pi * ticks/s * (rev/tick)
-        # TODO: make this (and ticks_per_rev) a property of DMCCMotor?
-        angular_velocity = 2 * pi * self.wheel_velocity / self.ticks_per_rev
-        # FIXME: This should be returning about 10-15 m/s at high speed
-        #        Use gun fire test script to determine actual value for ticks/rev
+        # [radians/s] = [rad/rev] * [ticks/s] / [tick/rev]
+        angular_velocity = (2 * pi) * self.wheel_velocity / self.ticks_per_rev
         velocity = self.wheel_radius * angular_velocity
+        self.logger.debug("Calculated dart velocity: {:0.3f}".format(velocity))
         return velocity
 
     @lib.api_call

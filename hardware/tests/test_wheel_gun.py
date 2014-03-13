@@ -241,16 +241,16 @@ class TestDartVelocity(TestBot):
     def test_dart_velocity_sane(self):
         """Test that reasonable wheel speeds produce reasonable velocities.
 
-        A reasonable range of nerf velocities would be 5-25 /ms 
+        A reasonable range of nerf velocities would be 5-25 /ms
         """
-        self.gun.wheel_velocity = 150  # normal ang vel is up to 150 tick/s?
+        self.gun.wheel_velocity = 6950  # tps of one pololu motor, full power, unloaded
         vel1 = self.gun.get_dart_velocity()
         self.assertGreater(vel1, 3)
-        self.assertLess(vel1, 50)  
+        self.assertLess(vel1, 50)
 
-        self.gun.wheel_velocity = 75
+        self.gun.wheel_velocity = 3500  # around 50%
         vel2 = self.gun.get_dart_velocity()
         self.assertGreater(vel2, 3)
-        self.assertGreater(vel1, vel2)
+        self.assertGreater(vel1, vel2) # should be slower than at full power
 
 

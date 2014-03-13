@@ -688,7 +688,7 @@ class Follower(object):
                     return self.error
                 #if angle off, break to rotate again
                 bot_angle = (self.front_state - self.back_state)
-                if(bot_angle >= 4)
+                if(bot_angle >= 4):
                     break
                 # calculate PID terms`
                 current_time = time()

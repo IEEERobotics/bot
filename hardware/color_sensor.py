@@ -155,8 +155,10 @@ class ColorSensor(I2CDevice):
         """
         diff_c, diff_r, diff_g, diff_b = self.get_percent_diff()
 
+        # Green is weakest color, so bias it slightly.
+        diff_g += 0.01
         if color == "green":
-            if (diff_g > diff_r) and (diff_g > diff_b):
+            if (diff_g > diff_r) and (diff_g +  > diff_b):
                 return True
         elif color == "red":
             if (diff_r > diff_g) and (diff_r > diff_b):

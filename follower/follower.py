@@ -114,10 +114,10 @@ class Follower(object):
     def reset_errors(self):
         self.error = "NONE"
         #state variables
-        self.front_state = Follower.No_Line
-        self.back_state = Follower.No_Line
-        self.left_state = Follower.No_Line
-        self.right_state = Follower.No_Line
+        #self.front_state = Follower.No_Line
+        #self.back_state = Follower.No_Line
+        #self.left_state = Follower.No_Line
+        #self.right_state = Follower.No_Line
 
         # post error vars
         self.intersection = False
@@ -182,11 +182,7 @@ class Follower(object):
             self.rotate_error = self.rotate_pid.pid(
                 0, bot_angle, self.sampling_time)
             # Report errors from strafe and rotate pid's 
-            self.logger.info("FS: {}, BS {}, LS {}, RS {}, StrafeErr: {}, RotErr: {}".format(
-                self.front_state,
-                self.back_state,
-                self.left_state,
-                self.right_state,
+            self.logger.info(" StrafeErr: {}, RotErr: {}".format(
                 self.strafe_error,
                 self.rotate_error))
             # Update motors
@@ -343,10 +339,62 @@ class Follower(object):
         # Get the current IR readings
         if current_ir_reading is None:
             current_ir_reading = self.ir_hub.read_binary(Follower.White_Black)
+
+        #using heading, make front/back/left/right state assignments
+        self.determine_states(current_ir_reading)
+        
+        #Clear on_x flag if off line on side arrays
+        if(self.on_x and ((self.right_state > 15) or (self.left_state > 15))):
+            self.on_x = False
+
+        #Check for error conditions
+        if((self.front_state > 15) or (self.back_state > 15) or
+            (self.right_state < Follower.No_Line) and (self.left_state < Follower.No_Line)):
+            
+            # Lost Lines Superscede other conditions
+            if((self.front_state == Follower.No_Line) and (self.back_state == Follower.No_Line)):
+                # Front and back lost line
+                self.error = "LOST_LINE" 
+            elif(self.front_state == Follower.No_Line):
+                # Front lost line
+                self.error = "FRONT_LOST" 
+            elif(self.back_state == Follower.No_Line):
+                # Back lost line
+                self.error = "BACK_LOST"
+            # Intersection preceds Large Object
+            elif ((not (self.right_state == Follower.No_Line) and 
+                not (self.left_state == Follower.No_Line)) and 
+                    not self.on_x):
+                # Found Intersection because left and right lit up
+                # if on_x=True, ignore this error
+                self.error = "ON_INTERSECTION" 
+            elif((self.front_state == Follower.Large_Object) ):
+                # Found large object on front array. 
+                self.error = "LARGE_OBJECT" 
+            else:
+                if( self.back_state == Follower.Large_Object):
+                    # Ignore large objects on back array by using prev back state
+                    self.back_state = prev_back_state
+                else:
+                    #Ignore Noise conditions 
+                    self.front_state = prev_front_state
+                    self.back_state = prev_back_state
+                    # self.error = "NONE"
+        else: #no errors
+            self.error = "NONE" 
+
+        self.logger.info("FS: {}, BS {}, LS {}, RS {}".format(
+            self.front_state,
+            self.back_state,
+            self.left_state,
+            self.right_state))
+        return self.front_state, self.back_state, self.left_state, self.right_state
+
+
+    def determine_states(self ,current_ir_reading):
         if self.heading is None:
             self.heading = 180 #use implicit default value for testing
             self.logger.info("Using Test Heading = 180")
-
         # Heading east
         if self.heading == 270:
             # Forward is on the left side
@@ -403,48 +451,7 @@ class Follower(object):
             # Right is on the back
             self.right_state = self.get_position_rl(
                 current_ir_reading["left"])
-
-        #Clear on_x flag if off line on side arrays
-        if(self.on_x and ((self.right_state > 15) or (self.left_state > 15))):
-            self.on_x = False
-
-        #Check for error conditions
-        if((self.front_state > 15) or (self.back_state > 15) or
-            (self.right_state < Follower.No_Line) and (self.left_state < Follower.No_Line)):
-            
-            # Intersection preceds Large Object
-            if ((not (self.right_state == Follower.No_Line) and 
-                not (self.left_state == Follower.No_Line)) and 
-                    not self.on_x):
-                # Found Intersection because left and right lit up
-                # if on_x=True, ignore this error
-                self.error = "ON_INTERSECTION" 
-            elif((self.front_state == Follower.Large_Object) ):
-                # Found large object on front array. 
-                self.error = "LARGE_OBJECT" 
-
-            if( self.back_state == Follower.Large_Object):
-                # Ignore large objects on back array by using prev back state
-                self.back_state = prev_back_state
-
-            # Lost Lines Superscede other conditions
-            if((self.front_state == Follower.No_Line) and (self.back_state == Follower.No_Line)):
-                # Front and back lost line
-                self.error = "LOST_LINE" 
-            elif(self.front_state == Follower.No_Line):
-                # Front lost line
-                self.error = "FRONT_LOST" 
-            elif(self.back_state == Follower.No_Line):
-                # Back lost line
-                self.error = "BACK_LOST"
-            else:
-                #Ignore Noise conditions 
-                self.front_state = prev_front_state
-                self.back_state = prev_back_state
-                # self.error = "NONE"
-        else: #no errors
-            self.error = "NONE" 
-        return self.front_state, self.back_state, self.left_state, self.right_state
+        
 
 
     def update_exit_state(self):
@@ -565,32 +572,50 @@ class Follower(object):
     @lib.api_call
     def center_on_intersection(self, heading = 180):
         """center on intersection"""
-        side_to_side_strafe = pid_mod.PID()
-        self.center_on_line(heading)
-        previous_time = time();
+        # first use center on line
         self.heading = heading
+        self.center_on_line(heading)
+        
+        #then correct forwards/backwards
+        forw_to_back_strafe = pid_mod.PID()
+        # Init front_PID
+        forw_to_back_strafe.set_k_values(2.5, 0, 1)
+        previous_time = time();
         while True:
-            current_time = time()
-            # Init front_PID
-            side_to_side_strafe.set_k_values(3.75, 0, .75)
+            # kill momentum before reading
+            self.driver.move(0, 0)
             # Assig states
             self.assign_states()
-            # Call PID`
+            # Check for error conditions
+            if ((self.error != "NONE" and self.error != "ON_INTERSECTION")
+                or (self.left_state == Follower.No_Line 
+                    or self.right_state == Follower.No_Line)):
+                self.update_exit_state()
+                self.logger.info("Error: {}".format( self.error ))
+                self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
+                    self.front_state,
+                    self.back_state,
+                    self.left_state,
+                    self.right_state))
+                self.driver.move(0,0)
+                return self.error
+            # setup pid
             bot_position = (self.left_state + self.right_state)/2
-            # Call Rotate PID
+            current_time = time()
+            # Call PID
             self.logger.info("bot_position = {}".format(bot_position))
-            position_error = side_to_side_strafe.pid(
+            position_error = forw_to_back_strafe.pid(
                 0, bot_position, self.sampling_time)
-            # Report errors from strafe and rotate pid's 
             if(abs(bot_position) < 3):
                 self.driver.move(0,0)
                 break
             # Cap at 0 and 100
             translate_speed =  max(0,min(100,abs(position_error)))
+            # use sign and heading to determin which direction to strafe
             if(position_error >= 0):
-                translate_angle = 0
+                translate_angle = (0 + self.heading)%360
             else:
-                translate_angle = 180
+                translate_angle = (180 + self.heading)%360
             if(abs(bot_position) < 3):
               return
             self.logger.info("translate_speed = {}".format(translate_speed))
@@ -608,18 +633,30 @@ class Follower(object):
         side_to_side_strafe = pid_mod.PID()
         self.heading = heading
         while True:
-            center_rotate_pid.integral_error = 0
+            center_rotate_pid.clear_error()
             previous_time = time();
-            center_rotate_pid.previous_error = 0
+            # Init front_PID
+            center_rotate_pid.set_k_values(2.75, .4, .75)
             while True:
-                # Init front_PID
-                center_rotate_pid.set_k_values(2.75, .4, .75)
+                # kill momentum before reading
+                self.driver.move(0, 0)
                 # Assig states
                 self.assign_states()
                 # Check for error conditions
+                if(self.error != "NONE" and self.error != "ON_INTERSECTION"):
+                    self.update_exit_state()
+                    self.logger.info("Error: {}".format( self.error ))
+                    self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
+                        self.front_state,
+                        self.back_state,
+                        self.left_state,
+                        self.right_state))
+                    self.driver.move(0,0)
+                    return self.error
+
                 current_time = time()
                 self.sampling_time = current_time - previous_time
-                # Call PID`
+                # 
                 bot_angle = (self.front_state - self.back_state)
                 # Call Rotate PID
                 self.logger.info("bot_angle = {}".format(bot_angle))
@@ -634,18 +671,36 @@ class Follower(object):
                 self.rotate(rotate_speed)
                 # Take the current time set it equal to the previous time
                 previous_time = current_time
-            side_to_side_strafe.integral_error = 0
-            side_to_side_strafe.previous_error = 0
+            
+
+            side_to_side_strafe.clear_error()
             previous_time = time();
+            # Init front_PID
+            side_to_side_strafe.set_k_values(.75, .5, 1.75)
             while True:
-                # Init front_PID
-                side_to_side_strafe.set_k_values(.75, .5, 1.75)
+                # kill momentum before reading
+                self.driver.move(0, 0)
                 # Assig states
                 self.assign_states()
-                # Call PID`
+                # Check for error conditions
+                if(self.error != "NONE" and self.error != "ON_INTERSECTION"):
+                    self.update_exit_state()
+                    self.logger.info("Error: {}".format( self.error ))
+                    self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
+                        self.front_state,
+                        self.back_state,
+                        self.left_state,
+                        self.right_state))
+                    self.driver.move(0,0)
+                    return self.error
+                #if angle off, break to rotate again
+                bot_angle = (self.front_state - self.back_state)
+                if(bot_angle >= 4):
+                    break
+                # calculate PID terms`
                 current_time = time()
                 bot_position = (self.front_state + self.back_state)/2
-                # Call Rotate PID
+                # Call side_to_side PID
                 self.logger.info("bot_position = {}".format(bot_position))
                 self.sampling_time = current_time - previous_time;
                 position_error = side_to_side_strafe.pid(
@@ -656,10 +711,11 @@ class Follower(object):
                     break
                 # Cap at 0 and 100
                 translate_speed =  max(0,min(100,abs(position_error)))
+                #use sign and heading to determine which side to strafe to
                 if(position_error >= 0):
-                    translate_angle = 90
+                    translate_angle = (-90 + self.heading)%360
                 else:
-                    translate_angle = 270
+                    translate_angle = (-270 + self.heading)%360
                 if(abs(bot_position) < 3):
                   return
                 self.logger.info("position_error = {}".format(position_error))
@@ -668,8 +724,10 @@ class Follower(object):
                 self.driver.move(translate_speed, translate_angle)
                 # Take the current time set it equal to the previous time
                 previous_time = current_time
+
             if((abs(self.front_state) < 4) and (abs(self.back_state < 4))):
                 return "Done"
+        #end top while loop
 
     @lib.api_call
     def center_on_blue_block(self, heading=180):
@@ -677,10 +735,22 @@ class Follower(object):
         self.heading = heading
         # Assign the current states to the correct heading
         self.assign_states()
-        # Move forward until off block
+        # Check for error conditions
+        if(self.error != "NONE" and self.error!="LARGE_OBJECT"):
+            self.update_exit_state()
+            self.logger.info("Error: {}".format( self.error ))
+            self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
+                self.front_state,
+                self.back_state,
+                self.left_state,
+                self.right_state))
+            self.driver.move(0,0)
+            return self.error
+       # Move forward until off block
         direction = 180 - heading
-        while self.front_state == Follower.Large_Object:
+        while self.error == Follower.Large_Object:
             self.driver.move(60,direction)
+            sleep(0.25)
             self.assign_states()
         #After off block, use center on line to straigten
         self.center_on_line(heading)

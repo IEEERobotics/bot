@@ -49,6 +49,7 @@ class Pilot:
             self.darts_fired)
 
     def run(self):
+        self.logger.info("Starting attack run")
         # Start indefinite loop to run through states till FINISH
         last_state = None  # to detect state changes, mainly for debugging
         while self.state != self.State.FINISH:

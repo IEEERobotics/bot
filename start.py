@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Start CLI or auto interfaces, CtrlServer or tests."""
+"""Start CLI, pilot, CtrlServer or tests."""
 
 import argparse
 from subprocess import Popen
@@ -27,7 +27,7 @@ parser.add_argument("-t", "--tests", action="store_true",
     help="run all unit tests")
 parser.add_argument("-s", "--server", action="store_true",
     help="start server to provide for controlling the bot")
-interface_group.add_argument("-a", "--auto", action="store_true",
+interface_group.add_argument("-p", "--pilot", action="store_true",
     help="autonomously solve the course")
 interface_group.add_argument("-c", "--cli", action="store_true",
     help="CLI interface for controlling the bot")
@@ -70,10 +70,11 @@ if args.server:
     # Give server a chance to get up and running
     sleep(.3)
 
-if args.auto:
-    import planner.fsm_planner
-    print "Starting autonomous solver"
-    planner = planner.fsm_planner.Robot()
+if args.pilot:
+    import pilot as pilot_mod
+    print "Starting pilot"
+    pilot = pilot_mod.Pilot()
+    pilot.run()
 
 if args.cli:
     # Build addresses of remote resources

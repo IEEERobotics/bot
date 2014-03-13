@@ -166,7 +166,7 @@ class ColorSensor(I2CDevice):
         return False
 
     @lib.api_call
-    def watch_for_color(self, color, timeout=60):
+    def watch_for_color(self, color, timeout=5):
         """Waits for given color to be found.
         
         :param color: Color to wait for.

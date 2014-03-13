@@ -92,6 +92,7 @@ class TargetLocator(object):
         self.capture = None
         self.width = 0
         self.height = 0
+        self.offset = np.float32([0.0, 0.0])
         self.auto_exposure = 1.0
 
         # ** Image processing
@@ -155,6 +156,7 @@ class TargetLocator(object):
                 self.capture, CV_CAP_PROP_FRAME_WIDTH, self.width)
             cv.SetCaptureProperty(
                 self.capture, CV_CAP_PROP_FRAME_HEIGHT, self.height)
+            self.offset = np.float32([self.width / 2.0, self.height / 2.0])
 
     def get_auto_exposure(self):
         return self.auto_exposure  # NOTE: query device?
@@ -259,7 +261,7 @@ class TargetLocator(object):
             # TODO: Reject all if s.d. is greater than half of mean side length
 
             if good_centroids.size > 0:
-                self.location = np.mean(good_centroids, axis=0)
+                self.location = np.mean(good_centroids, axis=0) - self.offset
                 return  # don't fall-through and return None!
 
         self.location = None  # None if target not found
@@ -326,7 +328,7 @@ def runTargetLocator(device=TargetLocator.default_device, gui=False):
         try:
             loc = targetLocator.find_target()
             if loc is not None:
-                x, y = loc[0], loc[1]  # test unpacking
+                x, y = tuple(loc)  # test unpacking; alt.: loc[0], loc[1]
                 #print "run(): (x, y) = ({:6.2f}, {:6.2f})".format(x, y)
 
             if gui:

@@ -143,12 +143,15 @@ class TargetLocator(object):
         mask2 = cv2.inRange(hsv, lower_red1, upper_red1)
 
         # Perform an OR operation to get the FINAL MASK
-        mask = np.bitwise_or(mask1, mask2)
+        mask3 = np.bitwise_or(mask1, mask2)
+	ker=cv2.getStructuringElement(cv2.MORPH_RECT,(3,3))
+#	mask=cv2.morphologyEx(mask3, cv2.MORPH_CLOSE, ker)
+	mask=cv2.dilate(mask3,ker,iterations=1)
 
         # Bitwise-AND mask and original image to extract the target
         self.res = cv2.bitwise_and(
-                np.asarray(img[:, :]), np.asarray(img[:, :]),
-                mask=np.asarray(mask[:, :]))
+	np.asarray(img[:, :]), np.asarray(img[:, :]),
+	mask=np.asarray(mask[:, :]))
 
         # Squares is the array that has the pixel locations of the vertices
         self.squares = self.find_squares(self.res)

@@ -39,7 +39,7 @@ class Pilot:
 
         # Initialize other members
         self.state = self.State.START
-        self.heading = 0  # TODO: Ensure starting direction is correct
+        self.heading = 180
         self.blue_blocks = 0  # no. of blue blocks found and centered on
         self.darts_fired = 0  # no. of darts fired
 

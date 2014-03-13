@@ -581,7 +581,18 @@ class Follower(object):
             side_to_side_strafe.set_k_values(3.75, 0, .75)
             # Assig states
             self.assign_states()
-            # Call PID`
+            # Check for error conditions
+            if(self.error != "NONE"):
+                self.update_exit_state()
+                self.logger.info("Error: {}".format( self.error ))
+                self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
+                    self.front_state,
+                    self.back_state,
+                    self.left_state,
+                    self.right_state))
+                self.driver.move(0,0)
+                return self.error
+           # Call PID`
             bot_position = (self.left_state + self.right_state)/2
             # Call Rotate PID
             self.logger.info("bot_position = {}".format(bot_position))
@@ -706,7 +717,18 @@ class Follower(object):
         self.heading = heading
         # Assign the current states to the correct heading
         self.assign_states()
-        # Move forward until off block
+        # Check for error conditions
+        if(self.error != "NONE"):
+            self.update_exit_state()
+            self.logger.info("Error: {}".format( self.error ))
+            self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
+                self.front_state,
+                self.back_state,
+                self.left_state,
+                self.right_state))
+            self.driver.move(0,0)
+            return self.error
+       # Move forward until off block
         direction = 180 - heading
         while self.error == Follower.Large_Object:
             self.driver.move(60,direction)

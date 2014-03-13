@@ -579,9 +579,11 @@ class Follower(object):
         #then correct forwards/backwards
         forw_to_back_strafe = pid_mod.PID()
         # Init front_PID
-        forw_to_back_strafe.set_k_values(3.75, 0, .75)
+        forw_to_back_strafe.set_k_values(2.5, 0, 1)
         previous_time = time();
         while True:
+            # kill momentum before reading
+            self.driver.move(0, 0)
             # Assig states
             self.assign_states()
             # Check for error conditions
@@ -633,9 +635,11 @@ class Follower(object):
         while True:
             center_rotate_pid.clear_error()
             previous_time = time();
-            while True:
-                # Init front_PID
-                center_rotate_pid.set_k_values(2.75, .4, .75)
+            # Init front_PID
+           center_rotate_pid.set_k_values(2.75, .4, .75)
+           while True:
+                # kill momentum before reading
+                self.driver.move(0, 0)
                 # Assig states
                 self.assign_states()
                 # Check for error conditions
@@ -674,9 +678,11 @@ class Follower(object):
             # Init front_PID
             side_to_side_strafe.set_k_values(.75, .5, 1.75)
             while True:
+                # kill momentum before reading
+                self.driver.move(0, 0)
                 # Assig states
                 self.assign_states()
-                 # Check for error conditions
+                # Check for error conditions
                 if(self.error != "NONE" and self.error != "ON_INTERSECTION"):
                     self.update_exit_state()
                     self.logger.info("Error: {}".format( self.error ))

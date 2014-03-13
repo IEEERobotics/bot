@@ -9,7 +9,7 @@ import lib.lib as lib
 import hardware.ir_hub as ir_hub_mod
 import driver.mec_driver as mec_driver_mod
 import pid as pid_mod
-#import hardware.color_sensor as color_sensor_mod
+import hardware.color_sensor as color_sensor_mod
 
 
 class Follower(object):
@@ -33,7 +33,7 @@ class Follower(object):
         self.ir_hub = ir_hub_mod.IRHub()
         self.ir_hub.thrsh = 100
         self.driver = mec_driver_mod.MecDriver()
-#        self.color = color_sensor_mod.ColorSensor()
+        self.color = color_sensor_mod.ColorSensor()
 
         # Build PIDs
         self.strafe = pid_mod.PID()
@@ -89,10 +89,10 @@ class Follower(object):
         return self.rotate_error
 
     
-#    @lib.api_call
-#    def wait_for_start(self):
-#        """Poll color senor unti green start signal lights up."""
-#        return self.color.watch_for_green() 
+    @lib.api_call
+    def wait_for_start(self):
+        """Poll color senor unti green start signal lights up."""
+        return self.color.watch_for_green() 
 
     @lib.api_call
     def is_on_line(self):

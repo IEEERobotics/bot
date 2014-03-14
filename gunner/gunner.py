@@ -50,9 +50,8 @@ class Gunner(object):
     def ratio_localizer(self, dists_from_center):
         """Localize based on range measurement from center of bot"""
 
-        #x_size = 1.2065  # in meters, official spec: 47.5"
-        x_size = 1.1786  # in meters, practice course: 46.4"
-        y_size = 2.4257  # in meters, official spec: 95.5"
+        x_size = self.config['course']['default']['x_size']
+        y_size = self.config['course']['default']['y_size']
 
         # bot will have left side facing target
         # back + front = x_size when square
@@ -87,10 +86,11 @@ class Gunner(object):
     def validate_pose(self, x_pos, y_pos, theta):
 
         # minimums and maximums of possible blue block centers
-        y_min = 0.889  # 35"
-        y_max = 1.524  # 60"
-        x_min = 0.3    # ~12"
-        x_max = 1.07   # 42"
+        conf = self.config['course']['firing_box']
+        y_min = conf['y_min']
+        y_max = conf['y_max']
+        x_min = conf['x_min']
+        x_max = conf['x_max']
         if not ((x_min < x_pos < x_max) and (y_min < y_pos < y_max)):
             self.logger.warning("Invalid position for firing ({},{}), expected ({},{})-({},{})".format(
                     x_pos, y_pos, x_min, y_min, x_max, y_max))

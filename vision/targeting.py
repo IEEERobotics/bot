@@ -125,6 +125,9 @@ class TargetLocator(object):
 
         # ** Misc
         self.do_cast_contours = (cv2.__version__ == "2.4.3")  # bug workaround
+        self.refinement_skip_samples = 5  # no. of camera samples to skip
+        self.refinement_num_samples = 10  # samples to process
+        self.refinement_good_threshold = 5  # good sample count to accept
 
         # ** Final output
         self.location = None  # target location
@@ -171,6 +174,34 @@ class TargetLocator(object):
             self.auto_exposure = value
             cv.SetCaptureProperty(
                 self.capture, CV_CAP_PROP_AUTO_EXPOSURE, self.auto_exposure)
+
+    # TODO: @lib.api_call?
+    def find_target_refined(self):
+        """Use find_target() repeatedly to get a refined result."""
+        if self.capture is None:
+            return self.location  # no input, can't do anything!
+
+        # Skip some frames
+        for i in xrange(self.refinement_skip_samples):
+            img = cv.QueryFrame(self.capture)  # skip
+
+        # Read till at least a threshold number are good
+        best_location = None
+        num_good = 0
+        for i in xrange(self.refinement_skip_samples):
+            location = self.find_target()
+            if location is not None:
+                best_location = location
+                num_good += 1
+                if num_good >= self.refinement_good_threshold:
+                    break
+
+        if best_location is not None:
+            self.logger.info(
+                "Target @ (%6.2f, %6.2f) [refined]",
+                best_location[0], best_location[1])
+            self.location = best_location
+        return best_location
 
     # TODO: @lib.api_call?
     def find_target(self):
@@ -317,8 +348,9 @@ class TargetLocator(object):
             cv2.drawContours(self.res, self.squares, -1, (0, 255, 0), 3)
             # Paint target, if located
             if self.location is not None:
+                disp_location = self.location + self.offset
                 cv2.circle(
-                    self.res, (int(self.location[0]), int(self.location[1])),
+                    self.res, (int(disp_location[0]), int(disp_location[1])),
                     3, (0, 255, 255), -1)
         cv2.imshow("Output", self.res)  # NOTE: someone needs to call waitKey
 
@@ -338,7 +370,7 @@ def runTargetLocator(device=TargetLocator.default_device,
     print "run(): Starting main loop Ctrl+C here or Esc on image to quit..."
     while True:
         try:
-            loc = targetLocator.find_target()
+            loc = targetLocator.find_target_refined()
             if loc is not None:
                 x, y = tuple(loc)  # test unpacking; alt.: loc[0], loc[1]
                 #print "run(): (x, y) = ({:6.2f}, {:6.2f})".format(x, y)

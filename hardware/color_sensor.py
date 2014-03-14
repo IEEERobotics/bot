@@ -98,7 +98,7 @@ class ColorSensor(I2CDevice):
             b = self.registers['BDATA'].read()
 
             # Green is weakest color, so bias it to 110% reading.
-            g *= 1.01
+            g *= 1.0001
 
             return valid, c, r, g, b
         else:

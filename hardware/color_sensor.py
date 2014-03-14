@@ -143,8 +143,9 @@ class ColorSensor(I2CDevice):
         diff_g = (self.color["green"] - self.bg) / self.bg
         diff_b = (self.color["blue"] - self.bb) / self.bb
         
-        # Bias green.
+        # Green is weakest color, so bias in that direction.
         diff_g *= 1.01
+
         return diff_c, diff_r, diff_g, diff_b
 
     @lib.api_call

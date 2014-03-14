@@ -60,7 +60,10 @@ class TestLocalize(test_bot.TestBot):
         super(TestLocalize, self).setUp()
         # Build wheel gunner
         self.gunner = gunner.Gunner()
-        self.good_dists = {'front': 0.7065, 'back': 0.5, 'left': 1.0, 'right': 1.4257}
+        x_size = self.config['course']['default']['x_size']
+        y_size = self.config['course']['default']['y_size']
+        self.good_dists = {'front': x_size - 0.5, 'back': 0.5,
+                'left': 1.0, 'right': y_size - 1.0}
         self.gunner.ultrasonics.read_dists = lambda: self.good_dists
         self.logger.info("Running: {}".format(self._testMethodName))
 

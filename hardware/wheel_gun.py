@@ -122,7 +122,7 @@ class WheelGun(object):
             return self._wheel_velocity
         left = self.wheel_motors['left'].velocity
         right = self.wheel_motors['right'].velocity
-        if not (left == right):
+        if abs(left - right) > 1:
             self.logger.warning("Wheel velocities not equal! Left: {}, Right: {}".format(left, right))
         return self.dmcc_to_tps * (left + right)/2.0
 

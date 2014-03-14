@@ -321,7 +321,7 @@ class TargetLocator(object):
                     binary, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
                 # OpenCV 2.4.3 bug workaround
                 if self.do_cast_contours:
-                    contours = [np.uint32(c) for c in contours]
+                    contours = [np.float32(c) for c in contours]
 
                 # Iterate over contours, find ones which look like squares
                 for cnt in contours:
@@ -370,7 +370,7 @@ def runTargetLocator(device=TargetLocator.default_device,
     print "run(): Starting main loop Ctrl+C here or Esc on image to quit..."
     while True:
         try:
-            loc = targetLocator.find_target_refined()
+            loc = targetLocator.find_target()
             if loc is not None:
                 x, y = tuple(loc)  # test unpacking; alt.: loc[0], loc[1]
                 #print "run(): (x, y) = ({:6.2f}, {:6.2f})".format(x, y)

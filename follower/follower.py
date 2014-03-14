@@ -748,10 +748,11 @@ class Follower(object):
             return self.error
        # Move forward until off block
         direction = 180 - heading
-        while self.error == Follower.Large_Object:
+        while self.front_state == Follower.Large_Object:
             self.driver.move(60,direction)
             sleep(0.25)
             self.assign_states()
+        self.driver.move(0, 0)
         #After off block, use center on line to straigten
         self.center_on_line(heading)
         return "DONE CENTER ON BLUE BLOCK"
@@ -766,6 +767,26 @@ class Follower(object):
 
 
 
+    @lib.api_call
+    def strafe_to_line(self, heading=90):
+        """Attempt to strafe sideways from one firing line to the next  """
+        #assumes centered on line
+        self.heading = heading
+        self.assign_states()
+        # strafe until off current line 
+        while ((self.left_state < Follower.No_Line) and
+            (self.right_state < Follower.No_Line)):
+            self.driver.move(self.translate_speed, heading)
+            self.assign_states()
+        self.driver.move(0, 0)
+        # strafe until on next line
+        while ((self.left_state == Follower.No_Line) or
+            (self.right_state == Follower.No_Line)):
+            self.driver.move(self.translate_speed, heading)
+            self.assign_states()       
+        self.driver.move(0, 0)       
+        return "DONE STRAFING TO LINE"
+ 
 
 
  

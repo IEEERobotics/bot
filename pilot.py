@@ -73,12 +73,16 @@ class Pilot:
             elif self.state == self.State.FOLLOW:
                 self.call('follower', 'follow', {'heading': self.heading})
                 result = self.call('follower', 'get_result')
-                # Not handling lost line
+                # Not handling LOST_LINE, FRONT_LOST and BACK_LOST
                 if result == "ON_INTERSECTION":
                     self.logger.info("Found intersection")
                     self.state = self.State.CENTER_ON_X
                 elif result == "LARGE_OBJECT":
-                    self.logger.info("Found large object, hopefully X")
+                    self.logger.info("Found large object, doing a short jerk")
+                    self.call('driver', 'drive', {
+                        'speed': 60,
+                        'angle': self.heading_to_driver_angle(self.heading),
+                        'duration': 0.1})
                     self.state = self.State.CENTER_ON_X
                 else:
                     self.bail("{} state after follow".format(result))
@@ -101,6 +105,8 @@ class Pilot:
                 result = self.call('follower', 'get_result')
                 if result != "ON_INTERSECTION":
                     self.bail("{} state after rotate on X".format(result))
+                # TODO: Deal with LOST_LINE, FRONT_LOST and BACK_LOST
+                #   (shouldn't normally happen, but may after a bad rotate)
                 self.state = self.State.FOLLOW_ON_X
             elif self.state == self.State.FOLLOW_ON_X:
                 self.call('follower', 'follow', {"heading": self.heading, 
@@ -151,6 +157,12 @@ class Pilot:
         self.logger.error("Can't handle follower result: {}".format(result))
         self.call('ctrl', 'stop_full')
         sys.exit(1)
+
+    def heading_to_driver_angle(self, heading):
+        """Convert bot heading to raw angle for driver."""
+        # NOTE(napratin,3/13): Currently follower uses 180 = front,
+        #   while driver uses 0 = front, hence the need for conversion.
+        return (heading + 180) % 360
 
 
 if __name__ == "__main__":

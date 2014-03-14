@@ -155,9 +155,9 @@ class Follower(object):
             # Check for error conditions
             if self.error != "NONE":
                 #require two succesive large_object readings to exit
-                if self.error=="LARGE_OBJECT" and count_object<1:
-                    count_object += 1
-                    continue
+#                if self.error=="LARGE_OBJECT" and count_object<1:
+#                    count_object += 1
+#                    continue
                 self.update_exit_state()
                 self.logger.info("Error: {}".format( self.error ))
                 self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
@@ -761,8 +761,8 @@ class Follower(object):
 
 
     @lib.api_call
-    def center_on_red(self):
-        return True  # TODO: Actually center on red_block
+    def fetch_error(self):
+        return self.error
 
 
 

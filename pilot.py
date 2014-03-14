@@ -13,7 +13,7 @@ class Pilot:
                       'FOLLOW', 'CENTER_ON_X', 'ROTATE_ON_X',
                       'CENTER_ON_BLUE', 'AIM', 'FIRE',
                       'CHOOSE_DIR_BLUE', 'TURN_BACK',
-                      'CENTER_ON_RED', 'FINISH'))
+                      'CENTER_ON_RED', 'FINISH', 'FOLLOW_ON_X'))
 
     def __init__(self, ctrl_addr="tcp://127.0.0.1:60000",
                  sub_addr="tcp://127.0.0.1:60001"):
@@ -39,13 +39,12 @@ class Pilot:
 
         # Initialize other members
         self.state = self.State.START
-        self.heading = 180
         self.blue_blocks = 0  # no. of blue blocks found and centered on
         self.darts_fired = 0  # no. of darts fired
 
     def __str__(self):
-        return "[{}] heading: {}, blue_blocks: {}, darts_fired: {}".format(
-            self.State.toString(self.state), self.heading, self.blue_blocks,
+        return "[{}] blue_blocks: {}, darts_fired: {}".format(
+            self.State.toString(self.state), self.blue_blocks,
             self.darts_fired)
 
     def run(self):
@@ -57,64 +56,59 @@ class Pilot:
                 self.logger.info(str(self))
                 last_state = self.state
 
-            # TODO: Require different systems to expose the desired API calls
             if self.state == self.State.START:
                 self.logger.info("Waiting for start")
-                # NOTE: follower must wrap color_sensor and expose is_* methods
                 result = self.call('color_sensor', 'watch_for_color',
                     {"color": "green"})
                 if result == True:
                     self.logger.info("Start signal found")
                     self.state = self.State.SMART_JERK
             elif self.state == self.State.SMART_JERK:
-                self.call('follower', 'smart_jerk')  # takes time
-                # Follower currently either finds the line or panics
-                #self.state = self.State.FIND_LINE
+                self.call('follower', 'smart_jerk')
+                self.call('follower', 'assign_states')
+                result = self.call('follower', 'fetch_error')
+                if result != "NONE":
+                    self.bail("{} state after smart jerk".format(result))
                 self.state = self.State.FOLLOW
-#           elif self.state == self.State.FIND_LINE:
-#               if self.call('follower', 'is_on_line') == True:  # on line
-#                   self.state = self.State.FOLLOW
-#               else:
-#                   self.logger.info("Lost line, trying to recover")
-#                   self.state = self.State.OSCILLATE
-#           elif self.state == self.State.OSCILLATE:
-#               self.call('follower', 'oscillate',
-#                   { 'heading' : self.heading })  # may succeed or fail
-#               self.state = self.State.FIND_LINE
             elif self.state == self.State.FOLLOW:
-                self.call('follower', 'follow', { 'heading' : self.heading })
-                # When follower is done following, one of the following is true
-                if self.call('follower', 'is_on_x') == True:  # intersection
+                self.call('follower', 'follow')
+                self.call('follower', 'assign_states')
+                result = self.call('follower', 'fetch_error')
+                # Not handling lost line
+                if result == "ON_INTERSECTION":
                     self.logger.info("Found intersection")
                     self.state = self.State.CENTER_ON_X
-                elif self.call('follower', 'is_on_blue') == True:  # blue block
-                    self.logger.info("Found blue block")
+                elif result == "LARGE_OBJECT":
+                    self.logger.info("Found large object")
                     self.state = self.State.CENTER_ON_BLUE
-                elif self.call('follower', 'is_on_red') == True:  # red block
-                    self.logger.info("Found red block")
-                    self.state = self.State.CENTER_ON_RED
-#               elif self.call('follower', 'is_end_of_line') == True:  # EOL
-#                   self.logger.info("At end of line")
-#                   self.state = self.State.TURN_BACK
-                elif self.call('follower', 'is_on_line') == False:  # at sea
-                    self.logger.warn("Lost line!")
-                    self.state = self.State.FIND_LINE
                 else:
-                    # Something wrong? Remain in FOLLOW state to try again
-                    self.logger.error("Unknown follower.follow result!")
+                    self.bail("{} state after follow".format(result))
             elif self.state == self.State.CENTER_ON_X:
-                self.call('follower', 'center_on_intersection')  # takes time
-                self.state = self.State.ROTATE_ON_X  # assume centering worked
+                self.call('follower', 'center_on_intersection')
+                self.call('follower', 'assign_states')
+                result = self.call('follower', 'fetch_error')
+                if result != "ON_INTERSECTION":
+                    self.bail("{} state after center on X".format(result))
+                self.state = self.State.ROTATE_ON_X
                 sys.exit(0)
             elif self.state == self.State.ROTATE_ON_X:
-                self.heading = (self.heading + 90) % 360  # always turn left
                 self.call('follower', 'rotate_on_x')
-                self.state = self.State.FOLLOW
+                self.call('follower', 'assign_states')
+                result = self.call('follower', 'fetch_error')
+                if result != "ON_INTERSECTION":
+                    self.bail("{} state after rotate on X".format(result))
+                self.state = self.State.FOLLOW_ON_X
+            elif self.state == self.State.FOLLOW_ON_X:
+                self.call('follower', 'follow', {"on_x": True})
+                self.call('follower', 'assign_states')
+                result = self.call('follower', 'fetch_error')
+                if not (result == "LARGE_OBJECT" or result == "NONE"):
+                    self.bail("{} state after rotate on X".format(result))
+                self.state = self.State.CENTER_ON_BLUE
+                # TODO: Nothing below this refactored to use returns!
             elif self.state == self.State.CENTER_ON_BLUE:
-                self.logger.info("Centering on blue block")
                 self.call('follower', 'center_on_blue')
                 self.blue_blocks += 1
-                # TODO: Wait for 3 secs., or ensure aiming takes that long?
                 self.state = self.State.AIM
             elif self.state == self.State.AIM:
                 self.logger.info("Aiming turret")
@@ -124,15 +118,10 @@ class Pilot:
                 self.logger.info("Firing gun")
                 self.call('gunner', 'fire')
                 self.darts_fired += 1
-                self.state = self.State.CHOOSE_DIR_BLUE  # same as TURN_BACK?
+                self.state = self.State.CHOOSE_DIR_BLUE
             elif self.state == self.State.CHOOSE_DIR_BLUE:
                 self.logger.info("Turning around from blue block")
-                self.heading = (self.heading + 180) % 360  # turn around
                 self.state = self.State.FOLLOW
-#           elif self.state == self.State.TURN_BACK:
-#               self.logger.info("Turning around from end of line")
-#               self.heading = (self.heading + 180) % 360  # turn around
-#               self.state = self.State.FOLLOW
             elif self.state == self.State.CENTER_ON_RED:
                 self.call('follower', 'center_on_red')
                 self.state = self.State.FINISH
@@ -148,6 +137,17 @@ class Pilot:
             return None
         else:
             return result['call_return']
+
+    def bail(self, msg):
+        """Log error message and exit cleanly, stopping all systems.
+
+        :param msg: Error message to log.
+        :type msg: string
+
+        """
+        self.logger.error("Can't handle follower result: {}".format(result))
+        self.call('ctrl', 'stop_full')
+        sys.exit(1)
 
 
 if __name__ == "__main__":

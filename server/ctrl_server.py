@@ -104,7 +104,7 @@ class CtrlServer(object):
             port=self.config["ctrl_server_port"])
         try:
             self.ctrl_sock.bind(self.server_bind_addr)
-        except zmq.error.ZMQError:
+        except zmq.ZMQError:
             self.logger.error("ZMQ error. Is a server already running?")
             self.logger.warning("May be connected to an old server instance.")
             sys.exit(1)

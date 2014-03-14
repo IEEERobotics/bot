@@ -33,7 +33,7 @@ class Follower(object):
         self.ir_hub = ir_hub_mod.IRHub()
         self.ir_hub.thrsh = 100
         self.driver = mec_driver_mod.MecDriver()
-        self.color = color_sensor_mod.ColorSensor()
+        self.color_sensor = color_sensor_mod.ColorSensor()
 
         # Build PIDs
         self.strafe = pid_mod.PID()
@@ -93,7 +93,7 @@ class Follower(object):
     @lib.api_call
     def wait_for_start(self):
         """Poll color senor unti green start signal lights up."""
-        return self.color.watch_for_color("green") 
+        return self.color_sensor.watch_for_color("green") 
 
     @lib.api_call
     def is_on_line(self):

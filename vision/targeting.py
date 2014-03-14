@@ -9,6 +9,7 @@ Can open a window to display detected target; this is disabled by default.
 import lib.lib as lib
 
 import sys
+import argparse
 import numpy as np
 import cv2
 import cv
@@ -122,6 +123,9 @@ class TargetLocator(object):
         self.kernel = self.kernel_inv_cross  # pick kernel that works best
         self.logger.debug("Morph. kernel: {}".format(self.kernel))
 
+        # ** Misc
+        self.do_cast_contours = (cv2.__version__ == "2.4.3")  # bug workaround
+
         # ** Final output
         self.location = None  # target location
 
@@ -137,7 +141,7 @@ class TargetLocator(object):
 
     def open_device(self, device=0):
         # Open input device [API: cv]
-        self.capture = cv.CaptureFromCAM(0)
+        self.capture = cv.CaptureFromCAM(device)  # NOTE: won't work with files
         return self.capture is not None
 
     def close_device(self):
@@ -238,7 +242,7 @@ class TargetLocator(object):
         # Squares is the array that has the pixel locations of the vertices
         self.squares = self.find_squares(self.res)
         if self.squares:
-            self.logger.debug("%d squares", len(self.squares))
+            self.logger.debug("%d square(s)", len(self.squares))
             #print "Squares: {}".format(self.squares)  # [verbose]
 
             # Process squares array and set self.location to (x, y) pair
@@ -284,6 +288,9 @@ class TargetLocator(object):
                 # Find contours (NOTE: repeating this many times can be slow)
                 contours, hierarchy = cv2.findContours(
                     binary, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+                # OpenCV 2.4.3 bug workaround
+                if self.do_cast_contours:
+                    contours = [np.uint32(c) for c in contours]
 
                 # Iterate over contours, find ones which look like squares
                 for cnt in contours:
@@ -319,10 +326,15 @@ class TargetLocator(object):
         self.close_device()
 
 
-def runTargetLocator(device=TargetLocator.default_device, gui=False):
+def runTargetLocator(device=TargetLocator.default_device,
+        gui=False, debug=False):
     """A standalone driver for testing TargetLocator."""
 
     targetLocator = TargetLocator(device)
+    # Quick hack, elevating debug messages to info
+    if debug:
+        targetLocator.logger.debug = targetLocator.logger.info
+
     print "run(): Starting main loop Ctrl+C here or Esc on image to quit..."
     while True:
         try:
@@ -351,6 +363,20 @@ def runTargetLocator(device=TargetLocator.default_device, gui=False):
 
 
 if __name__ == "__main__":
-    runTargetLocator(
-        sys.argv[1] if len(sys.argv) > 1 else TargetLocator.default_device,
-        gui=True)
+    argParser = argparse.ArgumentParser(
+            description="TargetLocator: Driver program")
+    argParser.add_argument('--debug', action="store_true",
+            help="show debug output?")
+    guiGroup = argParser.add_mutually_exclusive_group()
+    guiGroup.add_argument('--gui', dest='gui', action='store_true',
+            default=True, help="display GUI interface/windows?")
+    guiGroup.add_argument('--no_gui', dest='gui', action='store_false',
+            default=False, help="suppress GUI interface/windows?")
+    argParser.add_argument('input_source', nargs='?',
+            default=str(TargetLocator.default_device),
+            help="input camera device no.")
+    options = argParser.parse_args()
+
+    print "TargetLocator: Running on OpenCV", cv2.__version__
+    runTargetLocator(int(options.input_source),
+        gui=options.gui, debug=options.debug)

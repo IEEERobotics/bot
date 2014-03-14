@@ -39,12 +39,13 @@ class Pilot:
 
         # Initialize other members
         self.state = self.State.START
+        self.heading = 180
         self.blue_blocks = 0  # no. of blue blocks found and centered on
         self.darts_fired = 0  # no. of darts fired
 
     def __str__(self):
-        return "[{}] blue_blocks: {}, darts_fired: {}".format(
-            self.State.toString(self.state), self.blue_blocks,
+        return "[{}] heading: {}, blue_blocks: {}, darts_fired: {}".format(
+            self.State.toString(self.state), self.heading, self.blue_blocks,
             self.darts_fired)
 
     def run(self):
@@ -65,49 +66,55 @@ class Pilot:
                     self.state = self.State.SMART_JERK
             elif self.state == self.State.SMART_JERK:
                 self.call('follower', 'smart_jerk')
-                self.call('follower', 'assign_states')
-                result = self.call('follower', 'fetch_error')
+                result = self.call('follower', 'get_result')
                 if result != "NONE":
                     self.bail("{} state after smart jerk".format(result))
                 self.state = self.State.FOLLOW
             elif self.state == self.State.FOLLOW:
-                self.call('follower', 'follow')
-                self.call('follower', 'assign_states')
-                result = self.call('follower', 'fetch_error')
+                self.call('follower', 'follow', {'heading': self.heading})
+                result = self.call('follower', 'get_result')
                 # Not handling lost line
                 if result == "ON_INTERSECTION":
                     self.logger.info("Found intersection")
                     self.state = self.State.CENTER_ON_X
                 elif result == "LARGE_OBJECT":
-                    self.logger.info("Found large object")
-                    self.state = self.State.CENTER_ON_BLUE
+                    self.logger.info("Found large object, hopefully X")
+                    self.state = self.State.CENTER_ON_X
                 else:
                     self.bail("{} state after follow".format(result))
             elif self.state == self.State.CENTER_ON_X:
                 self.call('follower', 'center_on_intersection')
-                self.call('follower', 'assign_states')
-                result = self.call('follower', 'fetch_error')
+                result = self.call('follower', 'get_result')
                 if result != "ON_INTERSECTION":
                     self.bail("{} state after center on X".format(result))
                 self.state = self.State.ROTATE_ON_X
-                sys.exit(0)
             elif self.state == self.State.ROTATE_ON_X:
-                self.call('follower', 'rotate_on_x')
-                self.call('follower', 'assign_states')
-                result = self.call('follower', 'fetch_error')
+                # Always turn left
+                if self.heading == 180:
+                    # Traveling forward relative to bot
+                    self.call('follower', 'rotate_on_x', {"direction": "left"})
+                elif self.heading == 0:
+                    # Traveling backwards relative to bot
+                    self.call('follower', 'rotate_on_x', {"direction": "right"})
+                else:
+                    self.bail("Unexpected heading: {}".format(self.heading))
+                result = self.call('follower', 'get_result')
                 if result != "ON_INTERSECTION":
                     self.bail("{} state after rotate on X".format(result))
                 self.state = self.State.FOLLOW_ON_X
             elif self.state == self.State.FOLLOW_ON_X:
-                self.call('follower', 'follow', {"on_x": True})
-                self.call('follower', 'assign_states')
-                result = self.call('follower', 'fetch_error')
+                self.call('follower', 'follow', {"heading": self.heading, 
+                    "on_x": True})
+                result = self.call('follower', 'get_result')
                 if not (result == "LARGE_OBJECT" or result == "NONE"):
                     self.bail("{} state after rotate on X".format(result))
+                # TODO: Seems wrong if moving between intersections
                 self.state = self.State.CENTER_ON_BLUE
-                # TODO: Nothing below this refactored to use returns!
             elif self.state == self.State.CENTER_ON_BLUE:
                 self.call('follower', 'center_on_blue')
+                result = self.call('follower', 'get_result')
+                if result != "NONE":
+                    self.bail("{} state after center on blue".format(result))
                 self.blue_blocks += 1
                 self.state = self.State.AIM
             elif self.state == self.State.AIM:
@@ -118,13 +125,9 @@ class Pilot:
                 self.logger.info("Firing gun")
                 self.call('gunner', 'fire')
                 self.darts_fired += 1
-                self.state = self.State.CHOOSE_DIR_BLUE
-            elif self.state == self.State.CHOOSE_DIR_BLUE:
                 self.logger.info("Turning around from blue block")
+                self.heading = (self.heading + 180) % 360
                 self.state = self.State.FOLLOW
-            elif self.state == self.State.CENTER_ON_RED:
-                self.call('follower', 'center_on_red')
-                self.state = self.State.FINISH
 
         self.logger.info(str(self))  # terminal state report
         self.logger.info("Done!")

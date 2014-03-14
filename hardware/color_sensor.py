@@ -97,9 +97,6 @@ class ColorSensor(I2CDevice):
             g = self.registers['GDATA'].read()
             b = self.registers['BDATA'].read()
 
-            # Green is weakest color, so bias it to 110% reading.
-            g *= 1.0001
-
             return valid, c, r, g, b
         else:
             return 1, 1, 1, 1, 1
@@ -145,6 +142,9 @@ class ColorSensor(I2CDevice):
         diff_r = (self.color["red"] - self.br) / self.br
         diff_g = (self.color["green"] - self.bg) / self.bg
         diff_b = (self.color["blue"] - self.bb) / self.bb
+        
+        # Bias green.
+        diff_g *= 1.01
         return diff_c, diff_r, diff_g, diff_b
 
     @lib.api_call

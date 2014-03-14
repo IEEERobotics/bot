@@ -132,7 +132,7 @@ class Follower(object):
         return 
  
     @lib.api_call
-    def follow(self, heading=180, on_x=False):
+    def follow(self, heading, on_x=False):
         """Follow line along given heading"""
         #reset errors
         self.reset_errors()
@@ -757,15 +757,10 @@ class Follower(object):
         self.center_on_line(heading)
         return "DONE CENTER ON BLUE BLOCK"
 
-
-
-
-
     @lib.api_call
-    def fetch_error(self):
+    def get_result(self):
+        self.assign_states()
         return self.error
-
-
 
     @lib.api_call
     def strafe_to_line(self, heading=90):
@@ -786,7 +781,3 @@ class Follower(object):
             self.assign_states()       
         self.driver.move(0, 0)       
         return "DONE STRAFING TO LINE"
- 
-
-
- 

@@ -15,12 +15,14 @@ class Pilot:
                       'CHOOSE_DIR_BLUE', 'TURN_BACK',
                       'CENTER_ON_RED', 'FINISH', 'FOLLOW_ON_X'))
 
-    def __init__(self, ctrl_addr="tcp://127.0.0.1:60000",
-                 sub_addr="tcp://127.0.0.1:60001"):
+    def __init__(self,
+                 ctrl_addr="tcp://127.0.0.1:60000",
+                 sub_addr="tcp://127.0.0.1:60001",
+                 max_intersections=3):
         # Get config, build logger
         self.config = lib.get_config()
         self.logger = lib.get_logger()
-        
+
         # Build control client
         try:
             self.ctrl_client = ctrl_client_mod.CtrlClient(ctrl_addr)
@@ -40,12 +42,18 @@ class Pilot:
         # Initialize other members
         self.state = self.State.START
         self.heading = 180
+        self.max_intersections = max_intersections  # total on course
+        self.intersections = 0  # no. of intersections seen
         self.blue_blocks = 0  # no. of blue blocks found and centered on
         self.darts_fired = 0  # no. of darts fired
 
     def __str__(self):
-        return "[{}] heading: {}, blue_blocks: {}, darts_fired: {}".format(
-            self.State.toString(self.state), self.heading, self.blue_blocks,
+        return "[{}] heading: {}, intersections: {},"
+               " blue_blocks: {}, darts_fired: {}".format(
+            self.State.toString(self.state),
+            self.intersections,
+            self.heading,
+            self.blue_blocks,
             self.darts_fired)
 
     def run(self):
@@ -75,17 +83,31 @@ class Pilot:
                 result = self.call('follower', 'get_result')
                 # Not handling LOST_LINE, FRONT_LOST and BACK_LOST
                 if result == "ON_INTERSECTION":
+                    # We're definitely on a intersection
                     self.logger.info("Found intersection")
                     self.state = self.State.CENTER_ON_X
                 elif result == "LARGE_OBJECT":
-                    self.logger.info("Found large object, doing a short jerk")
-                    self.call('driver', 'drive', {
-                        'speed': 60,
-                        'angle': self.heading_to_driver_angle(self.heading),
-                        'duration': 0.1})
-                    self.state = self.State.CENTER_ON_X
+                    # Check if we've seen all intersections already
+                    if self.intersections >= self.max_intersections:
+                        self.logger.warn("Must be red! We're done.")
+                        self.state = self.State.FINISH
+                    else:
+                        # We could be on an intersection
+                        self.logger.info("Found large object, doing short jerk")
+                        self.call('driver', 'drive', {
+                            'speed': 60,
+                            'angle': self.heading_to_driver_angle(self.heading),
+                            'duration': 0.1})
+                        self.state = self.State.CENTER_ON_X
                 else:
-                    self.bail("{} state after follow".format(result))
+                    # Check if we're expecting the second (curved) intersection
+                    # TODO: Do this only when coming back from a branch?
+                    if self.intersections == 1:
+                        # If so, keep following
+                        self.logger.info(
+                            "{} state; could be intersection 2".format(result))
+                    else:
+                        self.bail("{} state after follow".format(result))
             elif self.state == self.State.CENTER_ON_X:
                 self.call('follower', 'center_on_intersection')
                 result = self.call('follower', 'get_result')
@@ -97,8 +119,15 @@ class Pilot:
                 if self.heading == 180:
                     # Traveling forward relative to bot
                     self.call('follower', 'rotate_on_x', {"direction": "left"})
+                    # NOTE: Only count an intersection when going out
+                    self.intersection += 1
+                    # Check if we've seen all intersections already
+                    if self.intersections > self.max_intersections:
+                        self.logger.warn("Too many intersections! We're done.")
+                        self.state = self.State.FINISH
                 elif self.heading == 0:
                     # Traveling backwards relative to bot
+                    # NOTE: Don't count intersection here
                     self.call('follower', 'rotate_on_x', {"direction": "right"})
                 else:
                     self.bail("Unexpected heading: {}".format(self.heading))

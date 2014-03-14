@@ -132,7 +132,7 @@ class Follower(object):
         return 
  
     @lib.api_call
-    def follow(self, heading, on_x=False):
+    def follow(self, heading=180, on_x=False):
         """Follow line along given heading"""
         #reset errors
         self.reset_errors()

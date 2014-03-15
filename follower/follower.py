@@ -234,8 +234,12 @@ class Follower(object):
         self.logger.info("right = {}".format(self.right_state))
     
     @lib.api_call
-    def oscillate(self, heading, osc_time=1):
-        """Oscillate sideways, increasing in amplitude until line is found"""
+    def oscillate(self, heading=0, osc_time=0.5):
+        """Oscillate sideways, increasing in amplitude until line is found
+        :param heading: The forward direction of the bot.
+        :param osc_time: The initial time spent in each direction.
+        
+        """
 
         # Time in seconds for which bot oscillates in each direction.
         # Speed at which the bot is oscillating.

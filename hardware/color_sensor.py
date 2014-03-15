@@ -92,7 +92,7 @@ class ColorSensor(I2CDevice):
 
         """
 
-        duty_period = brightness/100 * 2 * 10^6
+        duty_period = brightness/100 * 2000000
         # try:
             # assert duty_period < 2*10^6
         # except AssertionError:

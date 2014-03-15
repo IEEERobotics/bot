@@ -141,9 +141,9 @@ class Follower(object):
         self.heading = heading
         previous_time = time()
         # Init front_PID
-        self.strafe.set_k_values(8, 0, .1)
+        self.strafe.set_k_values(10, 0, .5)
         # Inti rotate_PID
-        self.rotate_pid.set_k_values(6, 0, .10)
+        self.rotate_pid.set_k_values(7, 0, 1)
         # Get current heading
         self.heading = heading
         # Continue until an error condition
@@ -640,7 +640,7 @@ class Follower(object):
             center_rotate_pid.clear_error()
             previous_time = time();
             # Init front_PID
-            center_rotate_pid.set_k_values(2.75, .4, .75)
+            center_rotate_pid.set_k_values(6.75, .4, 1.75)
             while True:
                 # kill momentum before reading
                 self.driver.move(0, 0)
@@ -680,7 +680,7 @@ class Follower(object):
             side_to_side_strafe.clear_error()
             previous_time = time();
             # Init front_PID
-            side_to_side_strafe.set_k_values(.75, .5, 1.75)
+            side_to_side_strafe.set_k_values(2.75, 1, 3.75)
             while True:
                 # kill momentum before reading
                 self.driver.move(0, 0)

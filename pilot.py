@@ -183,7 +183,7 @@ class Pilot:
         :type msg: string
 
         """
-        self.logger.error("Can't handle follower result: {}".format(result))
+        self.logger.error("Can't handle follower result: {}".format(msg))
         self.call('ctrl', 'stop_full')
         sys.exit(1)
 

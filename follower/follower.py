@@ -455,7 +455,7 @@ class Follower(object):
             # Right is on the back
             self.right_state = self.get_position_rl(
                 current_ir_reading["left"])
-        
+        self.left_state = self.right_state    
 
 
     def update_exit_state(self):

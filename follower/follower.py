@@ -43,7 +43,7 @@ class Follower(object):
         self.error = "NONE"
         
         # motor variables
-        self.translate_speed =  60
+        self.translate_speed =  75  
         self.prev_rate = 0
 
         #state variables
@@ -143,7 +143,7 @@ class Follower(object):
         # Init front_PID
         self.strafe.set_k_values(8, 0, .1)
         # Inti rotate_PID
-        self.rotate_pid.set_k_values(6, 0, 0)
+        self.rotate_pid.set_k_values(6, 0, .10)
         # Get current heading
         self.heading = heading
         # Continue until an error condition
@@ -155,9 +155,9 @@ class Follower(object):
             # Check for error conditions
             if self.error != "NONE":
                 #require two succesive large_object readings to exit
-#                if self.error=="LARGE_OBJECT" and count_object<1:
-#                    count_object += 1
-#                    continue
+                if self.error=="LARGE_OBJECT" and count_object<1:
+                    count_object += 1
+                    continue
                 self.update_exit_state()
                 self.logger.info("Error: {}".format( self.error ))
                 self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
@@ -192,7 +192,7 @@ class Follower(object):
 
 
     @lib.api_call
-    def rotate_on_x(self,direction="left",speed=100,time=0.7):
+    def rotate_on_x(self,direction="left",speed=100,time=0.95):
         #After center_on_x, rotate in the commanded directions
         #by 90 degrees. 
         if(direction=="left"):
@@ -209,7 +209,8 @@ class Follower(object):
         sleep(time)
 
         self.driver.move(0,0)
-
+        
+        self.center_on_intersection()
         return "Done"
 
     @lib.api_call
@@ -375,10 +376,13 @@ class Follower(object):
                 if( self.back_state == Follower.Large_Object):
                     # Ignore large objects on back array by using prev back state
                     self.back_state = prev_back_state
-                else:
+                if(self.front_state == Follower.Noise):
                     #Ignore Noise conditions 
                     self.front_state = prev_front_state
+                if(self.back_state == Follower.Noise):
+                    #Ignore Noise conditions
                     self.back_state = prev_back_state
+                
                     # self.error = "NONE"
         else: #no errors
             self.error = "NONE" 
@@ -451,7 +455,7 @@ class Follower(object):
             # Right is on the back
             self.right_state = self.get_position_rl(
                 current_ir_reading["left"])
-        
+        self.left_state = self.right_state    
 
 
     def update_exit_state(self):
@@ -556,7 +560,7 @@ class Follower(object):
         if((count != 0) and (last_count != 0)):
             self.driver.move(0,0)
             return "DONE"
-        self.driver.move(70,0)
+        self.driver.move(self.translate_speed,0)
         self.logger.info("count = {}".format(count))
         last_count = count 
 

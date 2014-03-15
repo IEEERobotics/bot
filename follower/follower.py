@@ -436,11 +436,13 @@ class Follower(object):
             self.back_state = self.get_position_rl(
                 current_ir_reading["back"])
             # Left is on the left
-            self.left_state = self.get_position_lr(
-                current_ir_reading["left"])
+            #self.left_state = self.get_position_lr(
+            #    current_ir_reading["left"])
             # right is on the right
             self.right_state = self.get_position_rl(
                 current_ir_reading["right"])
+            #for tri_state, copy right state to left
+            self.left_state = self.right_state
         # Heading north
         elif self.heading == 0:
             # Forward is on the right side
@@ -453,9 +455,10 @@ class Follower(object):
             self.left_state = self.get_position_lr(
                 current_ir_reading["right"])
             # Right is on the back
-            self.right_state = self.get_position_rl(
-                current_ir_reading["left"])
-        self.left_state = self.right_state    
+            #self.right_state = self.get_position_rl(
+            #    current_ir_reading["left"])
+            #in tri state, copy left to right
+            self.right_state = self.left_state
 
 
     def update_exit_state(self):
@@ -583,7 +586,7 @@ class Follower(object):
         #then correct forwards/backwards
         forw_to_back_strafe = pid_mod.PID()
         # Init front_PID
-        forw_to_back_strafe.set_k_values(2.5, 0, 1)
+        forw_to_back_strafe.set_k_values(5.5, 0.5, 2)
         previous_time = time();
         while True:
             # kill momentum before reading
@@ -620,7 +623,7 @@ class Follower(object):
                 translate_angle = (0 + self.heading)%360
             else:
                 translate_angle = (180 + self.heading)%360
-            if(abs(bot_position) < 3):
+            if(abs(bot_position) < 5):
               return
             self.logger.info("translate_speed = {}".format(translate_speed))
             self.logger.info("translate_angle = {}".format(translate_angle))
@@ -680,7 +683,7 @@ class Follower(object):
             side_to_side_strafe.clear_error()
             previous_time = time();
             # Init front_PID
-            side_to_side_strafe.set_k_values(2.75, 1, 3.75)
+            side_to_side_strafe.set_k_values(4.75, 2, 5.75)
             while True:
                 # kill momentum before reading
                 self.driver.move(0, 0)

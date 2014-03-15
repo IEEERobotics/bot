@@ -104,7 +104,7 @@ class CtrlServer(object):
             port=self.config["ctrl_server_port"])
         try:
             self.ctrl_sock.bind(self.server_bind_addr)
-        except zmq.error.ZMQError:
+        except zmq.ZMQError:
             self.logger.error("ZMQ error. Is a server already running?")
             self.logger.warning("May be connected to an old server instance.")
             sys.exit(1)
@@ -130,7 +130,6 @@ class CtrlServer(object):
 
         self.gunner = Gunner()
         self.follower = Follower()
-        self.color_sensor = ColorSensor()
 
         systems = {}
         systems["ctrl"] = self
@@ -141,7 +140,7 @@ class CtrlServer(object):
         systems["ultrasonics"] = self.gunner.ultrasonics
         systems["gun"] = self.gunner.gun
         systems["ir_hub"] = self.follower.ir_hub
-        systems["color_sensor"] = self.color_sensor
+        systems["color_sensor"] = self.follower.color_sensor
         self.logger.debug("Systems: {}".format(systems))
         return systems
 

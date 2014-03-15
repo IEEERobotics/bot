@@ -286,8 +286,12 @@ def live_read_loop(delay=0.25, accurate=False):
         try:
             readings = hub.read_all()
             print "\n{}".format(time())
-            print "\n".join("{}: {}".format(name, reading)
-                            for name, reading in readings.iteritems())
+            nums = " ".join(["%4d" % i for i in range(16)])
+            print "Name ", nums
+            for name, reading in readings.items():
+                print "{:5s}:".format(name),
+                out = ", ".join(["%03d" % i for i in reading])
+                print out
             sleep(delay)
         except KeyboardInterrupt:
             print "ir_hub.live_read_loop(): Interrupted; exiting..."

@@ -43,7 +43,7 @@ class Follower(object):
         self.error = "NONE"
         
         # motor variables
-        self.translate_speed =  60
+        self.translate_speed =  75  
         self.prev_rate = 0
 
         #state variables
@@ -143,7 +143,7 @@ class Follower(object):
         # Init front_PID
         self.strafe.set_k_values(8, 0, .1)
         # Inti rotate_PID
-        self.rotate_pid.set_k_values(6, 0, 0)
+        self.rotate_pid.set_k_values(6, 0, .10)
         # Get current heading
         self.heading = heading
         # Continue until an error condition
@@ -155,9 +155,9 @@ class Follower(object):
             # Check for error conditions
             if self.error != "NONE":
                 #require two succesive large_object readings to exit
-#                if self.error=="LARGE_OBJECT" and count_object<1:
-#                    count_object += 1
-#                    continue
+                if self.error=="LARGE_OBJECT" and count_object<1:
+                    count_object += 1
+                    continue
                 self.update_exit_state()
                 self.logger.info("Error: {}".format( self.error ))
                 self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 

@@ -9,6 +9,7 @@ Can open a window to display detected target; this is disabled by default.
 import lib.lib as lib
 
 import sys
+import argparse
 import numpy as np
 import cv2
 import cv
@@ -122,6 +123,12 @@ class TargetLocator(object):
         self.kernel = self.kernel_inv_cross  # pick kernel that works best
         self.logger.debug("Morph. kernel: {}".format(self.kernel))
 
+        # ** Misc
+        self.do_cast_contours = (cv2.__version__ == "2.4.3")  # bug workaround
+        self.refinement_skip_samples = 5  # no. of camera samples to skip
+        self.refinement_num_samples = 10  # samples to process
+        self.refinement_good_threshold = 5  # good sample count to accept
+
         # ** Final output
         self.location = None  # target location
 
@@ -137,7 +144,7 @@ class TargetLocator(object):
 
     def open_device(self, device=0):
         # Open input device [API: cv]
-        self.capture = cv.CaptureFromCAM(0)
+        self.capture = cv.CaptureFromCAM(device)  # NOTE: won't work with files
         return self.capture is not None
 
     def close_device(self):
@@ -167,6 +174,34 @@ class TargetLocator(object):
             self.auto_exposure = value
             cv.SetCaptureProperty(
                 self.capture, CV_CAP_PROP_AUTO_EXPOSURE, self.auto_exposure)
+
+    # TODO: @lib.api_call?
+    def find_target_refined(self):
+        """Use find_target() repeatedly to get a refined result."""
+        if self.capture is None:
+            return self.location  # no input, can't do anything!
+
+        # Skip some frames
+        for i in xrange(self.refinement_skip_samples):
+            img = cv.QueryFrame(self.capture)  # skip
+
+        # Read till at least a threshold number are good
+        best_location = None
+        num_good = 0
+        for i in xrange(self.refinement_skip_samples):
+            location = self.find_target()
+            if location is not None:
+                best_location = location
+                num_good += 1
+                if num_good >= self.refinement_good_threshold:
+                    break
+
+        if best_location is not None:
+            self.logger.info(
+                "Target @ (%6.2f, %6.2f) [refined]",
+                best_location[0], best_location[1])
+            self.location = best_location
+        return best_location
 
     # TODO: @lib.api_call?
     def find_target(self):
@@ -238,7 +273,7 @@ class TargetLocator(object):
         # Squares is the array that has the pixel locations of the vertices
         self.squares = self.find_squares(self.res)
         if self.squares:
-            self.logger.debug("%d squares", len(self.squares))
+            self.logger.debug("%d square(s)", len(self.squares))
             #print "Squares: {}".format(self.squares)  # [verbose]
 
             # Process squares array and set self.location to (x, y) pair
@@ -284,6 +319,9 @@ class TargetLocator(object):
                 # Find contours (NOTE: repeating this many times can be slow)
                 contours, hierarchy = cv2.findContours(
                     binary, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+                # OpenCV 2.4.3 bug workaround
+                if self.do_cast_contours:
+                    contours = [np.float32(c) for c in contours]
 
                 # Iterate over contours, find ones which look like squares
                 for cnt in contours:
@@ -310,8 +348,9 @@ class TargetLocator(object):
             cv2.drawContours(self.res, self.squares, -1, (0, 255, 0), 3)
             # Paint target, if located
             if self.location is not None:
+                disp_location = self.location + self.offset
                 cv2.circle(
-                    self.res, (int(self.location[0]), int(self.location[1])),
+                    self.res, (int(disp_location[0]), int(disp_location[1])),
                     3, (0, 255, 255), -1)
         cv2.imshow("Output", self.res)  # NOTE: someone needs to call waitKey
 
@@ -319,10 +358,15 @@ class TargetLocator(object):
         self.close_device()
 
 
-def runTargetLocator(device=TargetLocator.default_device, gui=False):
+def runTargetLocator(device=TargetLocator.default_device,
+        gui=False, debug=False):
     """A standalone driver for testing TargetLocator."""
 
     targetLocator = TargetLocator(device)
+    # Quick hack, elevating debug messages to info
+    if debug:
+        targetLocator.logger.debug = targetLocator.logger.info
+
     print "run(): Starting main loop Ctrl+C here or Esc on image to quit..."
     while True:
         try:
@@ -351,6 +395,20 @@ def runTargetLocator(device=TargetLocator.default_device, gui=False):
 
 
 if __name__ == "__main__":
-    runTargetLocator(
-        sys.argv[1] if len(sys.argv) > 1 else TargetLocator.default_device,
-        gui=True)
+    argParser = argparse.ArgumentParser(
+            description="TargetLocator: Driver program")
+    argParser.add_argument('--debug', action="store_true",
+            help="show debug output?")
+    guiGroup = argParser.add_mutually_exclusive_group()
+    guiGroup.add_argument('--gui', dest='gui', action='store_true',
+            default=True, help="display GUI interface/windows?")
+    guiGroup.add_argument('--no_gui', dest='gui', action='store_false',
+            default=False, help="suppress GUI interface/windows?")
+    argParser.add_argument('input_source', nargs='?',
+            default=str(TargetLocator.default_device),
+            help="input camera device no.")
+    options = argParser.parse_args()
+
+    print "TargetLocator: Running on OpenCV", cv2.__version__
+    runTargetLocator(int(options.input_source),
+        gui=options.gui, debug=options.debug)

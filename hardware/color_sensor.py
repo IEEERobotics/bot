@@ -83,6 +83,21 @@ class ColorSensor(I2CDevice):
         b /= c
         c /= self.max_c  # normalize c to [0, 1] range
         return valid, c, r, g, b  # return valid flag if someone's interested
+        
+    @lib.api_call
+    def LED_brightness(self,brightness):
+        """Changes brightness of LED.
+        :param brightness: 
+        :type int: Percent of fully on LED brightness.
+
+        """
+
+        try:
+            assert duty_period < 20*10^6
+        except AssertionError:
+            raise AssertionError("invalid duty cycle")
+        self.pwm.duty = brightness/100 * 20*10^6
+        
 
     def read_data(self, bias_color="", bias_constant=0):
         """Reads in raw data directly from color_sensor.

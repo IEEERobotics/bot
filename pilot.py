@@ -72,7 +72,8 @@ class Pilot:
                     self.logger.info("Start signal found")
                     self.state = self.State.SMART_JERK
             elif self.state == self.State.SMART_JERK:
-                self.call('follower', 'smart_jerk')
+                #self.call('follower', 'smart_jerk')
+                self.call("driver", "drive", {"speed": 80, "angle": 0, "duration": 1.7})
                 result = self.call('follower', 'get_result')
                 if result != "NONE":
                     self.bail("{} state after smart jerk".format(result))

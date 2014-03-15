@@ -246,7 +246,6 @@ class ColorSensor(I2CDevice):
             return "Error: Unknown color"
         return False
 
-
 def read_loop():
     """Instantiate a ColorSensor object and read indefinitely."""
     print "start"

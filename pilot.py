@@ -13,14 +13,16 @@ class Pilot:
                       'FOLLOW', 'CENTER_ON_X', 'ROTATE_ON_X',
                       'CENTER_ON_BLUE', 'AIM', 'FIRE',
                       'CHOOSE_DIR_BLUE', 'TURN_BACK',
-                      'CENTER_ON_RED', 'FINISH'))
+                      'CENTER_ON_RED', 'FINISH', 'FOLLOW_ON_X'))
 
-    def __init__(self, ctrl_addr="tcp://127.0.0.1:60000",
-                 sub_addr="tcp://127.0.0.1:60001"):
+    def __init__(self,
+                 ctrl_addr="tcp://127.0.0.1:60000",
+                 sub_addr="tcp://127.0.0.1:60001",
+                 max_intersections=3):
         # Get config, build logger
         self.config = lib.get_config()
         self.logger = lib.get_logger()
-        
+
         # Build control client
         try:
             self.ctrl_client = ctrl_client_mod.CtrlClient(ctrl_addr)
@@ -40,12 +42,18 @@ class Pilot:
         # Initialize other members
         self.state = self.State.START
         self.heading = 180
+        self.max_intersections = max_intersections  # total on course
+        self.intersections = 0  # no. of intersections seen
         self.blue_blocks = 0  # no. of blue blocks found and centered on
         self.darts_fired = 0  # no. of darts fired
 
     def __str__(self):
-        return "[{}] heading: {}, blue_blocks: {}, darts_fired: {}".format(
-            self.State.toString(self.state), self.heading, self.blue_blocks,
+        return "[{}] heading: {}, intersections: {},"
+               " blue_blocks: {}, darts_fired: {}".format(
+            self.State.toString(self.state),
+            self.intersections,
+            self.heading,
+            self.blue_blocks,
             self.darts_fired)
 
     def run(self):
@@ -57,64 +65,92 @@ class Pilot:
                 self.logger.info(str(self))
                 last_state = self.state
 
-            # TODO: Require different systems to expose the desired API calls
             if self.state == self.State.START:
                 self.logger.info("Waiting for start")
-                # NOTE: follower must wrap color_sensor and expose is_* methods
                 result = self.call('color_sensor', 'watch_for_color',
                     {"color": "green"})
                 if result == True:
                     self.logger.info("Start signal found")
                     self.state = self.State.SMART_JERK
             elif self.state == self.State.SMART_JERK:
-                self.call('follower', 'smart_jerk')  # takes time
-                # Follower currently either finds the line or panics
-                #self.state = self.State.FIND_LINE
+                self.call('follower', 'smart_jerk')
+                result = self.call('follower', 'get_result')
+                if result != "NONE":
+                    self.bail("{} state after smart jerk".format(result))
                 self.state = self.State.FOLLOW
-#           elif self.state == self.State.FIND_LINE:
-#               if self.call('follower', 'is_on_line') == True:  # on line
-#                   self.state = self.State.FOLLOW
-#               else:
-#                   self.logger.info("Lost line, trying to recover")
-#                   self.state = self.State.OSCILLATE
-#           elif self.state == self.State.OSCILLATE:
-#               self.call('follower', 'oscillate',
-#                   { 'heading' : self.heading })  # may succeed or fail
-#               self.state = self.State.FIND_LINE
             elif self.state == self.State.FOLLOW:
-                self.call('follower', 'follow', { 'heading' : self.heading })
-                # When follower is done following, one of the following is true
-                if self.call('follower', 'is_on_x') == True:  # intersection
+                self.call('follower', 'follow', {'heading': self.heading})
+                result = self.call('follower', 'get_result')
+                # Not handling LOST_LINE, FRONT_LOST and BACK_LOST
+                if result == "ON_INTERSECTION":
+                    # We're definitely on a intersection
                     self.logger.info("Found intersection")
                     self.state = self.State.CENTER_ON_X
-                elif self.call('follower', 'is_on_blue') == True:  # blue block
-                    self.logger.info("Found blue block")
-                    self.state = self.State.CENTER_ON_BLUE
-                elif self.call('follower', 'is_on_red') == True:  # red block
-                    self.logger.info("Found red block")
-                    self.state = self.State.CENTER_ON_RED
-#               elif self.call('follower', 'is_end_of_line') == True:  # EOL
-#                   self.logger.info("At end of line")
-#                   self.state = self.State.TURN_BACK
-                elif self.call('follower', 'is_on_line') == False:  # at sea
-                    self.logger.warn("Lost line!")
-                    self.state = self.State.FIND_LINE
+                elif result == "LARGE_OBJECT":
+                    # Check if we've seen all intersections already
+                    if self.intersections >= self.max_intersections:
+                        self.logger.warn("Must be red! We're done.")
+                        self.state = self.State.FINISH
+                    else:
+                        # We could be on an intersection
+                        self.logger.info("Found large object, doing short jerk")
+                        self.call('driver', 'drive', {
+                            'speed': 60,
+                            'angle': self.heading_to_driver_angle(self.heading),
+                            'duration': 0.1})
+                        self.state = self.State.CENTER_ON_X
                 else:
-                    # Something wrong? Remain in FOLLOW state to try again
-                    self.logger.error("Unknown follower.follow result!")
+                    # Check if we're expecting the second (curved) intersection
+                    # TODO: Do this only when coming back from a branch?
+                    if self.intersections == 1:
+                        # If so, keep following
+                        self.logger.info(
+                            "{} state; could be intersection 2".format(result))
+                    else:
+                        self.bail("{} state after follow".format(result))
             elif self.state == self.State.CENTER_ON_X:
-                self.call('follower', 'center_on_intersection')  # takes time
-                self.state = self.State.ROTATE_ON_X  # assume centering worked
-                sys.exit(0)
+                self.call('follower', 'center_on_intersection')
+                result = self.call('follower', 'get_result')
+                if result != "ON_INTERSECTION":
+                    self.bail("{} state after center on X".format(result))
+                self.state = self.State.ROTATE_ON_X
             elif self.state == self.State.ROTATE_ON_X:
-                self.heading = (self.heading + 90) % 360  # always turn left
-                self.call('follower', 'rotate_on_x')
-                self.state = self.State.FOLLOW
+                # Always turn left
+                if self.heading == 180:
+                    # Traveling forward relative to bot
+                    self.call('follower', 'rotate_on_x', {"direction": "left"})
+                    # NOTE: Only count an intersection when going out
+                    self.intersection += 1
+                    # Check if we've seen all intersections already
+                    if self.intersections > self.max_intersections:
+                        self.logger.warn("Too many intersections! We're done.")
+                        self.state = self.State.FINISH
+                elif self.heading == 0:
+                    # Traveling backwards relative to bot
+                    # NOTE: Don't count intersection here
+                    self.call('follower', 'rotate_on_x', {"direction": "right"})
+                else:
+                    self.bail("Unexpected heading: {}".format(self.heading))
+                result = self.call('follower', 'get_result')
+                if result != "ON_INTERSECTION":
+                    self.bail("{} state after rotate on X".format(result))
+                # TODO: Deal with LOST_LINE, FRONT_LOST and BACK_LOST
+                #   (shouldn't normally happen, but may after a bad rotate)
+                self.state = self.State.FOLLOW_ON_X
+            elif self.state == self.State.FOLLOW_ON_X:
+                self.call('follower', 'follow', {"heading": self.heading, 
+                    "on_x": True})
+                result = self.call('follower', 'get_result')
+                if not (result == "LARGE_OBJECT" or result == "NONE"):
+                    self.bail("{} state after rotate on X".format(result))
+                # TODO: Seems wrong if moving between intersections
+                self.state = self.State.CENTER_ON_BLUE
             elif self.state == self.State.CENTER_ON_BLUE:
-                self.logger.info("Centering on blue block")
                 self.call('follower', 'center_on_blue')
+                result = self.call('follower', 'get_result')
+                if result != "NONE":
+                    self.bail("{} state after center on blue".format(result))
                 self.blue_blocks += 1
-                # TODO: Wait for 3 secs., or ensure aiming takes that long?
                 self.state = self.State.AIM
             elif self.state == self.State.AIM:
                 self.logger.info("Aiming turret")
@@ -124,18 +160,9 @@ class Pilot:
                 self.logger.info("Firing gun")
                 self.call('gunner', 'fire')
                 self.darts_fired += 1
-                self.state = self.State.CHOOSE_DIR_BLUE  # same as TURN_BACK?
-            elif self.state == self.State.CHOOSE_DIR_BLUE:
                 self.logger.info("Turning around from blue block")
-                self.heading = (self.heading + 180) % 360  # turn around
+                self.heading = (self.heading + 180) % 360
                 self.state = self.State.FOLLOW
-#           elif self.state == self.State.TURN_BACK:
-#               self.logger.info("Turning around from end of line")
-#               self.heading = (self.heading + 180) % 360  # turn around
-#               self.state = self.State.FOLLOW
-            elif self.state == self.State.CENTER_ON_RED:
-                self.call('follower', 'center_on_red')
-                self.state = self.State.FINISH
 
         self.logger.info(str(self))  # terminal state report
         self.logger.info("Done!")
@@ -148,6 +175,23 @@ class Pilot:
             return None
         else:
             return result['call_return']
+
+    def bail(self, msg):
+        """Log error message and exit cleanly, stopping all systems.
+
+        :param msg: Error message to log.
+        :type msg: string
+
+        """
+        self.logger.error("Can't handle follower result: {}".format(result))
+        self.call('ctrl', 'stop_full')
+        sys.exit(1)
+
+    def heading_to_driver_angle(self, heading):
+        """Convert bot heading to raw angle for driver."""
+        # NOTE(napratin,3/13): Currently follower uses 180 = front,
+        #   while driver uses 0 = front, hence the need for conversion.
+        return (heading + 180) % 360
 
 
 if __name__ == "__main__":

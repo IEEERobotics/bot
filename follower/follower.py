@@ -155,9 +155,9 @@ class Follower(object):
             # Check for error conditions
             if self.error != "NONE":
                 #require two succesive large_object readings to exit
-                if self.error=="LARGE_OBJECT" and count_object<1:
-                    count_object += 1
-                    continue
+#                if self.error=="LARGE_OBJECT" and count_object<1:
+#                    count_object += 1
+#                    continue
                 self.update_exit_state()
                 self.logger.info("Error: {}".format( self.error ))
                 self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
@@ -748,24 +748,36 @@ class Follower(object):
             return self.error
        # Move forward until off block
         direction = 180 - heading
-        while self.error == Follower.Large_Object:
+        while self.front_state == Follower.Large_Object:
             self.driver.move(60,direction)
             sleep(0.25)
             self.assign_states()
+        self.driver.move(0, 0)
         #After off block, use center on line to straigten
         self.center_on_line(heading)
         return "DONE CENTER ON BLUE BLOCK"
 
-
-
-
+    @lib.api_call
+    def get_result(self):
+        self.assign_states()
+        return self.error
 
     @lib.api_call
-    def center_on_red(self):
-        return True  # TODO: Actually center on red_block
-
-
-
-
-
- 
+    def strafe_to_line(self, heading=90):
+        """Attempt to strafe sideways from one firing line to the next  """
+        #assumes centered on line
+        self.heading = heading
+        self.assign_states()
+        # strafe until off current line 
+        while ((self.left_state < Follower.No_Line) and
+            (self.right_state < Follower.No_Line)):
+            self.driver.move(self.translate_speed, heading)
+            self.assign_states()
+        self.driver.move(0, 0)
+        # strafe until on next line
+        while ((self.left_state == Follower.No_Line) or
+            (self.right_state == Follower.No_Line)):
+            self.driver.move(self.translate_speed, heading)
+            self.assign_states()       
+        self.driver.move(0, 0)       
+        return "DONE STRAFING TO LINE"

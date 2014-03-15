@@ -258,9 +258,10 @@ class Follower(object):
             "Post-correction angles: angle1: {}, angle2: {}".format(
                 angle1, angle2))
 
-        # Test headings for valid 0,360 values.
-        assert 0 <= angle1 <= 360, "angle1 is {}".format(angle1)
-        assert 0 <= angle2 <= 360, "angle2 is {}".format(angle2)
+        # Heading may be unecessary.
+        # # Test headings for valid 0,360 values.
+        # assert 0 <= angle1 <= 360, "angle1 is {}".format(angle1)
+        # assert 0 <= angle2 <= 360, "angle2 is {}".format(angle2)
 
         # Todo: Consider making this a function call.
         line_not_found = True

@@ -92,12 +92,13 @@ class ColorSensor(I2CDevice):
 
         """
 
-        duty_period = brightness/100 * 20 * 10^6
+        duty_period = brightness/100 * 2 * 10^6
         try:
-            assert duty_period < 20*10^6
+            assert duty_period < 2*10^6
         except AssertionError:
             raise AssertionError("invalid duty cycle")
-        self.pwm.duty = brightness/100 * 20*10^6
+            
+        self.pwm.duty = duty_period
         
 
     def read_data(self, bias_color="", bias_constant=0):

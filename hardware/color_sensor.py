@@ -93,10 +93,10 @@ class ColorSensor(I2CDevice):
         """
 
         duty_period = brightness/100 * 2 * 10^6
-        try:
-            assert duty_period < 2*10^6
-        except AssertionError:
-            raise AssertionError("invalid duty cycle")
+        # try:
+            # assert duty_period < 2*10^6
+        # except AssertionError:
+            # raise AssertionError("invalid duty cycle")
             
         self.pwm.duty = duty_period
         

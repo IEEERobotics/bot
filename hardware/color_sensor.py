@@ -91,14 +91,13 @@ class ColorSensor(I2CDevice):
         :type int: Percent of fully on LED brightness.
 
         """
-
-        duty_period = brightness/100 * 2000000
+        
         # try:
             # assert duty_period < 2*10^6
         # except AssertionError:
             # raise AssertionError("invalid duty cycle")
             
-        self.pwm.duty = duty_period
+        self.pwm.duty = brightness/100. * 2000000
         
 
     def read_data(self, bias_color="", bias_constant=0):

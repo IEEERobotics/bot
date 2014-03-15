@@ -48,8 +48,7 @@ class Pilot:
         self.darts_fired = 0  # no. of darts fired
 
     def __str__(self):
-        return "[{}] heading: {}, intersections: {},"
-               " blue_blocks: {}, darts_fired: {}".format(
+        return "[{}] heading: {}, intersections: {}, blue_blocks: {}, darts_fired: {}".format(
             self.State.toString(self.state),
             self.intersections,
             self.heading,
@@ -78,6 +77,7 @@ class Pilot:
                 if result != "NONE":
                     self.bail("{} state after smart jerk".format(result))
                 self.state = self.State.FOLLOW
+                sys.exit(0)
             elif self.state == self.State.FOLLOW:
                 self.call('follower', 'follow', {'heading': self.heading})
                 result = self.call('follower', 'get_result')

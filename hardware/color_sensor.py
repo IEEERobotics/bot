@@ -84,11 +84,15 @@ class ColorSensor(I2CDevice):
         c /= self.max_c  # normalize c to [0, 1] range
         return valid, c, r, g, b  # return valid flag if someone's interested
 
-    def read_data(self):
+    def read_data(self, bias_color="", bias_constant=0):
         """Reads in raw data directly from color_sensor.
-        
+
+        :param bias_color: One color can be made more sensitive.
+            note: May cause false positives.
+            recommended values are ~1%
+        :param bias_constant: Percentage increase by which to bias.
         :returns: Validity, Clear (magnitude), Red, Green, Blue.
-        
+
         """
         if not self.testing:
             valid = self.registers['STATUS'].read('AVALID')
@@ -96,6 +100,13 @@ class ColorSensor(I2CDevice):
             r = self.registers['RDATA'].read()
             g = self.registers['GDATA'].read()
             b = self.registers['BDATA'].read()
+
+            if bias_color == "green":
+                g *= 1 + bias_constant/100
+            elif bias_color == "red":
+                r *= 1 + bias_constant/100
+            elif bias_color == "blue":
+                b *= 1 + bias_constant/100
 
             return valid, c, r, g, b
         else:
@@ -143,9 +154,6 @@ class ColorSensor(I2CDevice):
         diff_g = (self.color["green"] - self.bg) / self.bg
         diff_b = (self.color["blue"] - self.bb) / self.bb
         
-        # Green is weakest color, so bias in that direction.
-        diff_g *= 1.01
-
         return diff_c, diff_r, diff_g, diff_b
 
     @lib.api_call

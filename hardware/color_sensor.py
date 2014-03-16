@@ -5,7 +5,6 @@ import pybbb.bbb.pwm as pwm_mod
 from i2c_device.i2c_device import I2CDevice
 import lib.lib as lib
 
-
 class ColorSensor(I2CDevice):
 
     """Wrapper class for TCS3472 I2C-based color sensor."""
@@ -85,18 +84,18 @@ class ColorSensor(I2CDevice):
         return valid, c, r, g, b  # return valid flag if someone's interested
         
     @lib.api_call
-    def LED_brightness(self,brightness):
+    def led_brightness(self,brightness):
         """Changes brightness of LED.
         :param brightness: 
         :type int: Percent of fully on LED brightness.
 
         """
-        
+
         # try:
             # assert duty_period < 2*10^6
         # except AssertionError:
             # raise AssertionError("invalid duty cycle")
-            
+
         self.pwm.duty = int(brightness/100. * 2000000)
         
 

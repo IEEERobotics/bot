@@ -199,6 +199,19 @@ class ColorSensor(I2CDevice):
 
         return False
 
+    def decides_color(self):
+        """Decides on color based on readings.
+        
+        :returns: Name of color found.
+        """
+        
+        if detects_color("green"):
+            return "green"
+        elif detects_color("red"):
+            return "red"
+        elif detects_color("blue"):
+            return "blue"
+
     @lib.api_call
     def watch_for_color(self, color, timeout=5):
         """Waits for given color to be found.
@@ -262,6 +275,7 @@ class ColorSensor(I2CDevice):
         else:
             return "Error: Unknown color"
         return False
+        
 
 def read_loop():
     """Instantiate a ColorSensor object and read indefinitely."""

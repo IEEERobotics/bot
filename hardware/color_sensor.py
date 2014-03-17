@@ -129,7 +129,7 @@ class ColorSensor(I2CDevice):
 
     def get_percentage(self):
         """Calculates percentages of total color for each color.
-        
+
         :returns: Validity, Clear (magnitude), Red, Green, Blue.
 
         """
@@ -146,7 +146,7 @@ class ColorSensor(I2CDevice):
         :raises AssertionError: When Color sensor saw nothing.
 
         """
-        
+
         # Repeatedly attempts baseline if zeros are found.
         # Note: if this doesn't work on the first try, something
         # is usually wrong.
@@ -160,26 +160,26 @@ class ColorSensor(I2CDevice):
 
     def get_percent_diff(self):
         """Calculates percent difference from baseline.
-        
+
         :returns: percent differences of brightness, and colors.
-        
+
         """
         diff_c = (self.color["clear"] - self.bc) / self.bc
         diff_r = (self.color["red"] - self.br) / self.br
         diff_g = (self.color["green"] - self.bg) / self.bg
         diff_b = (self.color["blue"] - self.bb) / self.bb
-        
+
         diff_g *= 1.01
-        
+
         return diff_c, diff_r, diff_g, diff_b
 
     @lib.api_call
     def detects_color(self, color):
         """Checks to see if given color is present.
-        
+
         :param color: Color to check for.
         :type color: string
-        
+
         :returns: True if color found. False otherwise.
 
         """
@@ -202,7 +202,7 @@ class ColorSensor(I2CDevice):
     @lib.api_call
     def watch_for_color(self, color, timeout=5):
         """Waits for given color to be found.
-        
+
         :param color: Color to wait for.
         :type color: string
         :param timeout: Maximum time in seconds for which it will wait.
@@ -210,7 +210,7 @@ class ColorSensor(I2CDevice):
         :returns: True when color is eventually found. False if never found.
         """
         start_time = time.time()
-        
+
         while time.time() - start_time < timeout:
             if self.detects_color(color):
                 return True
@@ -218,13 +218,13 @@ class ColorSensor(I2CDevice):
 
     def detects_color_diff_method(self, color, thresh=0.2):
         """Finds color based on the total % of total color that is seen. 
-        
+
         Each percentage is a fraction of the total color (r+g+b)
         as seen by the color sensor. The percentages all add up 
         to 100.
 
         Note: This is experimental and not recommended for use.
-        
+
         :param color: Color to search for.
         :type color: string
         :param thresh: Difference in percentage expected.

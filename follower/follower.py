@@ -43,7 +43,7 @@ class Follower(object):
         self.error = "NONE"
         
         # motor variables
-        self.translate_speed =  60
+        self.translate_speed =  75  
         self.prev_rate = 0
 
         #state variables
@@ -141,9 +141,9 @@ class Follower(object):
         self.heading = heading
         previous_time = time()
         # Init front_PID
-        self.strafe.set_k_values(8, 0, .1)
+        self.strafe.set_k_values(10, 0, .5)
         # Inti rotate_PID
-        self.rotate_pid.set_k_values(6, 0, 0)
+        self.rotate_pid.set_k_values(7, 0, 1)
         # Get current heading
         self.heading = heading
         # Continue until an error condition
@@ -192,7 +192,7 @@ class Follower(object):
 
 
     @lib.api_call
-    def rotate_on_x(self,direction="left",speed=100,time=0.7):
+    def rotate_on_x(self,direction="left",speed=100,time=0.95):
         #After center_on_x, rotate in the commanded directions
         #by 90 degrees. 
         if(direction=="left"):
@@ -209,7 +209,8 @@ class Follower(object):
         sleep(time)
 
         self.driver.move(0,0)
-
+        
+        self.center_on_intersection()
         return "Done"
 
     @lib.api_call
@@ -233,8 +234,12 @@ class Follower(object):
         self.logger.info("right = {}".format(self.right_state))
     
     @lib.api_call
-    def oscillate(self, heading, osc_time=1):
-        """Oscillate sideways, increasing in amplitude until line is found"""
+    def oscillate(self, heading=0, osc_time=0.5):
+        """Oscillate sideways, increasing in amplitude until line is found
+        :param heading: The forward direction of the bot.
+        :param osc_time: The initial time spent in each direction.
+        
+        """
 
         # Time in seconds for which bot oscillates in each direction.
         # Speed at which the bot is oscillating.
@@ -257,9 +262,10 @@ class Follower(object):
             "Post-correction angles: angle1: {}, angle2: {}".format(
                 angle1, angle2))
 
-        # Test headings for valid 0,360 values.
-        assert 0 <= angle1 <= 360, "angle1 is {}".format(angle1)
-        assert 0 <= angle2 <= 360, "angle2 is {}".format(angle2)
+        # Heading may be unecessary.
+        # # Test headings for valid 0,360 values.
+        # assert 0 <= angle1 <= 360, "angle1 is {}".format(angle1)
+        # assert 0 <= angle2 <= 360, "angle2 is {}".format(angle2)
 
         # Todo: Consider making this a function call.
         line_not_found = True
@@ -375,10 +381,13 @@ class Follower(object):
                 if( self.back_state == Follower.Large_Object):
                     # Ignore large objects on back array by using prev back state
                     self.back_state = prev_back_state
-                else:
+                if(self.front_state == Follower.Noise):
                     #Ignore Noise conditions 
                     self.front_state = prev_front_state
+                if(self.back_state == Follower.Noise):
+                    #Ignore Noise conditions
                     self.back_state = prev_back_state
+                
                     # self.error = "NONE"
         else: #no errors
             self.error = "NONE" 
@@ -432,11 +441,13 @@ class Follower(object):
             self.back_state = self.get_position_rl(
                 current_ir_reading["back"])
             # Left is on the left
-            self.left_state = self.get_position_lr(
-                current_ir_reading["left"])
+            #self.left_state = self.get_position_lr(
+            #    current_ir_reading["left"])
             # right is on the right
             self.right_state = self.get_position_rl(
                 current_ir_reading["right"])
+            #for tri_state, copy right state to left
+            self.left_state = self.right_state
         # Heading north
         elif self.heading == 0:
             # Forward is on the right side
@@ -449,9 +460,10 @@ class Follower(object):
             self.left_state = self.get_position_lr(
                 current_ir_reading["right"])
             # Right is on the back
-            self.right_state = self.get_position_rl(
-                current_ir_reading["left"])
-        
+            #self.right_state = self.get_position_rl(
+            #    current_ir_reading["left"])
+            #in tri state, copy left to right
+            self.right_state = self.left_state
 
 
     def update_exit_state(self):
@@ -556,7 +568,7 @@ class Follower(object):
         if((count != 0) and (last_count != 0)):
             self.driver.move(0,0)
             return "DONE"
-        self.driver.move(70,0)
+        self.driver.move(self.translate_speed,0)
         self.logger.info("count = {}".format(count))
         last_count = count 
 
@@ -579,7 +591,7 @@ class Follower(object):
         #then correct forwards/backwards
         forw_to_back_strafe = pid_mod.PID()
         # Init front_PID
-        forw_to_back_strafe.set_k_values(2.5, 0, 1)
+        forw_to_back_strafe.set_k_values(5.5, 0.5, 2)
         previous_time = time();
         while True:
             # kill momentum before reading
@@ -616,7 +628,7 @@ class Follower(object):
                 translate_angle = (0 + self.heading)%360
             else:
                 translate_angle = (180 + self.heading)%360
-            if(abs(bot_position) < 3):
+            if(abs(bot_position) < 5):
               return
             self.logger.info("translate_speed = {}".format(translate_speed))
             self.logger.info("translate_angle = {}".format(translate_angle))
@@ -636,7 +648,7 @@ class Follower(object):
             center_rotate_pid.clear_error()
             previous_time = time();
             # Init front_PID
-            center_rotate_pid.set_k_values(2.75, .4, .75)
+            center_rotate_pid.set_k_values(6.75, .4, 1.75)
             while True:
                 # kill momentum before reading
                 self.driver.move(0, 0)
@@ -676,7 +688,7 @@ class Follower(object):
             side_to_side_strafe.clear_error()
             previous_time = time();
             # Init front_PID
-            side_to_side_strafe.set_k_values(.75, .5, 1.75)
+            side_to_side_strafe.set_k_values(4.75, 2, 5.75)
             while True:
                 # kill momentum before reading
                 self.driver.move(0, 0)
@@ -748,24 +760,36 @@ class Follower(object):
             return self.error
        # Move forward until off block
         direction = 180 - heading
-        while self.error == Follower.Large_Object:
+        while self.front_state == Follower.Large_Object:
             self.driver.move(60,direction)
             sleep(0.25)
             self.assign_states()
+        self.driver.move(0, 0)
         #After off block, use center on line to straigten
         self.center_on_line(heading)
         return "DONE CENTER ON BLUE BLOCK"
 
-
-
-
+    @lib.api_call
+    def get_result(self):
+        self.assign_states()
+        return self.error
 
     @lib.api_call
-    def center_on_red(self):
-        return True  # TODO: Actually center on red_block
-
-
-
-
-
- 
+    def strafe_to_line(self, heading=90):
+        """Attempt to strafe sideways from one firing line to the next  """
+        #assumes centered on line
+        self.heading = heading
+        self.assign_states()
+        # strafe until off current line 
+        while ((self.left_state < Follower.No_Line) and
+            (self.right_state < Follower.No_Line)):
+            self.driver.move(self.translate_speed, heading)
+            self.assign_states()
+        self.driver.move(0, 0)
+        # strafe until on next line
+        while ((self.left_state == Follower.No_Line) or
+            (self.right_state == Follower.No_Line)):
+            self.driver.move(self.translate_speed, heading)
+            self.assign_states()       
+        self.driver.move(0, 0)       
+        return "DONE STRAFING TO LINE"

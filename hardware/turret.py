@@ -78,4 +78,17 @@ class Turret(object):
             angle = max(axis_min, min(axis_max, angle))
         self.servos["pitch"].position = angle
 
+    @lib.api_call
+    def aim(self, pitch, yaw):
+        """Thin wrapper for setting pitch and yaw in one command.
+
+        :param pitch: Angle in degees to set turn to on pitch axis.
+        :type pitch: float
+        :param yaw: Angle in degees to set turn to on pitch axis.
+        :type yaw: float
+
+        """
+        self.set_pitch(pitch)
+        self.set_yaw(yaw)
+
     pitch = property(get_pitch, set_pitch)

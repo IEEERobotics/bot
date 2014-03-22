@@ -1,4 +1,4 @@
-# Bot
+# Bot2014
 
 Code for the IEEE Robotics Team's 2014 robot(s).
 
@@ -12,9 +12,9 @@ Code for the IEEE Robotics Team's 2014 robot(s).
 
 ## GitHub: Issues and Wiki
 
-We use GitHub's [issues](https://github.com/NCSUhardware/bot/issues) feature to report and track bugs, tasks, feature requests, questions and generally any thread that's related to the code. Checking the issues frequently keeps you up to date on the work being done, the work that needs to be done (please contribute!) and anything that may be wrong with code you're responsible for.
+We use GitHub's [issues](https://github.com/IEEERobotics/bot2014/issues) feature to report and track bugs, tasks, feature requests, questions and generally any thread that's related to the code. Checking the issues frequently keeps you up to date on the work being done, the work that needs to be done (please contribute!) and anything that may be wrong with code you're responsible for.
 
-As the code matures, we'll put more effort into developing this repo's [wiki](https://github.com/NCSUhardware/bot/wiki). As you find things that should be documented, please feel free to edit wiki pages and create your own. 
+As the code matures, we'll put more effort into developing this repo's [wiki](https://github.com/IEEERobotics/bot2014/wiki). As you find things that should be documented, please feel free to edit wiki pages and create your own. 
 
 ## Style
 
@@ -30,7 +30,7 @@ If you don't think you can manage that, please, please set up [pre-commit hooks]
 2. Re-read [PEP8]
 3. Pedantically follow [PEP8]
 
-I suggest running the program pep8 against your code before each commit. You can use the [bot/scripts/check_pep8.sh](scripts/check_pep8.sh) script to test all *.py files in the repo. See the [dependencies](README.md#pep8-checker) section for install instructions.
+I suggest running the program pep8 against your code before each commit. You can use the [bot2014/scripts/check_pep8.sh](scripts/check_pep8.sh) script to test all *.py files in the repo. See the [dependencies](README.md#pep8-checker) section for install instructions.
 
 ### Docstring Style
 
@@ -87,10 +87,10 @@ First, make a decision about how you want to structure your file system. Where a
 Once you know where you're going to store the code, navigate there and then run:
 
 ```bash
-git clone --recursive git@github.com:NCSUhardware/bot.git
+git clone --recursive git@github.com:IEEERobotics/bot2014.git
 ```
 
-If you already have the repo and simply need the [pybbb] submodule (`bot/pybbb` is empty), then run the following from the root of the repo:
+If you already have the repo and simply need the [pybbb] submodule (`bot2014/pybbb` is empty), then run the following from the root of the repo:
 
 ```bash
 git pull # Always a good idea
@@ -206,7 +206,7 @@ TODO: How?
 
 [pre-commit hooks]: README.md#hooks-or-how-to-make-daniels-life-easier
 [pre-commit hook]: README.md#hooks-or-how-to-make-daniels-life-easier
-[pybbb]: https://github.com/NCSUhardware/pybbb
+[pybbb]: https://github.com/IEEERobotics/pybbb
 [git-scm section on submodules]: http://git-scm.com/book/en/Git-Tools-Submodules#Cloning-a-Project-with-Submodules
 [PEP8]: http://www.python.org/dev/peps/pep-0008/
 [PEP7]: http://www.python.org/dev/peps/pep-0007/
@@ -216,4 +216,4 @@ TODO: How?
 [PEP257]: http://www.python.org/dev/peps/pep-0257/
 [multi-OS guide]: https://help.github.com/articles/set-up-git#platform-windows
 [Git Hooks]: http://git-scm.com/book/en/Customizing-Git-Git-Hooks
-[issue tracker]: https://github.com/NCSUhardware/bot/issues?direction=desc&sort=updated&state=open
+[issue tracker]: https://github.com/IEEERobotics/bot2014/issues?direction=desc&sort=updated&state=open

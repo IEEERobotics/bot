@@ -34,8 +34,8 @@ ultrasonics: {
 }
 
 two_motors:
-    - {GPIO: 117, PWM: 0}
-    - {GPIO: 115, PWM: 1}
+    - {GPIO: 117, PWM: 1}
+    - {GPIO: 115, PWM: 2}
 
 turret_servos:
 - {PWM: 2, axis: yaw}  # Turret servo - pan: P9_42 (pwm2/ecap0)

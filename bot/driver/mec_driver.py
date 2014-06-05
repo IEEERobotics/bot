@@ -49,6 +49,7 @@ class MecDriver(driver.Driver):
         else:
             return self.motors[name].velocity
 
+    @lib.api_call
     def set_motor(self, name, value):
         if self.mode == 'power':
             self.motors[name].power = value

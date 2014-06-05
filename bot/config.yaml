@@ -4,14 +4,22 @@ testing: true
 test_mode: {
     color_sensor: true,
     ultrasonics: true,
+    dmcc: true,
     ir:{ front: false, back: true, right: true, left: false}
 }
 
+ADC: {
+    ONE: 0x48,
+    TWO: 0x49,
+    THREE: 0x4A,
+    FOUR: 0x4B
+}
+
 dmcc_drive_motors: {
-    front_left: { board_num: 0, motor_num: 1 },
-    front_right: { board_num: 0, motor_num: 2, invert: True },
-    back_left: { board_num: 2, motor_num: 1 },
-    back_right: { board_num: 2, motor_num: 2, invert: True }
+    back_left: { board_num: 0, motor_num: 1 },
+    back_right: { board_num: 0, motor_num: 2, invert: True },
+    front_left: { board_num: 1, motor_num: 1 },
+    front_right: { board_num: 1, motor_num: 2, invert: True }
 }
 
 turret: {

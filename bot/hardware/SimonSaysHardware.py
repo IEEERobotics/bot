@@ -4,8 +4,8 @@ import time
 from math import pi
 
 import bot.lib.lib as lib
-from bot.hardware.stepper_motor import Stepper_Motor
-from bot.servo import Servo
+from bot.hardware.stepper_motor import Stepper_motor
+from bot.hardware.servo import Servo
 
 class SimonSaysHardware(object):
 
@@ -25,11 +25,13 @@ class SimonSaysHardware(object):
         self.position = 1
         
         if self.config["test_mode"]["simon_player"]:
-        
+            # add code for test mode
+            pass
+
         else:
             # Build the servo and stepper motor
             self.servo = Servo(self.config["Simon_Says"]["servo"])
-            self.stepper = Stepper_Motor(
+            self.stepper = Stepper_motor(
                 self.config["Simon_Says"]["stepper"])
 
     @property
@@ -41,7 +43,8 @@ class SimonSaysHardware(object):
         """
         return self.position
 
-    @position.setter(self, pos):
+    @position.setter
+    def position(self, pos):
         """Setter for the motor's current position. Call it each time
         the hardware rotates. HAS to be in the range 1-4.
 
@@ -64,7 +67,7 @@ class SimonSaysHardware(object):
         :type position: int ranging from 1 - 4.
 
         """
-        if ((position > 0) || (position < 5)):
+        if ((position > 0) or (position < 5)):
             # count the number of 90 degree rotations to be made.
             count = position - self.position
 

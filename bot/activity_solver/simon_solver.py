@@ -6,7 +6,7 @@ the stepper motor is used for controlling that actuators position.
 
 import bot.lib.lib as lib
 import bbb as bbb_mod
-from bot.hardware import SimonSaysHardware
+from bot.hardware.SimonSaysHardware import SimonSaysHardware
 
 from time import sleep
 

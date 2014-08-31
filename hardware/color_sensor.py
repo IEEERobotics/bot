@@ -278,6 +278,10 @@ class ColorSensor(I2CDevice):
         return False
         
 
+
+if __name__ == "__main__":
+    read_loop()
+
 def read_loop():
     """Instantiate a ColorSensor object and read indefinitely."""
     print "start"
@@ -324,5 +328,3 @@ def read_loop():
             break
     print "Done."
 
-if __name__ == "__main__":
-    read_loop()

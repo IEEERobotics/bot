@@ -2,7 +2,7 @@
 
 # Check source file for PEP8 conformance.
 
-cd ../bot &> /dev/null
+cd ../bot2014 &> /dev/null
 cd_return=$?
 if [ $cd_return -ne "0" ]
 then

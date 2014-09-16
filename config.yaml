@@ -53,7 +53,7 @@ course: {
     # bonding box of valid firing locations (for gunner)
     firing_box: { 
         y_min: 0.889,  # 35"
-        y_max: 1.524,  # 60"
+        y_max: 1.55,  # 60"
         x_min: 0.3,  # ~12"
         x_max: 1.07   # 42"
     }

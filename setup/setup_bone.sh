@@ -152,7 +152,7 @@ echo "========================="
 echo "Configuring git..."
 git config --global user.name "ncsubot"
 git config --global user.email "ncsubot@gmail.com"
-fetch_git_repo NCSUhardware/bot
+fetch_git_repo NCSUhardware/bot2014
 fetch_git_repo NCSUhardware/DMCC_Library
 fetch_git_repo jschornick/i2c_device
 fetch_git_repo jschornick/pypruss

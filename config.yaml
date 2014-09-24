@@ -3,8 +3,8 @@ testing: false
 dmcc_drive_motors: {
     front_left: { board_num: 0, motor_num: 1 },
     front_right: { board_num: 0, motor_num: 2, invert: True },
-    back_left: { board_num: 1, motor_num: 1 },
-    back_right: { board_num: 1, motor_num: 2, invert: True }
+    back_left: { board_num: 2, motor_num: 1 },
+    back_right: { board_num: 2, motor_num: 2, invert: True }
 }
 
 turret: {
@@ -22,8 +22,8 @@ gun: {
         advance: 72   # Gun trigger - advance: P8_43 (gpio72)
     },
     dmcc_wheel_motors: {
-        right: { board_num: 2, motor_num: 1 },
-        left: { board_num: 2, motor_num: 2, invert: True },
+        right: { board_num: 1, motor_num: 1 },
+        left: { board_num: 1, motor_num: 2, invert: True },
     }
 }
 

@@ -6,30 +6,29 @@ MAINTAINER Daniel Farrell <dfarrell07@gmail.com>
 
 # These are the packages installed via setup/setup_bone.sh
 # https://github.com/IEEERobotics/bot2014/blob/master/setup/setup_bone.sh
-# TODO: Am I buiding a dev env or just something that can run the software?
 RUN apt-get update && apt-get install -y git \
                                          python \
+                                         python-dev \
                                          python-yaml \
                                          python-simplejson \
                                          libzmq-dev \
                                          python-zmq \
                                          python-numpy \
                                          python-smbus \
-                                         python-virtualenv \
-                                         tmux \
-                                         rsync \
                                          python-pip \
-                                         python-dev \
-                                         build-essential \
-                                         vim \
-                                         vim-tiny \
-                                         less \
-                                         cmake \
-                                         ipython \
-                                         nmap \
-                                         tree \
-                                         vim-nox \
-                                         screen \
-                                         i2c-tools \
-                                         wireless-tools \
-                                         grc
+                                         pep8
+
+# Clone required repos into /src
+RUN git clone https://github.com/IEEERobotics/DMCC_Library.git /src/DMCC_Library
+RUN git clone https://github.com/jschornick/i2c_device.git /src/i2c_device
+
+# Install required repos
+RUN cd /src/i2c_device && python setup.py install
+RUN cd /src/DMCC_Library && python setup.py install
+
+# Drop source (bot2014, current context) in /src dir
+# Do the ADD as late as possible, as it invalidates cache
+ADD . /src/bot2014
+
+WORKDIR /src/bot2014
+CMD ["./start.py", "-Ts"]

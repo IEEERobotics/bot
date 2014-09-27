@@ -30,5 +30,9 @@ RUN cd /src/DMCC_Library && python setup.py install
 # Do the ADD as late as possible, as it invalidates cache
 ADD . /src/bot2014
 
+# Due to issue #112, tests must be run before server can start
+# The tests create simulated hardware files required by server in test mode
+RUN cd /src/bot2014 && ./start.py -t
+
 WORKDIR /src/bot2014
 CMD ["./start.py", "-Ts"]

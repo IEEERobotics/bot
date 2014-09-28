@@ -20,11 +20,13 @@ RUN apt-get update && apt-get install -y git \
 
 # Clone required repos into /src
 RUN git clone https://github.com/IEEERobotics/DMCC_Library.git /src/DMCC_Library
+RUN git clone https://github.com/IEEERobotics/pybbb.git /src/pybbb
 RUN git clone https://github.com/jschornick/i2c_device.git /src/i2c_device
 
 # Install required repos
 RUN cd /src/i2c_device && python setup.py install
 RUN cd /src/DMCC_Library && python setup.py install
+RUN cd /src/pybbb && python setup.py install
 
 # Drop source (bot2014, current context) in /src dir
 # Do the ADD as late as possible, as it invalidates cache

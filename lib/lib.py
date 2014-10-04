@@ -1,6 +1,6 @@
 """Library of useful functions that apply to many modules."""
 
-from os import getcwd, path
+from os import path
 import logging.handlers
 
 try:

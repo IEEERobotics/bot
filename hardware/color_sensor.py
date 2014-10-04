@@ -276,11 +276,6 @@ class ColorSensor(I2CDevice):
         else:
             return "Error: Unknown color"
         return False
-        
-
-
-if __name__ == "__main__":
-    read_loop()
 
 def read_loop():
     """Instantiate a ColorSensor object and read indefinitely."""
@@ -327,4 +322,7 @@ def read_loop():
         except KeyboardInterrupt:
             break
     print "Done."
+    
+if __name__ == "__main__":
+    read_loop()
 

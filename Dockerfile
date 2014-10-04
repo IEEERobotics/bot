@@ -20,8 +20,8 @@ RUN apt-get update && apt-get install -y git \
 
 # Clone required repos into /src
 RUN git clone https://github.com/IEEERobotics/DMCC_Library.git /src/DMCC_Library
-RUN git clone https://github.com/IEEERobotics/pybbb.git /src/pybbb
 RUN git clone https://github.com/jschornick/i2c_device.git /src/i2c_device
+RUN git clone https://github.com/IEEERobotics/pybbb.git /src/pybbb
 
 # Install required repos
 RUN cd /src/i2c_device && python setup.py install
@@ -35,6 +35,9 @@ ADD . /src/bot2014
 # Due to issue #112, tests must be run before server can start
 # The tests create simulated hardware files required by server in test mode
 RUN cd /src/bot2014 && ./start.py -t
+
+# TODO: Expose server port
+EXPOSE 60000
 
 WORKDIR /src/bot2014
 CMD ["./start.py", "-Ts"]

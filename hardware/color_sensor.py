@@ -139,6 +139,17 @@ class ColorSensor(I2CDevice):
         g = (g / total) * 100
         b = (b / total) * 100
         return v, c, r, g, b
+    
+    def detect_on(self):
+        """Detects if red light is on or off.
+
+        """
+        v, c, r, g, b = self.get_percentage()
+
+        if r < 50.0:
+            print "OFF"
+        else:
+            print "ON"
 
     def get_baseline(self):
         """Obtains "base" colors to work from.
@@ -291,7 +302,11 @@ def read_loop():
                                                                             colorSensor.br,\
                                                                             colorSensor.bg,\
                                                                             colorSensor.bb)
-
+    percentages = colorSensor.get_percentage()
+    
+    print "Red: {:5.3f}, Green: {:5.3f}, Blue: {:5.3f}".format(percentages[2], \
+                                                            percentages[3],\
+                                                            percentages[4])
 
     # self.logger.debug("baseline: bv: {}, bc: {}, br: {}, bg: {}, bb: {}".format(bv, bc, br, bg, bb))
 
@@ -306,6 +321,13 @@ def read_loop():
                                                                             colorSensor.color["red"],\
                                                                             colorSensor.color["green"],\
                                                                             colorSensor.color["blue"])
+            
+            percentages = colorSensor.get_percentage()
+    
+            print "Red: {:5.3f}, Green: {:5.3f}, Blue: {:5.3f}".format(percentages[2], \
+                                                            percentages[3],\
+                                                            percentages[4])
+            colorSensor.detect_on()
             # if colorSensor.detects_color("green"):
                 # print "Found green, Percent method"
 

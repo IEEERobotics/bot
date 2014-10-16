@@ -151,7 +151,7 @@ class ColorSensor(I2CDevice):
         else:
             print "ON"
 
-    def get_baseline(self):
+    def get_baseline(self, timeout=5):
         """Obtains "base" colors to work from.
 
         :raises AssertionError: When Color sensor saw nothing.
@@ -161,7 +161,8 @@ class ColorSensor(I2CDevice):
         # Repeatedly attempts baseline if zeros are found.
         # Note: if this doesn't work on the first try, something
         # is usually wrong.
-        while True:
+        start_time = time.time()
+        while (time.time() - start_time) < timeout:
             self.bv, self.bc, \
             self.br, self.bg, \
             self.bb = self.read_data()

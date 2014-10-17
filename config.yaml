@@ -1,5 +1,11 @@
 testing: false
 
+individual_testing: {
+    color_sensor: false,
+    ir: false,
+    ultrasonics: false
+}
+
 dmcc_drive_motors: {
     front_left: { board_num: 0, motor_num: 1 },
     front_right: { board_num: 0, motor_num: 2, invert: True },

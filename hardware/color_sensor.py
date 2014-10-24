@@ -162,15 +162,17 @@ class ColorSensor(I2CDevice):
         # Note: if this doesn't work on the first try, something
         # is usually wrong.
         start_time = time.time()
+        attempt_count = 0
         while (time.time() - start_time) < timeout:
             self.bv, self.bc, \
             self.br, self.bg, \
             self.bb = self.read_data()
-            attempt_count = 0
+            attempt_count += 1 
             if self.br != 0 and self.bg != 0 and self.bb != 0:
                 break
         if attempt_count > 0:
-            self.logger.error("Baseline not found on {} attempt.")
+            self.logger.error("Baseline found on {} attempt.",
+                             attempt_count)
 
     def get_percent_diff(self):
         """Calculates percent difference from baseline.

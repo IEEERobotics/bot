@@ -3,8 +3,8 @@
 import unittest
 import random
 
-import lib.lib as lib
-import hardware.solenoid as s_mod
+import bot.lib.lib as lib
+import bot.hardware.solenoid as s_mod
 import tests.test_bot as test_bot
 
 

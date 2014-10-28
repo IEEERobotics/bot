@@ -1,9 +1,11 @@
 """Test cases for targeting solver function ."""
 
-import lib.lib as lib
 from os import path
 from unittest import TestCase
-import gunner.targeting_solver as targeting
+
+import bot.lib.lib as lib
+import bot.gunner.targeting_solver as targeting
+
 
 class TestTargetingSolver(TestCase):
 

@@ -1,16 +1,12 @@
 """Test case for pid"""
+
 import sys
 import os
 import unittest
 
-sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
-try:
-    import lib.lib as lib
-    import tests.test_bot as test_bot
-    import follower.pid as pid_mod
-except ImportError:
-    print "ImportError: Use `python -m unittest discover` from project root."
-    raise
+import bot.lib.lib as lib
+import tests.test_bot as test_bot
+import bot.follower.pid as pid_mod
 
 # Build logger
 logger = lib.get_logger()

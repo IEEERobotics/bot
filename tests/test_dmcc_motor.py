@@ -1,11 +1,13 @@
 """Test cases for DMCC motor abstraction class."""
 
-from hardware.dmcc_motor import DMCCMotorSet, DMCCMotor
-import lib.lib as lib
-import tests.test_bot as test_bot
 from os import path
 from unittest import TestCase, expectedFailure
+
 import pyDMCC
+
+import tests.test_bot as test_bot
+from bot.hardware.dmcc_motor import DMCCMotorSet, DMCCMotor
+import bot.lib.lib as lib
 
 class TestDMCCMotorSet(TestCase):
 

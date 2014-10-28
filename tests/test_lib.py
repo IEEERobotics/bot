@@ -2,7 +2,7 @@
 
 import logging
 
-import lib.lib as lib
+import bot.lib.lib as lib
 import tests.test_bot as test_bot
 
 

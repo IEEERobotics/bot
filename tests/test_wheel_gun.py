@@ -4,7 +4,7 @@ import time
 from unittest import TestCase, expectedFailure
 
 from tests.test_bot import TestBot
-import hardware.wheel_gun as wheel_gun
+import bot.hardware.wheel_gun as wheel_gun
 
 
 class TestWheelGun(TestBot):

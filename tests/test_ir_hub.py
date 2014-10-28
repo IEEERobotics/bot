@@ -4,8 +4,8 @@ import random
 from time import time, sleep
 import unittest
 
-import lib.lib as lib
-import hardware.ir_hub as ir_hub_mod
+import bot.lib.lib as lib
+import bot.hardware.ir_hub as ir_hub_mod
 import tests.test_bot as test_bot
 
 

@@ -1,11 +1,11 @@
 """Test cases for mec driver."""
 
 from math import fabs, hypot, atan2, degrees
-
-import lib.lib as lib
-from driver.mec_driver import MecDriver  # For convenience
-import tests.test_bot as test_bot
 from unittest import expectedFailure
+
+import bot.lib.lib as lib
+from bot.driver.mec_driver import MecDriver  # For convenience
+import bot.tests.test_bot as test_bot
 
 class TestRotate(test_bot.TestBot):
     """Test rotation of mec wheels"""

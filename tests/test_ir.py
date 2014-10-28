@@ -1,8 +1,8 @@
 """Test cases for IR abstraction superclass."""
 
-import lib.lib as lib
-import hardware.ir as ir_mod
-import tests.test_bot as test_bot
+import bot.lib.lib as lib
+import bot.hardware.ir as ir_mod
+import bot.tests.test_bot as test_bot
 
 
 class TestSelectedUnitVal(test_bot.TestBot):

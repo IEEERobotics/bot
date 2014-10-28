@@ -2,8 +2,8 @@
 
 from random import randint
 
-import lib.lib as lib
-import hardware.turret as t_mod
+import bot.lib.lib as lib
+import bot.hardware.turret as t_mod
 import tests.test_bot as test_bot
 
 

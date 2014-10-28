@@ -1,11 +1,12 @@
 """Test cases for gunner."""
 
 from random import randint
-
-import lib.lib as lib
-import gunner.gunner as gunner
-import tests.test_bot as test_bot
 from unittest import TestCase
+
+import bot.lib.lib as lib
+import bot.gunner.gunner as gunner
+import tests.test_bot as test_bot
+
 
 class TestAim(test_bot.TestBot):
 
@@ -28,6 +29,7 @@ class TestAim(test_bot.TestBot):
 
     def test_aim(self):
         self.gunner.aim()
+
 
 class TestFire(test_bot.TestBot):
 

@@ -2,15 +2,15 @@
 
 import lib.lib as lib
 from os import path
+from unittest import TestCase, expectedFailure
+import struct
 
 config_file = path.dirname(path.realpath(__file__))+"/test_config.yaml"
 config = lib.get_config(config_file)
 
-import hardware.ultrasonic
-from hardware.ultrasonic import Ultrasonic
+import bot.hardware.ultrasonic
+from bot.hardware.ultrasonic import Ultrasonic
 
-from unittest import TestCase, expectedFailure
-import struct
 
 class TestUltrasonic(TestCase):
 

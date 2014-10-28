@@ -4,14 +4,9 @@ import sys
 import os
 import unittest
 
-sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
-try:
-    import lib.lib as lib
-    import follower.follower as f_mod
-    import tests.test_bot as test_bot
-except ImportError:
-    print "ImportError: Use `python -m unittest discover` from project root."
-    raise
+import bot.lib.lib as lib
+import bot.follower.follower as f_mod
+import tests.test_bot as test_bot
 
 
 class TestFollower(test_bot.TestBot):

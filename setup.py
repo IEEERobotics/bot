@@ -20,7 +20,7 @@ setup(
     keywords="NCSU IEEE Robotics robot bot hardware",
     packages=find_packages(),
     # TODO: Fix for this style test layout
-    #test_suite="tests",
+    test_suite="tests",
     # See for more install_requires info: http://goo.gl/vCOKSw
     # See for more install_requires info: http://goo.gl/5zQKIF
     # TODO: List all known minimum requirements

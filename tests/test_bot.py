@@ -4,7 +4,7 @@ import sys
 import os
 import unittest
 
-import lib.lib as lib
+import bot.lib.lib as lib
 
 def additional_tests():
     return unittest.defaultTestLoader.discover("..")

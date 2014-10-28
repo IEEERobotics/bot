@@ -1,12 +1,13 @@
 """Test cases for motor abstraction class."""
 
 from random import randint
-
-import lib.lib as lib
-import hardware.motor as m_mod
-from tests.test_bot import TestBot
 from unittest import TestCase
 from os import path
+
+import bot.lib.lib as lib
+import bot.hardware.motor as m_mod
+from tests.test_bot import TestBot
+
 
 class TestSpeed(TestBot):
 

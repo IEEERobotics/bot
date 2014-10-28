@@ -171,8 +171,8 @@ class ColorSensor(I2CDevice):
             if self.br != 0 and self.bg != 0 and self.bb != 0:
                 break
         if attempt_count > 0:
-            self.logger.error("Baseline found on {} attempt.",
-                             attempt_count)
+            self.logger.error("Baseline found on {} attempt.".format(
+                             attempt_count))
 
     def get_percent_diff(self):
         """Calculates percent difference from baseline.

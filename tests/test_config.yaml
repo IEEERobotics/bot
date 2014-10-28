@@ -1,5 +1,5 @@
 testing: True
-logging: {log_file: logs/test.log, file_handler_level: DEBUG, stream_handler_level: CRITICAL}
+logging: {log_file: bot/logs/test.log, file_handler_level: DEBUG, stream_handler_level: CRITICAL}
 
 dmcc_drive_motors: {
     front_left: { board_num: 0, motor_num: 1 },
@@ -24,7 +24,7 @@ dmcc_inverted: {
 
 ultrasonics: {
     pru_num: 0,
-    pru_file: "pru/ultrasonic.bin",
+    pru_file: "bot/pru/ultrasonic.bin",
     sensors: {
         front: { offset: 0, xy: [  0.0,  0.15], dir: [ 0.0,  1.0] },
         back:  { offset: 8, xy: [  0.0, -0.15], dir: [ 0.0, -1.0] },
@@ -62,7 +62,7 @@ ir_analog_adc_config: {  # ADC configuration
 ir_read_delay: 0.01  # duration in secs. to pause between each select-read operation to let ADCs settle
 ir_read_adc: true  # read accurate ADC values instead of binary GPIO values
 ir_verbose_output: false  # print verbose output to console (log level: INFO), for debugging & testing only
-test_pwm_base_dir: simulator/pins/pwm/pwm
-test_gpio_base_dir: simulator/pins/gpio/gpio
-test_adc_base_dir: simulator/pins/adc
+test_pwm_base_dir: bot/simulator/pins/pwm/pwm
+test_gpio_base_dir: bot/simulator/pins/gpio/gpio
+test_adc_base_dir: bot/simulator/pins/adc
 irs_per_array: 16

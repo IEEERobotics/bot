@@ -1,7 +1,0 @@
-name: test_follow_intersectionEx
-actions:
-    - action_num: 0
-      type: follow
-      description: 
-        summary: Follow line until intersection of start-box and line.
-        expected_result: IntersectionException

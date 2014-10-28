@@ -1,7 +1,6 @@
 """Test cases for gunner."""
 
 from random import randint
-from unittest import TestCase
 
 import bot.lib.lib as lib
 import bot.gunner.gunner as gunner

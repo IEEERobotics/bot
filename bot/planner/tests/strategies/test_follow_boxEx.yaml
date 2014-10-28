@@ -1,7 +1,0 @@
-name: test_follow_boxEx
-actions:
-    - action_num: 0
-      type: follow
-      description: 
-        summary: Follow line until target box is found.
-        expected_result: BoxException

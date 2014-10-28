@@ -1,9 +1,9 @@
 """Abstraction layer for motors."""
 
-import pybbb.bbb.pwm as pwm_mod
-import pybbb.bbb.gpio as gpio_mod
+import bot.pybbb.bbb.pwm as pwm_mod
+import bot.pybbb.bbb.gpio as gpio_mod
 
-import lib.lib as lib
+import bot.lib.lib as lib
 
 FORWARD = 1
 REVERSE = 0

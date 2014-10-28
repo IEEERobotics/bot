@@ -1,6 +1,7 @@
 import math
 from os import path
-import lib.lib as lib
+
+import bot.lib.lib as lib
 
 # Note: Units for calculations are Kg, m, s
 ft_to_m = .3048 #conversion factor from feet to meters

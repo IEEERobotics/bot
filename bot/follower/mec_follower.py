@@ -5,7 +5,7 @@ from time import time, sleep
 
 import numpy as np
 
-import lib.lib as lib
+import bot.lib.lib as lib
 import pid ad pid_mod
 
 

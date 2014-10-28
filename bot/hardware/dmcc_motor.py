@@ -1,8 +1,10 @@
 ")""Abstraction layer for DMCC-based motors."""
 
-import lib.lib as lib
-import pyDMCC
 from collections import defaultdict
+
+import pyDMCC
+
+import bot.lib.lib as lib
 
 class DMCCMotorSet(dict):
     """A single interface to a collection of DMCCs and associated motors."""

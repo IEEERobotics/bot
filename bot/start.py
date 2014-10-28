@@ -8,8 +8,8 @@ import os
 import sys
 from time import sleep
 
-import lib.lib as lib
-import interface.cli as cli_mod
+import bot.lib.lib as lib
+import bot.interface.cli as cli_mod
 
 # Build parser and argument groups
 description="start CLI, Planner, CtrlServer, unit tests or PEP8 scan"

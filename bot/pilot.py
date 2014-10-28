@@ -1,9 +1,10 @@
 """Autonomous control client that solves IEEE Hardware Competition 2014."""
 
 import sys
-import lib.lib as lib
-import client.ctrl_client as ctrl_client_mod
-import client.sub_client as sub_client_mod
+
+import bot.lib.lib as lib
+import bot.client.ctrl_client as ctrl_client_mod
+import bot.client.sub_client as sub_client_mod
 
 
 class Pilot:

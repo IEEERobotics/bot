@@ -5,11 +5,11 @@ from time import time
 from time import sleep
 import numpy as np
 
-import lib.lib as lib
-import hardware.ir_hub as ir_hub_mod
-import driver.mec_driver as mec_driver_mod
+import bot.lib.lib as lib
+import bot.hardware.ir_hub as ir_hub_mod
+import bot.driver.mec_driver as mec_driver_mod
 import pid as pid_mod
-import hardware.color_sensor as color_sensor_mod
+import bot.hardware.color_sensor as color_sensor_mod
 
 
 class Follower(object):

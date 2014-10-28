@@ -11,7 +11,7 @@ except ImportError:
     sys.stderr.write("ERROR: Failed to import zmq. Is it installed?")
     raise
 
-import lib.lib as lib
+import bot.lib.lib as lib
 
 
 class PubServer(threading.Thread):

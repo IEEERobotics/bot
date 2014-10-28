@@ -1,12 +1,13 @@
 """Handle aiming and firing darts."""
 
-import lib.lib as lib
-import hardware.turret as turret
-import hardware.wheel_gun as wheel_gun
-import hardware.ultrasonic as ultrasonic
-import targeting_solver as targeting
 import time
 from math import acos, degrees
+
+import bot.lib.lib as lib
+import bot.hardware.turret as turret
+import bot.hardware.wheel_gun as wheel_gun
+import bot.hardware.ultrasonic as ultrasonic
+import bot.gunner.targeting_solver as targeting
 
 class Gunner(object):
 

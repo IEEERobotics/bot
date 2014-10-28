@@ -12,8 +12,8 @@ except:
     sys.stderr.write("ERROR: This module cannot be run without the Leap SDK")
     raise
 
-import lib.lib as lib
-import client
+import bot.lib.lib as lib
+import bot.client
 
 ControlRange = namedtuple('ControlRange',
                           ['min', 'zero_min', 'zero_max', 'max'])

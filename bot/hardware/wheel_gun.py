@@ -1,11 +1,11 @@
 """Encapsulates functionality required to fire a wheel-based gun."""
 
 import time
-import lib.lib as lib
 from math import pi
 
-from pybbb.bbb import gpio
-from hardware.dmcc_motor import DMCCMotorSet
+import bot.lib.lib as lib
+from bot.pybbb.bbb import gpio
+from bot.hardware.dmcc_motor import DMCCMotorSet
 
 
 class WheelGun(object):

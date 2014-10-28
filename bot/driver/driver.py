@@ -1,6 +1,6 @@
 """Module for handling high-level movement commands."""
 
-import lib.lib as lib
+import bot.lib.lib as lib
 
 
 class Driver(object):

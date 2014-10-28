@@ -5,7 +5,7 @@ from unittest import expectedFailure
 
 import bot.lib.lib as lib
 from bot.driver.mec_driver import MecDriver  # For convenience
-import bot.tests.test_bot as test_bot
+import tests.test_bot as test_bot
 
 class TestRotate(test_bot.TestBot):
     """Test rotation of mec wheels"""

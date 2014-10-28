@@ -6,13 +6,13 @@ Can open a window to display detected target; this is disabled by default.
 """
 # TODO: Update documentation to better reflect overall function
 
-import lib.lib as lib
-
 import sys
 import argparse
 import numpy as np
 import cv2
 import cv
+
+import bot.lib.lib as lib
 
 
 # TODO: Remove these parameter definitions as they are already in cv2 or cv2.cv

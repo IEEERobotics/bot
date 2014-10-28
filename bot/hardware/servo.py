@@ -1,8 +1,8 @@
 """Abstraction layer for servos."""
 
-import pybbb.bbb.pwm as pwm_mod
+import bot.pybbb.bbb.pwm as pwm_mod
 
-import lib.lib as lib
+import bot.lib.lib as lib
 
 
 class Servo(object):

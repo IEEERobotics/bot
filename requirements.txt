@@ -1,0 +1,5 @@
+-e git+https://github.com/jschornick/i2c_device.git#egg=i2c-device
+-e git+https://github.com/IEEERobotics/DMCC_Library.git#egg=pyDMCC
+-e git+https://github.com/IEEERobotics/pybbb.git#egg=bbb
+simplejson
+tox

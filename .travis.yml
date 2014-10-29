@@ -1,0 +1,12 @@
+language: python
+python:
+    - "3.2"
+    - "2.7"
+    - "pypy"
+# Install dependencies
+before_install:
+    - sudo apt-get update -qq
+    - sudo apt-get install python-smbus git libzmq-dev python-zmq python-dev python-yaml python-numpy
+install: pip install -r requirements.txt
+# Run tests
+script: tox

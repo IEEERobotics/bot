@@ -1,21 +1,25 @@
 language: python
+# Other versions are installed by default. Configure tox.ini to use them.
 python:
     - "2.7"
-# Sets Travis' venv to check for system site pacakges
+# Sets Travis' venv to check for system site packages
+# This makes numpy imports work
 # See: http://stackoverflow.com/questions/17224389/scipy-importerror-on-travis-ci
 virtualenv:
   system_site_packages: true
 # Install dependencies
 before_install:
-    # Bull shitting and hoping this helps
+    # This makes numpy imports work
     # See: http://stackoverflow.com/questions/17224389/scipy-importerror-on-travis-ci
     - SITE_PKG_DIR=$VIRTUAL_ENV/lib/python$TRAVIS_PYTHON_VERSION/site-packages
     - rm -f $VIRTUAL_ENV/lib/python$TRAVIS_PYTHON_VERSION/no-global-site-packages.txt
-    # This is an attempt at fixing strang Travis ZMQ fails
+    # This fixes an issue with Travis already having some ZMQ stuff installed
     # See: https://github.com/travis-ci/travis-ci/issues/1715
     - sudo rm /etc/apt/sources.list.d/travis_ci_zeromq3-source.list
+    # Install system-level requirements. Ideally, we'd do this with pip. Not possible.
     - sudo apt-get update -qq
     - sudo apt-get install -y python-smbus libzmq-dev python-zmq python-yaml python-numpy
+# This is the preferred way to install stuff.
 install: pip install -r requirements.txt
 # Run tests
 script: tox

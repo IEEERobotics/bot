@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/IEEERobotics/bot2014.svg?branch=master)](https://travis-ci.org/IEEERobotics/bot2014)
+
 # Bot2014
 
 Code for the IEEE Robotics Team's 2014 robot(s).

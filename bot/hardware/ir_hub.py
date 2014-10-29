@@ -2,7 +2,7 @@
 
 from time import time, sleep
 
-import bot.pybbb.bbb.gpio as gpio_mod
+import bbb.gpio as gpio_mod
 
 import bot.lib.lib as lib
 import ir_analog as ir_analog_mod

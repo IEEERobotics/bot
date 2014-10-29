@@ -4,7 +4,7 @@ import time
 from math import pi
 
 import bot.lib.lib as lib
-from bot.pybbb.bbb import gpio
+from bbb import gpio
 from bot.hardware.dmcc_motor import DMCCMotorSet
 
 

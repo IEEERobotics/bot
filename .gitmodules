@@ -1,3 +1,0 @@
-[submodule "pybbb"]
-	path = bot/pybbb
-	url = git@github.com:NCSUhardware/pybbb.git

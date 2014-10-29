@@ -1,6 +1,6 @@
 """Abstraction layer for solenoids."""
 
-import bot.pybbb.bbb.gpio as gpio_mod
+import bbb.gpio as gpio_mod
 
 import bot.lib.lib as lib
 

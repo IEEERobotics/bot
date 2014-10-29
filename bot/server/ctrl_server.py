@@ -8,6 +8,9 @@ from simplejson.decoder import JSONDecodeError
 import zmq
 import signal
 
+# This is required to make imports work
+sys.path = [os.getcwd()] + sys.path
+
 import bot.lib.lib as lib
 from bot.gunner.gunner import Gunner
 from bot.follower.follower import Follower
@@ -64,7 +67,7 @@ class CtrlServer(object):
 
     """
 
-    def __init__(self, testing=None, config_file="config.yaml"):
+    def __init__(self, testing=None, config_file="bot/config.yaml"):
         """Build ZMQ REP socket and instantiate bot systems.
 
         :param testing: True if running on simulated HW, False if on bot.

@@ -93,7 +93,7 @@ class CtrlClient(object):
         self.ctrl_sock = self.context.socket(zmq.REQ)
         self.ctrl_sock.connect(ctrl_addr)
         self.discover()
-        print "CtrlClient connected to CtrlServer at {}".format(ctrl_addr)
+        print("CtrlClient connected to CtrlServer at {}".format(ctrl_addr))
 
     def discover(self):
         """Gets list of exported objects/methods, maps to local attributes.
@@ -107,7 +107,7 @@ class CtrlClient(object):
         reply = self.ctrl_sock.recv_json()
 
         if reply["type"] != "list_reply":
-            print "Error discovering objects: {}".format(reply)
+            print("Error discovering objects: {}".format(reply))
             return False
 
         # 'self.objects' is a dict indexed by object name, whose values
@@ -118,7 +118,7 @@ class CtrlClient(object):
         # names of exported objects. Each stores an ApiClass that acts
         # as a local representation of that object (including its
         # exported methods).
-        for obj_name, methods in self.objects.items():
+        for obj_name, methods in list(self.objects.items()):
             setattr(self, obj_name, ApiClass(self.ctrl_sock, obj_name, methods))
 
     def call(self, obj_name, method, params):
@@ -160,7 +160,7 @@ class CtrlClient(object):
         reply = self.ctrl_sock.recv_json()
         reply_time = (time() - start) * 1000
         if reply["type"] != "ping_reply":
-            print "Ping failed: {}".format(reply)
+            print("Ping failed: {}".format(reply))
         return reply_time
 
     def stop_full(self):

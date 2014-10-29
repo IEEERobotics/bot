@@ -8,7 +8,7 @@ import numpy as np
 import bot.lib.lib as lib
 import bot.hardware.ir_hub as ir_hub_mod
 import bot.driver.mec_driver as mec_driver_mod
-import pid as pid_mod
+from . import pid as pid_mod
 import bot.hardware.color_sensor as color_sensor_mod
 
 
@@ -71,7 +71,7 @@ class Follower(object):
     def update(self):
         """Read IR values, compute aggregates."""
         ir_readings = self.ir_hub.read_binary(Follower.White_Black)
-        for name, reading in ir_readings.iteritems():
+        for name, reading in ir_readings.items():
             reading_arr = np.int_(reading)  # convert readings to numpy array
             reading_sum = np.sum(np_reading)  # = no. of units lit
             if reading_sum > 0:
@@ -324,7 +324,7 @@ class Follower(object):
         start_time = time()
         while True:
             reading = self.ir_hub.read_all()
-            for name, array in reading.iteritems():
+            for name, array in reading.items():
                 if self.reading_contains_pattern([1, 1], array):
                     return {"line_found": True,
                             "time_elapsed": time() - start_time}

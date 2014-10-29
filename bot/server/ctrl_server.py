@@ -15,7 +15,7 @@ import bot.lib.lib as lib
 from bot.gunner.gunner import Gunner
 from bot.follower.follower import Follower
 from bot.hardware.color_sensor import ColorSensor
-import pub_server as pub_server_mod
+from . import pub_server as pub_server_mod
 import bot.lib.messages as msgs
 
 
@@ -216,7 +216,7 @@ class CtrlServer(object):
         self.logger.debug("List of callable API objects requested")
         # Dict of subsystem object names to their callable methods.
         callables = {}
-        for name, obj in self.systems.items():
+        for name, obj in list(self.systems.items()):
             methods = []
             # Filter out methods which are not explicitly flagged for export
             for member in getmembers(obj):

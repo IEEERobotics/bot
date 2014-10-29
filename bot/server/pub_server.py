@@ -109,7 +109,7 @@ class PubServer(threading.Thread):
 
     def publish(self):
         """Publish information about bot."""
-        for topic_name, topic_val in self.topics.iteritems():
+        for topic_name, topic_val in list(self.topics.items()):
             # FIXME: This always calls every function.
             # ZMQ will drop any topics that no clients are subscribed to, but
             # the idea is to prevent these calls from being made in the first

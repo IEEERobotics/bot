@@ -35,7 +35,7 @@ class SubClient(object):
         self.sub_addr = sub_addr
         self.sub_sock = self.context.socket(zmq.SUB)
         self.sub_sock.connect(self.sub_addr)
-        print "SubClient subscribed to PubServer at {}".format(self.sub_addr)
+        print("SubClient subscribed to PubServer at {}".format(self.sub_addr))
 
     def print_msgs(self):
         """Prints messages subscribed to via SUB socket.
@@ -43,12 +43,12 @@ class SubClient(object):
         Note that crtl+c is the expected way to exit this loop.
 
         """
-        print "Printing messages, ctrl+c to quit loop..."
+        print("Printing messages, ctrl+c to quit loop...")
         while True:
             try:
                 pprint(self.sub_sock.recv())
             except KeyboardInterrupt:
-                print
+                print()
                 return
 
     def add_topic(self, topic):

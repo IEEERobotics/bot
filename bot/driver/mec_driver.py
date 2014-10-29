@@ -2,9 +2,10 @@
 
 from math import sin, cos, pi, fabs, sqrt, hypot, atan2, degrees
 from time import sleep, time
-import driver
-import lib.lib as lib
-from hardware.dmcc_motor import DMCCMotorSet
+
+import bot.driver.driver as driver
+import bot.lib.lib as lib
+from bot.hardware.dmcc_motor import DMCCMotorSet
 
 
 class MecDriver(driver.Driver):

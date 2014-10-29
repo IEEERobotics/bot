@@ -5,11 +5,8 @@ import cmd
 import sys
 import os
 
-# These paths will need to be changed if this is running ouside of the repo
-new_path = [os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")]
-sys.path = new_path + sys.path
-import client.ctrl_client as ctrl_client_mod
-import client.sub_client as sub_client_mod
+import bot.client.ctrl_client as ctrl_client_mod
+import bot.client.sub_client as sub_client_mod
 
 
 class CLI(cmd.Cmd):

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Start CLI, pilot, CtrlServer or tests."""
+"""Start CLI, pilot and/or CtrlServer."""
 
 import argparse
 from subprocess import Popen
@@ -8,11 +8,14 @@ import os
 import sys
 from time import sleep
 
+new_path = [os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")]
+sys.path = new_path + sys.path
+
 import lib.lib as lib
 import interface.cli as cli_mod
 
 # Build parser and argument groups
-description="start CLI, Planner, CtrlServer, unit tests or PEP8 scan"
+description="start CLI, pilot and/or CtrlServer"
 parser = argparse.ArgumentParser(description)
 
 # Starting interfaces should be mutually exclusive
@@ -21,10 +24,6 @@ interface_group = parser.add_mutually_exclusive_group()
 # Add arguments
 parser.add_argument("-T", "--test-mode", action="store_true",
     help="use simulated hardware, to allow running off the bone")
-parser.add_argument("-8", "--pep8", action="store_true",
-    help="run script to check PEP8 style conformance")
-parser.add_argument("-t", "--tests", action="store_true",
-    help="run all unit tests")
 parser.add_argument("-s", "--server", action="store_true",
     help="start server to provide for controlling the bot")
 interface_group.add_argument("-p", "--pilot", action="store_true",
@@ -41,17 +40,9 @@ if len(sys.argv) == 1:
 args = parser.parse_args()
 
 # Run on simulated hardware, or not
-lib.set_testing(args.test_mode)
+lib.set_testing(args.test_mode, "config.yaml")
 if args.test_mode:
     print "Using simulated hardware"
-
-if args.pep8:
-    print "Running PEP8 style checks"
-    os.system("./scripts/check_pep8.sh")
-
-if args.tests:
-    print "Running unit tests"
-    os.system("python -m unittest discover -v")
 
 if args.server:
     # Fail if starting the server on the bot and not root
@@ -65,8 +56,10 @@ if args.server:
         signal.signal(signal.SIGINT, signal.SIG_IGN)
 
     print "Starting server"
-    process_description = ["./server/ctrl_server.py", str(args.test_mode)]
-    server = Popen(process_description, preexec_fn=preexec_fn)
+    # Need to have process start from root of repo for imports to work
+    cwd = str(os.path.join(os.path.abspath(os.path.dirname(__file__)), ".."))
+    process_description = ["./bot/server/ctrl_server.py", str(args.test_mode)]
+    server = Popen(process_description, preexec_fn=preexec_fn, cwd=cwd)
     # Give server a chance to get up and running
     sleep(.3)
 

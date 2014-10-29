@@ -2,7 +2,7 @@
 
 import bot.lib.lib as lib
 import bot.hardware.ir as ir_mod
-import bot.tests.test_bot as test_bot
+import tests.test_bot as test_bot
 
 
 class TestSelectedUnitVal(test_bot.TestBot):

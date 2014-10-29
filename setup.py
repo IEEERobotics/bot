@@ -1,3 +1,8 @@
+# Dirty hack to make tests work in Vagrant env
+# Remove once this is fixed: http://bugs.python.org/issue8876
+import os
+del os.link
+
 from setuptools import setup, find_packages
 
 setup(
@@ -12,7 +17,7 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Natural Language :: English",
         "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "License :: OSI Approved :: BSD License",

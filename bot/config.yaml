@@ -37,7 +37,7 @@ gun: {
 # offset is the PRU data memory offset containing the sensor result
 ultrasonics: {
     pru_num: 0,
-    pru_file: "pru/ultrasonic.bin",
+    pru_file: "bot/pru/ultrasonic.bin",
     sensors: {
         front: { offset: 0, xy: [  0.0,  0.15], dir: [ 0.0,  1.0] },
         back:  { offset: 8, xy: [  0.0, -0.15], dir: [ 0.0, -1.0] },
@@ -85,13 +85,12 @@ ir_analog_adc_config: {  # ADC configuration
 }
 ir_read_adc: true  # read accurate ADC values instead of binary GPIO values
 ir_verbose_output: false  # print verbose output to console (log level: INFO), for debugging & testing only
-logging: {log_file: logs/bot.log, file_handler_level: DEBUG, stream_handler_level: INFO}  # Logging options
-strategy: planner/strategies/strategy0.yaml
-targeting: gunner/targeting/targeting0.yaml
-test_pwm_base_dir: simulator/pins/pwm/pwm
-test_gpio_base_dir: simulator/pins/gpio/gpio
-test_adc_base_dir: simulator/pins/adc
-fsm_tests: ./planner/tests/input/RobotNormalTest.txt
+logging: {log_file: bot/logs/bot.log, file_handler_level: DEBUG, stream_handler_level: INFO}  # Logging options
+strategy: bot/planner/strategies/strategy0.yaml
+targeting: bot/gunner/targeting/targeting0.yaml
+test_pwm_base_dir: bot/simulator/pins/pwm/pwm
+test_gpio_base_dir: bot/simulator/pins/gpio/gpio
+test_adc_base_dir: bot/simulator/pins/adc
 server_protocol: tcp
 server_bind_host: "*"  # Special hostname servers bind to, for listening on all interfaces
 server_host: 127.0.0.1  # Default hostname clients connect to

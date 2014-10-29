@@ -1,9 +1,10 @@
 """Abstraction of all ultrasonic sensors as one unit."""
 
-import lib.lib as lib
 import sys
 import mmap
 import struct
+
+import bot.lib.lib as lib
 try:
     import pypruss
 except ImportError:

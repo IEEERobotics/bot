@@ -1,7 +1,7 @@
 """Abstraction of turret hardware."""
 
-import lib.lib as lib
-import hardware.servo as s_mod
+import bot.lib.lib as lib
+import bot.hardware.servo as s_mod
 
 
 class Turret(object):

@@ -1,15 +1,15 @@
 """Test cases for DMCC motor abstraction class."""
 
-import lib.lib as lib
 from os import path
 from unittest import TestCase, expectedFailure
 import struct
 
-config_file = path.dirname(path.realpath(__file__))+"/test_config.yaml"
-config = lib.get_config(config_file)
-
+import bot.lib.lib as lib
 import bot.hardware.ultrasonic
 from bot.hardware.ultrasonic import Ultrasonic
+
+config_file = path.dirname(path.realpath(__file__))+"/test_config.yaml"
+config = lib.get_config(config_file)
 
 
 class TestUltrasonic(TestCase):

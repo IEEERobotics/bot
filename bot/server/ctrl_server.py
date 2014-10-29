@@ -8,15 +8,15 @@ from simplejson.decoder import JSONDecodeError
 import zmq
 import signal
 
-new_path = [os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")]
-sys.path = new_path + sys.path
+# This is required to make imports work
+sys.path = [os.getcwd()] + sys.path
 
-import lib.lib as lib
-from gunner.gunner import Gunner
-from follower.follower import Follower
-from hardware.color_sensor import ColorSensor
+import bot.lib.lib as lib
+from bot.gunner.gunner import Gunner
+from bot.follower.follower import Follower
+from bot.hardware.color_sensor import ColorSensor
 import pub_server as pub_server_mod
-import lib.messages as msgs
+import bot.lib.messages as msgs
 
 
 def is_api_method(obj, name):
@@ -67,7 +67,7 @@ class CtrlServer(object):
 
     """
 
-    def __init__(self, testing=None, config_file="config.yaml"):
+    def __init__(self, testing=None, config_file="bot/config.yaml"):
         """Build ZMQ REP socket and instantiate bot systems.
 
         :param testing: True if running on simulated HW, False if on bot.

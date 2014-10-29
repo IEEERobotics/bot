@@ -119,7 +119,7 @@ class TestFollower(test_bot.TestBot):
                 ((index - 1) * 2 - 15 + 1) * -1, 
                 self.follower.get_position_rl(position))
        
-#    @unittest.expectedFailure
+    @unittest.expectedFailure
     def test_assign_states(self):
         self.follower.heading = 180 #270
         # head in the direction of the bone

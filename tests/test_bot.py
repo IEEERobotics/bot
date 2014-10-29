@@ -17,7 +17,7 @@ class TestBot(unittest.TestCase):
     def setUp(self):
         """Get config, set simulation pins to known state, set test flag."""
         # Load config and logger
-        self.config = lib.get_config("config.yaml")
+        self.config = lib.get_config("bot/config.yaml")
         self.logger = lib.get_logger()
 
         # Set testing flag in config

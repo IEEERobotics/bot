@@ -1,6 +1,6 @@
 """Abstraction layer for ultrasonic sensors"""
 
-import lib.lib as lib
+import bot.lib.lib as lib
 
 class US(object):
 

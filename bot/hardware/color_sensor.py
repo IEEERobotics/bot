@@ -1,9 +1,11 @@
 """Controls activity related to RGB color sensor."""
+
 import time
 
-import pybbb.bbb.pwm as pwm_mod
 from i2c_device.i2c_device import I2CDevice
-import lib.lib as lib
+
+import bbb.pwm as pwm_mod
+import bot.lib.lib as lib
 
 class ColorSensor(I2CDevice):
 

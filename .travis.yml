@@ -1,14 +1,16 @@
 language: python
 python:
-    - "3.2"
     - "2.7"
-    - "pypy"
 # Sets Travis' venv to check for system site pacakges
 # See: http://stackoverflow.com/questions/17224389/scipy-importerror-on-travis-ci
 virtualenv:
   system_site_packages: true
 # Install dependencies
 before_install:
+    # Bull shitting and hoping this helps
+    # See: http://stackoverflow.com/questions/17224389/scipy-importerror-on-travis-ci
+    - SITE_PKG_DIR=$VIRTUAL_ENV/lib/python$TRAVIS_PYTHON_VERSION/site-packages
+    - rm -f $VIRTUAL_ENV/lib/python$TRAVIS_PYTHON_VERSION/no-global-site-packages.txt
     # This is an attempt at fixing strang Travis ZMQ fails
     # See: https://github.com/travis-ci/travis-ci/issues/1715
     - sudo rm /etc/apt/sources.list.d/travis_ci_zeromq3-source.list

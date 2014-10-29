@@ -22,7 +22,7 @@ before_install:
 # This is the preferred way to install stuff.
 install: pip install -r requirements.txt
 # Run tests
-script: tox
+script: python -m unittest discover
 # Configure notifications
 notifications:
     email:

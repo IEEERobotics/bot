@@ -22,12 +22,14 @@ before_install:
     # Install system-level requirements. Ideally, we'd do this with pip. Not possible.
     - sudo apt-get update -qq
     - sudo apt-get install -y python-smbus libzmq-dev python-zmq python-yaml python-numpy
+    # This is just for debugging the hell that is Tox+Travis
+    - pip freeze
 
 # Ideally, we'd install everything via pip. Not always possible.
 install: pip install -r requirements.txt
 
 # Command to run tests
-script: tox
+script: tox -vv
 
 # Sets Travis to run these test jobs in parallel, report them independently
 env:

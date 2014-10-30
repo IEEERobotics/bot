@@ -31,6 +31,7 @@ env:
 notifications:
     email:
         recipients:
-            - dfarrell07@gmail.com
+            - jakunesh@ncsu.edu
+            - asamara@ncsu.edu
     on_success: change
     on_failure: always

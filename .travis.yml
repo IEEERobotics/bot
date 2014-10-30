@@ -4,7 +4,7 @@ python:
     - "2.7"
 
 # Sets Travis' venv to check for system site packages
-# This makes numpy imports work
+# This makes numpy (and other system-wide package) imports work
 # See: http://stackoverflow.com/questions/17224389/scipy-importerror-on-travis-ci
 virtualenv:
     system_site_packages: true

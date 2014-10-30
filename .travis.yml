@@ -2,12 +2,14 @@ language: python
 # Other versions are installed by default. Configure tox.ini to use them.
 python:
     - "2.7"
+
 # Sets Travis' venv to check for system site packages
 # This makes numpy imports work
 # See: http://stackoverflow.com/questions/17224389/scipy-importerror-on-travis-ci
 virtualenv:
   system_site_packages: true
-# Install dependencies
+
+# Configure the build system
 before_install:
     # This makes numpy imports work
     # See: http://stackoverflow.com/questions/17224389/scipy-importerror-on-travis-ci
@@ -19,14 +21,23 @@ before_install:
     # Install system-level requirements. Ideally, we'd do this with pip. Not possible.
     - sudo apt-get update -qq
     - sudo apt-get install -y python-smbus libzmq-dev python-zmq python-yaml python-numpy
-# This is the preferred way to install stuff.
+
+# Ideally, we'd install everything via pip. Not always possible.
 install: pip install -r requirements.txt
-# Run tests
-script: python -m unittest discover
+
+# Command to run tests
+script: tox
+
+# Sets Travis to run these test jobs in parallel, report them independently
+env:
+    - TOXENV=py27
+    - TOXENV=docs
+    - TOXENV=pep8
+
 # Configure notifications
 notifications:
     email:
         recipients:
             - dfarrell07@gmail.com
-        on_success: change
-        on_failure: change
+    on_success: change
+    on_failure: change

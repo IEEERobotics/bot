@@ -3,3 +3,4 @@
 -e git+https://github.com/IEEERobotics/pybbb.git#egg=bbb
 simplejson
 tox
+pyyaml

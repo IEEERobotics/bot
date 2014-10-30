@@ -2,7 +2,6 @@ language: python
 # Other versions are installed by default. Configure tox.ini to use them.
 python:
     - "2.7"
-    - "3.2"
 
 # Sets Travis' venv to check for system site packages
 # This makes numpy imports work

@@ -51,7 +51,7 @@ class IRHub(object):
         self._thresh = config["ir_thresh"]
 
         # Build GPIO pins used to select which IR units are active
-        if config["testing"]:
+        if config["test_mode"]["ir"]["front"]:
             # Get dir of simulated hardware files from config
             gpio_test_dir_base = config["test_gpio_base_dir"]
 

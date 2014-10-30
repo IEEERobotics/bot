@@ -1,9 +1,9 @@
-testing: false
+testing: true
 
 # Not all hardware is used all the time
-test: {
-    color_sensor: false,
-    ultrasonics: false,
+test_mode: {
+    color_sensor: true,
+    ultrasonics: true,
     ir:{ front: false, back: true, right: true, left: false}
 }
 

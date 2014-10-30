@@ -13,29 +13,29 @@ virtualenv:
 before_install:
     # This makes numpy imports work
     # See: http://stackoverflow.com/questions/17224389/scipy-importerror-on-travis-ci
-    # TODO: Add this back. Removed while debugging main package import issue.
-    #- SITE_PKG_DIR=$VIRTUAL_ENV/lib/python$TRAVIS_PYTHON_VERSION/site-packages
-    #- rm -f $VIRTUAL_ENV/lib/python$TRAVIS_PYTHON_VERSION/no-global-site-packages.txt
+    - SITE_PKG_DIR=$VIRTUAL_ENV/lib/python$TRAVIS_PYTHON_VERSION/site-packages
+    - rm -f $VIRTUAL_ENV/lib/python$TRAVIS_PYTHON_VERSION/no-global-site-packages.txt
     # This fixes an issue with Travis already having some ZMQ stuff installed
     # See: https://github.com/travis-ci/travis-ci/issues/1715
     - sudo rm /etc/apt/sources.list.d/travis_ci_zeromq3-source.list
     # Install system-level requirements. Ideally, we'd do this with pip. Not possible.
     - sudo apt-get update -qq
     - sudo apt-get install -y python-smbus libzmq-dev python-zmq python-yaml python-numpy
-    # This is just for debugging the hell that is Tox+Travis
-    - pip freeze
 
 # Ideally, we'd install everything via pip. Not always possible.
 install: pip install -r requirements.txt
 
 # Command to run tests
-script: tox -vv
+# Tox is currently FUBR, using standard unittest for now
+#script: tox -vv
+script: python -m unittest discover
 
 # Sets Travis to run these test jobs in parallel, report them independently
-env:
-    - TOXENV=py27
-    - TOXENV=docs
-    - TOXENV=pep8
+# TODO: Add this back if we get Tox working
+#env:
+#    - TOXENV=py27
+#    - TOXENV=docs
+#    - TOXENV=pep8
 
 # Configure notifications
 notifications:

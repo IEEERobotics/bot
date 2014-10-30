@@ -20,7 +20,7 @@ before_install:
     - sudo apt-get install -y python-smbus libzmq-dev python-zmq python-yaml python-numpy
 
 # Ideally, we'd install everything via pip. Not always possible.
-install: pip install -r requirements.txt
+#install: pip install -r requirements.txt
 
 # Command to run tests
 script: tox -vv

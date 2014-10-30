@@ -1,9 +1,10 @@
-testing: false
+testing: true
 
-individual_testing: {
-    color_sensor: false,
-    ir: false,
-    ultrasonics: false
+# Not all hardware is used all the time
+test_mode: {
+    color_sensor: true,
+    ultrasonics: true,
+    ir:{ front: false, back: true, right: true, left: false}
 }
 
 dmcc_drive_motors: {

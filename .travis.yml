@@ -4,17 +4,13 @@ python:
     - "2.7"
 
 # Sets Travis' venv to check for system site packages
-# This makes numpy imports work
+# This makes numpy (and other system-wide package) imports work
 # See: http://stackoverflow.com/questions/17224389/scipy-importerror-on-travis-ci
 virtualenv:
     system_site_packages: true
 
 # Configure the build system
 before_install:
-    # This makes numpy imports work
-    # See: http://stackoverflow.com/questions/17224389/scipy-importerror-on-travis-ci
-    - SITE_PKG_DIR=$VIRTUAL_ENV/lib/python$TRAVIS_PYTHON_VERSION/site-packages
-    - rm -f $VIRTUAL_ENV/lib/python$TRAVIS_PYTHON_VERSION/no-global-site-packages.txt
     # This fixes an issue with Travis already having some ZMQ stuff installed
     # See: https://github.com/travis-ci/travis-ci/issues/1715
     - sudo rm /etc/apt/sources.list.d/travis_ci_zeromq3-source.list
@@ -22,25 +18,20 @@ before_install:
     - sudo apt-get update -qq
     - sudo apt-get install -y python-smbus libzmq-dev python-zmq python-yaml python-numpy
 
-# Ideally, we'd install everything via pip. Not always possible.
-install: pip install -r requirements.txt
-
 # Command to run tests
-# Tox is currently FUBR, using standard unittest for now
-#script: tox -vv
-script: python -m unittest discover
+script: tox -vv
 
 # Sets Travis to run these test jobs in parallel, report them independently
-# TODO: Add this back if we get Tox working
-#env:
-#    - TOXENV=py27
-#    - TOXENV=docs
-#    - TOXENV=pep8
+env:
+    - TOXENV=py27
+    - TOXENV=docs
+    - TOXENV=pep8
 
 # Configure notifications
 notifications:
     email:
         recipients:
-            - dfarrell07@gmail.com
+            - jakunesh@ncsu.edu
+            - asamara@ncsu.edu
     on_success: change
-    on_failure: change
+    on_failure: always

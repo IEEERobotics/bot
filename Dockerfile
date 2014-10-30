@@ -26,11 +26,6 @@ RUN wget -q --no-check-certificate "https://raw.githubusercontent.com/IEEERoboti
 # Do the ADD as late as possible, as it invalidates cache
 ADD . /opt/bot
 
-# Due to issue #112, tests must be run before server can start
-# The tests create simulated hardware files required by server in test mode
-# TODO: Still needed?
-#RUN cd /opt/bot2014 && ./start.py -t
-
 # Expose server port
 EXPOSE 60000
 

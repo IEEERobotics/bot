@@ -35,7 +35,12 @@ The project uses Tox to run unit tests with various Python interpreters, confirm
 
 To run a specific set of tests in a virtual environment, use `tox -e<name of tests>`. For example, `tox -epep8` to run [PEP8] style checks or `tox -epy27` to run unit tests with a Python 2.7 interpreter.
 
+TODO: Note about running in Vagrant/Docker
+TODO: Note about Travis CI
+
 ## Dependencies
+
+Now that we have super-sexy [Vagrant] and [Docker] environments, our dependencies are almost completely handled for you. All you'll need to do is to your machine is install git for working with the code, [Vagrant] for standing up [Vagrant] environments and [Docker] for standing up Docker environments.
 
 ### Git
 

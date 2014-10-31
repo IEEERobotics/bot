@@ -294,35 +294,38 @@ class ColorSensor(I2CDevice):
             return "Error: Unknown color"
         return False
 
+
 def read_loop():
     """Instantiate a ColorSensor object and read indefinitely."""
     print "start"
     colorSensor = ColorSensor()
 
-    #gets base values for all colors.
+    # gets base values for all colors.
     time.sleep(0.5)
     colorSensor.get_baseline()
 
-    print "bv: {}, bc: {:5.3f}, br: {:5.3f}, bg: {:5.3f}, bb: {:5.3f}".format(colorSensor.bv
-                                                                            , colorSensor.bc
-                                                                            , colorSensor.br
-                                                                            , colorSensor.bg
-                                                                            , colorSensor.bb)
+    print "bv: {}, bc: {:5.3f},\
+           br: {:5.3f}, bg: {:5.3f}, bb: {:5.3f}".format(
+                                                         colorSensor.bv,
+                                                         colorSensor.bc,
+                                                         colorSensor.br,
+                                                         colorSensor.bg,
+                                                         colorSensor.bb)
     percentages = colorSensor.get_percentage()
     
-    print "Red: {:5.3f}, Green: {:5.3f}, Blue: {:5.3f}".format(percentages[2]
-                                                              , percentages[3]
-                                                              , percentages[4])
+    print "Red: {:5.3f}, Green: {:5.3f}, Blue: {:5.3f}"\
+                                .format(percentages[2],
+                                        percentages[3],
+                                        percentages[4])
 
-    # self.logger.debug("baseline: bv: {}, bc: {}, br: {}, bg: {}, bb: {}".format(bv, bc, br, bg, bb))
-
-    print "before loop"
     t0 = time.time()
     while True:
         try:
             elapsed = time.time() - t0
             print "[{:8.3f}] ".format(elapsed)
-            print "bv: {}, bc: {:5.3f}, br: {:5.3f}, bg: {:5.3f}, bb: {:5.3f}".format(colorSensor.bv
+            print "bv: {}, bc: {:5.3f},\
+             br: {:5.3f}, bg: {:5.3f}, bb: {:5.3f}".format(
+                                                colorSensor.bv
                                                                             , colorSensor.color["clear"]
                                                                             , colorSensor.color["red"]
                                                                             , colorSensor.color["green"]
@@ -330,27 +333,15 @@ def read_loop():
             
             percentages = colorSensor.get_percentage()
     
-            print "Red: {:5.3f}, Green: {:5.3f}, Blue: {:5.3f}".format(percentages[2],
+            print "Red: {:5.3f}, Green: {:5.3f}, Blue: {:5.3f}".format(
+                                                            percentages[2],
                                                             percentages[3],
                                                             percentages[4])
             colorSensor.detect_on()
-            # if colorSensor.detects_color("green"):
-                # print "Found green, Percent method"
-
-            # if colorSensor.is_green_diff_method():
-                # print "diff method"
-
-            #print "v: {}  c: {}, r: {}, g: {} b: {}".format(valid, c, r, g, b)
-            # v, c, r, g, b = colorSensor.get_data_normalized()  # read normalized RGB values 
-            #v, c, r, g, b = colorSensor.get_percentage()
-            # Find out which color has plurality of percentage.
-            # print "v: {}, c: {:5.3f}, r: {:5.3f}, g: {:5.3f}, b: {:5.3f}".format(v, c, r, g, b)
-
             time.sleep(0.1)
         except KeyboardInterrupt:
             break
     print "Done."
-    
+
 if __name__ == "__main__":
     read_loop()
-

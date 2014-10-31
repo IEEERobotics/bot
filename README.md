@@ -52,7 +52,14 @@ TODO
 
 ### Docker
 
-TODO
+After installing docker: `https://docs.docker.com/installation/fedora/`
+`docker pull ieeerobotics/bot`
+`docker run -ti ieeerobotics/bot bash`
+
+Run tests:
+`tox`
+Check pep8:
+`tox -epep8`
 
 [Vagrant]: https://docs.vagrantup.com/v2/A
 [Docker]: https://docs.docker.com/

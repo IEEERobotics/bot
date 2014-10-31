@@ -12,9 +12,6 @@ except:
     sys.stderr.write("ERROR: This module cannot be run without the Leap SDK")
     raise
 
-import bot.lib.lib as lib
-import bot.client
-
 ControlRange = namedtuple('ControlRange',
                           ['min', 'zero_min', 'zero_max', 'max'])
 pitchRange = ControlRange(-30.0, -10.0, 10.0, 30.0)  # -ve is forward
@@ -89,9 +86,9 @@ class LeapClient(Leap.Listener, client.Client):
             # Proceed only if 3 or more fingers are seen and other
             #   criteria met (to prevent flaky behavior)
             position = hand.palm_position
-            x = position[0]
-            y = position[1]
-            z = position[2]
+            position[0] # x
+            position[1] # y
+            position[2] # z
             # TODO Use a state machine to prevent abrupt changes
             # Max hand height (z-position), min fingers; TODO other filters
             if z <= 40 and len(fingers) >= 3:

@@ -265,10 +265,9 @@ class ColorSensor(I2CDevice):
 
         """
         # Reads in percentages of total color
-        pv, pc, \
-        percent_red,\
-        percent_green, \
-        percent_blue = self.get_percentage()
+        pv , pc , \
+        percent_red ,\
+        percent_green , percent_blue = self.get_percentage()
 
         total_color = self.color["red"] \
                     + self.color["green"] \

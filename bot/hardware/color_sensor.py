@@ -59,10 +59,10 @@ class ColorSensor(I2CDevice):
         
         """
         v, c, r, g, b = self.read_data()
-        color = {"clear": c,
-                  "red": r,
-                  "green": g,
-                  "blue": b}
+        color = {"clear": c
+                , "red": r
+                , "green": g
+                , "blue": b}
         return color
 
     def get_data_normalized(self):
@@ -304,16 +304,16 @@ def read_loop():
     time.sleep(0.5)
     colorSensor.get_baseline()
 
-    print "bv: {}, bc: {:5.3f}, br: {:5.3f}, bg: {:5.3f}, bb: {:5.3f}".format(colorSensor.bv, \
-                                                                            colorSensor.bc,\
-                                                                            colorSensor.br,\
-                                                                            colorSensor.bg,\
-                                                                            colorSensor.bb)
+    print "bv: {}, bc: {:5.3f}, br: {:5.3f}, bg: {:5.3f}, bb: {:5.3f}".format(colorSensor.bv
+                                                                            , colorSensor.bc
+                                                                            , colorSensor.br
+                                                                            , colorSensor.bg
+                                                                            , colorSensor.bb)
     percentages = colorSensor.get_percentage()
     
-    print "Red: {:5.3f}, Green: {:5.3f}, Blue: {:5.3f}".format(percentages[2], \
-                                                            percentages[3],\
-                                                            percentages[4])
+    print "Red: {:5.3f}, Green: {:5.3f}, Blue: {:5.3f}".format(percentages[2]
+                                                              , percentages[3]
+                                                              , percentages[4])
 
     # self.logger.debug("baseline: bv: {}, bc: {}, br: {}, bg: {}, bb: {}".format(bv, bc, br, bg, bb))
 
@@ -323,16 +323,16 @@ def read_loop():
         try:
             elapsed = time.time() - t0
             print "[{:8.3f}] ".format(elapsed)
-            print "bv: {}, bc: {:5.3f}, br: {:5.3f}, bg: {:5.3f}, bb: {:5.3f}".format(colorSensor.bv, \
-                                                                            colorSensor.color["clear"],\
-                                                                            colorSensor.color["red"],\
-                                                                            colorSensor.color["green"],\
-                                                                            colorSensor.color["blue"])
+            print "bv: {}, bc: {:5.3f}, br: {:5.3f}, bg: {:5.3f}, bb: {:5.3f}".format(colorSensor.bv
+                                                                            , colorSensor.color["clear"]
+                                                                            , colorSensor.color["red"]
+                                                                            , colorSensor.color["green"]
+                                                                            , colorSensor.color["blue"])
             
             percentages = colorSensor.get_percentage()
     
-            print "Red: {:5.3f}, Green: {:5.3f}, Blue: {:5.3f}".format(percentages[2], \
-                                                            percentages[3],\
+            print "Red: {:5.3f}, Green: {:5.3f}, Blue: {:5.3f}".format(percentages[2],
+                                                            percentages[3],
                                                             percentages[4])
             colorSensor.detect_on()
             # if colorSensor.detects_color("green"):

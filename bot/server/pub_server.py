@@ -91,7 +91,8 @@ class PubServer(threading.Thread):
             "turret_detail": self.gunner.turret.__str__,
             "turret_yaw": self.gunner.turret.get_yaw,
             "turret_pitch": self.gunner.turret.get_pitch,
-            "ir": self.ir_hub.read_all,  # May tieup IRs, bad if line following
+            # May tieup IRs, bad if line following
+            "ir": self.ir_hub.read_all,
             "ir_cached": self.ir_hub.read_cached  # May give slightly old data
         }
 

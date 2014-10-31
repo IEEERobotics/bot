@@ -120,7 +120,9 @@ class CLI(cmd.Cmd):
                 except ValueError:
                     print "Bad parameter value"
                     return
-                result = self.ctrl_client.call(obj_name, method_name, param_dict)
+                result = self.ctrl_client.call(obj_name
+                                               , method_name
+                                               , param_dict)
                 print "-->", result
             else:
                 print "Unknown API method:", method_name

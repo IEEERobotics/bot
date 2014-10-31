@@ -88,7 +88,7 @@ class LeapClient(Leap.Listener, client.Client):
             position = hand.palm_position
             position[0] # x
             position[1] # y
-            position[2] # z
+            z = position[2]
             # TODO Use a state machine to prevent abrupt changes
             # Max hand height (z-position), min fingers; TODO other filters
             if z <= 40 and len(fingers) >= 3:

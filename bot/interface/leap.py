@@ -86,8 +86,8 @@ class LeapClient(Leap.Listener, client.Client):
             # Proceed only if 3 or more fingers are seen and other
             #   criteria met (to prevent flaky behavior)
             position = hand.palm_position
-            position[0] # x
-            position[1] # y
+            position[0]  # x
+            position[1]  # y
             z = position[2]
             # TODO Use a state machine to prevent abrupt changes
             # Max hand height (z-position), min fingers; TODO other filters

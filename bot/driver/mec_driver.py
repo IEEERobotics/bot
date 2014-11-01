@@ -22,9 +22,9 @@ class MecDriver(driver.Driver):
     max_angular_rate = 100
 
     # Used to keep track of last set speeds.
-    #translate_speed = 0
-    #translate_angle = 0
-    #angular_rate = 0
+    # translate_speed = 0
+    # translate_angle = 0
+    # angular_rate = 0
 
     def __init__(self, mode='power'):
         """Run superclass's init, build motor abstraction objects."""

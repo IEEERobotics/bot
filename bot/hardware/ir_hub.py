@@ -5,7 +5,7 @@ from time import time, sleep
 import bbb.gpio as gpio_mod
 
 import bot.lib.lib as lib
-import ir_analog as ir_analog_mod
+from . import ir_analog as ir_analog_mod
 
 
 class IRHub(object):
@@ -264,7 +264,7 @@ class IRHub(object):
             self.select_nth_units(0)
         select_nth_units_avg = (time() - start_time) / num_reads
 
-        return {"read_binary_avg": read_binary_avg, 
+        return {"read_binary_avg": read_binary_avg,
                 "read_all_avg": read_all_avg,
                 "read_nth_units_avg": read_nth_units_avg,
                 "select_nth_units_avg": select_nth_units_avg}

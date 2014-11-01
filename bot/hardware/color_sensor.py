@@ -7,6 +7,7 @@ from i2c_device.i2c_device import I2CDevice
 import bbb.pwm as pwm_mod
 import bot.lib.lib as lib
 
+
 class ColorSensor(I2CDevice):
 
     """Wrapper class for TCS3472 I2C-based color sensor."""
@@ -14,7 +15,7 @@ class ColorSensor(I2CDevice):
     # TODO: Make these config items and load in __init__()
     max_c = 65536
 
-    #Base values to be changed by get_baseline
+    # Base values to be changed by get_baseline
     bv = 0.0
     bc = 0.0
     bg = 0.0
@@ -54,20 +55,17 @@ class ColorSensor(I2CDevice):
     @property
     def color(self):
         """Actual color currently being viewed.
-        
+
         :returns: dict containing color components.
-        
+
         """
         v, c, r, g, b = self.read_data()
-        color = {"clear": c
-                , "red": r
-                , "green": g
-                , "blue": b}
+        color = {"clear": c, "red": r, "green": g, "blue": b}
         return color
 
     def get_data_normalized(self):
         """Finds normalized color readings, compared to overall color viewing.
-        
+
         :returns: Validity, Clear (magnitude), red, green, blue
 
         """
@@ -84,22 +82,21 @@ class ColorSensor(I2CDevice):
         b /= c
         c /= self.max_c  # normalize c to [0, 1] range
         return valid, c, r, g, b  # return valid flag if someone's interested
-        
+
     @lib.api_call
-    def led_brightness(self,brightness):
+    def led_brightness(self, brightness):
         """Changes brightness of LED.
-        :param brightness: 
+        :param brightness:
         :type int: Percent of fully on LED brightness.
 
         """
 
         # try:
-            # assert duty_period < 2*10^6
+        # assert duty_period < 2*10^6
         # except AssertionError:
-            # raise AssertionError("invalid duty cycle")
+        # raise AssertionError("invalid duty cycle")
 
-        self.pwm.duty = int(brightness/100. * 2000000)
-        
+        self.pwm.duty = int(brightness / 100. * 2000000)
 
     def read_data(self, bias_color="", bias_constant=0):
         """Reads in raw data directly from color_sensor.
@@ -119,11 +116,11 @@ class ColorSensor(I2CDevice):
             b = self.registers['BDATA'].read()
 
             if bias_color == "green":
-                g *= 1 + bias_constant/100
+                g *= 1 + bias_constant / 100
             elif bias_color == "red":
-                r *= 1 + bias_constant/100
+                r *= 1 + bias_constant / 100
             elif bias_color == "blue":
-                b *= 1 + bias_constant/100
+                b *= 1 + bias_constant / 100
 
             return valid, c, r, g, b
         else:
@@ -141,7 +138,7 @@ class ColorSensor(I2CDevice):
         g = (g / total) * 100
         b = (b / total) * 100
         return v, c, r, g, b
-    
+
     def detect_on(self):
         """Detects if red light is on or off.
 
@@ -167,14 +164,14 @@ class ColorSensor(I2CDevice):
         attempt_count = 0
         while (time.time() - start_time) < timeout:
             self.bv, self.bc, \
-            self.br, self.bg, \
-            self.bb = self.read_data()
-            attempt_count += 1 
+                self.br, self.bg, \
+                self.bb = self.read_data()
+            attempt_count += 1
             if self.br != 0 and self.bg != 0 and self.bb != 0:
                 break
         if attempt_count > 0:
             self.logger.error("Baseline found on {} attempt.".format(
-                             attempt_count))
+                attempt_count))
 
     def get_percent_diff(self):
         """Calculates percent difference from baseline.
@@ -205,7 +202,7 @@ class ColorSensor(I2CDevice):
         diff_c, diff_r, diff_g, diff_b = self.get_percent_diff()
 
         if color == "green":
-            if (diff_g > diff_r) and (diff_g  > diff_b):
+            if (diff_g > diff_r) and (diff_g > diff_b):
                 return True
         elif color == "red":
             if (diff_r > diff_g) and (diff_r > diff_b):
@@ -220,10 +217,10 @@ class ColorSensor(I2CDevice):
 
     def decides_color(self):
         """Decides on color based on readings.
-        
+
         :returns: Name of color found.
         """
-        
+
         if detects_color("green"):
             return "green"
         elif detects_color("red"):
@@ -249,10 +246,10 @@ class ColorSensor(I2CDevice):
         return False
 
     def detects_color_diff_method(self, color, thresh=0.2):
-        """Finds color based on the total % of total color that is seen. 
+        """Finds color based on the total % of total color that is seen.
 
         Each percentage is a fraction of the total color (r+g+b)
-        as seen by the color sensor. The percentages all add up 
+        as seen by the color sensor. The percentages all add up
         to 100.
 
         Note: This is experimental and not recommended for use.
@@ -265,13 +262,13 @@ class ColorSensor(I2CDevice):
 
         """
         # Reads in percentages of total color
-        pv , pc , \
-        percent_red ,\
-        percent_green , percent_blue = self.get_percentage()
+        pv, pc, \
+            percent_red,\
+            percent_green, percent_blue = self.get_percentage()
 
         total_color = self.color["red"] \
-                    + self.color["green"] \
-                    + self.color["blue"]
+            + self.color["green"] \
+            + self.color["blue"]
 
         total_base = self.br + self.bg + self.bb
 
@@ -306,38 +303,31 @@ def read_loop():
 
     print "bv: {}, bc: {:5.3f},\
            br: {:5.3f}, bg: {:5.3f}, bb: {:5.3f}".format(
-                                                         colorSensor.bv,
-                                                         colorSensor.bc,
-                                                         colorSensor.br,
-                                                         colorSensor.bg,
-                                                         colorSensor.bb)
+        colorSensor.bv,
+        colorSensor.bc,
+        colorSensor.br,
+        colorSensor.bg,
+        colorSensor.bb)
     percentages = colorSensor.get_percentage()
-    
+
     print "Red: {:5.3f}, Green: {:5.3f}, Blue: {:5.3f}"\
-                                .format(percentages[2],
-                                        percentages[3],
-                                        percentages[4])
+        .format(percentages[2],
+                percentages[3],
+                percentages[4])
 
     t0 = time.time()
     while True:
         try:
             elapsed = time.time() - t0
             print "[{:8.3f}] ".format(elapsed)
-            print "bv: {}, bc: {:5.3f},\
-             br: {:5.3f}, bg: {:5.3f}, bb: {:5.3f}".format(
-                                                colorSensor.bv
-                                                                            , colorSensor.color["clear"]
-                                                                            , colorSensor.color["red"]
-                                                                            , colorSensor.color["green"]
-                                                                            , colorSensor.color["blue"])
-            
             percentages = colorSensor.get_percentage()
-    
+
             print "Red: {:5.3f}, Green: {:5.3f}, Blue: {:5.3f}".format(
-                                                            percentages[2],
-                                                            percentages[3],
-                                                            percentages[4])
+                percentages[2],
+                percentages[3],
+                percentages[4])
             colorSensor.detect_on()
+
             time.sleep(0.1)
         except KeyboardInterrupt:
             break

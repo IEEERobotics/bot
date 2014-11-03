@@ -5,6 +5,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # TODO: Upgrade Vagrant to Debian 8 and install pypy once it's out.
     config.vm.box = "chef/debian-7.7"
 
+    config.vm.synced_folder ".", "/vagrant", disabled: true
+    config.vm.synced_folder ".", "/home/vagrant/bot"
+
     config.vm.provision "shell", inline: "apt-get update"
     config.vm.provision "shell", inline: "apt-get install -y python-pip \
                                                              python-smbus \
@@ -15,8 +18,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                                                              python-yaml \
                                                              python-numpy \
                                                              python3.2"
-    config.vm.provision "shell", inline: "pip install -r /vagrant/requirements.txt"
-    config.vm.synced_folder ".", "/home/vagrant/bot"
+    config.vm.provision "shell", inline: "pip install -r /home/vagrant/bot/requirements.txt"
 
     config.vm.define "base" do |base|
         # Just the shared config above

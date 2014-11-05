@@ -15,7 +15,7 @@ class TestTargetingSolver(TestCase):
         self.config = lib.get_config()
         self.logger = lib.get_logger()
         self.logger.info("Running {}()".format(self._testMethodName))
-        #config = path.dirname(path.realpath(__file__))+"/test_config.yaml"
+        # config = path.dirname(path.realpath(__file__))+"/test_config.yaml"
 
     def test_getTargetDistance(self):
         distance = targeting.getTargetDistance(.3572, 0.9144)
@@ -34,10 +34,11 @@ class TestTargetingSolver(TestCase):
         self.assertAlmostEqual(servoAngle, 57.66, places=2)
 
     def test_getFiringSolution(self):
-        vert_servo_angle, horiz_servo_angle = targeting.getFiringSolution(.3572,.9144, 0, 7.4439)
+        vert_servo_angle, horiz_servo_angle = targeting.getFiringSolution(
+            .3572, .9144, 0, 7.4439)
         self.assertAlmostEqual(horiz_servo_angle, 13.942, places=2)
         self.assertAlmostEqual(vert_servo_angle, 63, places=0)
 
     def test_getFiringSolution_bad_velocity(self):
         with self.assertRaises(ValueError):
-            targeting.getFiringSolution(.3572,.9144, 0, .5)
+            targeting.getFiringSolution(.3572, .9144, 0, .5)

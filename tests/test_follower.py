@@ -54,19 +54,19 @@ class TestFollower(test_bot.TestBot):
         #           1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16
         position = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         for index, value in enumerate(position):
-            position[index] =  1
+            position[index] = 1
             if(index > 0):
-                position[index -1] = 0
+                position[index - 1] = 0
             self.assertEquals(
                 index * 2 - 15, self.follower.get_position_lr(
                     position))
         position = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         for index, value in enumerate(position):
-            position[index] =  1
+            position[index] = 1
             if(index == 0):
                 continue
             if(index > 1):
-                position[index -2] = 0
+                position[index - 2] = 0
             self.assertEquals(
                 (index - 1) * 2 - 15 + 1, self.follower.get_position_lr(
                     position))
@@ -102,28 +102,29 @@ class TestFollower(test_bot.TestBot):
         position = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         # Test good conditions for line in range
         for index, value in enumerate(position):
-            position[index] =  1
+            position[index] = 1
             if(index > 0):
-                position[index -1] = 0
+                position[index - 1] = 0
             self.assertEquals(
-                ( index * 2 - 15) * -1, self.follower.get_position_rl(
+                (index * 2 - 15) * -1, self.follower.get_position_rl(
                     position))
         position = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         for index, value in enumerate(position):
-            position[index] =  1
+            position[index] = 1
             if(index == 0):
                 continue
             if(index > 1):
-                position[index -2] = 0
+                position[index - 2] = 0
             self.assertEquals(
-                ((index - 1) * 2 - 15 + 1) * -1, 
+                ((index - 1) * 2 - 15 + 1) * -1,
                 self.follower.get_position_rl(position))
-       
+
     @unittest.expectedFailure
     def test_assign_states(self):
-        self.follower.heading = 180 #270
+        self.follower.heading = 180  # 270
         # head in the direction of the bone
-        test_array = {"front": [0] * 16, "back": [0] * 16,
+        test_array = {
+            "front": [0] * 16, "back": [0] * 16,
             "right": [0] * 16, "left": [0] * 16}
         # begin test nomarl operations and intersection detection
         for i in range(16):
@@ -146,15 +147,15 @@ class TestFollower(test_bot.TestBot):
                 test_array["right"] = [0] * 16
                 test_array["right"][n] = 1
                 self.follower.assign_states(test_array)
-                # Normal 
-                self.assertEquals("NONE",self.follower.error)
+                # Normal
+                self.assertEquals("NONE", self.follower.error)
             test_array["right"] = [0] * 16
             for n in range(16):
                 test_array["left"] = [0] * 16
                 test_array["left"][n] = 1
                 self.follower.assign_states(test_array)
-                # Normal 
-                self.assertEquals("NONE",self.follower.error)
+                # Normal
+                self.assertEquals("NONE", self.follower.error)
             test_array["left"] = [0] * 16
             for n in range(16):
                 test_array["left"] = [0] * 16
@@ -163,34 +164,36 @@ class TestFollower(test_bot.TestBot):
                 test_array["right"][n] = 1
                 self.follower.assign_states(test_array)
                 # Intersection test
-                self.assertEquals("ON_INTERSECTION",self.follower.error)
+                self.assertEquals("ON_INTERSECTION", self.follower.error)
             test_array["left"] = [0] * 16
             test_array["right"] = [0] * 16
             if(i != 15):
                 test_array["back"][i+1] = 1
                 test_array["front"][i+1] = 1
-                # nomarl operation
+                # normal operation
                 self.follower.assign_states(test_array)
                 self.assertEquals(
-                     (i * 2 - 15 + 1), self.follower.front_state)
+                    (i * 2 - 15 + 1), self.follower.front_state)
                 self.assertEquals(
                     (i * 2 - 15 + 1) * -1, self.follower.back_state)
-                self.assertEquals(self.follower.No_Line, self.follower.right_state)
-                self.assertEquals(self.follower.No_Line, self.follower.left_state)
+                self.assertEquals(
+                    self.follower.No_Line, self.follower.right_state)
+                self.assertEquals(
+                    self.follower.No_Line, self.follower.left_state)
                 self.assertEquals("NONE", self.follower.error)
                 for n in range(16):
                     test_array["right"] = [0] * 16
                     test_array["right"][n] = 1
                     self.follower.assign_states(test_array)
-                # Normal 
-                self.assertEquals("NONE",self.follower.error)
+                # Normal
+                self.assertEquals("NONE", self.follower.error)
                 test_array["right"] = [0] * 16
                 for n in range(16):
                     test_array["left"] = [0] * 16
                     test_array["left"][n] = 1
                     self.follower.assign_states(test_array)
-                    # Normal 
-                    self.assertEquals("NONE",self.follower.error)
+                    # Normal
+                    self.assertEquals("NONE", self.follower.error)
                 for n in range(16):
                     test_array["left"] = [0] * 16
                     test_array["left"][n] = 1
@@ -198,7 +201,7 @@ class TestFollower(test_bot.TestBot):
                     test_array["right"][n] = 1
                     self.follower.assign_states(test_array)
                     # Intersection test
-                    self.assertEquals("ON_INTERSECTION",self.follower.error)
+                    self.assertEquals("ON_INTERSECTION", self.follower.error)
         test_array["front"] = [0] * 16
         test_array["back"] = [0] * 16
         # Lost line test
@@ -218,53 +221,51 @@ class TestFollower(test_bot.TestBot):
             # Lost front line test
             self.assertEquals("FRONT_LOST", self.follower.error)
 
-
-
     def test_determine_states(self):
-       test_array = {"front": [1] * 16, "back": [0] * 16,
+        test_array = {
+            "front": [1] * 16, "back": [0] * 16,
             "right": [0] * 16, "left": [0] * 16}
-       #180, front should have Large_object, else No_line
-       self.follower.heading = 180
-       self.follower.determine_states(test_array)
-       self.assertEquals(self.follower.Large_Object, self.follower.front_state)
-       self.assertEquals(self.follower.No_Line, self.follower.back_state)
-       self.assertEquals(self.follower.No_Line, self.follower.left_state)
-       self.assertEquals(self.follower.No_Line, self.follower.right_state)
-       #0, back should have Large_object, else No_line
-       self.follower.heading = 0
-       self.follower.determine_states(test_array)
-       self.assertEquals(self.follower.Large_Object, self.follower.back_state)
-       self.assertEquals(self.follower.No_Line, self.follower.front_state)
-       self.assertEquals(self.follower.No_Line, self.follower.left_state)
-       self.assertEquals(self.follower.No_Line, self.follower.right_state)
-       #90, left should have Large_object, else No_line
-       self.follower.heading = 90
-       self.follower.determine_states(test_array)
-       self.assertEquals(self.follower.Large_Object, self.follower.left_state)
-       self.assertEquals(self.follower.No_Line, self.follower.back_state)
-       self.assertEquals(self.follower.No_Line, self.follower.front_state)
-       self.assertEquals(self.follower.No_Line, self.follower.right_state)
-       #270, right should have Large_object, else No_line
-       self.follower.heading = 270
-       self.follower.determine_states(test_array)
-       self.assertEquals(self.follower.Large_Object, self.follower.right_state)
-       self.assertEquals(self.follower.No_Line, self.follower.back_state)
-       self.assertEquals(self.follower.No_Line, self.follower.left_state)
-       self.assertEquals(self.follower.No_Line, self.follower.front_state)
+        # 180, front should have Large_object, else No_line
+        self.follower.heading = 180
+        self.follower.determine_states(test_array)
+        self.assertEquals(
+            self.follower.Large_Object, self.follower.front_state)
+        self.assertEquals(self.follower.No_Line, self.follower.back_state)
+        self.assertEquals(self.follower.No_Line, self.follower.left_state)
+        self.assertEquals(self.follower.No_Line, self.follower.right_state)
+        # 0, back should have Large_object, else No_line
+        self.follower.heading = 0
+        self.follower.determine_states(test_array)
+        self.assertEquals(self.follower.Large_Object, self.follower.back_state)
+        self.assertEquals(self.follower.No_Line, self.follower.front_state)
+        self.assertEquals(self.follower.No_Line, self.follower.left_state)
+        self.assertEquals(self.follower.No_Line, self.follower.right_state)
+        # 90, left should have Large_object, else No_line
+        self.follower.heading = 90
+        self.follower.determine_states(test_array)
+        self.assertEquals(self.follower.Large_Object, self.follower.left_state)
+        self.assertEquals(self.follower.No_Line, self.follower.back_state)
+        self.assertEquals(self.follower.No_Line, self.follower.front_state)
+        self.assertEquals(self.follower.No_Line, self.follower.right_state)
+        # 270, right should have Large_object, else No_line
+        self.follower.heading = 270
+        self.follower.determine_states(test_array)
+        self.assertEquals(
+            self.follower.Large_Object, self.follower.right_state)
+        self.assertEquals(self.follower.No_Line, self.follower.back_state)
+        self.assertEquals(self.follower.No_Line, self.follower.left_state)
+        self.assertEquals(self.follower.No_Line, self.follower.front_state)
 
+        test_array = {
+            "front": [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0],
+            "back": [0] * 16, "right": [0] * 16, "left": [0] * 16}
 
-       test_array = {"front": [0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0], "back": [0] * 16,
-            "right": [0] * 16, "left": [0] * 16}
+        # front should have noise
+        self.follower.heading = 180
+        self.follower.determine_states(test_array)
+        self.assertEquals(self.follower.Noise, self.follower.front_state)
+        self.assertEquals(self.follower.No_Line, self.follower.back_state)
+        self.assertEquals(self.follower.No_Line, self.follower.left_state)
+        self.assertEquals(self.follower.No_Line, self.follower.right_state)
 
-       #front should have noise
-       self.follower.heading = 180
-       self.follower.determine_states(test_array)
-       self.assertEquals(self.follower.Noise, self.follower.front_state)
-       self.assertEquals(self.follower.No_Line, self.follower.back_state)
-       self.assertEquals(self.follower.No_Line, self.follower.left_state)
-       self.assertEquals(self.follower.No_Line, self.follower.right_state)
-
-       return
-
-
-
+        return

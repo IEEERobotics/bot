@@ -210,6 +210,7 @@ class TestWheelSpeed(TestBot):
         self.gun.wheel_power = -1
         self.assertEqual(self.gun.wheel_power, 0)
 
+
 class TestWheelVelocity(TestBot):
     def setUp(self):
         """Setup test hardware files and build wheel gunner object."""
@@ -227,6 +228,7 @@ class TestWheelVelocity(TestBot):
         self.gun.wheel_velocity = 50  # normal ang vel is up to 150 tick/s?
         self.assertEqual(self.gun.wheel_velocity, 50)
 
+
 class TestDartVelocity(TestBot):
 
     def setUp(self):
@@ -243,7 +245,8 @@ class TestDartVelocity(TestBot):
 
         A reasonable range of nerf velocities would be 5-25 /ms
         """
-        self.gun.wheel_velocity = 6950  # tps of one pololu motor, full power, unloaded
+        self.gun.wheel_velocity = 6950
+        # tps of one pololu motor, full power, unloaded
         vel1 = self.gun.get_dart_velocity()
         self.assertGreater(vel1, 3)
         self.assertLess(vel1, 50)
@@ -251,6 +254,4 @@ class TestDartVelocity(TestBot):
         self.gun.wheel_velocity = 3500  # around 50%
         vel2 = self.gun.get_dart_velocity()
         self.assertGreater(vel2, 3)
-        self.assertGreater(vel1, vel2) # should be slower than at full power
-
-
+        self.assertGreater(vel1, vel2)  # should be slower than at full power

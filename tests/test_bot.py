@@ -6,6 +6,7 @@ import unittest
 
 import bot.lib.lib as lib
 
+
 def additional_tests():
     return unittest.defaultTestLoader.discover("..")
 
@@ -38,7 +39,8 @@ class TestBot(unittest.TestCase):
         period_ns = "20000000\n"
         polarity = "0\n"
         for servo_conf in self.config["turret"]["servos"].values():
-            self.setup_pwm(servo_conf["PWM"], run, duty_ns, period_ns, polarity)
+            self.setup_pwm(
+                servo_conf["PWM"], run, duty_ns, period_ns, polarity)
 
     def setup_laser(self):
         """Set gun lasor simulation files to known state."""

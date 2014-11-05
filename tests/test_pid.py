@@ -64,4 +64,3 @@ class TestPID(test_bot.TestBot):
             assert abs(test_output[index] - output_value[index]) <= \
                 .001, "{} != {}, {}".format(
                     test_output[index], output_value[index], n)
-                    

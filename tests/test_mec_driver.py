@@ -7,6 +7,7 @@ import bot.lib.lib as lib
 from bot.driver.mec_driver import MecDriver  # For convenience
 import tests.test_bot as test_bot
 
+
 class TestRotate(test_bot.TestBot):
     """Test rotation of mec wheels"""
 
@@ -33,7 +34,8 @@ class TestRotate(test_bot.TestBot):
             self.md.rotate(test_angular_rate)
 
             # Check for approximate speed, as float values will seldom be exact
-            self.logger.debug("md.ang_vel: {:3d}, test_ang_vel: {:3d}".format(self.md.rotation_rate, test_angular_rate))
+            self.logger.debug("md.ang_vel: {:3d}, test_ang_vel: {:3d}".format(
+                self.md.rotation_rate, test_angular_rate))
             assert fabs(self.md.rotation_rate - test_angular_rate) < \
                 angular_rate_error_margin
 
@@ -112,16 +114,16 @@ class TestRotate(test_bot.TestBot):
     def test_move_zero(self):
         self.logger.info("Running test_move_zero()")
         self.logger.debug("Setting to zero")
-        self.md.move(0,0)
+        self.md.move(0, 0)
         self.assertEqual(self.md.speed, 0)
         self.logger.debug("Setting to 50")
-        self.md.move(50,0)
+        self.md.move(50, 0)
         self.assertNotEqual(self.md.speed, 0)
         self.logger.debug("Setting to zero again")
-        self.md.move(0,0)
+        self.md.move(0, 0)
         self.assertEqual(self.md.speed, 0)
         self.logger.debug("Setting to zero with angle")
-        self.md.move(0,90)
+        self.md.move(0, 90)
         self.assertEqual(self.md.speed, 0)
 
     def test_move_forward_strafe(self):
@@ -159,8 +161,8 @@ class TestRotate(test_bot.TestBot):
                 self.logger.debug("Check speed: {:3d}, angle: {:3d}".format(
                     self.md.speed, self.md.angle))
 
-                #Note: Speed no longer being checked due to
-                #Normalization eqs changing it.
+                # Note: Speed no longer being checked due to
+                # Normalization eqs changing it.
 
                 if fabs(test_speed) >= 10:
                     assert fabs(self.md.angle - test_angle) % 360 < \
@@ -169,7 +171,7 @@ class TestRotate(test_bot.TestBot):
                 # Check for valid duty cycles (speeds)
                 for motor in self.md.motors.itervalues():
                     assert MecDriver.min_speed <= motor.speed <= \
-                                                  MecDriver.max_speed
+                        MecDriver.max_speed
 
     def test_compound_move(self):
         # FIXME: This is just a dumb function that calls compound_move()
@@ -180,16 +182,16 @@ class TestRotate(test_bot.TestBot):
         translate_speed = 75
         translate_angle = 45
         angular_rate = 50
-        self.logger.debug("Set speed: {:3d}, angle: {:3d}, " \
-            "rate: {:3d}".format(translate_speed, translate_angle,
-            angular_rate))
-        self.md.compound_move(translate_speed, translate_angle,
-            angular_rate)
-        self.logger.debug("Check speed: {:3d}, angle: {:3d}"
-            .format(self.md.speed, self.md.angle))
+        self.logger.debug(
+            "Set speed: {:3d}, angle: {:3d}, ""rate: {:3d}".format(
+                translate_speed, translate_angle, angular_rate))
+        self.md.compound_move(
+            translate_speed, translate_angle, angular_rate)
+        self.logger.debug(
+            "Check speed: {:3d}, angle: {:3d}".format(
+                self.md.speed, self.md.angle))
 
         # Check for valid duty cycles (speeds)
         for motor in self.md.motors.itervalues():
             assert MecDriver.min_speed <= motor.speed
             assert motor.speed <= MecDriver.max_speed
-

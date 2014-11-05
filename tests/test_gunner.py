@@ -19,7 +19,8 @@ class TestAim(test_bot.TestBot):
         # Build wheel gunner
         self.gunner = gunner.Gunner()
         self.gunner.gun.dart_velocity = 10
-        self.gunner.ultrasonics.read_dists = lambda: {'front': 0.3, 'left': 0.5, 'back': 2.4384, 'right': 0.7192}
+        self.gunner.ultrasonics.read_dists = lambda: \
+            {'front': 0.3, 'left': 0.5, 'back': 2.4384, 'right': 0.7192}
 
     def tearDown(self):
         """Restore testing flag state in config file."""
@@ -40,7 +41,8 @@ class TestFire(test_bot.TestBot):
         super(TestFire, self).setUp()
         # Build wheel gunner
         self.gunner = gunner.Gunner()
-        self.gunner.ultrasonics.read_dists = lambda: {'front': 0.3, 'left': 0.5, 'back': 2.4384, 'right': 0.7192}
+        self.gunner.ultrasonics.read_dists = lambda: \
+            {'front': 0.3, 'left': 0.5, 'back': 2.4384, 'right': 0.7192}
         self.gunner.gun.dart_velocity = 10
 
     def tearDown(self):
@@ -54,6 +56,7 @@ class TestFire(test_bot.TestBot):
         """
         self.gunner.fire()
 
+
 class TestLocalize(test_bot.TestBot):
 
     def setUp(self):
@@ -63,8 +66,9 @@ class TestLocalize(test_bot.TestBot):
         self.gunner = gunner.Gunner()
         x_size = self.config['course']['default']['x_size']
         y_size = self.config['course']['default']['y_size']
-        self.good_dists = {'front': x_size - 0.5, 'back': 0.5,
-                'left': 1.0, 'right': y_size - 1.0}
+        self.good_dists = {
+            'front': x_size - 0.5, 'back': 0.5,
+            'left': 1.0, 'right': y_size - 1.0}
         self.gunner.ultrasonics.read_dists = lambda: self.good_dists
         self.logger.info("Running: {}".format(self._testMethodName))
 
@@ -94,7 +98,7 @@ class TestLocalize(test_bot.TestBot):
         # test distance, a valid firing location in the -x, -y quadrant
         dists = self.good_dists
         x, y, theta = self.gunner.ratio_localizer(dists)
-        valid = self.gunner.validate_pose(x,y,theta)
+        valid = self.gunner.validate_pose(x, y, theta)
         self.assertTrue(valid)
 
     def test_ratio_localizer_too_short_front(self):
@@ -102,27 +106,26 @@ class TestLocalize(test_bot.TestBot):
         dists = self.good_dists
         dists['front'] = 0.3
         with self.assertRaises(ValueError):
-           self.gunner.ratio_localizer(dists)
+            self.gunner.ratio_localizer(dists)
 
     def test_ratio_localizer_short_left(self):
         # short front moves us out of valid firing range
         dists = self.good_dists
         dists['left'] = 0.5
         x, y, theta = self.gunner.ratio_localizer(dists)
-        valid = self.gunner.validate_pose(x,y,theta)
+        valid = self.gunner.validate_pose(x, y, theta)
         self.assertFalse(valid)
 
     def test_ratio_localizer_angles(self):
         # good values for -x,-y quadrant with rotation
         dists = {'front': 0.7715, 'back': 0.55, 'left': 1.1, 'right': 1.5827}
         x, y, theta = self.gunner.ratio_localizer(dists)
-        valid = self.gunner.validate_pose(x,y,theta)
+        valid = self.gunner.validate_pose(x, y, theta)
         self.assertTrue(valid)
         self.assertLess(theta, 0)
 
         dists = {'front': 0.55, 'back': 0.7715, 'left': 1.1, 'right': 1.5827}
         x, y, theta = self.gunner.ratio_localizer(dists)
-        valid = self.gunner.validate_pose(x,y,theta)
+        valid = self.gunner.validate_pose(x, y, theta)
         self.assertTrue(valid)
         self.assertGreater(theta, 0)
-

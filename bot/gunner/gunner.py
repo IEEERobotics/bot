@@ -9,6 +9,7 @@ import bot.hardware.wheel_gun as wheel_gun
 import bot.hardware.ultrasonic as ultrasonic
 import bot.gunner.targeting_solver as targeting
 
+
 class Gunner(object):
 
     """Logic for aiming the turret and firing darts.
@@ -27,25 +28,27 @@ class Gunner(object):
         self.turret = turret.Turret()
         self.ultrasonics = ultrasonic.Ultrasonic()
 
-
     @lib.api_call
     def localize(self):
         """Localize using ultrasonic sensors"""
         dists = self.ultrasonics.read_dists()
-        # TODO: Handle skewed bot when not square to the course (e.g. on the arc line)
+        # TODO: Handle skewed bot when not square to the course
+        # (e.g. on the arc line)
         x, y, theta = self.ratio_localizer(dists)
         self.logger.info("Localize calculated pose: ({}, {}, {})".format(
-                    x, y, theta))
-        return x,y,theta
+            x, y, theta))
+        return x, y, theta
 
     def dumb_localizer(self, dists_from_center):
-        """Localize based on range measurement from center of bot, assuming square"""
+        """Localize based on range measurement from center of bot,
+        assuming square"""
 
         self.logger.warning("Using dumb localizer!")
         x = dists_from_center['back']
         y = dists_from_center['left']
         theta = 0.0
-        self.logger.debug("Calculated pose: ({}, {}, {})".format(x,y,theta))
+        self.logger.debug("Calculated pose: ({}, {}, {})".format(
+            x, y, theta))
         return x, y, theta
 
     def ratio_localizer(self, dists_from_center):
@@ -66,10 +69,12 @@ class Gunner(object):
         y_pos = dists['left'] * ratio
         if ratio > 1.1:
             # TODO: use longer sensor + front as alternate?
-            self.logger.error("Sensor X total ({}) MUCH smaller than course X ({})".format(x_tot, x_size))
+            self.logger.error("Sensor X total ({}) MUCH smaller \
+                than course X ({})".format(x_tot, x_size))
             raise ValueError
         if ratio > 1:
-            self.logger.warning("Sensor X total ({}) smaller than course X ({}), assuming square".format(x_tot, x_size))
+            self.logger.warning("Sensor X total ({}) smaller than course \
+                X ({}), assuming square".format(x_tot, x_size))
             theta = 0.0
         else:
             # sin theta = (x_pos/back) = ratio
@@ -79,10 +84,10 @@ class Gunner(object):
         if x_pos < (x_size/2.0):
             theta = -theta
 
-        self.logger.debug("Calculated pose: ({}, {}, {})".format(x_pos,y_pos,theta))
+        self.logger.debug("Calculated pose: ({}, {}, {})".format(
+            x_pos, y_pos, theta))
 
         return x_pos, y_pos, theta
-
 
     def validate_pose(self, x_pos, y_pos, theta):
 
@@ -93,8 +98,9 @@ class Gunner(object):
         x_min = conf['x_min']
         x_max = conf['x_max']
         if not ((x_min < x_pos < x_max) and (y_min < y_pos < y_max)):
-            self.logger.warning("Invalid position for firing ({},{}), expected ({},{})-({},{})".format(
-                    x_pos, y_pos, x_min, y_min, x_max, y_max))
+            self.logger.warning("Invalid position for firing ({},{}), \
+                expected ({},{})-({},{})".format(
+                x_pos, y_pos, x_min, y_min, x_max, y_max))
             return False
             logger.debug("Position is valid for firing")
         return True
@@ -114,10 +120,13 @@ class Gunner(object):
         # dart_velocity should be roughtly 5-14 m/s
         dart_velocity = self.gun.dart_velocity
 
-        self.logger.debug("Getting firing solution using dart_vel: %0.2f", dart_velocity)
-        pitch, yaw = targeting.getFiringSolution(x_pos, y_pos, theta, dart_velocity)
+        self.logger.debug(
+            "Getting firing solution using dart_vel: %0.2f", dart_velocity)
+        pitch, yaw = targeting.getFiringSolution(
+            x_pos, y_pos, theta, dart_velocity)
         yaw += 90
-        self.logger.info("Aiming turret to (pitch: {}, yaw: {})".format(pitch, yaw))
+        self.logger.info(
+            "Aiming turret to (pitch: {}, yaw: {})".format(pitch, yaw))
         self.turret.pitch = pitch
         self.turret.yaw = yaw
 
@@ -125,7 +134,8 @@ class Gunner(object):
         # TODO: make config param so we can zero during testing
         time.sleep(0.2)
 
-        # Call CV to find left-right offset, calc server adjustment based on dist to target
+        # Call CV to find left-right offset,
+        # calc server adjustment based on dist to target
         # opencv stuff => image offset
         self.logger.warning("OpenCV turret repositioning not implemented")
         targeting.getTargetDistance(x_pos, y_pos)
@@ -134,4 +144,3 @@ class Gunner(object):
     def fire(self):
         """Tell the gun to fire a dart"""
         self.gun.fire()
-

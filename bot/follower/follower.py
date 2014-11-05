@@ -16,14 +16,14 @@ class Follower(object):
 
     """Follows a line, detects intersections and stop conditions."""
 
-    #Class variables
-    #Array_Conditions
-    Large_Object = 17  #the array sees a large object
-    No_Line = 16 #the array see no line
-    Noise = 19 #white values not next to each other
-    
-    #Variables for read_binary calls
-    White_Black = True #False  #True= white line, False= black line
+    # Class variables
+    # Array_Conditions
+    Large_Object = 17  # the array sees a large object
+    No_Line = 16  # the array see no line
+    Noise = 19  # white values not next to each other
+
+    # Variables for read_binary calls
+    White_Black = True  # False  # True= white line, False= black line
 
     def __init__(self):
         # Build logger
@@ -39,15 +39,15 @@ class Follower(object):
         self.strafe = pid_mod.PID()
         self.strafe_error = 0.0
         self.rotate_pid = pid_mod.PID()
-        self.rotate_error= 0.0
+        self.rotate_error = 0.0
         self.error = "NONE"
-        
+
         # motor variables
-        self.translate_speed =  75  
+        self.translate_speed = 75
         self.prev_rate = 0
 
-        #state variables
-        self.heading = None #must be initialize by callee
+        # state variables
+        self.heading = None  # must be initialize by callee
         self.front_state = Follower.No_Line
         self.back_state = Follower.No_Line
         self.left_state = Follower.No_Line
@@ -64,7 +64,7 @@ class Follower(object):
         return self.translate_speed
 
     @lib.api_call
-    def set_translate_speed(self,speed):
+    def set_translate_speed(self, speed):
         self.translate_speed = speed
 
     @lib.api_call
@@ -75,12 +75,12 @@ class Follower(object):
             reading_arr = np.int_(reading)  # convert readings to numpy array
             reading_sum = np.sum(np_reading)  # = no. of units lit
             if reading_sum > 0:
-                self.ir_agg[name] = (np.sum(self.ir_pos * reading_arr)
-                                    / reading_sum)
+                self.ir_agg[name] = (
+                    np.sum(self.ir_pos * reading_arr) / reading_sum)
             else:
                 self.ir_agg[name] = None
         self.timeLastUpdated = time.time()
-   
+
     @lib.api_call
     def get_strafe_error(self):
         return self.strafe_error
@@ -89,11 +89,10 @@ class Follower(object):
     def get_rotate_error(self):
         return self.rotate_error
 
-    
     @lib.api_call
     def wait_for_start(self):
         """Poll color senor unti green start signal lights up."""
-        return self.color_sensor.watch_for_color("green") 
+        return self.color_sensor.watch_for_color("green")
 
     @lib.api_call
     def is_on_line(self):
@@ -113,11 +112,11 @@ class Follower(object):
 
     def reset_errors(self):
         self.error = "NONE"
-        #state variables
-        #self.front_state = Follower.No_Line
-        #self.back_state = Follower.No_Line
-        #self.left_state = Follower.No_Line
-        #self.right_state = Follower.No_Line
+        # state variables
+        # self.front_state = Follower.No_Line
+        # self.back_state = Follower.No_Line
+        # self.left_state = Follower.No_Line
+        # self.right_state = Follower.No_Line
 
         # post error vars
         self.intersection = False
@@ -125,16 +124,16 @@ class Follower(object):
         self.timeLastUpdated = -1.0
         self.strafe_error = 0.0
         self.rotate_error = 0.0
-        
-        #reset pids
+
+        # reset pids
         self.strafe.clear_error()
         self.rotate_pid.clear_error()
-        return 
- 
+        return
+
     @lib.api_call
     def follow(self, heading, on_x=False):
         """Follow line along given heading"""
-        #reset errors
+        # reset errors
         self.reset_errors()
         self.on_x = on_x
         # Get the initial conditioni
@@ -147,27 +146,27 @@ class Follower(object):
         # Get current heading
         self.heading = heading
         # Continue until an error condition
-        count_object=0 
+        count_object = 0
 
         while True:
             # Assign the current states to the correct heading
             self.assign_states()
             # Check for error conditions
             if self.error != "NONE":
-                #require two succesive large_object readings to exit
-                if self.error=="LARGE_OBJECT" and count_object<1:
+                # require two succesive large_object readings to exit
+                if self.error == "LARGE_OBJECT" and count_object < 1:
                     count_object += 1
                     continue
                 self.update_exit_state()
-                self.logger.info("Error: {}".format( self.error ))
-                self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
+                self.logger.info("Error: {}".format(self.error))
+                self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format(
                     self.front_state,
                     self.back_state,
                     self.left_state,
                     self.right_state))
-                self.driver.move(0,0)
+                self.driver.move(0, 0)
                 return self.error
-            
+
             # average states.
             bot_position = (self.front_state + self.back_state)/2
             # Get the current time of the CPU
@@ -176,12 +175,12 @@ class Follower(object):
             # Call PID
             self.strafe_error = self.strafe.pid(
                 0, bot_position, self.sampling_time)
-            #calculate difference between array's for approx. pseudo angle 
+            # calculate difference between array's for approx. pseudo angle
             bot_angle = (self.front_state - self.back_state)
             # Call Rotate PID
             self.rotate_error = self.rotate_pid.pid(
                 0, bot_angle, self.sampling_time)
-            # Report errors from strafe and rotate pid's 
+            # Report errors from strafe and rotate pid's
             self.logger.info(" StrafeErr: {}, RotErr: {}".format(
                 self.strafe_error,
                 self.rotate_error))
@@ -190,26 +189,25 @@ class Follower(object):
             # Take the current time set it equal to the previous time
             previous_time = current_time
 
-
     @lib.api_call
-    def rotate_on_x(self,direction="left",speed=100,time=0.95):
-        #After center_on_x, rotate in the commanded directions
-        #by 90 degrees. 
-        if(direction=="left"):
+    def rotate_on_x(self, direction="left", speed=100, time=0.95):
+        # After center_on_x, rotate in the commanded directions
+        # by 90 degrees.
+        if(direction == "left"):
             sign = 1
-        elif(direction=="right"):
+        elif(direction == "right"):
             sign = -1
         else:
             self.logger.error("Bad param direction, please use left or right")
             return "DONE"
 
         # sign turns in correct direction
-        self.rotate(sign*speed) 
+        self.rotate(sign*speed)
 
         sleep(time)
 
-        self.driver.move(0,0)
-        
+        self.driver.move(0, 0)
+
         self.center_on_intersection()
         return "Done"
 
@@ -232,13 +230,13 @@ class Follower(object):
         self.logger.info("back = {}".format(self.back_state))
         self.logger.info("left = {}".format(self.left_state))
         self.logger.info("right = {}".format(self.right_state))
-    
+
     @lib.api_call
     def oscillate(self, heading=0, osc_time=0.5):
         """Oscillate sideways, increasing in amplitude until line is found
         :param heading: The forward direction of the bot.
         :param osc_time: The initial time spent in each direction.
-        
+
         """
 
         # Time in seconds for which bot oscillates in each direction.
@@ -331,6 +329,7 @@ class Follower(object):
                 if time() - start_time > max_time:
                     return {"line_found": False,
                             "time_elapsed": time() - start_time}
+
     @lib.api_call
     def assign_states(self, current_ir_reading=None):
         """ on_x=True flag does not allow intersection errors
@@ -346,63 +345,66 @@ class Follower(object):
         if current_ir_reading is None:
             current_ir_reading = self.ir_hub.read_binary(Follower.White_Black)
 
-        #using heading, make front/back/left/right state assignments
+        # using heading, make front/back/left/right state assignments
         self.determine_states(current_ir_reading)
-        
-        #Clear on_x flag if off line on side arrays
+
+        # Clear on_x flag if off line on side arrays
         if(self.on_x and ((self.right_state > 15) or (self.left_state > 15))):
             self.on_x = False
 
-        #Check for error conditions
+        # Check for error conditions
         if((self.front_state > 15) or (self.back_state > 15) or
-            (self.right_state < Follower.No_Line) and (self.left_state < Follower.No_Line)):
-            
+            (self.right_state < Follower.No_Line) and
+                (self.left_state < Follower.No_Line)):
+
             # Lost Lines Superscede other conditions
-            if((self.front_state == Follower.No_Line) and (self.back_state == Follower.No_Line)):
+            if((self.front_state == Follower.No_Line) and
+                    (self.back_state == Follower.No_Line)):
                 # Front and back lost line
-                self.error = "LOST_LINE" 
+                self.error = "LOST_LINE"
             elif(self.front_state == Follower.No_Line):
                 # Front lost line
-                self.error = "FRONT_LOST" 
+                self.error = "FRONT_LOST"
             elif(self.back_state == Follower.No_Line):
                 # Back lost line
                 self.error = "BACK_LOST"
             # Intersection preceds Large Object
-            elif ((not (self.right_state == Follower.No_Line) and 
-                not (self.left_state == Follower.No_Line)) and 
+            elif ((not (self.right_state == Follower.No_Line) and
+                    not (self.left_state == Follower.No_Line)) and
                     not self.on_x):
                 # Found Intersection because left and right lit up
                 # if on_x=True, ignore this error
-                self.error = "ON_INTERSECTION" 
-            elif((self.front_state == Follower.Large_Object) ):
-                # Found large object on front array. 
-                self.error = "LARGE_OBJECT" 
+                self.error = "ON_INTERSECTION"
+            elif((self.front_state == Follower.Large_Object)):
+                # Found large object on front array.
+                self.error = "LARGE_OBJECT"
             else:
-                if( self.back_state == Follower.Large_Object):
-                    # Ignore large objects on back array by using prev back state
+                if(self.back_state == Follower.Large_Object):
+                    # Ignore large objects on back array
+                    # by using prev back state
                     self.back_state = prev_back_state
                 if(self.front_state == Follower.Noise):
-                    #Ignore Noise conditions 
+                    # Ignore Noise conditions
                     self.front_state = prev_front_state
                 if(self.back_state == Follower.Noise):
-                    #Ignore Noise conditions
+                    # Ignore Noise conditions
                     self.back_state = prev_back_state
-                
+
                     # self.error = "NONE"
-        else: #no errors
-            self.error = "NONE" 
+        else:  # no errors
+            self.error = "NONE"
 
         self.logger.info("FS: {}, BS {}, LS {}, RS {}".format(
             self.front_state,
             self.back_state,
             self.left_state,
             self.right_state))
-        return self.front_state, self.back_state, self.left_state, self.right_state
+        return self.front_state, self.back_state, \
+            self.left_state, self.right_state
 
-
-    def determine_states(self ,current_ir_reading):
+    def determine_states(self, current_ir_reading):
         if self.heading is None:
-            self.heading = 180 #use implicit default value for testing
+            self.heading = 180  # use implicit default value for testing
             self.logger.info("Using Test Heading = 180")
         # Heading east
         if self.heading == 270:
@@ -441,12 +443,12 @@ class Follower(object):
             self.back_state = self.get_position_rl(
                 current_ir_reading["back"])
             # Left is on the left
-            #self.left_state = self.get_position_lr(
+            # self.left_state = self.get_position_lr(
             #    current_ir_reading["left"])
             # right is on the right
             self.right_state = self.get_position_rl(
                 current_ir_reading["right"])
-            #for tri_state, copy right state to left
+            # for tri_state, copy right state to left
             self.left_state = self.right_state
         # Heading north
         elif self.heading == 0:
@@ -460,11 +462,10 @@ class Follower(object):
             self.left_state = self.get_position_lr(
                 current_ir_reading["right"])
             # Right is on the back
-            #self.right_state = self.get_position_rl(
+            # self.right_state = self.get_position_rl(
             #    current_ir_reading["left"])
-            #in tri state, copy left to right
+            # in tri state, copy left to right
             self.right_state = self.left_state
-
 
     def update_exit_state(self):
         if(self.error == "ON_INTERSECTION"):
@@ -479,7 +480,7 @@ class Follower(object):
     def get_position_lr(self, readings):
         """Reading the IR sensors from left to right.
 
-        Calculates the current state in reference to center from 
+        Calculates the current state in reference to center from
         left to right. States go form -15 to 15.
 
         """
@@ -487,7 +488,7 @@ class Follower(object):
         state = 0.0
         for index, value in enumerate(readings):
             if(value == 1):
-               self.hit_position.append(index)
+                self.hit_position.append(index)
         if len(self.hit_position) >= 4:
             # Error: Large Object detected
             return Follower.Large_Object
@@ -496,8 +497,8 @@ class Follower(object):
             return Follower.No_Line
 
         state = self.hit_position[0] * 2
-        #Use first two hit irs to determine position on array
-        #Ignores extra bits as noise.
+        # Use first two hit irs to determine position on array
+        # Ignores extra bits as noise.
         if len(self.hit_position) > 1:
             if self.hit_position[1] > 0:
                 state = state + 1
@@ -510,7 +511,7 @@ class Follower(object):
     def get_position_rl(self, readings):
         """Reading the IR sensors from right to left.
 
-        Calculates the current state in reference to center from 
+        Calculates the current state in reference to center from
         right to left. States go form -15 to 15.
 
         """
@@ -518,7 +519,7 @@ class Follower(object):
         state = 0.0
         for index, value in enumerate(readings):
             if(value == 1):
-               self.hit_position.append(index)
+                self.hit_position.append(index)
         if len(self.hit_position) >= 4:
             # Error: Large Object detected
             return Follower.Large_Object
@@ -527,8 +528,8 @@ class Follower(object):
             return Follower.No_Line
 
         state = self.hit_position[0] * 2
-        #Use first two hit irs to determine position on array
-        #Ignores extra bits as noise.
+        # Use first two hit irs to determine position on array
+        # Ignores extra bits as noise.
         if len(self.hit_position) > 1:
             if(self.hit_position[1] > 0):
                 state = state + 1
@@ -541,38 +542,38 @@ class Follower(object):
     @lib.api_call
     def motors(self, bot_angle):
         """Used to update the motors speed and angular motion."""
-        #If outside standard deviation angle, use rotate to straiten
-        #if within std angle, use move to translate forward and strafe to
+        # If outside standard deviation angle, use rotate to straiten
+        # if within std angle, use move to translate forward and strafe to
         # correct towards line horizontally
         # std is 7 on a range of -15 to 15
         std_angle = 7
         if abs(bot_angle) < std_angle:
-            translate_angle = (self.strafe_error - self.heading + 180)%360
-            self.driver.move(self.translate_speed, translate_angle) 
+            translate_angle = (self.strafe_error - self.heading + 180) % 360
+            self.driver.move(self.translate_speed, translate_angle)
         else:
-            #cap speed between (-100,100)
-            rotate_speed = max(-100,min(100,self.rotate_error))
+            # cap speed between (-100, 100)
+            rotate_speed = max(-100, min(100, self.rotate_error))
             self.logger.info("rotate_speed = {}".format(rotate_speed))
-            self.rotate(rotate_speed) 
-            
+            self.rotate(rotate_speed)
+
     @lib.api_call
     def smart_jerk(self):
-      """Used to get the bot out of the box"""
-      last_count = 0
-      while True:
-        count = 0
-        ir_reading = self.ir_hub.read_binary(Follower.White_Black)
-        for value in ir_reading["back"]:
-            if(value == 1):
-                count += 1
-        if((count != 0) and (last_count != 0)):
-            self.driver.move(0,0)
-            return "DONE"
-        self.driver.move(self.translate_speed,0)
-        self.logger.info("count = {}".format(count))
-        last_count = count 
+        """Used to get the bot out of the box"""
+        last_count = 0
+        while True:
+            count = 0
+            ir_reading = self.ir_hub.read_binary(Follower.White_Black)
+            for value in ir_reading["back"]:
+                if(value == 1):
+                    count += 1
+            if((count != 0) and (last_count != 0)):
+                self.driver.move(0, 0)
+                return "DONE"
+            self.driver.move(self.translate_speed, 0)
+            self.logger.info("count = {}".format(count))
+            last_count = count
 
-    #Prevent rapid sign changes in rotate calls
+    # Prevent rapid sign changes in rotate calls
     def rotate(self, rate):
         if(self.prev_rate*rate < 0):
             self.driver.move(0, 0)
@@ -582,17 +583,17 @@ class Follower(object):
         return
 
     @lib.api_call
-    def center_on_intersection(self, heading = 180):
+    def center_on_intersection(self, heading=180):
         """center on intersection"""
         # first use center on line
         self.heading = heading
         self.center_on_line(heading)
-        
-        #then correct forwards/backwards
+
+        # then correct forwards/backwards
         forw_to_back_strafe = pid_mod.PID()
         # Init front_PID
         forw_to_back_strafe.set_k_values(5.5, 0.5, 2)
-        previous_time = time();
+        previous_time = time()
         while True:
             # kill momentum before reading
             self.driver.move(0, 0)
@@ -600,16 +601,16 @@ class Follower(object):
             self.assign_states()
             # Check for error conditions
             if ((self.error != "NONE" and self.error != "ON_INTERSECTION")
-                or (self.left_state == Follower.No_Line 
+                or (self.left_state == Follower.No_Line
                     or self.right_state == Follower.No_Line)):
                 self.update_exit_state()
-                self.logger.info("Error: {}".format( self.error ))
-                self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
+                self.logger.info("Error: {}".format(self.error))
+                self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format(
                     self.front_state,
                     self.back_state,
                     self.left_state,
                     self.right_state))
-                self.driver.move(0,0)
+                self.driver.move(0, 0)
                 return self.error
             # setup pid
             bot_position = (self.left_state + self.right_state)/2
@@ -619,17 +620,17 @@ class Follower(object):
             position_error = forw_to_back_strafe.pid(
                 0, bot_position, self.sampling_time)
             if(abs(bot_position) < 3):
-                self.driver.move(0,0)
+                self.driver.move(0, 0)
                 break
             # Cap at 0 and 100
-            translate_speed =  max(0,min(100,abs(position_error)))
+            translate_speed = max(0, min(100, abs(position_error)))
             # use sign and heading to determin which direction to strafe
             if(position_error >= 0):
-                translate_angle = (0 + self.heading)%360
+                translate_angle = (0 + self.heading) % 360
             else:
-                translate_angle = (180 + self.heading)%360
+                translate_angle = (180 + self.heading) % 360
             if(abs(bot_position) < 5):
-              return
+                return
             self.logger.info("translate_speed = {}".format(translate_speed))
             self.logger.info("translate_angle = {}".format(translate_angle))
             self.driver.move(translate_speed, translate_angle)
@@ -637,16 +638,15 @@ class Follower(object):
             previous_time = current_time
         return "DONE"
 
-
     @lib.api_call
-    def center_on_line(self, heading = 180):
+    def center_on_line(self, heading=180):
         """Used to center on the line"""
         center_rotate_pid = pid_mod.PID()
         side_to_side_strafe = pid_mod.PID()
         self.heading = heading
         while True:
             center_rotate_pid.clear_error()
-            previous_time = time();
+            previous_time = time()
             # Init front_PID
             center_rotate_pid.set_k_values(6.75, .4, 1.75)
             while True:
@@ -657,36 +657,34 @@ class Follower(object):
                 # Check for error conditions
                 if(self.error != "NONE" and self.error != "ON_INTERSECTION"):
                     self.update_exit_state()
-                    self.logger.info("Error: {}".format( self.error ))
-                    self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
+                    self.logger.info("Error: {}".format(self.error))
+                    self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format(
                         self.front_state,
                         self.back_state,
                         self.left_state,
                         self.right_state))
-                    self.driver.move(0,0)
+                    self.driver.move(0, 0)
                     return self.error
 
                 current_time = time()
                 self.sampling_time = current_time - previous_time
-                # 
                 bot_angle = (self.front_state - self.back_state)
                 # Call Rotate PID
                 self.logger.info("bot_angle = {}".format(bot_angle))
                 rotate_error = center_rotate_pid.pid(
                     0, bot_angle, self.sampling_time)
-                # Report errors from strafe and rotate pid's 
+                # Report errors from strafe and rotate pid's
                 if(abs(bot_angle) < 4):
-                  self.driver.move(0,0)
-                  break
+                    self.driver.move(0, 0)
+                    break
                 self.logger.info("rotate_error = {}".format(rotate_error))
-                rotate_speed = max(-100,min(100,rotate_error))
+                rotate_speed = max(-100, min(100, rotate_error))
                 self.rotate(rotate_speed)
                 # Take the current time set it equal to the previous time
                 previous_time = current_time
-            
 
             side_to_side_strafe.clear_error()
-            previous_time = time();
+            previous_time = time()
             # Init front_PID
             side_to_side_strafe.set_k_values(4.75, 2, 5.75)
             while True:
@@ -697,15 +695,15 @@ class Follower(object):
                 # Check for error conditions
                 if(self.error != "NONE" and self.error != "ON_INTERSECTION"):
                     self.update_exit_state()
-                    self.logger.info("Error: {}".format( self.error ))
-                    self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
+                    self.logger.info("Error: {}".format(self.error))
+                    self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format(
                         self.front_state,
                         self.back_state,
                         self.left_state,
                         self.right_state))
-                    self.driver.move(0,0)
+                    self.driver.move(0, 0)
                     return self.error
-                #if angle off, break to rotate again
+                # if angle off, break to rotate again
                 bot_angle = (self.front_state - self.back_state)
                 if(bot_angle >= 4):
                     break
@@ -714,32 +712,38 @@ class Follower(object):
                 bot_position = (self.front_state + self.back_state)/2
                 # Call side_to_side PID
                 self.logger.info("bot_position = {}".format(bot_position))
-                self.sampling_time = current_time - previous_time;
+                self.sampling_time = current_time - previous_time
                 position_error = side_to_side_strafe.pid(
                     0, bot_position, self.sampling_time)
-                # Report errors from strafe and rotate pid's 
+                # Report errors from strafe and rotate pid's
                 if(abs(bot_position) < 3):
-                    self.driver.move(0,0)
+                    self.driver.move(0, 0)
                     break
                 # Cap at 0 and 100
-                translate_speed =  max(0,min(100,abs(position_error)))
-                #use sign and heading to determine which side to strafe to
+                translate_speed = max(0, min(100, abs(position_error)))
+                # use sign and heading to determine which side to strafe to
                 if(position_error >= 0):
-                    translate_angle = (-90 + self.heading)%360
+                    translate_angle = (-90 + self.heading) % 360
                 else:
-                    translate_angle = (-270 + self.heading)%360
+                    translate_angle = (-270 + self.heading) % 360
                 if(abs(bot_position) < 3):
-                  return
-                self.logger.info("position_error = {}".format(position_error))
-                self.logger.info("translate_speed = {}".format(translate_speed))
-                self.logger.info("translate_angle = {}".format(translate_angle))
-                self.driver.move(translate_speed, translate_angle)
+                    return
+                    self.logger.info(
+                        "position_error = {}".format(
+                            position_error))
+                    self.logger.info(
+                        "translate_speed = {}".format(
+                            translate_speed))
+                    self.logger.info(
+                        "translate_angle = {}".format(
+                            translate_angle))
+                    self.driver.move(translate_speed, translate_angle)
                 # Take the current time set it equal to the previous time
                 previous_time = current_time
 
             if((abs(self.front_state) < 4) and (abs(self.back_state < 4))):
                 return "Done"
-        #end top while loop
+        # end top while loop
 
     @lib.api_call
     def center_on_blue_block(self, heading=180):
@@ -748,24 +752,24 @@ class Follower(object):
         # Assign the current states to the correct heading
         self.assign_states()
         # Check for error conditions
-        if(self.error != "NONE" and self.error!="LARGE_OBJECT"):
+        if(self.error != "NONE" and self.error != "LARGE_OBJECT"):
             self.update_exit_state()
-            self.logger.info("Error: {}".format( self.error ))
-            self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format( 
+            self.logger.info("Error: {}".format(self.error))
+            self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format(
                 self.front_state,
                 self.back_state,
                 self.left_state,
                 self.right_state))
-            self.driver.move(0,0)
+            self.driver.move(0, 0)
             return self.error
-       # Move forward until off block
+        # Move forward until off block
         direction = 180 - heading
         while self.front_state == Follower.Large_Object:
-            self.driver.move(60,direction)
+            self.driver.move(60, direction)
             sleep(0.25)
             self.assign_states()
         self.driver.move(0, 0)
-        #After off block, use center on line to straigten
+        # After off block, use center on line to straigten
         self.center_on_line(heading)
         return "DONE CENTER ON BLUE BLOCK"
 
@@ -777,19 +781,19 @@ class Follower(object):
     @lib.api_call
     def strafe_to_line(self, heading=90):
         """Attempt to strafe sideways from one firing line to the next  """
-        #assumes centered on line
+        # assumes centered on line
         self.heading = heading
         self.assign_states()
-        # strafe until off current line 
+        # strafe until off current line
         while ((self.left_state < Follower.No_Line) and
-            (self.right_state < Follower.No_Line)):
+                (self.right_state < Follower.No_Line)):
             self.driver.move(self.translate_speed, heading)
             self.assign_states()
-        self.driver.move(0, 0)
+            self.driver.move(0, 0)
         # strafe until on next line
         while ((self.left_state == Follower.No_Line) or
-            (self.right_state == Follower.No_Line)):
+                (self.right_state == Follower.No_Line)):
             self.driver.move(self.translate_speed, heading)
-            self.assign_states()       
-        self.driver.move(0, 0)       
+            self.assign_states()
+            self.driver.move(0, 0)
         return "DONE STRAFING TO LINE"

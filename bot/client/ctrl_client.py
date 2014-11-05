@@ -119,7 +119,8 @@ class CtrlClient(object):
         # as a local representation of that object (including its
         # exported methods).
         for obj_name, methods in self.objects.items():
-            setattr(self, obj_name, ApiClass(self.ctrl_sock, obj_name, methods))
+            setattr(self, obj_name, ApiClass(
+                self.ctrl_sock, obj_name, methods))
 
     def call(self, obj_name, method, params):
         """Call a remote API method by name.

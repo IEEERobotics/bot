@@ -49,7 +49,8 @@ class Pilot:
         self.darts_fired = 0  # no. of darts fired
 
     def __str__(self):
-        return "[{}] heading: {}, intersections: {}, blue_blocks: {}, darts_fired: {}".format(
+        return "[{}] heading: {}, intersections: {}, blue_blocks: {}, \
+        darts_fired: {}".format(
             self.State.toString(self.state),
             self.intersections,
             self.heading,
@@ -67,14 +68,16 @@ class Pilot:
 
             if self.state == self.State.START:
                 self.logger.info("Waiting for start")
-                result = self.call('color_sensor', 'watch_for_color',
-                    {"color": "green"})
-                if result == True:
+                result = self.call(
+                    'color_sensor', 'watch_for_color', {"color": "green"})
+                if result is True:
                     self.logger.info("Start signal found")
                     self.state = self.State.SMART_JERK
             elif self.state == self.State.SMART_JERK:
-                #self.call('follower', 'smart_jerk')
-                self.call("driver", "drive", {"speed": 80, "angle": 0, "duration": 1.7})
+                # self.call('follower', 'smart_jerk')
+                self.call(
+                    "driver", "drive",
+                    {"speed": 80, "angle": 0, "duration": 1.7})
                 result = self.call('follower', 'get_result')
                 if result != "NONE":
                     self.bail("{} state after smart jerk".format(result))
@@ -95,10 +98,12 @@ class Pilot:
                         self.state = self.State.FINISH
                     else:
                         # We could be on an intersection
-                        self.logger.info("Found large object, doing short jerk")
+                        self.logger.info(
+                            "Found large object, doing short jerk")
                         self.call('driver', 'drive', {
                             'speed': 60,
-                            'angle': self.heading_to_driver_angle(self.heading),
+                            'angle': self.heading_to_driver_angle(
+                                self.heading),
                             'duration': 0.1})
                         self.state = self.State.CENTER_ON_X
                 else:
@@ -130,7 +135,8 @@ class Pilot:
                 elif self.heading == 0:
                     # Traveling backwards relative to bot
                     # NOTE: Don't count intersection here
-                    self.call('follower', 'rotate_on_x', {"direction": "right"})
+                    self.call(
+                        'follower', 'rotate_on_x', {"direction": "right"})
                 else:
                     self.bail("Unexpected heading: {}".format(self.heading))
                 result = self.call('follower', 'get_result')
@@ -140,8 +146,9 @@ class Pilot:
                 #   (shouldn't normally happen, but may after a bad rotate)
                 self.state = self.State.FOLLOW_ON_X
             elif self.state == self.State.FOLLOW_ON_X:
-                self.call('follower', 'follow', {"heading": self.heading, 
-                    "on_x": True})
+                self.call(
+                    'follower', 'follow',
+                    {"heading": self.heading, "on_x": True})
                 result = self.call('follower', 'get_result')
                 if not (result == "LARGE_OBJECT" or result == "NONE"):
                     self.bail("{} state after rotate on X".format(result))

@@ -9,27 +9,35 @@ try:
     import pypruss
 except ImportError:
     logger = lib.get_logger()
+
     class pypruss(object):
         logger.info("Using fake pypruss module")
+
         @staticmethod
         def init():
             pass
+
         @staticmethod
         def open(foo):
             pass
+
         @staticmethod
         def pruintc_init():
             pass
+
         @staticmethod
         def exec_program(foo, bar):
             pass
+
         @staticmethod
         def wait_for_event(event):
             pass
+
         @staticmethod
         def clear_event(foo, bar):
             pass
-    #sys.modules['pypruss'] = pypruss
+    # sys.modules['pypruss'] = pypruss
+
 
 class Ultrasonic(dict):
 
@@ -56,7 +64,7 @@ class Ultrasonic(dict):
                 self.pru_mem = mmap.mmap(f.fileno(), 32, offset=PRU_ADDR)
         except IOError as e:
             self.logger.warning("Could not open /dev/mem: {}".format(e))
-            self.pru_mem = struct.pack('IIIIIIII', 1,2,3,4,5,6,7,8)
+            self.pru_mem = struct.pack('IIIIIIII', 1, 2, 3, 4, 5, 6, 7, 8)
 
         # Initialize the PRU driver (not sure what this does?)
         pypruss.init()
@@ -68,7 +76,7 @@ class Ultrasonic(dict):
 
         pypruss.pruintc_init()  # Init the interrupt controller
         self.logger.debug("Loading PRU program: {}".format(
-                    us_config['pru_file']))
+            us_config['pru_file']))
         pypruss.exec_program(us_config['pru_num'], us_config['pru_file'])
         self.sensors = us_config['sensors']
 
@@ -79,8 +87,10 @@ class Ultrasonic(dict):
         dists = {}
         for sensor in meters:
             dists[sensor] = meters[sensor] \
-                 + self.sensors[sensor]['xy'][0] * self.sensors[sensor]['dir'][0] \
-                 + self.sensors[sensor]['xy'][1] * self.sensors[sensor]['dir'][1]
+                + self.sensors[sensor]['xy'][0] \
+                * self.sensors[sensor]['dir'][0] \
+                + self.sensors[sensor]['xy'][1] \
+                * self.sensors[sensor]['dir'][1]
         self.logger.debug("Dists: {}".format(dists))
         return dists
 
@@ -88,16 +98,15 @@ class Ultrasonic(dict):
     def read_meters(self):
         times = self.read_times()
         # approx 5877 microseconds per meter
-        meters = { sensor:times[sensor]/5877.0 for sensor,t in times.items()}
+        meters = {sensor: times[sensor]/5877.0 for sensor, t in times.items()}
         self.logger.debug("Meters: {}".format(meters))
         return meters
-
 
     @lib.api_call
     def read_inches(self):
         times = self.read_times()
         # approx 149.3 microseconds per inch
-        inches = { sensor:times[sensor]/149.3 for sensor,t in times.items()}
+        inches = {sensor: times[sensor]/149.3 for sensor, t in times.items()}
         self.logger.debug("Inches: {}".format(inches))
         return inches
 
@@ -110,17 +119,17 @@ class Ultrasonic(dict):
         self.logger.debug("Waiting for PRU interrupt")
         pypruss.wait_for_event(self.PRU_EVOUT_0)
         self.logger.debug("Received PRU interrupt")
-        pypruss.clear_event(self.PRU_EVOUT_0,self.PRU0_ARM_INTERRUPT)
+        pypruss.clear_event(self.PRU_EVOUT_0, self.PRU0_ARM_INTERRUPT)
         times = {}
         inches = {}
         for i in self.sensors:
-            times[i] = struct.unpack_from('I', self.pru_mem, self.sensors[i]['offset'])[0]
+            times[i] = struct.unpack_from(
+                'I', self.pru_mem, self.sensors[i]['offset'])[0]
             self.logger.debug("Sensor: %s = %d", i, times[i])
 
         self.logger.debug("Waiting for duplicate PRU interrupt")
         pypruss.wait_for_event(self.PRU_EVOUT_0)
         self.logger.debug("Received (expected) duplicated PRU interrupt")
-        pypruss.clear_event(self.PRU_EVOUT_0,self.PRU0_ARM_INTERRUPT)
+        pypruss.clear_event(self.PRU_EVOUT_0, self.PRU0_ARM_INTERRUPT)
         self.logger.debug("Times: {}".format(times))
         return times
-

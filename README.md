@@ -48,7 +48,28 @@ We version control our code with git, because welcome to the 2000s. Head over to
 
 ### Vagrant
 
-TODO
+Head over to the [Vagrant Downloads](https://www.vagrantup.com/downloads.html) page and grab the latest version of Vagrant for your OS. Fedora/RHEL/CentOS folks need the RPM package, Ubuntu/Debian folks need the DEB package. Note that Vagrant also supports Windows and OSX.
+
+Assuming you're on Fedora/RHEL/CentOS, find the .rpm file you just downloaded and install it:
+
+```
+sudo rpm -i <name of rpm>
+```
+
+Vagrant uses various "providers" for virtualization support. By default, it uses VirtualBox. If you don't have VirtualBox installed, you'll see an error message when you try to `vagrant up` anything. Install VirtualBox (Fedora/RHEL/CentOS):
+
+```
+sudo yum install VirtualBox -y
+```
+
+You can now stand up our Vagrant environment(s). If this is your first time using the base image we build on, it'll be downloaded from VagrantCloud for you. That may take some time, but it'll be cached locally for future use.
+
+```
+[~/bot2014]$ vagrant up
+# Will build both the base and tooled boxes
+```
+
+There are actually two Vagrant boxes defined in our Vagrantfile. One, called `base`, provides only the minimum required to run the codebase. The other, called `tooled`, adds various useful dev tools to the `base` box. The `tooled` box is meant for folks that don't have good development environments set up locally (ie, Windows). For folks with dev environments they are comfortable with already, use the `base` box, edit code on your host and then run tests and/or the CLI/Server in Vagrant. Everything in the root of the repo is synced with `/home/vagrant/bot` in both Vagrant boxes.
 
 ### Docker
 

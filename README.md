@@ -100,6 +100,15 @@ You can now stand up our Vagrant environment(s). If this is your first time usin
 
 There are actually two Vagrant boxes defined in our Vagrantfile. One, called `base`, provides only the minimum required to run the codebase. The other, called `tooled`, adds various useful dev tools to the `base` box. The `tooled` box is meant for folks that don't have good development environments set up locally (ie, Windows). For folks with dev environments they are comfortable with already, use the `base` box, edit code on your host and then run tests and/or the CLI/Server in Vagrant. Everything in the root of the repo is synced with `/home/vagrant/bot` in both Vagrant boxes.
 
+#### Kernel Errors
+
+If, *after completing the above process*, you still see kernel-related errors, you may need to do the following:
+
+```
+sudo yum install kmod-VirtualBox -y
+sudo systemctl restart systemd-modules-load.service
+```
+
 ### Dependencies: Docker
 
 TODO: Better install docs

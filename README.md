@@ -49,23 +49,37 @@ TODO
 
 Vagrant allows you to trivially spin up a VM that's totally configured to support our codebase. It isolates its environment at an OS level, instead of a process level like Docker. This makes it slower. However, Vagrant is supported on Windows where Docker is not.
 
-Now that the work of creating a `Vagrantfile` is done, you can spin up a Vagrant environment with a simple one-liner:
-
 Note: If you don't have Vagrant installed/configured, head over to the Dependencies: Vagrant section.
 
-```
-[~/bot2014]$ vagrant up
-```
-
-You can gen connect to your new Vagrant VM with this equally trivial command:
+Now that the work of creating a `Vagrantfile` is done, you can spin up a Vagrant environment with a simple one-liner:
 
 ```
-[~/bot2014]$ vagrant ssh
+# General form: vagrant up <name of box>
+[~/bot2014]$ vagrant up base
+```
+
+If this is your first time using the base image we build on, it'll be downloaded from VagrantCloud for you. That may take some time, but it'll be cached locally for future use.
+
+There are actually two Vagrant boxes defined in our Vagrantfile. One, called `base`, provides only the minimum required to run the codebase. The other, called `tooled`, adds various useful dev tools to the `base` box. The `tooled` box is meant for folks that don't have good development environments set up locally (ie, Windows). For folks with dev environments they are comfortable with already, use the `base` box, edit code on your host and then run tests and/or the CLI/Server in Vagrant. Everything in the root of the repo is synced with `/home/vagrant/bot` in both Vagrant boxes.
+
+Once a box is built and up, you can connect to it with this equally trivial command:
+
+```
+# General form: vagrant ssh <name of box> 
+[~/bot2014]$ vagrant ssh base
 ```
 
 You'll be given a shell in the Vagrant VM. Navigate around and run tests as normal.
 
-TODO: Examples
+```
+vagrant@packer-debian-7:~$ ls
+bot  src
+vagrant@packer-debian-7:~$ cd bot/
+vagrant@packer-debian-7:~/bot$ ls
+bot  Dockerfile  docs  LICENSE.txt  README.md  requirements.txt  setup.py  tests  tox.ini  Vagrantfile
+vagrant@packer-debian-7:~/bot$ tox
+<snip test output>
+```
 
 ## Dependencies
 
@@ -90,15 +104,6 @@ Vagrant uses various "providers" for virtualization support. By default, it uses
 ```
 sudo yum install VirtualBox -y
 ```
-
-You can now stand up our Vagrant environment(s). If this is your first time using the base image we build on, it'll be downloaded from VagrantCloud for you. That may take some time, but it'll be cached locally for future use.
-
-```
-[~/bot2014]$ vagrant up
-# Will build both the base and tooled boxes
-```
-
-There are actually two Vagrant boxes defined in our Vagrantfile. One, called `base`, provides only the minimum required to run the codebase. The other, called `tooled`, adds various useful dev tools to the `base` box. The `tooled` box is meant for folks that don't have good development environments set up locally (ie, Windows). For folks with dev environments they are comfortable with already, use the `base` box, edit code on your host and then run tests and/or the CLI/Server in Vagrant. Everything in the root of the repo is synced with `/home/vagrant/bot` in both Vagrant boxes.
 
 #### Kernel Errors
 

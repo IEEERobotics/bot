@@ -1,4 +1,4 @@
-"""Test cases for the ADS7830 ADC. ""
+"""Test cases for the ADS7830 ADC. """
 
 import time
 from unittest import TestCase, expectedFailure

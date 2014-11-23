@@ -152,7 +152,7 @@ sudo yum install VirtualBox -y
 
 #### Kernel Errors
 
-If, *after completing the above process*, you still see kernel-related errors, you may need to do the following:
+If you get a kernel upgrade in a normal `sudo yum update`, you may need to re-update your VirtualBox kernel modules.
 
 ```
 sudo yum install kmod-VirtualBox -y
@@ -187,7 +187,8 @@ You may need to reboot for the usermod step take effect.
 To verify that everything worked, grab an image from DockerHub and make sure you can run commands:
 
 ```
-sudo docker run -ti debian:7 echo "Hello world!"
+# Will need to prepend "sudo" if you haven't rebooted after usermod step
+docker run -ti debian:7 echo "Hello world!"
 ```
 
 [Vagrant]: https://docs.vagrantup.com/v2/A

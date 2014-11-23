@@ -40,7 +40,7 @@ For general docstring style guidance, see [PEP257]. Specialize your docstrings f
 The project uses Tox to run unit tests, confirm that Sphinx-gen'd docs build and verify that the code conforms to [PEP8] style. To kick off all tests, simply issue the `tox` command in the project's root. Note that Tox automatically builds and brings down virtual environments, installing required dependences as it does.
 
 ```
-[~/perf]$ tox
+root@5d8d6d5e188f:/opt/bot# tox
 <snip>
   py27: commands succeeded
   docs: commands succeeded

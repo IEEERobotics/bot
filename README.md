@@ -2,6 +2,8 @@
 
 # Bot2014
 
+Code for the NCSU IEEE Robotics Team's robot(s).
+
 - [Bot2014](#user-content-bot2014)
     - [Overview](#user-content-overview)
     - [Code Style](#user-content-code-style)
@@ -14,8 +16,6 @@
         - [Dependencies: Vagrant](#user-content-dependencies-vagrant)
           - [Kernel Errors](#user-content-kernel-errors)
         - [Dependencies: Docker](#user-content-dependencies-docker)
-
-Code for the NCSU IEEE Robotics Team's robot(s).
 
 ## Overview
 
@@ -161,16 +161,34 @@ sudo systemctl restart systemd-modules-load.service
 
 ### Dependencies: Docker
 
-TODO: Better install docs
+Docker supports most major OSs, including very recent support for Windows. The following instructions are for Fedora. More info about installation on other OSs [here](https://docs.docker.com/installation/).
 
-After installing docker: `https://docs.docker.com/installation/fedora/`
-`docker pull ieeerobotics/bot`
-`docker run -ti ieeerobotics/bot bash`
+Install the `docker-io` (not `docker`!) package:
 
-Run tests:
-`tox`
-Check pep8:
-`tox -epep8`
+```
+sudo yum install docker-io -y
+```
+
+Start the Docker daemon and configure it to start at boot:
+
+```
+sudo systemctl start docker
+sudo systemctl enable docke
+```
+
+To avoid having to run all Docker commands as root, add your user to the `docker` group:
+
+```
+sudo usermod -a -G docker <your username here>
+```
+
+You may need to reboot for the usermod step take effect.
+
+To verify that everything worked, grab an image from DockerHub and make sure you can run commands:
+
+```
+sudo docker run -ti debian:7 echo "Hello world!"
+```
 
 [Vagrant]: https://docs.vagrantup.com/v2/A
 [Docker]: https://docs.docker.com/

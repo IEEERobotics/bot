@@ -37,7 +37,7 @@ For general docstring style guidance, see [PEP257]. Specialize your docstrings f
 
 ## Testing
 
-The project uses Tox to run unit tests with various Python interpreters, confirm that Sphinx-gen'd docs build and test that the code conforms to [PEP8] style. To kick off all tests, simply issue the `tox` command in the project's root. Note that Tox automatically builds and brings down virtual environments, installing required dependences as it does.
+The project uses Tox to run unit tests, confirm that Sphinx-gen'd docs build and verify that the code conforms to [PEP8] style. To kick off all tests, simply issue the `tox` command in the project's root. Note that Tox automatically builds and brings down virtual environments, installing required dependences as it does.
 
 ```
 [~/perf]$ tox
@@ -50,13 +50,45 @@ The project uses Tox to run unit tests with various Python interpreters, confirm
 
 To run a specific set of tests in a virtual environment, use `tox -e<name of tests>`. For example, `tox -epep8` to run [PEP8] style checks or `tox -epy27` to run unit tests with a Python 2.7 interpreter.
 
-Our codebase is pretty awesome in that it supports standing up both Vagrant and Docker environments. The environments created there are pre-configured to completely support our code, so you don't have to do that work on your dev system. When testing, you should use one of those well-understood, documented, reproducible environments. See the Using Vagrant and Using Docker sections for details.
+Our codebase is pretty awesome in that it supports standing up both Vagrant and Docker environments. The environments created there are pre-configured to completely support our code, so you don't have to do that work on your dev system. When testing, you should use one of those well-understood, documented, reproducible environments. See the Vagrant(#user-content-vagrant) and Docker(#user-content-docker) sections for details.
 
-Another awesome thing about our codebase is that it's configured to do Continuous Integration using Travis CI. Every time a change is made to the code, an automated Travis job kicks off and runs all of our tests (unit tests, PEP8 style tests, builds the docs). If the build breaks, the badge at the top of this README turns red and the people listed in our `.travis.yml` file get notified via email. Keeping our project's badge green is a matter of pride. Don't fail us. ;)
+Another awesome thing about our codebase is that it's configured to do Continuous Integration using Travis CI. Every time a change is made to the code, an automated Travis job kicks off and runs all of our tests (unit tests, [PEP8] style tests, builds the docs). If the build breaks, the badge at the top of this README turns red and the people listed in our `.travis.yml` file get notified via email. Keeping our project's badge green is a matter of pride. Don't fail us. ;)
 
 ## Docker
 
-TODO
+Docker makes use of containers that work at a process level, compared to Vagrant's OS level isolation. This makes Docker images much more fast and lightweight. However, Docker support for Windows is in its very early stages and not yet ready for consumption, which is one plus for Vagrant. Linux users should prefer Docker.
+
+Aside: Docker is one of the sexiest new technologies around. If you get proficient with it, you should put that on your CV.
+
+If you haven't already, head over to the [Dependencies: Docker](#user-content-dependencies-docker) section and get Docker setup on your dev box.
+
+We have an Automated Build configured on DockerHub. For every change of the codebase, our Dockerfile is executed to create an up-to-date Docker image automatically by DockerHub. To grab a totally configured environment with the latest code, simply run:
+
+```
+[~/bot2014]$ docker pull ieeerobotics/bot
+```
+
+The default process that will be executed in our Docker image is given by the `CMD ["./start.py", "-Tsc"]` line in our Dockerfile. So, unless you override that default, `docker run` commands will start a client and server in test mode (simulating fake hardware).
+
+TODO: There's currently an issue with this. Simulated pin files must be created by running tests first. Working on it.
+
+```
+[~/bot2014]$ docker run -ti ieeerobotics/bot
+<snip>
+```
+
+You can run tests like this:
+
+```
+[~/bot2014]$ docker run -ti ieeerobotics/bot bash
+<snip>
+root@5d8d6d5e188f:/opt/bot/bot# cd ..
+# TODO: The right way to run tests is with tox, but I'm seeing issues with that atm
+root@5d8d6d5e188f:/opt/bot# python -m unittest discover
+<snip>
+```
+
+TODO: Description of code+test work flow
 
 ## Vagrant
 

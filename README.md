@@ -173,7 +173,7 @@ Start the Docker daemon and configure it to start at boot:
 
 ```
 sudo systemctl start docker
-sudo systemctl enable docke
+sudo systemctl enable docker
 ```
 
 To avoid having to run all Docker commands as root, add your user to the `docker` group:

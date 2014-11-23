@@ -2,6 +2,19 @@
 
 # Bot2014
 
+- [Bot2014](#user-content-bot2014)
+    - [Overview](#user-content-overview)
+    - [Code Style](#user-content-code-style)
+    - [Docstring Style](#user-content-docstring-style)
+    - [Testing](#user-content-testing)
+    - [Docker](#user-content-docker)
+    - [Vagrant](#user-content-vagrant)
+    - [Dependencies](#user-content-dependencies)
+        - [Dependencies: Git](#user-content-dependencies-git)
+        - [Dependencies: Vagrant](#user-content-dependencies-vagrant)
+          - [Kernel Errors](#user-content-kernel-errors)
+        - [Dependencies: Docker](#user-content-dependencies-docker)
+
 Code for the NCSU IEEE Robotics Team's robot(s).
 
 ## Overview

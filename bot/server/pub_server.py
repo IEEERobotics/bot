@@ -76,22 +76,35 @@ class PubServer(threading.Thread):
             "drive_motor_detail_fr": self.driver.motors["front_right"].__str__,
             "drive_motor_detail_bl": self.driver.motors["back_left"].__str__,
             "drive_motor_detail_fl": self.driver.motors["front_left"].__str__,
-            "drive_motor_vel_br": self.driver.motors["back_right"].get_velocity,
-            "drive_motor_vel_fr": self.driver.motors["front_right"].get_velocity,
-            "drive_motor_vel_bl": self.driver.motors["back_left"].get_velocity,
-            "drive_motor_vel_fl": self.driver.motors["front_left"].get_velocity,
-            "drive_motor_speed_br": self.driver.motors["back_right"].get_speed,
-            "drive_motor_speed_fr": self.driver.motors["front_right"].get_speed,
-            "drive_motor_speed_bl": self.driver.motors["back_left"].get_speed,
-            "drive_motor_speed_fl": self.driver.motors["front_left"].get_speed,
-            "drive_motor_dir_br": self.driver.motors["back_right"].get_direction,
-            "drive_motor_dir_fr": self.driver.motors["front_right"].get_direction,
-            "drive_motor_dir_bl": self.driver.motors["back_left"].get_direction,
-            "drive_motor_dir_fl": self.driver.motors["front_left"].get_direction,
+            "drive_motor_vel_br":
+                self.driver.motors["back_right"].get_velocity,
+            "drive_motor_vel_fr":
+                self.driver.motors["front_right"].get_velocity,
+            "drive_motor_vel_bl":
+                self.driver.motors["back_left"].get_velocity,
+            "drive_motor_vel_fl":
+                self.driver.motors["front_left"].get_velocity,
+            "drive_motor_speed_br":
+                self.driver.motors["back_right"].get_speed,
+            "drive_motor_speed_fr":
+                self.driver.motors["front_right"].get_speed,
+            "drive_motor_speed_bl":
+                self.driver.motors["back_left"].get_speed,
+            "drive_motor_speed_fl":
+                self.driver.motors["front_left"].get_speed,
+            "drive_motor_dir_br":
+                self.driver.motors["back_right"].get_direction,
+            "drive_motor_dir_fr":
+                self.driver.motors["front_right"].get_direction,
+            "drive_motor_dir_bl":
+                self.driver.motors["back_left"].get_direction,
+            "drive_motor_dir_fl":
+                self.driver.motors["front_left"].get_direction,
             "turret_detail": self.gunner.turret.__str__,
             "turret_yaw": self.gunner.turret.get_yaw,
             "turret_pitch": self.gunner.turret.get_pitch,
-            "ir": self.ir_hub.read_all,  # May tieup IRs, bad if line following
+            # May tieup IRs, bad if line following
+            "ir": self.ir_hub.read_all,
             "ir_cached": self.ir_hub.read_cached  # May give slightly old data
         }
 

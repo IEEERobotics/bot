@@ -88,8 +88,9 @@ class CtrlServer(object):
             self.logger.info("CtrlServer running in test mode")
             lib.set_testing(True)
         elif testing is None:
-            self.logger.info("Defaulting to config testing flag: {}".format(
-                                                    self.config["testing"]))
+            self.logger.info(
+                "Defaulting to config testing flag: {}".format(
+                    self.config["testing"]))
             lib.set_testing(self.config["testing"])
         else:
             self.logger.info("CtrlServer running in non-test mode")

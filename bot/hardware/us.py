@@ -2,6 +2,7 @@
 
 import bot.lib.lib as lib
 
+
 class US(object):
 
     """Class for abstracting ultrasonic sensors.
@@ -63,7 +64,7 @@ class US(object):
 
         """
         if not self.is_testing:
-            pass # TODO: Read ultrasonic sensor value
+            pass  # TODO: Read ultrasonic sensor value
         return self._distance
 
     def __str__(self):
@@ -72,13 +73,12 @@ class US(object):
         :returns: String giving name, distance etc. of ultrasonic sensor.
 
         """
-        return ("{name}: {{ gpio: {gpio}, loc: ({loc[0]}, {loc[1]}), "
+        return (
+            "{name}: {{ gpio: {gpio}, loc: ({loc[0]}, {loc[1]}), "
             + "dir: ({dir[0]}, {dir[1]}), dist: {dist} }}").format(
-                                                        name=self.name,
-                                                        gpio=self.gpio_num,
-                                                        loc=self.location,
-                                                        dir=self.direction,
-                                                        dist=self.distance)
+                name=self.name, gpio=self.gpio_num,
+                loc=self.location, dir=self.direction,
+                dist=self.distance)
 
     @property
     def distance(self):

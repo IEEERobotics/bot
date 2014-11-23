@@ -9,6 +9,7 @@ import tests.test_bot as test_bot
 from bot.hardware.dmcc_motor import DMCCMotorSet, DMCCMotor
 import bot.lib.lib as lib
 
+
 class TestDMCCMotorSet(TestCase):
 
     """Test motor set."""
@@ -20,7 +21,7 @@ class TestDMCCMotorSet(TestCase):
         self.logger.info("Running {}()".format(self._testMethodName))
 
     def test_instantiate(self):
-        conf = {'a_motor': { 'board_num': 0, 'motor_num': 1 }}
+        conf = {'a_motor': {'board_num': 0, 'motor_num': 1}}
         motor_set = DMCCMotorSet(conf)
         self.assertIsInstance(motor_set['a_motor'], DMCCMotor)
 
@@ -29,13 +30,14 @@ class TestDMCCMotorSet(TestCase):
         drive_motor_set = DMCCMotorSet(drive_conf)
         turret_conf = self.config['dmcc_turret_motors']
         turret_motor_set = DMCCMotorSet(turret_conf)
-        self.assertEqual(len(drive_motor_set.motors),4)
-        self.assertEqual(len(turret_motor_set.motors),2)
+        self.assertEqual(len(drive_motor_set.motors), 4)
+        self.assertEqual(len(turret_motor_set.motors), 2)
 
     def test_bad_config(self):
         motor_conf = self.config['dmcc_bad_motor_def']
         with self.assertRaises(KeyError):
             drive_motor_set = DMCCMotorSet(motor_conf)
+
 
 class TestDMCCMotor(TestCase):
 
@@ -82,7 +84,7 @@ class TestDMCCMotor(TestCase):
     def test_set_velocity(self):
         """Test setting the motor velocity"""
         motor = self.motor_set['front_left']
-        motor.setVelocityPID(1000,100,10)
+        motor.setVelocityPID(1000, 100, 10)
         motor.velocity = 0
         assert motor.velocity == 0
         motor.velocity = 50

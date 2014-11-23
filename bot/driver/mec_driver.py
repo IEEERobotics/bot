@@ -9,6 +9,7 @@ from bot.hardware.dmcc_motor import DMCCMotorSet
 
 
 class MecDriver(driver.Driver):
+
     """Subclass of Driver for movement with mecanum wheels."""
     # TODO: Check angle convention across class - math functions
     #   might be using counterclockwise positive
@@ -20,12 +21,12 @@ class MecDriver(driver.Driver):
     min_angular_rate = -100
     max_angular_rate = 100
 
-    #Used to keep track of last set speeds.
-    #translate_speed = 0
-    #translate_angle = 0
-    #angular_rate = 0
+    # Used to keep track of last set speeds.
+    # translate_speed = 0
+    # translate_angle = 0
+    # angular_rate = 0
 
-    def __init__(self, mode = 'power'):
+    def __init__(self, mode='power'):
         """Run superclass's init, build motor abstraction objects."""
         super(MecDriver, self).__init__()
 
@@ -107,8 +108,12 @@ class MecDriver(driver.Driver):
             self.get_motor("back_left")
         v_right = self.get_motor("front_right") + \
             self.get_motor("back_right")
-        rotation =  int(round((v_right - v_left) / 4))
-        self.logger.debug("Rotation:  (left {}: right: {})".format(rotation, v_left, v_right))
+        rotation = int(round((v_right - v_left) / 4))
+        self.logger.debug(
+            "Rotation:  (left {}: right: {})".format(
+                rotation,
+                v_left,
+                v_right))
         # TODO: Verify math; v/4 to take mean?
         return rotation
 
@@ -127,7 +132,7 @@ class MecDriver(driver.Driver):
         except AssertionError:
             raise AssertionError("Angular rate is out of bounds")
 
-        #if rate == 0:  # TODO deadband (epsilon) check?
+        # if rate == 0:  # TODO deadband (epsilon) check?
 
         self.set_motor("front_left", -rate)
         self.set_motor("front_right", rate)
@@ -140,7 +145,6 @@ class MecDriver(driver.Driver):
         # Only 2 wheels need to be turned on for each direction, but using all
         # 4 wheels in a conventional differential
         # rotation works fine
-
 
     @lib.api_call
     def move(self, speed, angle):
@@ -263,7 +267,7 @@ class MecDriver(driver.Driver):
             [fabs(front_left), fabs(front_right),
                 fabs(back_left), fabs(back_right)]
         )
-        
+
         total_speed = translate_speed + angular_rate
 
         front_left = front_left * total_speed / max_wheel_speed

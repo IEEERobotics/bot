@@ -149,7 +149,7 @@ class TargetLocator(object):
 
     def close_device(self):
         self.capture = None
-        #del self.capture  # NOTE: is this required?
+        # del self.capture  # NOTE: is this required?
 
     def get_frame_size(self):
         return self.width, self.height  # NOTE: query device?
@@ -263,7 +263,7 @@ class TargetLocator(object):
         # Perform an OR operation to get the FINAL MASK, morph to smooth
         mask3 = np.bitwise_or(mask1, mask2)
         mask = cv2.morphologyEx(mask3, cv2.MORPH_CLOSE, self.kernel)
-        #mask = cv2.dilate(mask3, self.kernel, iterations=1)
+        # mask = cv2.dilate(mask3, self.kernel, iterations=1)
 
         # Bitwise-AND mask and original image to extract the target
         self.res = cv2.bitwise_and(
@@ -274,7 +274,7 @@ class TargetLocator(object):
         self.squares = self.find_squares(self.res)
         if self.squares:
             self.logger.debug("%d square(s)", len(self.squares))
-            #print "Squares: {}".format(self.squares)  # [verbose]
+            # print "Squares: {}".format(self.squares)  # [verbose]
 
             # Process squares array and set self.location to (x, y) pair
             centroids = []
@@ -283,15 +283,15 @@ class TargetLocator(object):
                 centroid = np.mean(square, axis=0)
                 centroids.append(centroid)  # TODO: faster numpy way?
             centroids = np.array(centroids)
-            #print "Centroids:", centroids  # [verbose]
+            # print "Centroids:", centroids  # [verbose]
             mean_centroid = np.mean(centroids, axis=0)  # 2D mean
             sd_centroid = np.std(centroids, axis=0)  # 2D standard deviation
-            #print "Mean:", mean_centroid, ", s.d.:", sd_centroid  # [verbose]
+            # print "Mean:", mean_centroid, ", s.d.:", sd_centroid  # [verbose]
 
             good_centroids = centroids[np.all(
                 np.abs(centroids - mean_centroid) <= (1.2 * sd_centroid),
                 axis=1)]
-            #print "Good:", good_centroids  # [verbose]
+            # print "Good:", good_centroids  # [verbose]
 
             # TODO: Reject all if s.d. is greater than half of mean side length
 
@@ -358,8 +358,8 @@ class TargetLocator(object):
         self.close_device()
 
 
-def runTargetLocator(device=TargetLocator.default_device,
-        gui=False, debug=False):
+def runTargetLocator(
+        device=TargetLocator.default_device, gui=False, debug=False):
     """A standalone driver for testing TargetLocator."""
 
     targetLocator = TargetLocator(device)
@@ -373,7 +373,7 @@ def runTargetLocator(device=TargetLocator.default_device,
             loc = targetLocator.find_target()
             if loc is not None:
                 x, y = tuple(loc)  # test unpacking; alt.: loc[0], loc[1]
-                #print "run(): (x, y) = ({:6.2f}, {:6.2f})".format(x, y)
+                # print "run(): (x, y) = ({:6.2f}, {:6.2f})".format(x, y)
 
             if gui:
                 targetLocator.display_input()
@@ -396,19 +396,24 @@ def runTargetLocator(device=TargetLocator.default_device,
 
 if __name__ == "__main__":
     argParser = argparse.ArgumentParser(
-            description="TargetLocator: Driver program")
-    argParser.add_argument('--debug', action="store_true",
-            help="show debug output?")
+        description="TargetLocator: Driver program")
+    argParser.add_argument(
+        '--debug', action="store_true", help="show debug output?")
     guiGroup = argParser.add_mutually_exclusive_group()
-    guiGroup.add_argument('--gui', dest='gui', action='store_true',
-            default=True, help="display GUI interface/windows?")
-    guiGroup.add_argument('--no_gui', dest='gui', action='store_false',
-            default=False, help="suppress GUI interface/windows?")
-    argParser.add_argument('input_source', nargs='?',
-            default=str(TargetLocator.default_device),
-            help="input camera device no.")
+    guiGroup.add_argument(
+        '--gui', dest='gui', action='store_true',
+        default=True,
+        help="display GUI interface/windows?")
+    guiGroup.add_argument(
+        '--no_gui', dest='gui', action='store_false',
+        default=False,
+        help="suppress GUI interface/windows?")
+    argParser.add_argument(
+        'input_source', nargs='?',
+        default=str(TargetLocator.default_device),
+        help="input camera device no.")
     options = argParser.parse_args()
 
     print "TargetLocator: Running on OpenCV", cv2.__version__
-    runTargetLocator(int(options.input_source),
-        gui=options.gui, debug=options.debug)
+    runTargetLocator(
+        int(options.input_source), gui=options.gui, debug=options.debug)

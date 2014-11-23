@@ -68,7 +68,7 @@ class CtrlClient(object):
     """Used to issue control commands to the robot remotely.
 
     The control client should manage all command-type messages sent to the bot
-    by interfaces. For exaple, if a user using the CLI (cli.py) wants to
+    by interfaces. For example, if a user using the CLI (cli.py) wants to
     give a move command, the CtrlClient should be the object that actually
     sends that message over the wire.
 
@@ -119,7 +119,8 @@ class CtrlClient(object):
         # as a local representation of that object (including its
         # exported methods).
         for obj_name, methods in self.objects.items():
-            setattr(self, obj_name, ApiClass(self.ctrl_sock, obj_name, methods))
+            setattr(self, obj_name, ApiClass(
+                self.ctrl_sock, obj_name, methods))
 
     def call(self, obj_name, method, params):
         """Call a remote API method by name.

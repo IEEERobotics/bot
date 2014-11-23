@@ -6,6 +6,7 @@ import pyDMCC
 
 import bot.lib.lib as lib
 
+
 class DMCCMotorSet(dict):
     """A single interface to a collection of DMCCs and associated motors."""
 
@@ -23,8 +24,8 @@ class DMCCMotorSet(dict):
         self.logger = lib.get_logger()
         self.is_testing = self.config["testing"]
 
-        #print "Testing: ", self.config["testing"]
-        #print pyDMCC.lib._config
+        # print "Testing: ", self.config["testing"]
+        # print pyDMCC.lib._config
 
         # This instantiates all DMCCs in every DMCCManager, which is probably
         # not optimal, which works fine for our purposes.  Potentially better
@@ -36,20 +37,23 @@ class DMCCMotorSet(dict):
             self.logger.debug("Found %d physical DMCC boards" % len(dmccs))
         else:
             self.logger.debug("Skipping autodetect due to test mode")
-            dmccs = defaultdict(lambda: pyDMCC.DMCC(0, verify=False,
-                bus=None, logger=self.logger))
+            dmccs = defaultdict(
+                lambda: pyDMCC.DMCC(
+                    0, verify=False, bus=None, logger=self.logger))
 
         self.motors = {}
-        for name,conf in motor_config.items():
+        for name, conf in motor_config.items():
             if 'invert' in conf.keys():
                 invert = conf['invert']
             else:
                 invert = False
             try:
-                self.motors[name] = DMCCMotor(dmccs[conf['board_num']],
-                                              conf['motor_num'], invert )
+                self.motors[name] = DMCCMotor(
+                    dmccs[conf['board_num']], conf['motor_num'], invert)
             except KeyError:
-                self.logger.error("Bad motor definition for motor: '{}'".format(name))
+                self.logger.error(
+                    "Bad motor definition for motor: '{}'".format(
+                        name))
                 raise KeyError
 
         self.logger.debug("Setup {}".format(self))
@@ -64,7 +68,7 @@ class DMCCMotorSet(dict):
 
 class DMCCMotor(object):
 
-    def __init__(self, dmcc, motor_num, invert = False):
+    def __init__(self, dmcc, motor_num, invert=False):
         """Wraps an individual pyDMCC motor
 
         :param dmcc: Controlling pyDMCC.DMCC object, None when testing
@@ -93,8 +97,10 @@ class DMCCMotor(object):
             self._pos_kP = self._pos_kI = self._pos_kD = 0
             self._vel_kP = self._vel_kI = self._vel_kD = 0
         else:
-            self._pos_kP, self._pos_kI, self._pos_kD = self.real_motor.position_pid
-            self._vel_kP, self._vel_kI, self._vel_kD = self.real_motor.velocity_pid
+            self._pos_kP, self._pos_kI, self._pos_kD \
+                = self.real_motor.position_pid
+            self._vel_kP, self._vel_kI, self._vel_kD \
+                = self.real_motor.velocity_pid
 
         self._power = 0  # last set power; DMCC can't read back power (yet!)
         if self.is_testing:
@@ -111,7 +117,6 @@ class DMCCMotor(object):
 
         """
         return self.dmcc.voltage()
-
 
     @property
     def power(self):
@@ -135,8 +140,9 @@ class DMCCMotor(object):
         """
         # NB: don't use logging that involves expensive formatting
         value *= self.inversion_multiplier
-        self.logger.debug("Setting motor %d-%d power to %d",
-                self.dmcc.cape_num, self.motor_num, value)
+        self.logger.debug(
+            "Setting motor %d-%d power to %d",
+            self.dmcc.cape_num, self.motor_num, value)
 
         # We can't query the power setting, even from a physcial DMCC,
         # so we always have to do our own bookkeeping
@@ -152,7 +158,7 @@ class DMCCMotor(object):
 
         """
         if self.is_testing:
-            val =  self._position
+            val = self._position
         else:
             val = self.real_motor.position
         return val * self.inversion_multiplier
@@ -197,11 +203,13 @@ class DMCCMotor(object):
         """
 
         value *= self.inversion_multiplier
-        self.logger.debug("Setting motor %d-%d velociy to %d",
-                self.dmcc.cape_num, self.motor_num, value)
+        self.logger.debug(
+            "Setting motor %d-%d velociy to %d",
+            self.dmcc.cape_num, self.motor_num, value)
         # Verify that we've set meaningful PID constants
         if self._vel_kP == 0:
-            self.logger.warning("Can't set motor %d-%d velocity: kP not set.",
+            self.logger.warning(
+                "Can't set motor %d-%d velocity: kP not set.",
                 self.dmcc.cape_num, self.motor_num)
             raise RuntimeError
 
@@ -230,5 +238,3 @@ class DMCCMotor(object):
         """Returns basic motor ID information as a string."""
         return "{}: {{ DMCC: {} motor_num: {} }}".format(
             self.__class__.__name__, self.dmcc.cape_num, self.motor_num)
-
-

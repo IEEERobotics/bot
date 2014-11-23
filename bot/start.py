@@ -15,20 +15,24 @@ import lib.lib as lib
 import interface.cli as cli_mod
 
 # Build parser and argument groups
-description="start CLI, pilot and/or CtrlServer"
+description = "start CLI, pilot and/or CtrlServer"
 parser = argparse.ArgumentParser(description)
 
 # Starting interfaces should be mutually exclusive
 interface_group = parser.add_mutually_exclusive_group()
 
 # Add arguments
-parser.add_argument("-T", "--test-mode", action="store_true",
+parser.add_argument(
+    "-T", "--test-mode", action="store_true",
     help="use simulated hardware, to allow running off the bone")
-parser.add_argument("-s", "--server", action="store_true",
+parser.add_argument(
+    "-s", "--server", action="store_true",
     help="start server to provide for controlling the bot")
-interface_group.add_argument("-p", "--pilot", action="store_true",
+interface_group.add_argument(
+    "-p", "--pilot", action="store_true",
     help="autonomously solve the course")
-interface_group.add_argument("-c", "--cli", action="store_true",
+interface_group.add_argument(
+    "-c", "--cli", action="store_true",
     help="CLI interface for controlling the bot")
 
 # Print help if no arguments are given

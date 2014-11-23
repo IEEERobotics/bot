@@ -20,3 +20,5 @@
 .vagrant
 src/
 build/
+
+.idea

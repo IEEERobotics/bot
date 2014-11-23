@@ -15,7 +15,7 @@ class TestAngle(test_bot.TestBot):
         """Setup test hardware files and build turret object."""
         # Run general bot test setup
         super(TestAngle, self).setUp()
-        self.turret_conf = lib.get_config()['turret'] 
+        self.turret_conf = lib.get_config()['turret']
 
         # Build turret in testing mode
         self.turret = t_mod.Turret()

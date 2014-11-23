@@ -47,8 +47,9 @@ class Turret(object):
         axis_min = self.config['servos']['yaw']['min']
         axis_max = self.config['servos']['yaw']['max']
         if not (axis_min <= angle <= axis_max):
-            self.logger.warning("Clamping yaw angle to bounds {} => [{},{}]".format(
-                angle, axis_min, axis_max))
+            self.logger.warning(
+                "Clamping yaw angle to bounds {} => [{},{}]".format(
+                    angle, axis_min, axis_max))
             angle = max(axis_min, min(axis_max, angle))
         self.servos["yaw"].position = angle
 
@@ -73,8 +74,9 @@ class Turret(object):
         axis_min = self.config['servos']['pitch']['min']
         axis_max = self.config['servos']['pitch']['max']
         if not (axis_min <= angle <= axis_max):
-            self.logger.warning("Clamping pitch angle to bounds {} => [{},{}]".format(
-                angle, axis_min, axis_max))
+            self.logger.warning(
+                "Clamping pitch angle to bounds {} => [{},{}]".format(
+                    angle, axis_min, axis_max))
             angle = max(axis_min, min(axis_max, angle))
         self.servos["pitch"].position = angle
 

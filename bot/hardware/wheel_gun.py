@@ -23,9 +23,9 @@ class WheelGun(object):
             self.config['gun']['max_trigger_duration'])  # 0.25 secs.
 
         # 0.99895" (25.373mm) diameter
-        self.wheel_radius =  0.012687  # meters
-        self.ticks_per_rev = 48 # CPR on motor shaft per Pololu spec, verified
-        self.dmcc_to_tps = 20.4 # dmcc reported velocity must be scaled
+        self.wheel_radius = 0.012687  # meters
+        self.ticks_per_rev = 48  # CPR on motor shaft per Pololu spec, verified
+        self.dmcc_to_tps = 20.4  # dmcc reported velocity must be scaled
         self._dart_velocity = None  # shadow velocity for testing
         self._wheel_velocity = None  # shadow velocity for testing
 
@@ -76,7 +76,6 @@ class WheelGun(object):
 
     laser = property(get_laser, set_laser)
 
-
     @lib.api_call
     def get_wheel_power(self):
         """Get the power of the wheel motors.
@@ -87,7 +86,9 @@ class WheelGun(object):
         left = self.wheel_motors['left'].power
         right = self.wheel_motors['right'].power
         if not (left == right):
-            self.logger.warning("Wheel powers not equal! Left: {}, Right: {}".format(left, right))
+            self.logger.warning(
+                "Wheel powers not equal! Left: {}, Right: {}".format(
+                    left, right))
         return (left + right)/2.0
 
     @lib.api_call
@@ -102,14 +103,13 @@ class WheelGun(object):
         if not (0 <= power <= 100):
             self.logger.warning("Clamping invalid power  {} => [{},{}]".format(
                 power, 0, 100))
-            power = max(0,min(100,power))
+            power = max(0, min(100, power))
 
         self.logger.debug("Setting wheel power: {}".format(power))
         self.wheel_motors['left'].power = power
         self.wheel_motors['right'].power = power
 
     wheel_power = property(get_wheel_power, set_wheel_power)
-
 
     @lib.api_call
     def get_wheel_velocity(self):
@@ -123,7 +123,9 @@ class WheelGun(object):
         left = self.wheel_motors['left'].velocity
         right = self.wheel_motors['right'].velocity
         if abs(left - right) > 1:
-            self.logger.warning("Wheel velocities not equal! Left: {}, Right: {}".format(left, right))
+            self.logger.warning(
+                "Wheel velocities not equal! Left: {}, Right: {}".format(
+                    left, right))
         return self.dmcc_to_tps * (left + right)/2.0
 
     @lib.api_call
@@ -132,7 +134,6 @@ class WheelGun(object):
         self._wheel_velocity = velocity
 
     wheel_velocity = property(get_wheel_velocity, set_wheel_velocity)
-
 
     @lib.api_call
     def get_dart_velocity(self):
@@ -155,7 +156,7 @@ class WheelGun(object):
         """Setter used purely for testing"""
         self._dart_velocity = velocity
 
-    dart_velocity = property(get_dart_velocity,set_dart_velocity)
+    dart_velocity = property(get_dart_velocity, set_dart_velocity)
 
     @lib.api_call
     def spin_up(self):
@@ -207,4 +208,3 @@ class WheelGun(object):
         self.logger.debug("Retracting trigger")
         self.trigger_gpios['retract'].pulse(retract_duration)
         return True
-

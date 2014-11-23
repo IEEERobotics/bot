@@ -5,7 +5,7 @@ from time import time, sleep
 import bbb.gpio as gpio_mod
 
 import bot.lib.lib as lib
-import ir_analog as ir_analog_mod
+from . import ir_analog as ir_analog_mod
 
 
 class IRHub(object):
@@ -51,11 +51,11 @@ class IRHub(object):
         self._thresh = config["ir_thresh"]
 
         # Build GPIO pins used to select which IR units are active
-        if config["testing"]:
+        if config["test_mode"]["ir"]["front"]:
             # Get dir of simulated hardware files from config
             gpio_test_dir_base = config["test_gpio_base_dir"]
 
-            # Build GPIOs used for selecting active IR units in test mode
+            # Build GPIOs for selecting active IR units in test mode
             self.select_gpios = [
                 gpio_mod.GPIO(gpio, gpio_test_dir_base)
                 for gpio in config["ir_select_gpios"]]
@@ -70,7 +70,6 @@ class IRHub(object):
                                   "Not on the bone? Run unit test instead. " +
                                   "Exception: {}".format(e))
 
-        # Read mapping (dict) of IR array names to input GPIO pins from config
         # NOTE: IR unit select lines are common
         ir_analog_input_gpios = config["ir_analog_input_gpios"]
 
@@ -265,7 +264,7 @@ class IRHub(object):
             self.select_nth_units(0)
         select_nth_units_avg = (time() - start_time) / num_reads
 
-        return {"read_binary_avg": read_binary_avg, 
+        return {"read_binary_avg": read_binary_avg,
                 "read_all_avg": read_all_avg,
                 "read_nth_units_avg": read_nth_units_avg,
                 "select_nth_units_avg": select_nth_units_avg}

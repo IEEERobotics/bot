@@ -5,6 +5,7 @@ import unittest
 import bot.lib.lib as lib
 import bot.simulator.sim_hw_builder as sim_hw_builder_mod
 
+
 def additional_tests():
     return unittest.defaultTestLoader.discover("..")
 

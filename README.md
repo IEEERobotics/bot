@@ -83,8 +83,7 @@ You can run tests like this:
 [~/bot2014]$ docker run -ti ieeerobotics/bot bash
 <snip>
 root@5d8d6d5e188f:/opt/bot/bot# cd ..
-# TODO: The right way to run tests is with tox, but I'm seeing issues with that atm
-root@5d8d6d5e188f:/opt/bot# python -m unittest discover
+root@5d8d6d5e188f:/opt/bot# tox
 <snip>
 ```
 

@@ -21,7 +21,9 @@ class MecFollower(object):
         self.ir_hub.thrsh = 100
 
         # Build PID class
-        self.front_right = pid_mod.PID()
-        self.front_left = pid_mod.PID()
-        self.back_right = pid_mod.PID()
-        self.back_left = pid_mod.PID()
+        self.front_PID = pid_mod.PID()
+        self.back_PID = pid_mod.PID()
+		
+		
+		
+	

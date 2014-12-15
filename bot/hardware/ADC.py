@@ -1,6 +1,7 @@
 """Hardware abstraction for ADS7830 ADC"""
 
 import time
+import smbus as bus
 
 from i2c_device.i2c_device import I2CDevice
 
@@ -8,12 +9,16 @@ import bbb.pwm as pwm_mod
 import bot.lib.lib as lib
 
 
-class ADC(I2CDevice):
+
+class ADC(object):
     def __init__(self):
             """Initialized I2C device"""
             self.logger = lib.get_logger()
             self.bot_config = lib.get_config()
-
+            
+            # Default value of command byte. 
+            # Refer to ADS_7830 for more information
+            
             # Handle off-bone runs
             if self.bot_config["test_mode"]["ADC"]:
                 self.logger.debug("Running in test mode")
@@ -21,20 +26,29 @@ class ADC(I2CDevice):
                 self.logger.debug("Running in non-test mode")
 
                 # Setup I2C
-                I2CDevice.__init__(self, 1, 0x12,
+                addr = self.bot_config
+                I2CDevice.__init__(self, 1, 0x48,
                                 config='adc_ads7830_i2c.yaml')
-    def analog_read(self):
-        return self.registers['READ'].read()
+
+    @lib.api_call
+    def read_channel(self, channel_num, SD=0b0,
+                    internal_ref=0b0, AD_converter=0b0):
+        # Append bits to form command byte.
+        command_byte = (SD << 7) | (channel_num << 4) \
+                       (internal_ref << 3) | (AD_converter << 2) \
+                       | (0b00)
+        bus.write_byte(self.addr, command_byte)
+        return bus.read_byte(self.addr)
         
-def read_loop():
-    t0 = time.time()
-    print "Begin"
-    while True:
-        elapsed = time.time() - t0
-        value = ADC.analog_read()
-        print "[{:8.3f}]: {:5.3f}".format(elapsed, value)
-        time.sleep(0.1)
-    print "Done"
+    @lib.api_call
+    def read_all(self)
+        return read_channel(0), read_channel(1), read_channel(2), \
+               read_channel(3), read_channel(4), read_channel(5), \
+               read_channel(6), read_channel(7)
+    
+
+        
+
         
 
 if __name__ == "__main__":

@@ -8,6 +8,13 @@ test_mode: {
     ir:{ front: false, back: true, right: true, left: false}
 }
 
+ADC: {
+    ONE: 0x48,
+    TWO: 0x49,
+    THREE: 0x4A,
+    FOUR: 0x4B
+}
+
 dmcc_drive_motors: {
     front_left: { board_num: 0, motor_num: 1 },
     front_right: { board_num: 0, motor_num: 2, invert: True },

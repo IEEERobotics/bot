@@ -39,17 +39,25 @@ class ADC(object):
                        | (0b00)
         bus.write_byte(self.addr, command_byte)
         return bus.read_byte(self.addr)
-        
+
     @lib.api_call
     def read_all(self)
         return read_channel(0), read_channel(1), read_channel(2), \
                read_channel(3), read_channel(4), read_channel(5), \
                read_channel(6), read_channel(7)
-    
 
-        
-
-        
-
-if __name__ == "__main__":
-    read_loop()
+    @lib.api_call
+    def print_all(self)
+        print "0:{} 1:{} 2:{} 3:{} 4:{} 5:{} 6:{} 7:{}".format(
+                                            self.read_all)
+                                            
+    @lib.api_call
+    def read_loop(self)
+        t0 = time.time()
+        while True:
+            try:
+                print "[{:8.3f}] ".format(time.time()-t0),
+                self.print_all()
+            except KeyboardInterrupt:
+                break
+        print "Done."

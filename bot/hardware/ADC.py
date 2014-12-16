@@ -49,7 +49,7 @@ class ADC(object):
     @lib.api_call
     def print_all(self)
         print "0:{} 1:{} 2:{} 3:{} 4:{} 5:{} 6:{} 7:{}".format(
-                                            self.read_all)
+                                            self.read_all())
                                             
     @lib.api_call
     def read_loop(self)

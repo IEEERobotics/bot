@@ -13,7 +13,6 @@ sys.path = [os.getcwd()] + sys.path
 
 import bot.lib.lib as lib
 from bot.follower.follower import Follower
-from bot.hardware.color_sensor import ColorSensor
 import pub_server as pub_server_mod
 import bot.lib.messages as msgs
 
@@ -135,7 +134,6 @@ class CtrlServer(object):
         systems["follower"] = self.follower
         systems["driver"] = self.follower.driver
         systems["ir_hub"] = self.follower.ir_hub
-        systems["color_sensor"] = self.follower.color_sensor
         self.logger.debug("Systems: {}".format(systems))
         return systems
 

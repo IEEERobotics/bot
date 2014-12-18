@@ -5,6 +5,7 @@ import ir
 i2c_available = False
 try:
     import smbus
+    from time import sleep
     i2c_available = True
 except ImportError:
     print "ImportError: smbus module not found; I2C communication disabled"
@@ -65,15 +66,21 @@ class IRAnalog(ir.IRArray):
                     elif reg['bytes'] == 2:
                         self.set_adc_word(reg['addr'], reg['init'])
 
-            # Cache some config items that we may need later
-            self.result_addr = adc_config['result_addr']  # 2 bytes
-            self.result_mask = adc_config['result_mask']
-            self.result_shift = adc_config['result_shift']
         self.logger.debug("Setup {} (on I2C addr: {})".format(
             self, hex(self.i2c_addr)))
 
     def set_adc_byte(self, register, byte_value):
         self.bus.write_byte_data(self.i2c_addr, register, byte_value)
+
+    def write_adc_byte(self, byte_value):
+        self.bus.write_byte(self.i2c_addr, byte_value)
+
+    def read_adc_byte(self):
+        return self.bus.read_byte(self.i2c_addr)
+
+    def get_byte(self,value):
+        #self.write_adc_byte(value)
+        return self.bus.read_byte_data(self.i2c_addr,value)     #self.read_adc_byte()
 
     def set_adc_word(self, register, word_value):
         # TODO: Check if we need to use swap_bytes_uint16()

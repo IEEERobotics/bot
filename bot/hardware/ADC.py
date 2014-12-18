@@ -11,20 +11,20 @@ class ADC(object):
     
     """Class for communicating with ADS_7830 external ADC's"""
 
-    def __init__(self):
+    def __init__(self, i2c_bus, i2c_address):
             """Initialized I2C device"""
             self.logger = lib.get_logger()
             self.bot_config = lib.get_config()
+
+            # Bus location and address of ADC.
+            self.bus = i2c_bus
+            self.addr = i2c_address
 
             # Handle off-bone runs
             if self.bot_config["test_mode"]["ADC"]:
                 self.logger.debug("Running in test mode")
             else:
                 self.logger.debug("Running in non-test mode")
-
-                # Setup I2C
-                I2CDevice.__init__(self, 1, 0x12,
-                                config='adc_ads7830_i2c.yaml')
 
     @lib.api_call
     def read_channel(self, channel_num, SD=0b0,

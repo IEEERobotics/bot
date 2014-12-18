@@ -161,6 +161,7 @@ class IRHub(object):
         return self._thresh
 
     @lib.api_call
+
     def print_ir_loop(self, name):
         
         for i in range(1000):
@@ -168,7 +169,7 @@ class IRHub(object):
             for ch in self.reg:
                 ir_readings.append(self.arrays[name].get_byte(self.reg["ch0"]["addr"]))
             print "array:{}, readings{}  ".format(name, ir_readings)
-
+       
     @lib.api_call
     def set_thresh(self, thresh):
         """Setter for threshold used for analog to binary conversion.

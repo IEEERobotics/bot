@@ -7,6 +7,14 @@ test_mode: {
     ir:{ front: false, back: true, right: true, left: false}
 }
 
+# i2c addresses of ADC's that each read from IR array. 
+IR_board: {
+    front: 0x48
+    right: 0x49
+    left: 0x4a
+    back: 0x4b
+}
+
 dmcc_drive_motors: {
     back_left: { board_num: 0, motor_num: 1 },
     back_right: { board_num: 0, motor_num: 2, invert: True },

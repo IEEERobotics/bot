@@ -134,7 +134,6 @@ class CtrlServer(object):
         systems["follower"] = self.follower
         systems["driver"] = self.follower.driver
         systems["ir_hub"] = self.follower.ir_hub
-        systems["ADC"] = self.hardware.ADC
         self.logger.debug("Systems: {}".format(systems))
         return systems
 

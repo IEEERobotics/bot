@@ -50,6 +50,8 @@ class IRHub(object):
         # Threshold for black/white conversation from analog to binary
         self._thresh = config["ir_thresh"]
 
+        self.reg  = config["ir_analog_adc_config"]["i2c_registers"]
+
         # Build GPIO pins used to select which IR units are active
         if config["test_mode"]["ir"]["front"]:
             # Get dir of simulated hardware files from config
@@ -74,6 +76,7 @@ class IRHub(object):
         ir_analog_input_gpios = config["ir_analog_input_gpios"]
 
         # Create IR array objects
+        #FIXME gpios are not needed for the new adcs
         self.arrays = {}
         for name, gpio in ir_analog_input_gpios.iteritems():
             try:
@@ -174,6 +177,22 @@ class IRHub(object):
 
         """
         return self._thresh
+
+    @lib.api_call
+    def read_ir(self, name):
+        """Setter for threshold used for analog to binary conversion.
+
+        Note that the only reason we wrap this instance var in getters/setters
+        is to allow export via API using decorators.
+
+        """
+        i = 10000
+        j = 0
+        while True:
+            if (i == 0):
+                break
+            print(self.arrays[name].get_byte(self.reg["ch0"]["addr"]))
+            i = i - 1;
 
     @lib.api_call
     def set_thresh(self, thresh):

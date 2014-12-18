@@ -9,8 +9,9 @@ import bbb.pwm as pwm_mod
 import bot.lib.lib as lib
 
 
-
 class ADC(object):
+    
+    """Class for communicating with ADS_7830 external ADC's"""
     def __init__(self):
             """Initialized I2C device"""
             self.logger = lib.get_logger()
@@ -33,6 +34,12 @@ class ADC(object):
     @lib.api_call
     def read_channel(self, channel_num, SD=0b0,
                     internal_ref=0b0, AD_converter=0b0):
+        """Reads channel specified by channel_num, with options.
+        
+        :param channel_num: Channel 0-7 of analog input to read.
+        :type channel_num: int
+        :param SD: 
+        """
         # Append bits to form command byte.
         command_byte = (SD << 7) | (channel_num << 4) \
                        (internal_ref << 3) | (AD_converter << 2) \

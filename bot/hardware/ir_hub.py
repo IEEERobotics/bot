@@ -46,7 +46,7 @@ class IRHub(object):
 
         # Use accurate reading (ADC) or not (GPIO)
         self.ir_read_adc = config["ir_read_adc"]
-
+        
         # Threshold for black/white conversation from analog to binary
         self._thresh = config["ir_thresh"]
 

@@ -145,8 +145,9 @@ class IRHub(object):
 
         """
         # TODO more efficient loop using permutations?
-        for unit_n in xrange(self.num_ir_units):
-            self.read_nth_units(unit_n)
+        
+        for i in xrange(self.num_ir_units)
+            self.read_ir()
         self.last_read_time = time()
         return self.reading
 

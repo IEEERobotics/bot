@@ -161,13 +161,17 @@ class IRHub(object):
         return self._thresh
 
     @lib.api_call
+    def read_ir(self, ir_array, channel):
+        """Reads individual IR input."""
+        return self.arrays[ir_array].get_byte(self.reg[channel]["addr"])
 
-    def print_ir_loop(self, name):
+    @lib.api_call
+    def print_ir_loop(self, channel):
         
         for i in range(1000):
             ir_readings = []
             for ch in self.reg:
-                ir_readings.append(self.arrays[name].get_byte(self.reg["ch0"]["addr"]))
+                ir_readings.append(self.arrays[name].get_byte(self.reg[ch]["addr"]))
             print "array:{}, readings{}  ".format(name, ir_readings)
        
     @lib.api_call

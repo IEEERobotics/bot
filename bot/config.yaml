@@ -70,8 +70,9 @@ ir_select_gpios: [44, 26, 46, 65]  # GPIOs to select IR sensor units: [P8_12 (gp
 ir_analog_input_gpios: {front: 39, back: 35, left: 67, right: 68}  # GPIO pins to read selected IR sensor units: P8_04 (gpio39), P8_06 (gpio35), P8_08 (gpio67), P8_10 (gpio68)
 ir_analog_adc_config: {  # ADC configuration
     i2c_bus: 1,  # System I2C bus to use to talk to ADCs
-    i2c_addr: {left: 0x48, right: 0x49, back: 0x4a, front: 0x4b},  # I2C (7-bit) addresses for ADCs: 0x50, 0x51, 0x59, 0x5a
-    i2c_registers: {  # Register addresses, num bytes and initial values to set (if any)
+    i2c_addr: {left: 0x48, right: 0x49, back: 0x4a, front: 0x4b}
+    i2c_registers: {
+        # Default command bytes for reading each channel.
         ch0: {addr: 0x84},
         ch1: {addr: 0xc4},
         ch2: {addr: 0x94},

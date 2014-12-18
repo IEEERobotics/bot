@@ -186,13 +186,12 @@ class IRHub(object):
         is to allow export via API using decorators.
 
         """
-        i = 10000
-        j = 0
-        while True:
-            if (i == 0):
-                break
-            print(self.arrays[name].get_byte(self.reg["ch0"]["addr"]))
-            i = i - 1;
+        
+        for i in range(1000):
+            ir_readings = []
+            for ch in self.reg:
+                ir_readings.append(self.arrays[name].get_byte(self.reg["ch0"]["addr"]))
+            print "array:{}, readings{}  ".format(name, ir_readings)
 
     @lib.api_call
     def set_thresh(self, thresh):

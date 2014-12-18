@@ -71,8 +71,7 @@ ir_analog_input_gpios: {front: 39, back: 35, left: 67, right: 68}  # GPIO pins t
 ir_analog_adc_config: {  # ADC configuration
     i2c_bus: 1,  # System I2C bus to use to talk to ADCs
     i2c_addr: {left: 0x48, right: 0x49, back: 0x4a, front: 0x4b}
-    i2c_registers: {
-        # Default command bytes for reading each channel.
+    i2c_registers: {# Default command bytes for reading each channel.
         ch0: {addr: 0x8c},
         ch1: {addr: 0xcc},
         ch2: {addr: 0x9c},

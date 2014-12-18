@@ -101,24 +101,6 @@ class IRHub(object):
         return "IRHub:- {}".format("; ".join(str(array)
                                    for array in self.arrays.itervalues()))
 
-    def select_nth_units(self, n):
-        """Selects IR sensor unit (0 to num_ir_units-1).
-
-        Note that this applies to all arrays. So, selecting unit n
-        implies selecting it for all arrays managed by this abstraction.
-
-        Note that this is on Follower's critical path. Keep it fast.
-
-        :param n: IR unit to select, between 0 and num_ir_units-1.
-        :type n: int
-        :raises ValueError: If n isn't between 0 and num_ir_units-1
-
-        """
-        # Use binary string directly; more efficient
-        line_val = "{:04b}".format(n)
-
-        for gpio, value in zip(self.select_gpios, line_val):
-            gpio.value = int(value)
 
     def read_nth_units(self, n):
         """Read the currently selected IR units on each array.
@@ -179,13 +161,7 @@ class IRHub(object):
         return self._thresh
 
     @lib.api_call
-    def read_ir(self, name):
-        """Setter for threshold used for analog to binary conversion.
-
-        Note that the only reason we wrap this instance var in getters/setters
-        is to allow export via API using decorators.
-
-        """
+    def print_ir_loop(self, name):
         
         for i in range(1000):
             ir_readings = []

@@ -72,14 +72,14 @@ ir_analog_adc_config: {  # ADC configuration
     i2c_bus: 1,  # System I2C bus to use to talk to ADCs
     i2c_addr: {left: 0x48, right: 0x49, back: 0x4a, front: 0x4b}
     i2c_registers: {# Default command bytes for reading each channel.
-        ch0: {addr: 0x8c},
-        ch1: {addr: 0xcc},
-        ch2: {addr: 0x9c},
-        ch3: {addr: 0xdc},
-        ch4: {addr: 0xac},
-        ch5: {addr: 0xec},
-        ch6: {addr: 0xbc},
-        ch7: {addr: 0xfc}
+        ch0: {cmd: 0x8c},
+        ch1: {cmd: 0xcc},
+        ch2: {cmd: 0x9c},
+        ch3: {cmd: 0xdc},
+        ch4: {cmd: 0xac},
+        ch5: {cmd: 0xec},
+        ch6: {cmd: 0xbc},
+        ch7: {cmd: 0xfc}
     },
     result_mask: 0x0ff0,  # Mask to apply to conversion result
     result_shift: 4,  # No. of bits to shift to the right after applying mask

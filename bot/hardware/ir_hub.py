@@ -33,7 +33,7 @@ class IRHub(object):
 
     """
 
-    num_ir_units = 16  # Number of IR sensors on an array
+    num_ir_units = 8  # Number of IR sensors on an array
 
     def __init__(self):
         """Build IR array abstraction objects."""
@@ -66,8 +66,6 @@ class IRHub(object):
         # Create buffer to store readings from all sensor units
         self.reading = {}
         for array_name in self.config["ir_analog_adc_config"]["i2c_addr"]:
-            self.reading[array_name] = {}
-            # each
             self.reading[array_name] = [0] * 8
 
         self.last_read_time = None
@@ -111,6 +109,7 @@ class IRHub(object):
             except AttributeError:
                 # Likely caused by None array that couldn't be built
                 continue
+
     @lib.api_call
     def read_ir(self, ir_array, channel):
         """Reads individual IR input."""
@@ -130,10 +129,8 @@ class IRHub(object):
         """
         
         # Read every channel of every adc.
-        
-        for name in self.config["ir_analog_adc_config"]["i2c_addr"]:
-            for ch in self.config["ir_analog_adc_config"]["i2c_registers"]:                
-                self.reading[name][ch] = self.read_ir(name,ch)
+        for n in xrange(self.num_ir_units):
+            self.read_nth_units(n)
         self.last_read_time = time()
         return self.reading
 

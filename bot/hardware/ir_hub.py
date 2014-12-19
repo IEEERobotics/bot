@@ -141,6 +141,13 @@ class IRHub(object):
         for arr in self.config["ir_analog_adc_config"]["i2c_addr"]:
             self.reading[arr] = self.read_array(arr)
         return self.reading
+        
+    @lib.api_call
+    def read_all_loop(self):
+        while True:
+            print self.read_all(self)
+        except KeyboardInterrupt:
+            break
 
     @lib.api_call
     def get_thresh(self):

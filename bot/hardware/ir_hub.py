@@ -39,22 +39,22 @@ class IRHub(object):
         """Build IR array abstraction objects."""
         # Load config and logger
         self.logger = lib.get_logger()
-        config = lib.get_config()
+        self.config = lib.get_config()
 
         # Number of IR sensors on an array
-        self.num_ir_units = config["irs_per_array"]
+        self.num_ir_units = self.config["irs_per_array"]
 
         # Use accurate reading (ADC)
-        self.ir_read_adc = config["ir_read_adc"]
+        self.ir_read_adc = self.config["ir_read_adc"]
         
         # Threshold for black/white conversation from analog to binary
-        self._thresh = config["ir_thresh"]
+        self._thresh = self.config["ir_thresh"]
 
-        self.reg  = config["ir_analog_adc_config"]["i2c_registers"]
+        self.reg  = self.config["ir_analog_adc_config"]["i2c_registers"]
 
         # Create buffer to store readings from all sensor units
         self.reading = {}
-        for array_name in config["ir_analog_adc_config"]["i2c_addr"]:
+        for array_name in self.config["ir_analog_adc_config"]["i2c_addr"]:
             self.reading[array_name] = [0] * 16
 
         self.last_read_time = None

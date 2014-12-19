@@ -52,7 +52,7 @@ class IRHub(object):
 
         self.reg  = self.config["ir_analog_adc_config"]["i2c_registers"]
         # NOTE: IR unit select lines are common
-        ir_analog_input_gpios = config["ir_analog_input_gpios"]
+        ir_analog_input_gpios = self.config["ir_analog_input_gpios"]
         # Create IR array objects
         #FIXME gpios are not needed for the new adcs
         self.arrays = {}

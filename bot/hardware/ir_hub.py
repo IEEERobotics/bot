@@ -44,7 +44,7 @@ class IRHub(object):
         # Number of IR sensors on an array
         self.num_ir_units = config["irs_per_array"]
 
-        # Use accurate reading (ADC) or not (GPIO)
+        # Use accurate reading (ADC)
         self.ir_read_adc = config["ir_read_adc"]
         
         # Threshold for black/white conversation from analog to binary
@@ -131,6 +131,10 @@ class IRHub(object):
             except AttributeError:
                 # Likely caused by None array that couldn't be built
                 continue
+    @lib.api_call
+    def read_ir(self, ir_array, channel):
+        """Reads individual IR input."""
+        return self.arrays[ir_array].get_byte(self.reg[channel]["cmd"])
 
     @lib.api_call
     def read_all(self):
@@ -144,10 +148,10 @@ class IRHub(object):
         :returns: Readings from all IR sensor units managed by this object.
 
         """
-        # TODO more efficient loop using permutations?
-        
-        for i in xrange(self.num_ir_units)
-            self.read_ir()
+        # Read every channel of every adc.
+        for side in self.config["ir_analog_adc_config"]["i2c_addr"]:
+            for ch in self.config["ir_analog_adc_config"]["i2c_registers"]:
+                self.read_ir(side,ch)
         self.last_read_time = time()
         return self.reading
 
@@ -162,17 +166,12 @@ class IRHub(object):
         return self._thresh
 
     @lib.api_call
-    def read_ir(self, ir_array, channel):
-        """Reads individual IR input."""
-        return self.arrays[ir_array].get_byte(self.reg[channel]["addr"])
-
-    @lib.api_call
     def print_ir_loop(self, channel):
         
         for i in range(1000):
             ir_readings = []
             for ch in self.reg:
-                ir_readings.append(self.arrays[name].get_byte(self.reg[ch]["addr"]))
+                ir_readings.append(self.arrays[name].get_byte(self.reg[ch]["cmd"]))
             print "array:{}, readings{}  ".format(name, ir_readings)
        
     @lib.api_call

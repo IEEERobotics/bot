@@ -52,39 +52,6 @@ class IRHub(object):
 
         self.reg  = config["ir_analog_adc_config"]["i2c_registers"]
 
-        # Build GPIO pins used to select which IR units are active
-        if config["test_mode"]["ir"]["front"]:
-            # Get dir of simulated hardware files from config
-            gpio_test_dir_base = config["test_gpio_base_dir"]
-
-            # Build GPIOs for selecting active IR units in test mode
-            self.select_gpios = [
-                gpio_mod.GPIO(gpio, gpio_test_dir_base)
-                for gpio in config["ir_select_gpios"]]
-        else:
-            try:
-                # Build GPIOs used for selecting active IR units
-                self.select_gpios = [
-                    gpio_mod.GPIO(gpio)
-                    for gpio in config["ir_select_gpios"]]
-            except Exception as e:
-                self.logger.error("GPIOs could not be initialized. " +
-                                  "Not on the bone? Run unit test instead. " +
-                                  "Exception: {}".format(e))
-
-        # NOTE: IR unit select lines are common
-        ir_analog_input_gpios = config["ir_analog_input_gpios"]
-
-        # Create IR array objects
-        #FIXME gpios are not needed for the new adcs
-        self.arrays = {}
-        for name, gpio in ir_analog_input_gpios.iteritems():
-            try:
-                self.arrays[name] = ir_analog_mod.IRAnalog(name, gpio)
-            except IOError:
-                self.logger.error("Unable to create {} IR array".format(name))
-                self.arrays[name] = None
-
         # Create buffer to store readings from all sensor units
         self.reading = {}
         for array_name in self.arrays.keys():
@@ -148,10 +115,12 @@ class IRHub(object):
         :returns: Readings from all IR sensor units managed by this object.
 
         """
+        
         # Read every channel of every adc.
-        for side in self.config["ir_analog_adc_config"]["i2c_addr"]:
+        
+        for name in self.config["ir_analog_adc_config"]["i2c_addr"]:
             for ch in self.config["ir_analog_adc_config"]["i2c_registers"]:
-                self.read_ir(side,ch)
+                self.reading[name][ch] = self.read_ir(name,ch)
         self.last_read_time = time()
         return self.reading
 

@@ -146,7 +146,7 @@ class IRHub(object):
         return self._thresh
 
     @lib.api_call
-    def print_ir_loop(self, channel):
+    def print_ir_loop(self, name):
         
         for i in range(1000):
             ir_readings = []

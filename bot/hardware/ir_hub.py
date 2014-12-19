@@ -52,6 +52,16 @@ class IRHub(object):
 
         self.reg  = self.config["ir_analog_adc_config"]["i2c_registers"]
 
+        # Create IR array objects
+        #FIXME gpios are not needed for the new adcs
+        self.arrays = {}
+        for name, gpio in ir_analog_input_gpios.iteritems():
+            try:
+                self.arrays[name] = ir_analog_mod.IRAnalog(name, gpio)
+            except IOError:
+                self.logger.error("Unable to create {} IR array".format(name))
+                self.arrays[name] = None
+                            
         # Create buffer to store readings from all sensor units
         self.reading = {}
         for array_name in self.config["ir_analog_adc_config"]["i2c_addr"]:

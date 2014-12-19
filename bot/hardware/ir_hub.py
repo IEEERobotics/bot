@@ -145,7 +145,8 @@ class IRHub(object):
     @lib.api_call
     def read_all_loop(self):
         while True:
-            print self.read_all(self)
+            try: 
+                print self.read_all(self)
         except KeyboardInterrupt:
             break
 

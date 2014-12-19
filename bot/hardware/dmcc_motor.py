@@ -23,6 +23,7 @@ class DMCCMotorSet(dict):
         self.config = lib.get_config()
         self.logger = lib.get_logger()
         self.is_testing = self.config["test_mode"]["dmcc"]
+        self.logger.critical("Testing {}".format(self.is_testing))
 
         # print "Testing: ", self.config["testing"]
         # print pyDMCC.lib._config
@@ -82,7 +83,7 @@ class DMCCMotor(object):
         self.config = lib.get_config()
         self.logger = lib.get_logger()
 
-        self.is_testing = self.config["testing"]
+        self.is_testing = self.config["test_mode"]["dmcc"]
 
         self.dmcc = dmcc
         self.real_motor = dmcc.motors[motor_num]
@@ -97,6 +98,7 @@ class DMCCMotor(object):
             self._pos_kP = self._pos_kI = self._pos_kD = 0
             self._vel_kP = self._vel_kI = self._vel_kD = 0
         else:
+            self.logger.critical("Testing : {}".format(self.is_testing))
             self._pos_kP, self._pos_kI, self._pos_kD \
                 = self.real_motor.position_pid
             self._vel_kP, self._vel_kI, self._vel_kD \

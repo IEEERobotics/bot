@@ -6,6 +6,7 @@ test_mode: {
     ultrasonics: true,
     dmcc: true,
     ir:{ front: false, back: true, right: true, left: false}
+
 }
 
 ADC: {

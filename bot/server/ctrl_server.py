@@ -15,7 +15,7 @@ import bot.lib.lib as lib
 from bot.follower.follower import Follower
 import pub_server as pub_server_mod
 import bot.lib.messages as msgs
-
+from bot.hardware.stepper_motor import Stepper_motor
 
 def is_api_method(obj, name):
     """Tests whether named method exists in obj and is flagged for API export.
@@ -128,9 +128,11 @@ class CtrlServer(object):
         """
 
         self.follower = Follower()
+        self.stepper_motor = Stepper_motor()
 
         systems = {}
         systems["ctrl"] = self
+        systems["stepper_motor"] = self.stepper_motor
         systems["follower"] = self.follower
         systems["driver"] = self.follower.driver
         systems["ir_hub"] = self.follower.ir_hub

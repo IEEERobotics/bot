@@ -1,21 +1,17 @@
 """Abstraction layer for stepper motors."""
 
+import bot.lib.lib as lib
 import time
-import pybbb.bbb.gpio as gpio
+import bbb.gpio as gpio
 import threading
 
 class Stepper_motor(object):
 
     """Class for abstracting stepper motor settings."""
 
-    def __init__(self, gpio_1, gpio_2, gpio_3, gpio_4):
+    def __init__(self):
         """Setup GPIO interface.
-
-        :param gpio_1, gpio_2, gpio_3, gpio_4: The four GPIO
-        pins used by this stepper motor.
-
-        :type gpio_* = int
-
+        
         """
 
         # TODO(kvijay1995): After testing the motor, add logger,
@@ -23,70 +19,122 @@ class Stepper_motor(object):
         # Implement the helper functions.
 
         # Build the GPIO pins in live mode
+
+        # Build logger
+        self.logger = lib.get_logger()
+
         self.gpio_1 = gpio.GPIO(8)
         self.gpio_2 = gpio.GPIO(78)
         self.gpio_3 = gpio.GPIO(76)
         self.gpio_4 = gpio.GPIO(74)
 
-        # Build the different threads required to rotate the motor
-        self.t1 = threading.Thread(
-            target = gpio_1.pulse, args = (3.0/1000.0))
-
-        self.t2 = threading.Thread(
-            target = gpio_2.pulse, args = (3.0/1000.0))
-
-        self.t3 = threading.Thread(
-            target = gpio_3.pulse, args = (3.0/1000.0))
-
-        self.t4 = threading.Thread(
-            target = gpio_4.pulse, args = (3.0/1000.0))
-
-    def clockwise(self, duration = 10):
+    def clockwise(self): 
         """The motor rotates clockwise.
-
-        :param duration: duration to spin the motor.
 
         TODO(kvijay1995) : Needs to be tested.
 
         """
+        self.gpio_1.set_value(1)
+        self.gpio_2.set_value(0)
+        self.gpio_3.set_value(0)
+        self.gpio_4.set_value(0)
+        time.sleep(1.0/10000.0)
 
-        start = time.time()
+        self.gpio_1.set_value(1)
+        self.gpio_2.set_value(1)
+        self.gpio_3.set_value(0)
+        self.gpio_4.set_value(0)
+        time.sleep(1.0/10000.0)
 
-        while time.time() - start < duration:
-            t1.start()
-            time.sleep(2.0/1000.0)
+        self.gpio_1.set_value(0)
+        self.gpio_2.set_value(1)
+        self.gpio_3.set_value(0)
+        self.gpio_4.set_value(0)
+        time.sleep(1.0/10000.0)
 
-            t2.start()
-            time.sleep(2.0/1000.0)
+        self.gpio_1.set_value(0)
+        self.gpio_2.set_value(1)
+        self.gpio_3.set_value(1)
+        self.gpio_4.set_value(0)
+        time.sleep(1.0/10000.0)
 
-            t3.start()
-            time.sleep(2.0/1000.0)
+        self.gpio_1.set_value(0)
+        self.gpio_2.set_value(0)
+        self.gpio_3.set_value(1)
+        self.gpio_4.set_value(0)
+        time.sleep(1.0/10000.0)
 
-            t4.start()
-            time.sleep(2.0/1000.0)
+        self.gpio_1.set_value(0)
+        self.gpio_2.set_value(0)
+        self.gpio_3.set_value(1)
+        self.gpio_4.set_value(1)
+        time.sleep(1.0/10000.0)
 
-    def counter_clockwise(self, duration):
+        self.gpio_1.set_value(0)
+        self.gpio_2.set_value(0)
+        self.gpio_3.set_value(0)
+        self.gpio_4.set_value(1)
+        time.sleep(1.0/10000.0)
+
+        self.gpio_1.set_value(1)
+        self.gpio_2.set_value(0)
+        self.gpio_3.set_value(0)
+        self.gpio_4.set_value(1)
+        time.sleep(1.0/10000.0)
+
+    def counter_clockwise(self): 
         """Rotates the motor counter clockwise
-
-        :param duration: time interval to spin the motor.
 
         TODO(kvijay1995): Needs to be tested.
 
         """
-        start = time.time()
+        self.gpio_4.set_value(1)
+        self.gpio_3.set_value(0)
+        self.gpio_2.set_value(0)
+        self.gpio_1.set_value(0)
+        time.sleep(1.0/10000.0)
 
-        while time.time() - start < duration:
-            t4.start()
-            time.sleep(2.0/1000.0)
+        self.gpio_4.set_value(1)
+        self.gpio_3.set_value(1)
+        self.gpio_2.set_value(0)
+        self.gpio_1.set_value(0)
+        time.sleep(1.0/10000.0)
 
-            t3.start()
-            time.sleep(2.0/1000.0)
-            
-            t2.start()
-            time.sleep(2.0/1000.0)
+        self.gpio_4.set_value(0)
+        self.gpio_3.set_value(1)
+        self.gpio_2.set_value(0)
+        self.gpio_1.set_value(0)
+        time.sleep(1.0/10000.0)
 
-            t1.start()
-            time.sleep(2.0/1000.0)
+        self.gpio_4.set_value(0)
+        self.gpio_3.set_value(1)
+        self.gpio_2.set_value(1)
+        self.gpio_1.set_value(0)
+        time.sleep(1.0/10000.0)
+
+        self.gpio_4.set_value(0)
+        self.gpio_3.set_value(0)
+        self.gpio_2.set_value(1)
+        self.gpio_1.set_value(0)
+        time.sleep(1.0/10000.0)
+
+        self.gpio_4.set_value(0)
+        self.gpio_3.set_value(0)
+        self.gpio_2.set_value(1)
+        self.gpio_1.set_value(1)
+        time.sleep(1.0/10000.0)
+
+        self.gpio_4.set_value(0)
+        self.gpio_3.set_value(0)
+        self.gpio_2.set_value(0)
+        self.gpio_1.set_value(1)
+        time.sleep(1.0/10000.0)
+
+        self.gpio_4.set_value(1)
+        self.gpio_3.set_value(0)
+        self.gpio_2.set_value(0)
+        self.gpio_1.set_value(1)
+        time.sleep(1.0/10000.0)
 
     @property
     def speed(self):
@@ -110,14 +158,19 @@ class Stepper_motor(object):
         clockwise direction.
 
         """
+        for i in range(0,128):
+            self.clockwise()
 
     def rotate_90_counter_clockwise(self):
         """Rotates the motor 90 degrees in the
         counter_clockwise direction.
 
         """
+        for i in range(0,128):
+            self.counter_clockwise()
 
     @lib.api_call
     def test(self):
         """Test function for the motor."""
-        clockwise(15)
+        self.rotate_90_clockwise()
+        self.rotate_90_counter_clockwise()

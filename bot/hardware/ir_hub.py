@@ -98,7 +98,6 @@ class IRHub(object):
         :raises ValueError: If n isn't between 0 and num_ir_units-1
 
         """
-        self.select_nth_units(n)
 
         for name, array in self.arrays.iteritems():
             try:

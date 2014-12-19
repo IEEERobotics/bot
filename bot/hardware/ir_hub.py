@@ -67,7 +67,7 @@ class IRHub(object):
         self.reading = {}
         for array_name in self.config["ir_analog_adc_config"]["i2c_addr"]:
             for ch in self.config["ir_analog_adc_config"]["i2c_registers"]:
-                self.reading[array_name] = [0] * 16
+                self.reading[array_name][ch] = [0] * 16
 
         self.last_read_time = None
 
@@ -131,8 +131,7 @@ class IRHub(object):
         # Read every channel of every adc.
         
         for name in self.config["ir_analog_adc_config"]["i2c_addr"]:
-            for ch in self.config["ir_analog_adc_config"]["i2c_registers"]:
-                
+            for ch in self.config["ir_analog_adc_config"]["i2c_registers"]:                
                 self.reading[name][ch] = self.read_ir(name,ch)
         self.last_read_time = time()
         return self.reading

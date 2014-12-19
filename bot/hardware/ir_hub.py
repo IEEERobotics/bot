@@ -66,8 +66,9 @@ class IRHub(object):
         # Create buffer to store readings from all sensor units
         self.reading = {}
         for array_name in self.config["ir_analog_adc_config"]["i2c_addr"]:
+            self.reading[array_name] = {}
             for ch in self.config["ir_analog_adc_config"]["i2c_registers"]:
-                self.reading[array_name][ch] = [0] * 16
+                self.reading[array_name][ch] = 0
 
         self.last_read_time = None
 

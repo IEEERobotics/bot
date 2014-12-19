@@ -145,10 +145,8 @@ class IRHub(object):
     @lib.api_call
     def read_all_loop(self):
         while True:
-            try: 
-                print self.read_all(self)
-            except KeyboardInterrupt:
-                break
+            print self.read_all(self)
+
 
     @lib.api_call
     def get_thresh(self):

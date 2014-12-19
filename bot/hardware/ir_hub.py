@@ -102,9 +102,9 @@ class IRHub(object):
         for name, array in self.arrays.iteritems():
             try:
                 # Read only one, ADC or GPIO
-                self.reading[name][n] = array.read_adc_result()
-                    #if self.ir_read_adc \
-                  #  else array.selected_unit_val
+                self.reading[name][n] = array.read_adc_result() \
+                    if self.ir_read_adc \
+                    else array.selected_unit_val
             except AttributeError:
                 # Likely caused by None array that couldn't be built
                 continue
@@ -113,7 +113,17 @@ class IRHub(object):
     def read_ir(self, ir_array, channel):
         """Reads individual IR input."""
         return self.arrays[ir_array].get_byte(self.reg[channel]["cmd"])
-
+    
+    @lib.api_call
+    def read_array(self, ir_array):
+        """Returns list containing all readings of an entire
+        ir array.
+        """
+        arr_readings = []
+        for ch in self.reg:
+            arr_readings.append(read_ir(ir_array,ch))
+        return arr_readings
+    
     @lib.api_call
     def read_all(self):
         """Poll IR sensor units and return sensed information.
@@ -128,9 +138,8 @@ class IRHub(object):
         """
         
         # Read every channel of every adc.
-        for n in xrange(self.num_ir_units):
-            self.read_nth_units(n)
-        self.last_read_time = time()
+        for arr in self.config["ir_analog_adc_config"]["i2c_addr"]:
+            self.reading[arr] = read_array(arr)
         return self.reading
 
     @lib.api_call

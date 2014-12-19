@@ -102,9 +102,7 @@ class IRHub(object):
         for name, array in self.arrays.iteritems():
             try:
                 # Read only one, ADC or GPIO
-                self.reading[name][n] = array.read_adc_result() \
-                    if self.ir_read_adc \
-                    else array.selected_unit_val
+                self.reading[name][n] =  array.selected_unit_val
             except AttributeError:
                 # Likely caused by None array that couldn't be built
                 continue

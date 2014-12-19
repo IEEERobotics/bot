@@ -121,7 +121,7 @@ class IRHub(object):
         """
         arr_readings = []
         for ch in self.reg:
-            arr_readings.append(read_ir(ir_array,ch))
+            arr_readings.append(self.read_ir(ir_array,ch))
         return arr_readings
     
     @lib.api_call

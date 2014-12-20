@@ -1,6 +1,7 @@
 """Abstraction of all line-following arrays as one unit."""
 
 from time import time, sleep
+from pprint import pprint
 
 import bbb.gpio as gpio_mod
 
@@ -145,7 +146,11 @@ class IRHub(object):
     @lib.api_call
     def read_all_loop(self):
         while True:
-            print self.read_all(self)
+            try:
+                pprint(self.read_all())
+                sleep(0.1)
+            except KeyboardInterrupt:
+                break
 
 
     @lib.api_call

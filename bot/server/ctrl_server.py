@@ -12,9 +12,7 @@ import signal
 sys.path = [os.getcwd()] + sys.path
 
 import bot.lib.lib as lib
-from bot.gunner.gunner import Gunner
 from bot.follower.follower import Follower
-from bot.hardware.color_sensor import ColorSensor
 import pub_server as pub_server_mod
 import bot.lib.messages as msgs
 
@@ -129,19 +127,13 @@ class CtrlServer(object):
 
         """
 
-        self.gunner = Gunner()
         self.follower = Follower()
 
         systems = {}
         systems["ctrl"] = self
-        systems["gunner"] = self.gunner
         systems["follower"] = self.follower
         systems["driver"] = self.follower.driver
-        systems["turret"] = self.gunner.turret
-        systems["ultrasonics"] = self.gunner.ultrasonics
-        systems["gun"] = self.gunner.gun
         systems["ir_hub"] = self.follower.ir_hub
-        systems["color_sensor"] = self.follower.color_sensor
         self.logger.debug("Systems: {}".format(systems))
         return systems
 
@@ -304,9 +296,6 @@ class CtrlServer(object):
     def stop_full(self):
         """Stop all drive and gun motors, set turret to safe state."""
         self.systems["driver"].move(0, 0)
-        self.systems["gun"].wheel_power = 0
-        self.systems["turret"].pitch = 90
-        self.systems["turret"].yaw = 90
 
     def clean_up(self):
         """Tear down ZMQ socket."""

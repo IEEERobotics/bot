@@ -8,10 +8,10 @@ test_mode: {
 }
 
 dmcc_drive_motors: {
-    front_left: { board_num: 0, motor_num: 1 },
-    front_right: { board_num: 0, motor_num: 2, invert: True },
-    back_left: { board_num: 2, motor_num: 1 },
-    back_right: { board_num: 2, motor_num: 2, invert: True }
+    back_left: { board_num: 0, motor_num: 1 },
+    back_right: { board_num: 0, motor_num: 2, invert: True },
+    front_left: { board_num: 1, motor_num: 1 },
+    front_right: { board_num: 1, motor_num: 2, invert: True }
 }
 
 turret: {
@@ -70,17 +70,17 @@ ir_select_gpios: [44, 26, 46, 65]  # GPIOs to select IR sensor units: [P8_12 (gp
 ir_analog_input_gpios: {front: 39, back: 35, left: 67, right: 68}  # GPIO pins to read selected IR sensor units: P8_04 (gpio39), P8_06 (gpio35), P8_08 (gpio67), P8_10 (gpio68)
 ir_analog_adc_config: {  # ADC configuration
     i2c_bus: 1,  # System I2C bus to use to talk to ADCs
-    i2c_addr: {left: 0x50, right: 0x59, back: 0x51, front: 0x5a},  # I2C (7-bit) addresses for ADCs: 0x50, 0x51, 0x59, 0x5a
-    i2c_registers: {  # Register addresses, num bytes and initial values to set (if any)
-        alert_status     : { addr: 0x01, bytes: 1},
-        configuration    : { addr: 0x02, bytes: 1, init: 0x2d },    # 0x2d: Fastest cycle time, no alert hold, alert flag & pin enabled, active high
-        v_low            : { addr: 0x03, bytes: 2, init: 0x0000 },  # Low threshold
-        v_high           : { addr: 0x04, bytes: 2, init: 0x0750 },  # High threshold
-        v_hyst           : { addr: 0x05, bytes: 2, init: 0x0080 },  # Difference to clear alert bit
-        v_min            : { addr: 0x06, bytes: 2 },  # Min conversion result; default: 0x0fff (as per doc, but shouldn't it be 0xff0?)
-        v_max            : { addr: 0x07, bytes: 2 }   # Max conversion result; default: 0x0000
+    i2c_addr: {left: 0x4b, right: 0x49, back: 0x48, front: 0x4a},
+    i2c_registers: {# Default command bytes for reading each channel.
+        ch0: {cmd: 0x8c},
+        ch1: {cmd: 0xcc},
+        ch2: {cmd: 0x9c},
+        ch3: {cmd: 0xdc},
+        ch4: {cmd: 0xac},
+        ch5: {cmd: 0xec},
+        ch6: {cmd: 0xbc},
+        ch7: {cmd: 0xfc}
     },
-    result_addr: 0x00,  # Register address where conversion result is stored (2 bytes)
     result_mask: 0x0ff0,  # Mask to apply to conversion result
     result_shift: 4,  # No. of bits to shift to the right after applying mask
 }
@@ -97,6 +97,6 @@ server_bind_host: "*"  # Special hostname servers bind to, for listening on all 
 server_host: 127.0.0.1  # Default hostname clients connect to
 ctrl_server_port: 60000  # Port used to send control messages to the bot
 pub_server_port: 60001  # PubServer publishes bot data on this port
-irs_per_array: 16
+irs_per_array: 8
 color_sensor: {LED_PWM: 5}
 ir_thresh: 60

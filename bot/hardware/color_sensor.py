@@ -48,6 +48,9 @@ class ColorSensor(I2CDevice):
             self.pwm.duty = 1000000
         else:
             self.logger.debug("Running in test mode")
+            # Fake device at address "0x00"
+            I2CDevice.__init__(self, 1, 0x00, config='tcs3472_i2c.yaml')
+
 
         # Gets base values for comparisons to future readings.
         self.get_baseline()

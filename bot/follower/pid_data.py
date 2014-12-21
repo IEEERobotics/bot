@@ -27,6 +27,8 @@ class PID_data(object):
         self.l = l
         self.w = w
         self.ttheta=0
+        self.N1 = 0
+        self.N2 = 0
 #        self.theta = 0
 #        self.s = 0
 
@@ -34,7 +36,28 @@ class PID_data(object):
         self.n1 = N1-4.5
         self.n2 = N2-4.5
         self.ttheta = (self.n1-self.n2)*self.d/self.l
+        
+   
 """
+    def IR_switch(self,a)
+        self.N1[7] = a["front"][0]
+        self.N1[6] = a["front"][1]
+        self.N1[5] = a["front"][2]
+        self.N1[4] = a["front"][3]
+        self.N1[3] = a["front"][4]
+        self.N1[2] = a["front"][5]
+        self.N1[1] = a["front"][6]
+        self.N1[0] = a["front"][7]
+
+        self.N2[7] = a["back"][7]
+        self.N2[6] = a["back"][6]
+        self.N2[5] = a["back"][5]
+        self.N2[4] = a["back"][4]
+        self.N2[3] = a["back"][3]
+        self.N2[2] = a["back"][2]
+        self.N2[1] = a["back"][1]
+        self.N2[0] = a["back"][0]        
+        
     def IR_index(self,IR)
         i=0
 #        if (sum[IR]>=2)
@@ -45,8 +68,8 @@ class PID_data(object):
      
         
     def propa_error(self,N1,N2)
-        self.n1 = N1-4.5
-        self.n2 = N2-4.5
+        self.n1 = self.N1-3.5
+        self.n2 = self.N2-4.5
         self.ttheta = (self.n1-self.n2)*self.d/self.l
         theta = atan(self.ttheta)
         return theta

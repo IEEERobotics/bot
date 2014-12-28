@@ -35,7 +35,7 @@ class WheelGun(object):
         # Build GPIOs to control laser, motors and triggers
         self.trigger_gpios = dict()
         self.laser_gpio = None
-        if self.config["testing"]:
+        if self.config["testing"]["wheelgun"]:
             # Get dir of simulated hardware files from config
             gpio_test_dir = self.config['test_gpio_base_dir']
 

@@ -25,7 +25,7 @@ class Servo(object):
         # Load config
         config = lib.get_config()
 
-        if config["testing"]:
+        if config["testing"]["servo"]:
             # Get dir of simulated hardware files from config
             test_dir = config["test_pwm_base_dir"]
 

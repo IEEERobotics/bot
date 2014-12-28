@@ -28,8 +28,8 @@ class ColorSensor(I2CDevice):
         self.bot_config = lib.get_config()
 
         # Handle off-bone runs
-        self.testing = self.bot_config["testing"]
-        if not self.bot_config["test_mode"]["color_sensor"]:
+        self.testing = self.bot_config["test_mode"]["color_sensor"]:
+        if not self.testing:
             self.logger.debug("Running in non-test mode")
 
             # Setup I2C

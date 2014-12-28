@@ -48,7 +48,7 @@ class Motor(object):
         # Load system configuration
         config = lib.get_config()
 
-        if config["testing"]:
+        if config["testing"]["motor"]:
             # Get dir of simulated hardware files from config
             pwm_test_dir = config["test_pwm_base_dir"]
 

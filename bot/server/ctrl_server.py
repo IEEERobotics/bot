@@ -298,9 +298,6 @@ class CtrlServer(object):
     def stop_full(self):
         """Stop all drive and gun motors, set turret to safe state."""
         self.systems["driver"].move(0, 0)
-        self.systems["gun"].wheel_power = 0
-        self.systems["turret"].pitch = 90
-        self.systems["turret"].yaw = 90
 
     def clean_up(self):
         """Tear down ZMQ socket."""

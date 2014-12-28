@@ -1,6 +1,7 @@
 """Abstraction of all line-following arrays as one unit."""
 
 from time import time, sleep
+from pprint import pprint
 
 import bbb.gpio as gpio_mod
 
@@ -33,47 +34,28 @@ class IRHub(object):
 
     """
 
-    num_ir_units = 16  # Number of IR sensors on an array
+    num_ir_units = 8  # Number of IR sensors on an array
 
     def __init__(self):
         """Build IR array abstraction objects."""
         # Load config and logger
         self.logger = lib.get_logger()
-        config = lib.get_config()
+        self.config = lib.get_config()
 
         # Number of IR sensors on an array
-        self.num_ir_units = config["irs_per_array"]
+        self.num_ir_units = self.config["irs_per_array"]
 
-        # Use accurate reading (ADC) or not (GPIO)
-        self.ir_read_adc = config["ir_read_adc"]
-
+        # Use accurate reading (ADC)
+        self.ir_read_adc = self.config["ir_read_adc"]
+        
         # Threshold for black/white conversation from analog to binary
-        self._thresh = config["ir_thresh"]
+        self._thresh = self.config["ir_thresh"]
 
-        # Build GPIO pins used to select which IR units are active
-        if config["test_mode"]["ir"]["front"]:
-            # Get dir of simulated hardware files from config
-            gpio_test_dir_base = config["test_gpio_base_dir"]
-
-            # Build GPIOs for selecting active IR units in test mode
-            self.select_gpios = [
-                gpio_mod.GPIO(gpio, gpio_test_dir_base)
-                for gpio in config["ir_select_gpios"]]
-        else:
-            try:
-                # Build GPIOs used for selecting active IR units
-                self.select_gpios = [
-                    gpio_mod.GPIO(gpio)
-                    for gpio in config["ir_select_gpios"]]
-            except Exception as e:
-                self.logger.error("GPIOs could not be initialized. " +
-                                  "Not on the bone? Run unit test instead. " +
-                                  "Exception: {}".format(e))
-
+        self.reg  = self.config["ir_analog_adc_config"]["i2c_registers"]
         # NOTE: IR unit select lines are common
-        ir_analog_input_gpios = config["ir_analog_input_gpios"]
-
+        ir_analog_input_gpios = self.config["ir_analog_input_gpios"]
         # Create IR array objects
+        #FIXME gpios are not needed for the new adcs
         self.arrays = {}
         for name, gpio in ir_analog_input_gpios.iteritems():
             try:
@@ -81,11 +63,11 @@ class IRHub(object):
             except IOError:
                 self.logger.error("Unable to create {} IR array".format(name))
                 self.arrays[name] = None
-
+                            
         # Create buffer to store readings from all sensor units
         self.reading = {}
-        for array_name in self.arrays.keys():
-            self.reading[array_name] = [0] * 16
+        for array_name in self.config["ir_analog_adc_config"]["i2c_addr"]:
+            self.reading[array_name] = [0] * 8
 
         self.last_read_time = None
 
@@ -98,24 +80,6 @@ class IRHub(object):
         return "IRHub:- {}".format("; ".join(str(array)
                                    for array in self.arrays.itervalues()))
 
-    def select_nth_units(self, n):
-        """Selects IR sensor unit (0 to num_ir_units-1).
-
-        Note that this applies to all arrays. So, selecting unit n
-        implies selecting it for all arrays managed by this abstraction.
-
-        Note that this is on Follower's critical path. Keep it fast.
-
-        :param n: IR unit to select, between 0 and num_ir_units-1.
-        :type n: int
-        :raises ValueError: If n isn't between 0 and num_ir_units-1
-
-        """
-        # Use binary string directly; more efficient
-        line_val = "{:04b}".format(n)
-
-        for gpio, value in zip(self.select_gpios, line_val):
-            gpio.value = int(value)
 
     def read_nth_units(self, n):
         """Read the currently selected IR units on each array.
@@ -135,7 +99,6 @@ class IRHub(object):
         :raises ValueError: If n isn't between 0 and num_ir_units-1
 
         """
-        self.select_nth_units(n)
 
         for name, array in self.arrays.iteritems():
             try:
@@ -148,6 +111,21 @@ class IRHub(object):
                 continue
 
     @lib.api_call
+    def read_ir(self, ir_array, channel):
+        """Reads individual IR input."""
+        return self.arrays[ir_array].get_byte(self.reg[channel]["cmd"])
+    
+    @lib.api_call
+    def read_array(self, ir_array):
+        """Returns list containing all readings of an entire
+        ir array.
+        """
+        arr_readings = []
+        for ch in self.reg:
+            arr_readings.append(self.read_ir(ir_array,ch))
+        return arr_readings
+    
+    @lib.api_call
     def read_all(self):
         """Poll IR sensor units and return sensed information.
 
@@ -159,11 +137,21 @@ class IRHub(object):
         :returns: Readings from all IR sensor units managed by this object.
 
         """
-        # TODO more efficient loop using permutations?
-        for unit_n in xrange(self.num_ir_units):
-            self.read_nth_units(unit_n)
-        self.last_read_time = time()
+        
+        # Read every channel of every adc.
+        for arr in self.config["ir_analog_adc_config"]["i2c_addr"]:
+            self.reading[arr] = self.read_array(arr)
         return self.reading
+        
+    @lib.api_call
+    def read_all_loop(self):
+        while True:
+            try:
+                pprint(self.read_all())
+                sleep(0.1)
+            except KeyboardInterrupt:
+                break
+
 
     @lib.api_call
     def get_thresh(self):
@@ -175,6 +163,15 @@ class IRHub(object):
         """
         return self._thresh
 
+    @lib.api_call
+    def print_ir_loop(self, name):
+        
+        for i in range(1000):
+            ir_readings = []
+            for ch in self.reg:
+                ir_readings.append(self.arrays[name].get_byte(self.reg[ch]["cmd"]))
+            print "array:{}, readings{}  ".format(name, ir_readings)
+       
     @lib.api_call
     def set_thresh(self, thresh):
         """Setter for threshold used for analog to binary conversion.

@@ -1,38 +1,40 @@
 """Hardware abstraction for ADS7830 ADC"""
 
 import time
-import smbus as bus
 
 from i2c_device.i2c_device import I2CDevice
 
 import bbb.pwm as pwm_mod
 import bot.lib.lib as lib
 
-
-
 class ADC(object):
-    def __init__(self):
+    
+    """Class for communicating with ADS_7830 external ADC's"""
+
+    def __init__(self, i2c_bus, i2c_address):
             """Initialized I2C device"""
             self.logger = lib.get_logger()
             self.bot_config = lib.get_config()
-            
-            # Default value of command byte. 
-            # Refer to ADS_7830 for more information
-            
+
+            # Bus location and address of ADC.
+            self.bus = i2c_bus
+            self.addr = i2c_address
+
             # Handle off-bone runs
             if self.bot_config["test_mode"]["ADC"]:
                 self.logger.debug("Running in test mode")
             else:
                 self.logger.debug("Running in non-test mode")
 
-                # Setup I2C
-                addr = self.bot_config
-                I2CDevice.__init__(self, 1, 0x48,
-                                config='adc_ads7830_i2c.yaml')
-
     @lib.api_call
     def read_channel(self, channel_num, SD=0b0,
                     internal_ref=0b0, AD_converter=0b0):
+        """Reads channel specified by channel_num, with options.
+        
+        :param channel_num: Channel 0-7 of analog input to read.
+        :type channel_num: int
+        :param SD: 
+        """
         # Append bits to form command byte.
         command_byte = (SD << 7) | (channel_num << 4) \
                        (internal_ref << 3) | (AD_converter << 2) \

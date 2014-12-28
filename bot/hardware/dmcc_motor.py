@@ -1,4 +1,4 @@
-")""Abstraction layer for DMCC-based motors."""
+"""Abstraction layer for DMCC-based motors."""
 
 from collections import defaultdict
 

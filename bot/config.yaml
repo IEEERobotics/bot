@@ -4,8 +4,13 @@ testing: true
 test_mode: {
     color_sensor: true,
     ultrasonics: true,
-    ir:{ front: false, back: true, right: true, left: false}
-
+    ir:{ front: false, back: true, right: true, left: false},
+    IR: false,
+    ADC: false,
+    DMCC: false,
+    motor: false,
+    servo: false,
+    solenoid: false,
 }
 
 dmcc_drive_motors: {

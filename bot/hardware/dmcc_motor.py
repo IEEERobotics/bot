@@ -22,7 +22,7 @@ class DMCCMotorSet(dict):
         """
         self.config = lib.get_config()
         self.logger = lib.get_logger()
-        self.is_testing = self.config["test_mode"]["dmcc"]
+        self.is_testing = self.config["testing"]["DMCC"]
         self.logger.critical("Testing {}".format(self.is_testing))
 
         # print "Testing: ", self.config["testing"]
@@ -83,7 +83,7 @@ class DMCCMotor(object):
         self.config = lib.get_config()
         self.logger = lib.get_logger()
 
-        self.is_testing = self.config["test_mode"]["dmcc"]
+        self.is_testing = self.config["test_mode"]["DMCC"]
 
         self.dmcc = dmcc
         self.real_motor = dmcc.motors[motor_num]

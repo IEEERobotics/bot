@@ -39,7 +39,7 @@ class IRArray(object):
         self.config = lib.get_config()
 
         # Create GPIO for reading sensed IR values
-        if self.config["testing"]:
+        if self.config["testing"]["IR"]:
             # Get dir of simulated hardware files from config
             gpio_test_dir = self.config["test_gpio_base_dir"]
 

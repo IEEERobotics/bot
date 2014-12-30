@@ -90,21 +90,12 @@ class Servo(object):
         self.pwm.duty = int(round(1000000 + 1000000 * (position / 180.)))
         self.logger.debug("Updated {}".format(self))
 
+    @lib.api_call
+    def test(self):
+        """Instantiate a Servo object and test if it works."""
 
-def loop():
-    """Instantiate a Servo object and test if it works."""
-    print "start"
+        # print servo's current position
+        print "current servo angle: {}".format(self.position())
 
-    # build servo object and bind it to pin number 42
-    servo1 = Servo(2)
-
-    # print servo's current position
-    print "current servo angle: {}".format(servo1.position())
-
-    # change servo's position
-    servo1.position(140)
-
-    print "Done."
-
-if __name__ == "__main__":
-    loop()
+        # change servo's position
+        self.position(140)

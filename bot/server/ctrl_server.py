@@ -130,13 +130,13 @@ class CtrlServer(object):
 
         self.follower = Follower()
         # Build stepper motor and servo for testing purposes
-        self.stepper_motor = Stepper_motor(76, 74, 72, 70)
-        self.servo = Servo("insert servo num")
+        self.stepper_motor = Stepper_motor(78, 76, 74, 72)
+        self.servo = Servo("")
 
         systems = {}
         systems["ctrl"] = self
         systems["stepper_motor"] = self.stepper_motor
-        systems["servo"] = self.servo
+        # systems["servo"] = self.servo
         systems["follower"] = self.follower
         systems["driver"] = self.follower.driver
         systems["ir_hub"] = self.follower.ir_hub

@@ -6,7 +6,7 @@ test_mode: {
     IR: true,
     ADC: true,
     DMCC: true,
-    stepper: true,
+    stepper: false,
     motor: true,
     servo: true,
     solenoid: true,

@@ -1,5 +1,6 @@
 """Abstraction layer for stepper motors."""
 
+
 import bot.lib.lib as lib
 import time
 import bbb.gpio as gpio
@@ -22,7 +23,7 @@ class Stepper_motor(object):
         # of rotation. It is set to max speed by default.
         self.time_int = 1.0
 
-        if self.config["testing"]["stepper"]:
+        if self.config["test_mode"]["stepper"]:
             # Get dir of simulated hardware files from config
             gpio_test_dir = self.config['test_gpio_base_dir']
 
@@ -150,7 +151,7 @@ class Stepper_motor(object):
         :returns: Speed of the motor.
 
         """
-        return int(round((10000. - self.time_int)/100.)
+        return int(round(10000. - self.time_int)/100.)
 
     @speed.setter
     def speed(self, speed):
@@ -191,8 +192,9 @@ class Stepper_motor(object):
         """Test function for the motor. Makes the
         motor rotate clockwise until a
         Keyboard interrupt. """
-        try:
-            while True:
-                self.clockwise()
-        except KeyboardInterrupt:
-            print "Done."
+        #try:
+        #    while True:
+        #        self.clockwise()
+        #except KeyboardInterrupt:
+        #    print "Done."
+        self.rotate_90_clockwise()

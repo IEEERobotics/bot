@@ -165,9 +165,9 @@ cd $BASE_DIR/am335x_pru_package
 make
 make install
 
-if [ -d $BASE_DIR/bot/pru ];then
+if [ -d $BASE_DIR/bot2014/pru ];then
     echo "Assembling PRU code..."
-    cd $BASE_DIR/bot/pru
+    cd $BASE_DIR/bot2014/pru
     make
 fi
 
@@ -179,7 +179,7 @@ VENV_DIR=venv
 VENV_PATH=$BASE_DIR/$VENV_DIR
 virtualenv --clear --system-site-packages $VENV_PATH
 source $VENV_PATH/bin/activate
-echo $VENV_PATH > /root/bot/.venv
+echo $VENV_PATH > /root/bot2014/.venv
 
 echo "==============================="
 echo "Installing modules into venv..."

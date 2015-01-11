@@ -25,7 +25,7 @@ class US(object):
         # Get config and logger
         self.config = lib.get_config()
         self.logger = lib.get_logger()
-        self.is_testing = self.config["testing"]["ultrasonics"]
+        self.is_testing = self.config["test_mode"]["ultrasonics"]
 
         # Store name and params, initialize other members
         self.name = name

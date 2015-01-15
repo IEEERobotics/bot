@@ -95,7 +95,12 @@ class Servo(object):
         """Instantiate a Servo object and test if it works."""
 
         # print servo's current position
-        print "current servo angle: {}".format(self.position())
+        print "current servo angle: {}".format(self.position)
 
         # change servo's position
-        self.position(140)
+        self.position = 180
+        time.sleep(1)
+        self.position = 130
+        time.sleep(1)
+        self.position = 90
+        print "current servo angle: {}".format(self.position)

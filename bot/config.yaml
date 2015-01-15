@@ -8,7 +8,7 @@ test_mode: {
     DMCC: true,
     stepper: false,
     motor: true,
-    servo: true,
+    servo: false,
     solenoid: true,
 }
 

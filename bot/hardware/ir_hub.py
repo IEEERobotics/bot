@@ -112,7 +112,17 @@ class IRHub(object):
 
     @lib.api_call
     def read_ir(self, ir_array, channel):
-        """Reads individual IR input."""
+        """Reads individual IR input.
+
+        :param ir_array: Name of the array to be read.
+                        front, left, right, back.
+        :type ir_array: String
+
+        :param channel: number 0-7 corresponding to each ir.
+        :type channel: int
+          
+        :returns: byte array containing readings 0-255 
+        """
         return self.arrays[ir_array].get_byte(self.reg[channel]["cmd"])
     
     @lib.api_call
@@ -145,6 +155,7 @@ class IRHub(object):
         
     @lib.api_call
     def read_all_loop(self):
+        """Continuously reads values from adc until user exits."""
         while True:
             try:
                 pprint(self.read_all())

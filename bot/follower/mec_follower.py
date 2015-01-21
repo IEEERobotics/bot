@@ -56,22 +56,22 @@ class MecFollower(object):
         while i<=7:
             if (ir_f[i] <= 100):
                 ir_front[i] = 1
-            else
+            else:
                 ir_front[i] = 0
 
             if (ir_b[i] <= 100):
                 ir_back[i] = 1
-            else
+            else:
                 ir_back[i] = 0
             
             if (ir_l[i] <= 100 ):
                 ir_left[i] = 1
-            else
+            else:
                 ir_left[i] = 0
 
             if (ir_r[i] <= 100):
                 ir_right[i] = 1
-            else 
+            else: 
                 ir_right[i] = 0
     
             i = i+1
@@ -87,19 +87,18 @@ class MecFollower(object):
     @lib.api_call
     def forward(self):
         sum_front = (ir_front[0]+ir_front[1]+ir_front[2]+ir_front[3]+ir_front[4]+ir_front[5]+ir_front[6]+ir_front[7])
-    print sum_front
-
+        print sum_front
         if(sum_front == 2):
             front_error = (ir_front[0]*(-3.5)+ir_front[1]*(-2.5)+ir_front[2]*(-1.5)+ir_front[3]*(-0.5)+ir_front[4]*(0.5)+ir_front[5]*(1.5)+ir_front[6]*(2.5)+ir_front[7]*(3.5))-0
             current_time = time()
             self.sampling_time = current_time - previous_time
             self.front_right.set_k_values(1,0,0)
             self.front_error = self.front.pid(0,front_error,self.sampling_time)
-        previous_time = current_time
-        v_back_left_speed = v_back_left+self.front_error
-        v_back_right_speed = v_back_back-self.front_error
-        self.driver.set_motor("front_left",v_back_left_speed)
-        self.driver.set_motor("back_left", v_back_back_speed)
+            previous_time = current_time
+            v_back_left_speed = v_back_left+self.front_error
+            v_back_right_speed = v_back_back-self.front_error
+            self.driver.set_motor("front_left",v_back_left_speed)
+            self.driver.set_motor("back_left", v_back_back_speed)
         
     
     

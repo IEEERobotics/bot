@@ -76,9 +76,7 @@ class MecFollower(object):
     
             i = i+1
 
-        print ir_front
-        print v_back_left
-        print v_back_right
+        return "ir_front: {}, v_back_left: {}, v_back_right: {}".format(ir_fron, v_back_left, v_back_right)
 
     @lib.api_call
     def get_translate_speed(self):

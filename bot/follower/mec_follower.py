@@ -100,11 +100,3 @@ class MecFollower(object):
             self.driver.set_motor("front_left",v_back_left_speed)
             self.driver.set_motor("back_left", v_back_back_speed)
         
-    
-    
-        
-        
-        
-        
-        
-       

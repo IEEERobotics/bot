@@ -54,29 +54,29 @@ class MecFollower(object):
         
         i = 0
         while i<=7:
-            if (ir_f[i] <= 100):
+            if (ir_f[i] <= 200):
                 ir_front[i] = 1
             else:
                 ir_front[i] = 0
 
-            if (ir_b[i] <= 100):
+            if (ir_b[i] <= 200):
                 ir_back[i] = 1
             else:
                 ir_back[i] = 0
             
-            if (ir_l[i] <= 100 ):
+            if (ir_l[i] <= 200 ):
                 ir_left[i] = 1
             else:
                 ir_left[i] = 0
 
-            if (ir_r[i] <= 100):
+            if (ir_r[i] <= 200):
                 ir_right[i] = 1
             else: 
                 ir_right[i] = 0
     
             i = i+1
 
-        return "ir_front: {}, v_back_left: {}, v_back_right: {}".format(ir_fron, v_back_left, v_back_right)
+        return "ir_front: {}, v_back_left: {}, v_back_right: {}".format(ir_front, v_back_left, v_back_right)
 
     @lib.api_call
     def get_translate_speed(self):

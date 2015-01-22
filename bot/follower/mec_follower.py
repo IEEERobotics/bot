@@ -41,42 +41,42 @@ class MecFollower(object):
     @lib.api_call
     def update(self):
     # get IR readingsmec_driver_mod
-        ir_readings = self.ir_hub.read_all_loop
-        ir_f = ir_readings["front"]
-        ir_b = ir_readings["back"]
-        ir_l = ir_readings["left"]
-        ir_r = ir_readings["right"]
+        self.ir_readings = self.ir_hub.read_all_loop
+        self.ir_f = self.ir_readings["front"]
+        self.ir_b = self.ir_readings["back"]
+        self.ir_l = self.ir_readings["left"]
+        self.ir_r = self.ir_readings["right"]
         
-        v_front_left = get_motor("front_left")
-        v_front_right = get_motor("front_right")
-        v_back_left = get_motor("back_left")
-        v_back_right = get_motor("back_right") 
+        self.v_front_left = self.driver.get_motor("front_left")
+        self.v_front_right = self.driver.get_motor("front_right")
+        self.v_back_left = self.driver.get_motor("back_left")
+        self.v_back_right = self.driver.get_motor("back_right") 
         
         i = 0
         while i<=7:
-            if (ir_f[i] <= 200):
-                ir_front[i] = 1
+            if (self.ir_f[i] <= 200):
+                self.ir_front[i] = 1
             else:
-                ir_front[i] = 0
+                self.ir_front[i] = 0
 
-            if (ir_b[i] <= 200):
-                ir_back[i] = 1
+            if (self.ir_b[i] <= 200):
+                self.ir_back[i] = 1
             else:
-                ir_back[i] = 0
+                self.ir_back[i] = 0
             
-            if (ir_l[i] <= 200 ):
-                ir_left[i] = 1
+            if (self.ir_l[i] <= 200 ):
+                self.ir_left[i] = 1
             else:
-                ir_left[i] = 0
+                self.ir_left[i] = 0
 
-            if (ir_r[i] <= 200):
-                ir_right[i] = 1
+            if (self.ir_r[i] <= 200):
+                self.ir_right[i] = 1
             else: 
-                ir_right[i] = 0
+                self.ir_right[i] = 0
     
             i = i+1
 
-        return "ir_front: {}, v_back_left: {}, v_back_right: {}".format(ir_front, v_back_left, v_back_right)
+        return "ir_front: {}, v_back_left: {}, v_back_right: {}".format(self.ir_front, self.v_back_left, self.v_back_right)
 
     @lib.api_call
     def get_translate_speed(self):

@@ -12,7 +12,7 @@ import pid as pid_mod
 
 class MecFollower(object):
     """Subclass of Follower for line-following using mecanum wheels."""
-    _
+    
     def __init__(self):
         # Building logging
         self.logger = lib.get_logger()
@@ -37,11 +37,18 @@ class MecFollower(object):
         self.rotate_error = 0.0
         
         self.translate_speed=75
+        
+        self.ir_front = [0,0,0,0,0,0,0,0]
+        self.ir_back = [0,0,0,0,0,0,0,0]
+        self.ir_right = [0,0,0,0,0,0,0,0]
+        self.ir_left = [0,0,0,0,0,0,0,0]
+
+
     
     @lib.api_call
     def update(self):
     # get IR readingsmec_driver_mod
-        self.ir_readings = self.ir_hub.read_all_loop
+        self.ir_readings = self.ir_hub.read_all()
         self.ir_f = self.ir_readings["front"]
         self.ir_b = self.ir_readings["back"]
         self.ir_l = self.ir_readings["left"]

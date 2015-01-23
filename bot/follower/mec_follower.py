@@ -12,7 +12,7 @@ import pid as pid_mod
 
 class MecFollower(object):
     """Subclass of Follower for line-following using mecanum wheels."""
-    
+    _
     def __init__(self):
         # Building logging
         self.logger = lib.get_logger()
@@ -84,10 +84,13 @@ class MecFollower(object):
     
     @lib.api_call
     def forward(self):
-        sum_front = (ir_front[0]+ir_front[1]+ir_front[2]+ir_front[3]+ir_front[4]+ir_front[5]+ir_front[6]+ir_front[7])
+        sum_front = (self.ir_front[0] + self.ir_front[1] + \
+                self.ir_front[2] + self.ir_front[3] + \
+                self.ir_front[4] + self.ir_front[5] + \
+                self.ir_front[6] + self.ir_front[7])
         print sum_front
         if(sum_front == 2):
-            front_error = (ir_front[0]*(-3.5)+ir_front[1]*(-2.5)+ir_front[2]*(-1.5)+ir_front[3]*(-0.5)+ir_front[4]*(0.5)+ir_front[5]*(1.5)+ir_front[6]*(2.5)+ir_front[7]*(3.5))-0
+            front_error = (self.ir_front[0]*(-3.5)+self.ir_front[1]*(-2.5)+self.ir_front[2]*(-1.5)+self.ir_front[3]*(-0.5)+self.ir_front[4]*(0.5)+self.ir_front[5]*(1.5)+self.ir_front[6]*(2.5)+self.ir_front[7]*(3.5))-0
             current_time = time()
             self.sampling_time = current_time - previous_time
             self.front_right.set_k_values(1,0,0)

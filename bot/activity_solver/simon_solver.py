@@ -20,8 +20,20 @@ class SimonPlayer(object):
 
         self.is_testing = self.config["test_mode"]["simon_player"]
 
-        self.red_detector = bbb_mod.GPIO(self.config["simon"]["red"]
-        self.green_detector = bbb_mod.GPIO(self.config["simon"]["green"]
-        self.blue_detector = bbb_mod.GPIO(self.config["simon"]["blue"]
-        self.yellow_detector = bbb_mod.GPIO(self.config["simon"]["blue"]
+        self.color_detectors = dict()
+        for color in self.config["simon"]["colors"]:
+            self.color_detectors[color] = \
+             bbb_mod.GPIO(self.config["simon"]["colors"]
+
+        # init all detectors as inputs
+        for d in self.detectors:
+            d.input()
+
+    def read_all(self):
+        """read current value from all four detectors.
+        """
+        readings = dict()
+        for detector in self.color_detectors:
+            readings[detector] = color_detector.get_value()
+        return readings
 

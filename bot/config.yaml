@@ -10,6 +10,15 @@ test_mode: {
     motor: true,
     servo: false,
     solenoid: true,
+    simon_player: true
+}
+
+simon_says: {
+    # gpio nums for detectors.
+    red: 30,
+    green: 60,
+    blue: 31,
+    yellow: 48
 }
 
 dmcc_drive_motors: {

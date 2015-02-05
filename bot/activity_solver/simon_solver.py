@@ -40,3 +40,11 @@ class SimonPlayer(object):
             readings[detector] = color_detector.get_value()
         return readings
 
+    def read_all_loop(self):
+
+        while True:
+            try:
+                self.read_all()
+                sleep(0.1)
+            except KeyboardInterrupt:
+                break

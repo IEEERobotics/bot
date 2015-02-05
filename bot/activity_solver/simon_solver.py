@@ -31,6 +31,9 @@ class SimonPlayer(object):
 
     def read_all(self):
         """read current value from all four detectors.
+        
+        :return: dict {"red":<val>, "green":<val>, 
+                        "blue":<val>, "yellow":<val>}
         """
         readings = dict()
         for detector in self.color_detectors:

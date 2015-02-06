@@ -93,7 +93,7 @@ class MecFollower(object):
     def forward(self):
         try:
             while True:
-                update():
+                update()
                 sum_front = (self.ir_front[0] + self.ir_front[1] + self.ir_front[2] + self.ir_front[3] + self.ir_front[4] + self.ir_front[5] + self.ir_front[6] + self.ir_front[7])
                 print sum_front
         #if(sum_front == 2):

@@ -10,6 +10,12 @@ test_mode: {
     motor: true,
     servo: false,
     solenoid: true,
+    simon: true
+}
+
+Simon_Says: {
+    servo: 2 # P9_42
+    stepper: [78, 76, 74, 72] # P8_37, 39, 41, 43
 }
 
 dmcc_drive_motors: {

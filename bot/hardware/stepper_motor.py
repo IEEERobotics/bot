@@ -10,7 +10,7 @@ class Stepper_motor(object):
 
     """Class for abstracting stepper motor settings."""
 
-    def __init__(self, gpio_1, gpio_2, gpio_3, gpio_4):
+    def __init__(self, gpio_pins):
         """Setup GPIO interface."""
 
         # Build logger
@@ -28,17 +28,17 @@ class Stepper_motor(object):
             gpio_test_dir = self.config['test_gpio_base_dir']
 
             # Build gpio objects for BBB interaction, provide test dir
-            self.gpio_1 = gpio.GPIO(gpio_1, gpio_test_dir)
-            self.gpio_2 = gpio.GPIO(gpio_2, gpio_test_dir)
-            self.gpio_3 = gpio.GPIO(gpio_3, gpio_test_dir)
-            self.gpio_4 = gpio.GPIO(gpio_4, gpio_test_dir)
+            self.gpio_1 = gpio.GPIO(gpio_pins[0], gpio_test_dir)
+            self.gpio_2 = gpio.GPIO(gpio_pins[1], gpio_test_dir)
+            self.gpio_3 = gpio.GPIO(gpio_pins[2], gpio_test_dir)
+            self.gpio_4 = gpio.GPIO(gpio_pins[3], gpio_test_dir)
 
         else:
             # Build gpio pins
-            self.gpio_1 = gpio.GPIO(gpio_1)
-            self.gpio_2 = gpio.GPIO(gpio_2)
-            self.gpio_3 = gpio.GPIO(gpio_3)
-            self.gpio_4 = gpio.GPIO(gpio_4)
+            self.gpio_1 = gpio.GPIO(gpio_pins[0])
+            self.gpio_2 = gpio.GPIO(gpio_pins[1])
+            self.gpio_3 = gpio.GPIO(gpio_pins[2])
+            self.gpio_4 = gpio.GPIO(gpio_pins[3])
 
     def clockwise(self): 
         """The motor rotates clockwise.

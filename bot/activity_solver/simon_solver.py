@@ -7,10 +7,11 @@ the stepper motor is used for controlling that actuators position.
 import bot.lib.lib as lib
 import bbb as bbb_mod
 
+from time import sleep
 
 class SimonPlayer(object):
 
-    def __init__(self, simon_config):
+    def __init__(self):
         """Initializes the simon says player.
 
         :param simon_config: config entry mapping simons inputs
@@ -26,9 +27,10 @@ class SimonPlayer(object):
              bbb_mod.GPIO(self.config["simon"]["colors"]
 
         # init all detectors as inputs
-        for d in self.detectors:
+        for d in self.color_detectors:
             d.input()
 
+    @lib.api_call
     def read_all(self):
         """read current value from all four detectors.
         
@@ -40,6 +42,7 @@ class SimonPlayer(object):
             readings[detector] = color_detector.get_value()
         return readings
 
+    @lib.api_call
     def read_all_loop(self):
 
         while True:

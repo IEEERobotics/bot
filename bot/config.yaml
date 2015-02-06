@@ -13,8 +13,7 @@ test_mode: {
     simon_player: true
 }
 
-simon_says: {
-
+simon: {
     colors:{
         # gpio nums for detectors.
         red: 30,

@@ -131,7 +131,9 @@ class CtrlServer(object):
 
         self.follower = Follower()
         # Build stepper motor and servo for testing purposes
-        self.stepper_motor = Stepper_motor(78, 76, 74, 72)
+
+        gpio_pins = [78, 76, 74, 72]
+        self.stepper_motor = Stepper_motor(gpio_pins)
         self.servo = Servo(4)
         
         

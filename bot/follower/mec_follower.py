@@ -61,22 +61,22 @@ class MecFollower(object):
         
         i = 0
         while i<=7:
-            if (self.ir_f[i] <= 200):
+            if (self.ir_f[i] <= 50):
                 self.ir_front[i] = 1
             else:
                 self.ir_front[i] = 0
 
-            if (self.ir_b[i] <= 200):
+            if (self.ir_b[i] <= 50):
                 self.ir_back[i] = 1
             else:
                 self.ir_back[i] = 0
             
-            if (self.ir_l[i] <= 200 ):
+            if (self.ir_l[i] <= 50):
                 self.ir_left[i] = 1
             else:
                 self.ir_left[i] = 0
 
-            if (self.ir_r[i] <= 200):
+            if (self.ir_r[i] <= 50):
                 self.ir_right[i] = 1
             else: 
                 self.ir_right[i] = 0
@@ -91,20 +91,25 @@ class MecFollower(object):
     
     @lib.api_call
     def forward(self):
-        sum_front = (self.ir_front[0] + self.ir_front[1] + \
-                self.ir_front[2] + self.ir_front[3] + \
-                self.ir_front[4] + self.ir_front[5] + \
-                self.ir_front[6] + self.ir_front[7])
-        print sum_front
-        if(sum_front == 2):
-            front_error = (self.ir_front[0]*(-3.5)+self.ir_front[1]*(-2.5)+self.ir_front[2]*(-1.5)+self.ir_front[3]*(-0.5)+self.ir_front[4]*(0.5)+self.ir_front[5]*(1.5)+self.ir_front[6]*(2.5)+self.ir_front[7]*(3.5))-0
-            current_time = time()
-            self.sampling_time = current_time - previous_time
-            self.front_right.set_k_values(1,0,0)
-            self.front_error = self.front.pid(0,front_error,self.sampling_time)
-            previous_time = current_time
-            v_back_left_speed = v_back_left+self.front_error
-            v_back_right_speed = v_back_back-self.front_error
-            self.driver.set_motor("front_left",v_back_left_speed)
-            self.driver.set_motor("back_left", v_back_back_speed)
+        try:
+            while True:
+                update():
+                sum_front = (self.ir_front[0] + self.ir_front[1] + self.ir_front[2] + self.ir_front[3] + self.ir_front[4] + self.ir_front[5] + self.ir_front[6] + self.ir_front[7])
+                print sum_front
+        #if(sum_front == 2):
+                front_error = (self.ir_front[0]*(-3.5)+self.ir_front[1]*(-2.5)+self.ir_front[2]*(-1.5)+self.ir_front[3]*(-0.5)+self.ir_front[4]*(0.5)+self.ir_front[5]*(1.5)+self.ir_front[6]*(2.5)+self.ir_front[7]*(3.5))-0
+                current_time = time()
+                self.sampling_time = current_time - previous_time
+                self.front_right.set_k_values(1,0,0)
+                self.front_error = self.front.pid(0,front_error,self.sampling_time)
+                previous_time = current_time
+                v_back_left_speed = v_back_left+self.front_error
+                v_back_right_speed = v_back_back-self.front_error
+                self.driver.set_motor("back_left",v_back_left_speed)
+                self.driver.set_motor("back_right", v_back_right_speed)
+                self.driver.set_motor("front_right",v_back_left_speed)
+                self.driver.set_motor("front_left",v_back_right_speed)
+        except KeyboardInterrupt:
+            pass
+        
         

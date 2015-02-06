@@ -136,7 +136,6 @@ class CtrlServer(object):
         self.stepper_motor = Stepper_motor(gpio_pins)
         self.servo = Servo(4)
         
-        
         systems = {}
         systems["ctrl"] = self
         systems["stepper_motor"] = self.stepper_motor

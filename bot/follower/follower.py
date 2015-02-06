@@ -36,6 +36,14 @@ class Follower(object):
         self.color_sensor = color_sensor_mod.ColorSensor()
 
         # Build PIDs
+        self.front_right = pid_mod.PID();
+        self.front_right_error = 0.0
+        self.front_left = pid_mod.PID();
+        self.front_left_error = 0.0
+        self.back_right = pid_mod.PID();
+        self.back_right_error = 0.0
+        self.back_left = pid_mod.PID();
+        self.back_left_error = 0.0
         self.strafe = pid_mod.PID()
         self.strafe_error = 0.0
         self.rotate_pid = pid_mod.PID()
@@ -797,3 +805,99 @@ class Follower(object):
             self.assign_states()
             self.driver.move(0, 0)
         return "DONE STRAFING TO LINE"
+
+
+
+
+    @lib.api_call
+    def analog_state(self):
+        """Make call to analog arrays"""
+        
+        # Take current time before reading ADC readings of the IRs            
+        previous_time = time()
+        self.front_right.set_k_values(kp = .5, kd = 0.5, ki = 0.0)
+        self.front_left.set_k_values(kp = .5, kd = 0.5, ki = 0.0)
+        self.back_right.set_k_values(kp = .25, kd = 0.25, ki = 0.0)
+        self.back_left.set_k_values(kp = .25, kd = 0.25, ki = 0.0)
+        while True:
+
+            # Read ir arrays
+            self.array_block = self.ir_hub.read_all()
+            self.normaliza_arrays()
+            self.track_position()
+            
+            # Get the current time of the CPU
+            current_time = time()
+            self.sampling_time = current_time - previous_time
+
+            # Take current time before reading ADC readings of the IRs            
+            previous_time = time()
+
+            # Call PID
+            self.front_right_error = (50 + self.front_right.pid(
+                0, self.bot_position, self.sampling_time))
+
+            # Call PID
+            self.front_left_error = (50 - self.front_left.pid(
+                0, self.bot_position, self.sampling_time))
+
+            # Call PID
+            self.back_right_error = (50 + self.back_right.pid(
+                0, self.bot_position, self.sampling_time))
+            
+            # Call PID
+            self.back_left_error = (50 - self.back_left.pid(
+                0, self.bot_position, self.sampling_time))
+            
+
+            if(self.front_right_error >= 100):
+                self.front_right_error = 100
+            elif(self.front_right_error <= -100):
+                self.front_right_error = -100
+
+            if(self.front_left_error >= 100):
+                self.front_left_error = 100
+            elif(self.front_left_error <= -100):
+                self.front_left_error = -100
+
+            if(self.back_right_error >= 100):
+                self.back_right_error = 100
+            elif(self.back_right_error <= -100):
+                self.back_right_error = -100
+
+            if(self.back_left_error >= 100):
+                self.back_left_error = 100
+            elif(self.back_left_error <= -100):
+                self.back_left_error = -100
+
+            self.driver.set_motor(name = "front_right", value = self.front_right_error)
+            self.driver.set_motor(name = "front_left", value = self.front_left_error)
+            self.driver.set_motor(name = "back_right", value = self.back_right_error)
+            self.driver.set_motor(name = "back_left", value = self.back_left_error)
+
+    def normaliza_arrays(self):
+        """Uesd to mormaliza ir readings coming form the ir array"""
+        for array in self.array_block:
+            for position,value in enumerate(self.array_block[array]):
+                self.array_block[array][position] = (255 - value) - 100 
+                if(self.array_block[array][position] < 0):
+                    self.array_block[array][position] = 0
+                                            
+
+    def track_position(self):
+        """Trak the positon of the line"""
+        self.bot_position = 0;
+        value = max(self.array_block["front"])
+        if(value < 10):
+            return
+        index = self.array_block["front"].index(value)
+        print value
+        #if value > 10:
+        if index < 4:
+            self.bot_position = 5.0 * (4.0 - index) * (4.0 - index) * (4.0 - index)
+        else:
+            self.bot_position = 5.0 * (3.0 - index) * (3.0 - index) * (3.0 - index)
+
+
+
+

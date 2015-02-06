@@ -10,12 +10,17 @@ test_mode: {
     motor: true,
     servo: false,
     solenoid: true,
-    simon: true
+    simon_player: true
 }
 
-Simon_Says: {
-    servo: 2 # P9_42
-    stepper: [78, 76, 74, 72] # P8_37, 39, 41, 43
+simon_says: {
+
+    colors:{
+        # gpio nums for detectors.
+        red: 30,
+        green: 60,
+        blue: 31,
+        yellow: 48}
 }
 
 dmcc_drive_motors: {

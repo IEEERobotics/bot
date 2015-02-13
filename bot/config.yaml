@@ -19,7 +19,9 @@ simon: {
         red: 30,
         green: 60,
         blue: 31,
-        yellow: 48}
+        yellow: 48},
+    # Currently using 4 gpios for stepper motor.
+    # TODO(AhmedSamara) switch to pwm once PCB is in
 }
 
 dmcc_drive_motors: {

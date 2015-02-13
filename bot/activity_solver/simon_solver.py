@@ -20,11 +20,13 @@ class SimonPlayer(object):
         self.logger = lib.get_logger()
 
         self.is_testing = self.config["test_mode"]["simon_player"]
+        
+        self.color_gpio = self.config["simon"]["colors"]
 
         self.color_detectors = dict()
-        for color in self.config["simon"]["colors"]:
-            self.color_detectors[color] = \
-             bbb_mod.GPIO(self.config["simon"]["colors"]
+        for color in self.color_gpio:
+            self.color_detectors[color] =  \ 
+                bbb_mod.GPIO(self.color_gpio[color])
 
         # init all detectors as inputs
         for d in self.color_detectors:

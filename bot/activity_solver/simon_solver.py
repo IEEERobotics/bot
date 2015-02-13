@@ -25,12 +25,12 @@ class SimonPlayer(object):
 
         self.color_detectors = dict()
         for color in self.color_gpio:
-            self.color_detectors[color] =  \ 
+            self.color_detectors[color] = \
                 bbb_mod.GPIO(self.color_gpio[color])
 
         # init all detectors as inputs
         for d in self.color_detectors:
-            d.input()
+            self.color_detectors[d].input()
 
     @lib.api_call
     def read_all(self):
@@ -40,8 +40,8 @@ class SimonPlayer(object):
                         "blue":<val>, "yellow":<val>}
         """
         readings = dict()
-        for detector in self.color_detectors:
-            readings[detector] = color_detector.get_value()
+        for d in self.color_detectors:
+            readings[d] = self.color_detectors[d].get_value()
         return readings
 
     @lib.api_call

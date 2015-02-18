@@ -6,6 +6,7 @@ the stepper motor is used for controlling that actuators position.
 
 import bot.lib.lib as lib
 import bbb as bbb_mod
+from bot.hardware import SimonSaysHardware
 
 from time import sleep
 
@@ -31,6 +32,9 @@ class SimonPlayer(object):
         # init all detectors as inputs
         for d in self.color_detectors:
             self.color_detectors[d].input()
+
+        # construct the stepper motor hardware
+        self.simon = SimonSaysHardware()
 
     @lib.api_call
     def read_all(self):

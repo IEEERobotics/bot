@@ -34,6 +34,8 @@ class SimonSaysHardware(object):
             self.stepper = Stepper_motor(
                 self.config["Simon_Says"]["stepper"])
 
+        print "Simon says hardware has been built"
+
     @property
     def position(self):
         """Getter for motor's current position.
@@ -70,6 +72,9 @@ class SimonSaysHardware(object):
         if ((position > 0) or (position < 5)):
             # count the number of 90 degree rotations to be made.
             count = position - self.position
+
+            # DEBUG
+            print count
 
             if count > 0:
                 # rotate the specified number of times counterclockwise

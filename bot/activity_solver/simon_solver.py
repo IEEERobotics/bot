@@ -36,6 +36,8 @@ class SimonPlayer(object):
         # construct the stepper motor hardware
         self.simon = SimonSaysHardware()
 
+        print "Simon says player was created"
+
     @lib.api_call
     def read_all(self):
         """read current value from all four detectors.
@@ -57,3 +59,8 @@ class SimonPlayer(object):
                 sleep(0.1)
             except KeyboardInterrupt:
                 break
+
+    @lib.api_call
+    def verify(self):
+        """Test function for making sure the hardware works."""
+        self.simon.turn(2)

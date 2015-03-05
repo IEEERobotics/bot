@@ -51,8 +51,20 @@ class SimonPlayer(object):
 
         while True:
             try:
-                self.read_all()
+                print self.read_all()
                 sleep(0.1)
+            except KeyboardInterrupt:
+                break
+
+    def read_input(self):
+        """ This function returns the color (encoded to the sensor)
+        that is turns on.
+        """
+        while True:
+            try:
+                for d in self.color_detectors:
+                    if(self.color_detectors[d].get_value() != 0):
+                        return d
             except KeyboardInterrupt:
                 break
 
@@ -67,4 +79,45 @@ class SimonPlayer(object):
     @lib.api_call
     def test_press_start(self):
         """Test whether the servo presses the start button."""
-        self.simon.press_start():
+        self.simon.press_start()
+
+    @lib.api_call
+    def play_simon(self):
+        """ Test function for playing the actual game once the 
+        Simon is gripped.
+        """
+        round_no = 1
+        colors = {"blue" : 1, "red" : 2, "green" : 3, "yellow" : 4}
+        # 1) Press the start button
+        self.simon.press_start()
+ 
+        while True:
+            try:
+                
+                # 2) Read the input GPIOs until one of the value changes
+                # and pass the input into the algorithm to get the 
+                # positions to press the buttons
+
+                pos = dict()
+                for i in range(0,round_no):
+                    sensor_reading = self.read_input()
+                    # DEBUG
+                    print sensor_reading
+                    actual_position = (colors[sensor_reading] \
+                        + self.simon.position -1) % 4
+                    if(actual_position == 0)
+                        actual_reading = 4
+                    pos[i] = actual_reading
+
+                # 4) Call the self.turn() method with the position numbers
+                # the specified number of times
+                for i in range(0, round_no):
+                    self.simon.turn(pos[i])
+                # 5) Increment round_no
+                round_no = round_no + 1
+            except KeyboardInterrupt:
+                break
+        # reset to position 1 before exiting
+        self.simon.turn(1)
+        # SIDE-EFFECT: Actuator is going to reset to position 1
+        # press the button before exiting

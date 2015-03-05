@@ -84,12 +84,13 @@ class SimonSaysHardware(object):
             self.position = position
 
             # actuate the servo rails to press the button - to be tested
-            #self.servo.position = 180
+            self.servo.position = 180
 
             # TODO (Vijay): Put the thread to sleep for a little bit.
+            time.sleep(1)
 
             # Servo is reset to initial position
-            #self.servo.position = 90
+            self.servo.position = 90
 
     def press_start(self):
         """ Actuates the servo to press the start button.
@@ -97,13 +98,7 @@ class SimonSaysHardware(object):
         """
         self.servo.position = 0
 
-        # TODO(Vijay): Put the thread to sleep for a little bit.
+        time.sleep(1)
 
         # Servo is reset to initial position
-        #self.servo.position = 90
-
-    # Use self.position as a reference point to read in the color values.
-    # Localization can be done by reading a
-    # Gpio pin and triggering the turn() function
-    # with the position parameter determined by using the self.postion
-    # as a reference.
+        self.servo.position = 90

@@ -21,8 +21,8 @@ class SimonSaysHardware(object):
         self.config = lib.get_config()
 
         # Variable that stores the current position of the Simon
-        # says hardware.At startup it's set to 0.
-        self.position = 3
+        # says hardware.At startup it's set to 1.
+        self.position = 1
         
         if self.config["test_mode"]["simon_player"]:
             # add code for test mode
@@ -34,8 +34,7 @@ class SimonSaysHardware(object):
             self.stepper = Stepper_motor(
                 self.config["simon"]["stepper"])
 
-        print "Simon says hardware has been built"
-
+        # TODO(Vijay): Should add position property 
         """Getter for motor's current position.
 
         :returns: Position of the motor.
@@ -68,7 +67,7 @@ class SimonSaysHardware(object):
             count = position - self.position
 
             # DEBUG
-            print "The number of clockwise movements : {}".format(count)
+            print "The no. of c-clockwise movements : {}".format(count)
 
             if count > 0:
                 # rotate the specified number of times counterclockwise
@@ -85,17 +84,23 @@ class SimonSaysHardware(object):
             self.position = position
 
             # actuate the servo rails to press the button - to be tested
-            self.servo.position = 0 or 180
+            #self.servo.position = 180
 
-            # Back to the beginning position
-            self.servo.position = 90
+            # TODO (Vijay): Put the thread to sleep for a little bit.
+
+            # Servo is reset to initial position
+            #self.servo.position = 90
 
     def press_start(self):
         """ Actuates the servo to press the start button.
 
         """
-        # TODO: to be tested
-        self.servo.position = 180
+        self.servo.position = 0
+
+        # TODO(Vijay): Put the thread to sleep for a little bit.
+
+        # Servo is reset to initial position
+        #self.servo.position = 90
 
     # Use self.position as a reference point to read in the color values.
     # Localization can be done by reading a

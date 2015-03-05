@@ -20,8 +20,6 @@ class SimonPlayer(object):
         self.config = lib.get_config()
         self.logger = lib.get_logger()
 
-        self.is_testing = self.config["test_mode"]["simon_player"]
-        
         self.color_gpio = self.config["simon"]["colors"]
 
         self.color_detectors = dict()
@@ -35,8 +33,6 @@ class SimonPlayer(object):
 
         # construct the stepper motor hardware
         self.simon = SimonSaysHardware()
-
-        print "Simon says player was created"
 
     @lib.api_call
     def read_all(self):
@@ -61,6 +57,14 @@ class SimonPlayer(object):
                 break
 
     @lib.api_call
-    def test_stepper(self, pos):
-        """Test function for making sure the hardware works."""
+    def test_turn(self, pos):
+        """Test whether the stepper turns and presses button at the 
+        specified position.
+        
+        """
         self.simon.turn(pos)
+
+    @lib.api_call
+    def test_press_start(self):
+        """Test whether the servo presses the start button."""
+        self.simon.press_start():

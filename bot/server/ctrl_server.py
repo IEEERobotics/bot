@@ -15,8 +15,6 @@ import bot.lib.lib as lib
 from bot.follower.follower import Follower
 import pub_server as pub_server_mod
 import bot.lib.messages as msgs
-from bot.hardware.stepper_motor import Stepper_motor
-from bot.hardware.servo import Servo
 from bot.activity_solver.simon_solver import SimonPlayer
 
 def is_api_method(obj, name):
@@ -130,16 +128,9 @@ class CtrlServer(object):
         """
 
         self.follower = Follower()
-        # Build stepper motor and servo for testing purposes
-
-        gpio_pins = [78, 76, 74, 72]
-        self.stepper_motor = Stepper_motor(gpio_pins)
-        self.servo = Servo(4)
         
         systems = {}
         systems["ctrl"] = self
-        systems["stepper_motor"] = self.stepper_motor
-        systems["servo"] = self.servo
         systems["follower"] = self.follower
         systems["driver"] = self.follower.driver
         systems["ir_hub"] = self.follower.ir_hub

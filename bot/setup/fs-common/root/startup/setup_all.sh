@@ -9,16 +9,16 @@ source $dir/adc.sh
 # Gun laser: P8_35 (gpio8)
 load_gpio 8
 
-# Gun motor - left: P8_37 (gpio78)
+# Simon Arm - Stepper-motor(1) : P8_37 (gpio78)
 load_gpio 78
 
-# Gun motor - right: P8_39 (gpio76)
+# Simon Arm - Stepper-motor(2) : P8_39 (gpio76)
 load_gpio 76
 
-# Gun trigger - retract: P8_41 (gpio74)
+# Simon Arm - Stepper-motor(3) : P8_41 (gpio74)
 load_gpio 74
 
-# Gun trigger - advance: P8_43 (gpio72)
+# Simon Arm - Stepper-motor(4) : P8_43 (gpio72)
 load_gpio 72
 
 # Turret servo - pan/yaw: P9_42 (pwm2/ecap0)
@@ -63,6 +63,12 @@ load_gpio 112  # P9_30 left trigger
 load_gpio 113  # P9_28 left echo
 load_gpio 111  # P9_29 right trigger
 load_gpio 110  # P9_31 right echo
+
+# Simon Arm reader GPIOs
+load_gpio 30   # P9_11 red color reader
+load_gpio 60   # P9_12 green color reader
+load_gpio 31   # P9_13 blue color reader
+load_gpio 48   # P9_15 yellow color reader
 
 enable_adcs
 load_slot BB-BONE-PRU-01

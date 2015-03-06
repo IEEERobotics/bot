@@ -818,8 +818,14 @@ class Follower(object):
         self.front_right.set_k_values(kp = .2, kd = 0.1, ki = 0.0)
         self.front_left.set_k_values(kp = .2, kd = 0.1, ki = 0.0)
 
-        self.back_right.set_k_values(kp = .05, kd = 0.05, ki = 0.0)
-        self.back_left.set_k_values(kp = .09, kd = 0.09, ki = 0.0)
+        self.back_right.set_k_values(kp = .03, kd = 0.009, ki = 0.0)
+        self.back_left.set_k_values(kp = .03, kd = 0.009, ki = 0.0)
+        
+        self.front_right_error = 0.0
+        self.front_left_error = 0.0
+        self.back_right_error = 0.0
+        self.back_left_error = 0.0
+
         while True:
 
             # Read ir arrays
@@ -834,42 +840,89 @@ class Follower(object):
             # Take current time before reading ADC readings of the IRs            
             previous_time = time()
 
-            # Call PID
-            self.front_right_error = (50 + self.front_right.pid(
-                0, self.bot_front_position, self.sampling_time))
+            # Count the number of hits 
+            front_hits = self.count_num_of_hits(self.array_block["front"])
+            back_hits = self.count_num_of_hits(self.array_block["back"])
+            right_hits = self.count_num_of_hits(self.array_block["right"])
+            left_hits = self.count_num_of_hits(self.array_block["left"])
+            #print self.array_block
+             
+            if(front_hits > 0):
+                # Call PID
+                self.front_right_error = (50 + self.front_right.pid(
+                    0, self.bot_front_position, self.sampling_time))
 
-            # Call PID
-            self.front_left_error = (50 - self.front_left.pid(
-                0, self.bot_front_position, self.sampling_time))
+                # Call PID
+                self.front_left_error = (50 - self.front_left.pid(
+                    0, self.bot_front_position, self.sampling_time))
 
-            # Call PID
-            self.back_right_error = (50 + self.back_right.pid(
-                0, self.bot_back_position, self.sampling_time))
+                if(self.front_right_error >= 80):
+                    self.front_right_error = 80
+                elif(self.front_right_error <= -80):
+                    self.front_right_error = -80
+
+                if(self.front_left_error >= 80):
+                    self.front_left_error = 80
+                elif(self.front_left_error <= -80):
+                    self.front_left_error = -80
+            #else:
+                self.front_right_error = (50 + self.front_right.pid(
+                    0, self.bot_back_position, self.sampling_time))
+
+                # Call PID
+                self.front_left_error = (50 - self.front_left.pid(
+                    0, self.bot_back_position, self.sampling_time))
+
+                if(self.front_right_error >= 80):
+                    self.front_right_error = 80
+                elif(self.front_right_error <= -80):
+                    self.front_right_error = -80
+
+                if(self.front_left_error >= 80):
+                    self.front_left_error = 80
+                elif(self.front_left_error <= -80):
+                    self.front_left_error = -80
+
+            if(back_hits > 0):
+                # Call PID
+                self.back_right_error = (50 + self.back_right.pid(
+                    0, self.bot_back_position, self.sampling_time))
             
-            # Call PID
-            self.back_left_error = (50 - self.back_left.pid(
-                0, self.bot_back_position, self.sampling_time))
+                # Call PID
+                self.back_left_error = (50 - self.back_left.pid(
+                    0, self.bot_back_position, self.sampling_time))
+
+                if(self.back_right_error >= 80):
+                    self.back_right_error = 80
+                elif(self.back_right_error <= -80):
+                    self.back_right_error = -80
+
+                if(self.back_left_error >= 80):
+                    self.back_left_error = 80
+                elif(self.back_left_error <= -80):
+                    self.back_left_error = -80
+            else:        
+                # Call PID
+                self.back_right_error = (50 + self.back_right.pid(
+                    0, self.bot_front_position, self.sampling_time))
             
+                # Call PID
+                self.back_left_error = (50 - self.back_left.pid(
+                    0, self.bot_fron_position, self.sampling_time))
 
-            if(self.front_right_error >= 80):
-                self.front_right_error = 80
-            elif(self.front_right_error <= -80):
-                self.front_right_error = -80
+                if(self.back_right_error >= 80):
+                    self.back_right_error = 80
+                elif(self.back_right_error <= -80):
+                    self.back_right_error = -80
 
-            if(self.front_left_error >= 80):
-                self.front_left_error = 80
-            elif(self.front_left_error <= -80):
-                self.front_left_error = -80
+                if(self.back_left_error >= 80):
+                    self.back_left_error = 80
+                elif(self.back_left_error <= -80):
+                    self.back_left_error = -80
 
-            if(self.back_right_error >= 80):
-                self.back_right_error = 80
-            elif(self.back_right_error <= -80):
-                self.back_right_error = -80
+            if back_hits == 0 and front_hits == 0:
+                self.driver.move(speed = 0, angle = 0) 
 
-            if(self.back_left_error >= 80):
-                self.back_left_error = 80
-            elif(self.back_left_error <= -80):
-                self.back_left_error = -80
 
             self.driver.set_motor(name = "front_right", value = self.front_right_error)
             self.driver.set_motor(name = "front_left", value = self.front_left_error)
@@ -904,7 +957,7 @@ class Follower(object):
         if(value < 10):
             return
         index = self.array_block["back"].index(value)
-        print value
+        #print value
         #if value > 10:
         if index < 4:
             self.bot_back_position = 5.0 * (4.0 - index) * (4.0 - index) * (4.0 - index)
@@ -912,4 +965,9 @@ class Follower(object):
             self.bot_back_position = 5.0 * (3.0 - index) * (3.0 - index) * (3.0 - index)
 
 
-
+    def count_num_of_hits(self, array):
+        count = 0
+        for value in array:
+            if value > 0:
+                count = count + 1
+        return count

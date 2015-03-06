@@ -176,13 +176,13 @@ class Follower(object):
                 return self.error
 
             # average states.
-            bot_position = (self.front_state + self.back_state)/2
+            bot_front_position = (self.front_state + self.back_state)/2
             # Get the current time of the CPU
             current_time = time()
             self.sampling_time = current_time - previous_time
             # Call PID
             self.strafe_error = self.strafe.pid(
-                0, bot_position, self.sampling_time)
+                0, bot_front_position, self.sampling_time)
             # calculate difference between array's for approx. pseudo angle
             bot_angle = (self.front_state - self.back_state)
             # Call Rotate PID
@@ -621,13 +621,13 @@ class Follower(object):
                 self.driver.move(0, 0)
                 return self.error
             # setup pid
-            bot_position = (self.left_state + self.right_state)/2
+            bot_front_position = (self.left_state + self.right_state)/2
             current_time = time()
             # Call PID
-            self.logger.info("bot_position = {}".format(bot_position))
+            self.logger.info("bot_front_position = {}".format(bot_front_position))
             position_error = forw_to_back_strafe.pid(
-                0, bot_position, self.sampling_time)
-            if(abs(bot_position) < 3):
+                0, bot_front_position, self.sampling_time)
+            if(abs(bot_front_position) < 3):
                 self.driver.move(0, 0)
                 break
             # Cap at 0 and 100
@@ -637,7 +637,7 @@ class Follower(object):
                 translate_angle = (0 + self.heading) % 360
             else:
                 translate_angle = (180 + self.heading) % 360
-            if(abs(bot_position) < 5):
+            if(abs(bot_front_position) < 5):
                 return
             self.logger.info("translate_speed = {}".format(translate_speed))
             self.logger.info("translate_angle = {}".format(translate_angle))
@@ -717,14 +717,14 @@ class Follower(object):
                     break
                 # calculate PID terms`
                 current_time = time()
-                bot_position = (self.front_state + self.back_state)/2
+                bot_front_position = (self.front_state + self.back_state)/2
                 # Call side_to_side PID
-                self.logger.info("bot_position = {}".format(bot_position))
+                self.logger.info("bot_front_position = {}".format(bot_front_position))
                 self.sampling_time = current_time - previous_time
                 position_error = side_to_side_strafe.pid(
-                    0, bot_position, self.sampling_time)
+                    0, bot_front_position, self.sampling_time)
                 # Report errors from strafe and rotate pid's
-                if(abs(bot_position) < 3):
+                if(abs(bot_front_position) < 3):
                     self.driver.move(0, 0)
                     break
                 # Cap at 0 and 100
@@ -734,7 +734,7 @@ class Follower(object):
                     translate_angle = (-90 + self.heading) % 360
                 else:
                     translate_angle = (-270 + self.heading) % 360
-                if(abs(bot_position) < 3):
+                if(abs(bot_front_position) < 3):
                     return
                     self.logger.info(
                         "position_error = {}".format(
@@ -815,10 +815,11 @@ class Follower(object):
         
         # Take current time before reading ADC readings of the IRs            
         previous_time = time()
-        self.front_right.set_k_values(kp = .5, kd = 0.5, ki = 0.0)
-        self.front_left.set_k_values(kp = .5, kd = 0.5, ki = 0.0)
-        self.back_right.set_k_values(kp = .25, kd = 0.25, ki = 0.0)
-        self.back_left.set_k_values(kp = .25, kd = 0.25, ki = 0.0)
+        self.front_right.set_k_values(kp = .2, kd = 0.1, ki = 0.0)
+        self.front_left.set_k_values(kp = .2, kd = 0.1, ki = 0.0)
+
+        self.back_right.set_k_values(kp = .05, kd = 0.05, ki = 0.0)
+        self.back_left.set_k_values(kp = .09, kd = 0.09, ki = 0.0)
         while True:
 
             # Read ir arrays
@@ -835,40 +836,40 @@ class Follower(object):
 
             # Call PID
             self.front_right_error = (50 + self.front_right.pid(
-                0, self.bot_position, self.sampling_time))
+                0, self.bot_front_position, self.sampling_time))
 
             # Call PID
             self.front_left_error = (50 - self.front_left.pid(
-                0, self.bot_position, self.sampling_time))
+                0, self.bot_front_position, self.sampling_time))
 
             # Call PID
             self.back_right_error = (50 + self.back_right.pid(
-                0, self.bot_position, self.sampling_time))
+                0, self.bot_back_position, self.sampling_time))
             
             # Call PID
             self.back_left_error = (50 - self.back_left.pid(
-                0, self.bot_position, self.sampling_time))
+                0, self.bot_back_position, self.sampling_time))
             
 
-            if(self.front_right_error >= 100):
-                self.front_right_error = 100
-            elif(self.front_right_error <= -100):
-                self.front_right_error = -100
+            if(self.front_right_error >= 80):
+                self.front_right_error = 80
+            elif(self.front_right_error <= -80):
+                self.front_right_error = -80
 
-            if(self.front_left_error >= 100):
-                self.front_left_error = 100
-            elif(self.front_left_error <= -100):
-                self.front_left_error = -100
+            if(self.front_left_error >= 80):
+                self.front_left_error = 80
+            elif(self.front_left_error <= -80):
+                self.front_left_error = -80
 
-            if(self.back_right_error >= 100):
-                self.back_right_error = 100
-            elif(self.back_right_error <= -100):
-                self.back_right_error = -100
+            if(self.back_right_error >= 80):
+                self.back_right_error = 80
+            elif(self.back_right_error <= -80):
+                self.back_right_error = -80
 
-            if(self.back_left_error >= 100):
-                self.back_left_error = 100
-            elif(self.back_left_error <= -100):
-                self.back_left_error = -100
+            if(self.back_left_error >= 80):
+                self.back_left_error = 80
+            elif(self.back_left_error <= -80):
+                self.back_left_error = -80
 
             self.driver.set_motor(name = "front_right", value = self.front_right_error)
             self.driver.set_motor(name = "front_left", value = self.front_left_error)
@@ -886,7 +887,8 @@ class Follower(object):
 
     def track_position(self):
         """Trak the positon of the line"""
-        self.bot_position = 0;
+        self.bot_front_position = 0;
+        self.bot_back_position = 0;
         value = max(self.array_block["front"])
         if(value < 10):
             return
@@ -894,10 +896,20 @@ class Follower(object):
         print value
         #if value > 10:
         if index < 4:
-            self.bot_position = 5.0 * (4.0 - index) * (4.0 - index) * (4.0 - index)
+            self.bot_front_position = 5.0 * (4.0 - index) * (4.0 - index) * (4.0 - index)
         else:
-            self.bot_position = 5.0 * (3.0 - index) * (3.0 - index) * (3.0 - index)
+            self.bot_front_position = 5.0 * (3.0 - index) * (3.0 - index) * (3.0 - index)
 
+        value = max(self.array_block["back"])
+        if(value < 10):
+            return
+        index = self.array_block["back"].index(value)
+        print value
+        #if value > 10:
+        if index < 4:
+            self.bot_back_position = 5.0 * (4.0 - index) * (4.0 - index) * (4.0 - index)
+        else:
+            self.bot_back_position = 5.0 * (3.0 - index) * (3.0 - index) * (3.0 - index)
 
 
 

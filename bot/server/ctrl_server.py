@@ -13,6 +13,7 @@ sys.path = [os.getcwd()] + sys.path
 
 import bot.lib.lib as lib
 from bot.follower.follower import Follower
+from bot.follower.mec_follower import MecFollower
 import pub_server as pub_server_mod
 import bot.lib.messages as msgs
 
@@ -127,13 +128,16 @@ class CtrlServer(object):
 
         """
 
-        self.follower = Follower()
+        #self.follower = Follower()
+        self.mec_follower = MecFollower()
 
         systems = {}
         systems["ctrl"] = self
-        systems["follower"] = self.follower
-        systems["driver"] = self.follower.driver
-        systems["ir_hub"] = self.follower.ir_hub
+        
+        systems["mec_follower"] = self.mec_follower
+        systems["driver"] = self.mec_follower.driver
+        systems["ir_hub"] = self.mec_follower.ir_hub
+ 
         self.logger.debug("Systems: {}".format(systems))
         return systems
 

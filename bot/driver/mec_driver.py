@@ -42,7 +42,8 @@ class MecDriver(driver.Driver):
             self.motors["front_left"],
             self.motors["back_right"],
             self.motors["back_left"])
-
+    
+    @lib.api_call
     def get_motor(self, name):
         if self.mode == 'power':
             return self.motors[name].power

@@ -15,7 +15,7 @@ import bot.lib.lib as lib
 from bot.follower.follower import Follower
 import pub_server as pub_server_mod
 import bot.lib.messages as msgs
-
+import bot.hardware.pot as Pot
 
 def is_api_method(obj, name):
     """Tests whether named method exists in obj and is flagged for API export.
@@ -128,12 +128,14 @@ class CtrlServer(object):
         """
 
         self.follower = Follower()
+        self.pot = Pot("pot1")
 
         systems = {}
         systems["ctrl"] = self
         systems["follower"] = self.follower
         systems["driver"] = self.follower.driver
         systems["ir_hub"] = self.follower.ir_hub
+        systems["pot"] = self.pot
         self.logger.debug("Systems: {}".format(systems))
         return systems
 

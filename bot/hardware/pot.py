@@ -1,5 +1,7 @@
 """Analog IR array abstractions."""
 
+import bot.lib.lib as lib
+
 i2c_available = False
 try:
     import smbus

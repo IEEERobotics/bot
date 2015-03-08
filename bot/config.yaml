@@ -74,7 +74,7 @@ course: {
 
 pot_config: {  # ADC configuration
     i2c_bus: 1,  # System I2C bus to use to talk to ADCs
-    i2c_addr: {pot1: 0x4b},
+    i2c_addr: {pot1: 0x50},
     i2c_registers: {# Default command bytes for reading each channel.
         acr: {cmd: 0x10, init: 0x40},
         red: {cmd: 0x03, init: 0xf0},

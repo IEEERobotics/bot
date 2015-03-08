@@ -296,6 +296,12 @@ class MecDriver(driver.Driver):
         self.move(0, 0)  # stop
 
     @lib.api_call
+    def rotate_t(self, r_speed, r_time=999):
+        self.rotate(r_speed)
+        sleep(r_time)
+        self.move(0,0)
+
+    @lib.api_call
     def jerk(self, speed=80, angle=0, duration=.25):
         """Makes small forward jump - a thin wrapper over drive()."""
         self.drive(speed, angle, duration)

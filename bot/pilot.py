@@ -5,6 +5,7 @@ import sys
 import bot.lib.lib as lib
 import bot.client.ctrl_client as ctrl_client_mod
 import bot.client.sub_client as sub_client_mod
+
 import bot.activity_solver as act_mod
 
 class Pilot:

@@ -77,10 +77,10 @@ pot_config: {  # ADC configuration
     i2c_addr: {pot1: 0x50},
     i2c_registers: {# Default command bytes for reading each channel.
         acr: {cmd: 0x10, init: 0x40},
-        red: {cmd: 0x03, init: 0xf0},
-        green: {cmd: 0x02, init: 0xf0},
-        blue: {cmd: 0x01, init: 0xf0},
-        yellow: {cmd: 0x00, init: 0xf0}
+        yellow: {cmd: 0x03, init: 0xff},
+        green: {cmd: 0x02, init: 0xff},
+        blue: {cmd: 0x01, init: 0xff},
+        red: {cmd: 0x00, init: 0xff}
     }
 }
 

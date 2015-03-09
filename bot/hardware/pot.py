@@ -53,16 +53,16 @@ class Pot(object):
         self.config = lib.get_config()
 
         # ADC configuration over I2C
-        pot_config = self.config['pot_config']
-        self.i2c_addr = pot_config['i2c_addr'][name]
+        self.pot_config = self.config['pot_config']
+        self.i2c_addr = self.pot_config['i2c_addr'][name]
         
 
         if i2c_available:
             # Open I2C bus
-            self.bus = smbus.SMBus(pot_config['i2c_bus'])
+            self.bus = smbus.SMBus(self.pot_config['i2c_bus'])
 
             # Configure ADC using I2C commands
-            for reg_name, reg in pot_config['i2c_registers'].iteritems():
+            for reg_name, reg in self.pot_config['i2c_registers'].iteritems():
                 self.set_pot_byte(reg['cmd'], reg['init'])
 
         self.logger.debug("Setup {} (on I2C addr: {})".format(
@@ -98,9 +98,15 @@ class Pot(object):
             return 0
 
     @lib.api_call
-    def set_pot_wiper(self, pot_name, res_value): 
+    def set_pot_wiper(self, pot_name, pot_value): 
         """This Function is used to change the resisance value of the pot""" 
 
-        reg_config = pot_config["pot_config"][pot_name] 
-        self.set_pot_byte(reg_config["cmd"],res_value)
+        reg_config = self.pot_config["i2c_registers"][pot_name] 
+        self.set_pot_byte(reg_config["cmd"],pot_value)
+
+
+
+
+
+
 

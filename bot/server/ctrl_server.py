@@ -127,8 +127,6 @@ class CtrlServer(object):
         :returns: Dict of subsystems, maps system name to instantiated object.
 
         """
-
-<<<<<<< HEAD
         self.follower = Follower()
         
         systems = {}

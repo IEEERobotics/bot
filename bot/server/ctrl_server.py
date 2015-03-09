@@ -13,6 +13,7 @@ sys.path = [os.getcwd()] + sys.path
 
 import bot.lib.lib as lib
 from bot.follower.follower import Follower
+from bot.follower.mec_follower import MecFollower
 import pub_server as pub_server_mod
 import bot.lib.messages as msgs
 from bot.activity_solver.simon_solver import SimonPlayer
@@ -127,6 +128,7 @@ class CtrlServer(object):
 
         """
 
+<<<<<<< HEAD
         self.follower = Follower()
         
         systems = {}

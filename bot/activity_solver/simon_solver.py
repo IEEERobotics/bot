@@ -108,7 +108,7 @@ class SimonPlayer(object):
                     print sensor_reading
                     actual_position = (colors[sensor_reading] \
                         + self.simon.position -1) % 4
-                    if(actual_position == 0)
+                    if(actual_position == 0):
                         actual_reading = 4
                     pos[i] = actual_reading
 

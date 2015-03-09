@@ -28,7 +28,7 @@ class Pot(object):
 
     """
 
-    def __init__(self, name):
+    def __init__(self, name, color_gpio):
         """Setup required pins and get logger/config.
 
         Note that the value read on the read_gpio_pin will depend on
@@ -55,7 +55,8 @@ class Pot(object):
         # ADC configuration over I2C
         self.pot_config = self.config['pot_config']
         self.i2c_addr = self.pot_config['i2c_addr'][name]
-        
+        self.color_gpio = self.config["simon"]["colors"]
+        self.self.color_detectors = color_detectors
 
         if i2c_available:
             # Open I2C bus
@@ -115,6 +116,6 @@ class Pot(object):
     self.set_pot_wiper("green",511)
 
     for i in range(255, 0, -5):
-
+        
 
 

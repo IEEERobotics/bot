@@ -5,7 +5,7 @@ import sys
 import bot.lib.lib as lib
 import bot.client.ctrl_client as ctrl_client_mod
 import bot.client.sub_client as sub_client_mod
-
+import bot.activity_solver as act_mod
 
 class Pilot:
     """Autonomous control client based on comprehensive state machine."""
@@ -40,20 +40,6 @@ class Pilot:
         self.max_intersections = max_intersections  # total on course
         self.intersections = 0  # no. of intersections seen
 
-    def __str__(self):
-        return "[{}] heading: {}, intersections: {}, blue_blocks: {}, \
-        darts_fired: {}".format(
-            self.State.toString(self.state),
-            self.intersections,
-            self.heading,
-            self.blue_blocks,
-            self.darts_fired)
-
-    def run(self):
-        self.logger.info("Starting attack run")
-        # Start indefinite loop to run through states till FINISH
-        last_state = None  # to detect state changes, mainly for debugging
-
     def call(self, obj_name, method_name, param_dict=dict()):
         """Light wrapper around ctrl_client to handle result unpacking."""
         result = self.ctrl_client.call(obj_name, method_name, param_dict)
@@ -74,12 +60,33 @@ class Pilot:
         self.call('ctrl', 'stop_full')
         sys.exit(1)
 
-    def heading_to_driver_angle(self, heading):
-        """Convert bot heading to raw angle for driver."""
-        # NOTE(napratin,3/13): Currently follower uses 180 = front,
-        #   while driver uses 0 = front, hence the need for conversion.
-        return (heading + 180) % 360
+    def build_act_solvers(self):
+        """ Instantiates and returns dict of objects related to activity solver.
+        """
+        
+        # TODO(AhmedSamara): Build activity solvers for the rest of the activities.
+        acts = dict()
+        # Todo(AhemdSamara): Populate with solvers as they're made.
+        return acts
+        
 
+    def run(self):
+        """Main pilot interface with outside world.
+        start script will call, and pilot will handle all other logic.
+        """
+        
+        # Begin run.
+        
+        # wait for Start signal to indicate time to run.
+
+        self.acts = self.build_act_solvers()
+
+        for activity in self.acts:
+            # follow to intersection.
+
+            # orient self toward activity.
+
+            # solve activity.
 
 if __name__ == "__main__":
     Pilot().run()

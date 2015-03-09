@@ -6,7 +6,9 @@ import bot.lib.lib as lib
 import bot.client.ctrl_client as ctrl_client_mod
 import bot.client.sub_client as sub_client_mod
 
-import bot.activity_solver as act_mod
+import bot.activity_solver.simon_solver as simon_mod
+import bot.activity_solver.etch_sketch_solver as etch_mod
+
 
 class Pilot:
     """Autonomous control client based on comprehensive state machine."""
@@ -68,9 +70,9 @@ class Pilot:
         # TODO(AhmedSamara): Build activity solvers for the rest of the activities.
         acts = dict()
         # Todo(AhemdSamara): Populate with solvers as they're made.
+        
         return acts
         
-
     def run(self):
         """Main pilot interface with outside world.
         start script will call, and pilot will handle all other logic.
@@ -88,6 +90,14 @@ class Pilot:
             # orient self toward activity.
 
             # solve activity.
+
+            # turn 180
+
+            # line follow back to path
+
+            # turn to path (note, alternating right/left
+
+        # follow_to_block (finish line!)
 
 if __name__ == "__main__":
     Pilot().run()

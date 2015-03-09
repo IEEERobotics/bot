@@ -16,7 +16,7 @@ from bot.follower.follower import Follower
 from bot.follower.mec_follower import MecFollower
 import pub_server as pub_server_mod
 import bot.lib.messages as msgs
-from bot.hardware.simon_solver import SimonSolver
+from bot.activity_solver.simon_solver import SimonPlayer
 
 def is_api_method(obj, name):
     """Tests whether named method exists in obj and is flagged for API export.
@@ -129,7 +129,7 @@ class CtrlServer(object):
         """
 
         self.follower = Follower()
-        self.simon_solver = SimonSolver()
+        self.simon_solver = SimonPlayer()
 
         systems = {}
         systems["ctrl"] = self

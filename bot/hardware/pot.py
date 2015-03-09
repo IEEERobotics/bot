@@ -105,8 +105,16 @@ class Pot(object):
         self.set_pot_byte(reg_config["cmd"],pot_value)
 
 
+    @lib.api_call
+    def find_ambient_light(self): 
+        """This Function is used to adjust the pot to the ambient light""" 
+    
+    self.set_pot_wiper("yellow",511)
+    self.set_pot_wiper("red",511)
+    self.set_pot_wiper("blue",511)
+    self.set_pot_wiper("green",511)
 
-
+    for i in range(255, 0, -5):
 
 
 

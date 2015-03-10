@@ -42,18 +42,18 @@ set_duty     5 10000000
 set_polarity 5 0
 run_pwm      5  
 
-# rubiks cube
-load_pwm     6
-set_period   6 20000000
-set_duty     6 10000000
-set_polarity 6 0
-run_pwm      6
+# rubiks cube servo: P8_34 (pwm4/EHR1B)
+load_pwm     
+set_period   4 20000000
+set_duty     4 10000000
+set_polarity 4 0
+run_pwm      4
 
-# IR sensor array MUX select lines
-load_gpio 44  # P8_12
-load_gpio 26  # P8_14
-load_gpio 46  # P8_16
-load_gpio 65  # P8_18
+# rubiks cube gripper
+load_gpio 11
+load_gpio 89
+load_gpio 88
+
 
 # IR analog input GPIOs
 load_gpio 39  # P8_04, front

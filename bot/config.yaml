@@ -17,8 +17,8 @@ simon: {
     colors:{
         # gpio nums for detectors.
         red: 30,        # P8 - 4
-        green: 60,      # P8 - 6
-        blue: 31,       # P8 - 8
+        blue: 60,      # P8 - 6
+        green: 31,       # P8 - 8
         yellow: 48},    # P8 - 10
     # Currently using 4 gpios for stepper motor.
     # TODO(AhmedSamara) switch to pwm once PCB is in

@@ -19,30 +19,19 @@ def swap_bytes_uint16(value):
 
 
 class Pot(object):
-    """Abstraction for analog IR arrays.
+    """Abstraction for potentiometer on the sensor board
 
-    There are two 8-unit IR arrays on each of the four sides of the bot,
-    which are abstracted in hardware into a 16 unit array. There are
-    currently two types of arrays, one digital and one analog. This is
-    the class for abstracting analog arrays.
-
+    There is one Pot on the sensor cap. The pot is 
+    accessed through the i2c bus 2. The i2c Address
+    is located in the dic.
     """
 
-    def __init__(self, name, color_gpio):
+    def __init__(self, name, color_detectors):
         """Setup required pins and get logger/config.
 
-        Note that the value read on the read_gpio_pin will depend on
-        the currently value on the GPIO select lines. IRHub manages
-        the iteration over the select lines and the reading of each
-        array's read_gpio at each step of the iteration.
-
-        The analog array's hardware requires some configuration via
-        I2C before it can be used. We don't currently know how that
-        works, so for now we'll assume its GPIOs are ready to read.
-
-        :param name: Identifier for this IR array.
+        :param name: Identifier for this pot.
         :type name: string
-        :param read_gpio_pin: Pin used by array to read an IR unit.
+        :param color_detectors: Pin used by the detection circuit.
         :type input_adc_pin: int
 
         """
@@ -56,7 +45,7 @@ class Pot(object):
         self.pot_config = self.config['pot_config']
         self.i2c_addr = self.pot_config['i2c_addr'][name]
         self.color_gpio = self.config["simon"]["colors"]
-        self.self.color_detectors = color_detectors
+        self.color_detectors = color_detectors
 
         if i2c_available:
             # Open I2C bus
@@ -109,13 +98,27 @@ class Pot(object):
     @lib.api_call
     def find_ambient_light(self): 
         """This Function is used to adjust the pot to the ambient light""" 
-    
-    self.set_pot_wiper("yellow",511)
-    self.set_pot_wiper("red",511)
-    self.set_pot_wiper("blue",511)
-    self.set_pot_wiper("green",511)
-
-    for i in range(255, 0, -5):
         
+        # Set all pots to a max value    
+        self.set_pot_wiper("yellow",511)
+        self.set_pot_wiper("red",511)
+        self.set_pot_wiper("blue",511)
+        self.set_pot_wiper("green",511)
+        
+        # Create a dic for storing the max value
+        thresh_value = {'green': 511, 'red': 511, 'yellow': 511, 'blue': 511}
+
+        # Loop trough the pots and decrease the resistances if the sensor  
+        for i in range(255, 40, -5):
+            for color in self.color_gpio:
+                if self.color_detectors[color].get_value() == 1:
+                    self.set_pot_wiper(color,i)
+                    thresh_value[color] = i
+
+        # Adjust for maren
+        for color in self.color_gpio:
+            self.set_pot_wiper(color,thresh_value[color]-20)
+            print "wiper set to {} for {}".format(thresh_value[color],color)
+            print "gpio {} is {}".format(color, self.color_detectors[color].get_value())
 
 

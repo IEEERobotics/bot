@@ -42,6 +42,13 @@ set_duty     5 10000000
 set_polarity 5 0
 run_pwm      5  
 
+# rubiks cube
+load_pwm     6
+set_period   6 20000000
+set_duty     6 10000000
+set_polarity 6 0
+run_pwm      6
+
 # IR sensor array MUX select lines
 load_gpio 44  # P8_12
 load_gpio 26  # P8_14

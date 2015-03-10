@@ -17,7 +17,6 @@ from bot.follower.mec_follower import MecFollower
 import pub_server as pub_server_mod
 import bot.lib.messages as msgs
 
-
 def is_api_method(obj, name):
     """Tests whether named method exists in obj and is flagged for API export.
 
@@ -128,16 +127,14 @@ class CtrlServer(object):
 
         """
 
-        #self.follower = Follower()
-        self.mec_follower = MecFollower()
-
+        self.follower = Follower()
+        
         systems = {}
         systems["ctrl"] = self
-        
-        systems["mec_follower"] = self.mec_follower
-        systems["driver"] = self.mec_follower.driver
-        systems["ir_hub"] = self.mec_follower.ir_hub
- 
+        systems["follower"] = self.follower
+        systems["driver"] = self.follower.driver
+        systems["ir_hub"] = self.follower.ir_hub
+
         self.logger.debug("Systems: {}".format(systems))
         return systems
 

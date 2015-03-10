@@ -34,4 +34,5 @@ RUN cd /opt/bot && tox -epy27 2>&1
 EXPOSE 60000
 
 WORKDIR /opt/bot/bot
+# By default, start a server and CLI in test mode
 CMD ["./start.py", "-Tsc"]

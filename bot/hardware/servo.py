@@ -25,7 +25,7 @@ class Servo(object):
         # Load config
         config = lib.get_config()
 
-        if config["testing"]:
+        if config["test_mode"]["servo"]:
             # Get dir of simulated hardware files from config
             test_dir = config["test_pwm_base_dir"]
 
@@ -90,21 +90,17 @@ class Servo(object):
         self.pwm.duty = int(round(1000000 + 1000000 * (position / 180.)))
         self.logger.debug("Updated {}".format(self))
 
+    @lib.api_call
+    def test(self):
+        """Instantiate a Servo object and test if it works."""
 
-def loop():
-    """Instantiate a Servo object and test if it works."""
-    print "start"
+        # print servo's current position
+        print "current servo angle: {}".format(self.position)
 
-    # build servo object and bind it to pin number 42
-    servo1 = Servo(2)
-
-    # print servo's current position
-    print "current servo angle: {}".format(servo1.position())
-
-    # change servo's position
-    servo1.position(140)
-
-    print "Done."
-
-if __name__ == "__main__":
-    loop()
+        # change servo's position
+        self.position = 180
+        time.sleep(1)
+        self.position = 130
+        time.sleep(1)
+        self.position = 90
+        print "current servo angle: {}".format(self.position)

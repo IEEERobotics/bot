@@ -33,7 +33,7 @@ class ADC(object):
         
         :param channel_num: Channel 0-7 of analog input to read.
         :type channel_num: int
-        :param SD: 
+ 
         """
         # Append bits to form command byte.
         command_byte = (SD << 7) | (channel_num << 4) \
@@ -43,18 +43,18 @@ class ADC(object):
         return bus.read_byte(self.addr)
 
     @lib.api_call
-    def read_all(self)
+    def read_all(self):
         return read_channel(0), read_channel(1), read_channel(2), \
                read_channel(3), read_channel(4), read_channel(5), \
                read_channel(6), read_channel(7)
 
     @lib.api_call
-    def print_all(self)
+    def print_all(self):
         print "0:{} 1:{} 2:{} 3:{} 4:{} 5:{} 6:{} 7:{}".format(
                                             self.read_all())
                                             
     @lib.api_call
-    def read_loop(self)
+    def read_loop(self):
         t0 = time.time()
         while True:
             try:

@@ -16,6 +16,7 @@ from bot.follower.follower import Follower
 from bot.follower.mec_follower import MecFollower
 import pub_server as pub_server_mod
 import bot.lib.messages as msgs
+from bot.activity_solver.etch_a_sketch import etch_a_sketch
 
 def is_api_method(obj, name):
     """Tests whether named method exists in obj and is flagged for API export.
@@ -129,11 +130,14 @@ class CtrlServer(object):
 
         self.follower = Follower()
         
+        self.etch = etch_a_sketch()
+        
         systems = {}
         systems["ctrl"] = self
         systems["follower"] = self.follower
         systems["driver"] = self.follower.driver
         systems["ir_hub"] = self.follower.ir_hub
+        systems["etch"] = self.etch
 
         self.logger.debug("Systems: {}".format(systems))
         return systems

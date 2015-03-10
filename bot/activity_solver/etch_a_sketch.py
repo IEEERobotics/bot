@@ -27,7 +27,7 @@ class etch_a_sketch(object):
             self.vert_motor.speed = self.hardware.Stepper_motor.speed(60)
             self.horiz_motor.speed = self.hardware.Stepper_motor.speed(60)
 
-
+    @lib.api_call
     def drawI(self):
         x = 0
         while (x<6):
@@ -35,7 +35,7 @@ class etch_a_sketch(object):
             x+=1
         time.sleep(1)
 
-
+    @lib.api_call
     def drawE(self):
         for x in xrange(1,13):
             self.horiz_motor.counter_clockwise

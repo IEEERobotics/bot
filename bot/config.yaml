@@ -9,7 +9,7 @@ test_mode: {
     stepper: false,
     motor: true,
     servo: false,
-    etch_a_sketch: false
+    etch_a_sketch: false,
     solenoid: true,
     simon_player: false
 }
@@ -35,13 +35,13 @@ simon: {
     # TODO(AhmedSamara) switch to pwm once PCB is in
     
     servo: 2,            # TODO(vijay)P9 - 29 or 21?? also change 
-                         # servo pwm number to 1
+                         # servo pwm number to git branch --set-upstream-to=origin/<branch> etch_a_sketch1
 
     stepper: [78, 76, 74, 72]
 }
 
 etch_a_sketch_motors: {
-    left_stepper: [44,26,46,65]
+    left_stepper: [44,26,46,65],
     right_stepper: [49,15,117,14]
 }
 

@@ -18,9 +18,9 @@ class RubiksSolver(object):
         
         # Build low-level things
         self.gripper = servo_mod.Servo(self.servo_pwm)
-
-        # TODO(Remove as soon as this is functional)
-        self.gripper.test()
+        
+        # Set to starting position
+        self.gripper.position = 0
 
     @lib.api_call
     def move_arm(self, position):
@@ -30,3 +30,5 @@ class RubiksSolver(object):
     @lib.api_call
     def rubiks_test(self):
         self.gripper.test()
+
+

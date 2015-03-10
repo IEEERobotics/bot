@@ -11,7 +11,14 @@ test_mode: {
     motor: false,
     servo: false,
     solenoid: false,
+    etch_a_sketch: false
 }
+
+etch_a_sketch_motors:{
+    left_stepper: [44,26,46,65]
+    right_stepper: [49,15,117,14]
+}
+
 
 dmcc_drive_motors: {
     back_left: { board_num: 0, motor_num: 1 },

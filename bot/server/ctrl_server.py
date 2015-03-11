@@ -13,10 +13,8 @@ sys.path = [os.getcwd()] + sys.path
 
 import bot.lib.lib as lib
 from bot.follower.follower import Follower
-from bot.follower.mec_follower import MecFollower
 import pub_server as pub_server_mod
 import bot.lib.messages as msgs
-from bot.activity_solver.simon_solver import SimonPlayer
 
 def is_api_method(obj, name):
     """Tests whether named method exists in obj and is flagged for API export.
@@ -127,6 +125,7 @@ class CtrlServer(object):
         :returns: Dict of subsystems, maps system name to instantiated object.
 
         """
+
         self.follower = Follower()
         
         systems = {}
@@ -135,7 +134,6 @@ class CtrlServer(object):
         systems["driver"] = self.follower.driver
         systems["ir_hub"] = self.follower.ir_hub
 
-        systems["simon_player"] = SimonPlayer()
         self.logger.debug("Systems: {}".format(systems))
         return systems
 

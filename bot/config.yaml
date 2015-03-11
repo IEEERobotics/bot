@@ -2,7 +2,7 @@
 test_mode: {
     color_sensor: true,
     ultrasonics: true,
-    ir:{ front: true, back: true, right: true, left: true},
+    ir: { front: true, back: true, right: true, left: true},
     IR: true,
     ADC: true,
     DMCC: true,
@@ -11,6 +11,16 @@ test_mode: {
     servo: false,
     solenoid: true,
     simon_player: false
+}
+
+rubiks : {
+    servo_pwm: 6, # PWM number
+    
+    GPIO: {
+        FWD: 47,
+        REV: 27, 
+        PWR: 22 
+    }
 }
 
 simon: {

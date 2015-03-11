@@ -6,6 +6,9 @@ import bbb.gpio as gpio_mod
 
 class RubiksSolver(object):
     
+    
+    CLAMP_TIME = 10
+
     def __init__(self):
         
         self.config = lib.get_config()
@@ -41,6 +44,12 @@ class RubiksSolver(object):
         self.rev.set_value(0)
          
     @lib.api_call
+    def open_clamp(self):
+        self.set_motor("rev")
+        time.sleep(CLAMP_TIME)
+        self.set_motor("off")
+
+    @lib.api_call
     def close_clamp(self):
         """Turns both motors into "forward" position to close arm.
         
@@ -50,11 +59,10 @@ class RubiksSolver(object):
         """
 
         
-        self.fwd.set_value(1)
-        self.rev.set_value(0)
-
+        self.set_motor("fwd")
         # pause while grippers close
-        time.sleep(1)        
+        time.sleep(CLAMP_TIME)
+        self.set_motor("off")        
 
     @lib.api_call
     def set_motor(self, dir="off"):
@@ -92,12 +100,6 @@ class RubiksSolver(object):
     @lib.api_call
     def rubiks_test(self):
         self.gripper.test()
-
-    @lib.api_call
-    def open_clamp(self):
-        self.set_motor("rev")
-        time.sleep(3)
-        self.set_motor("stop")
 
     @lib.api_call
     def solve(self):

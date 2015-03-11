@@ -6,13 +6,13 @@ from time import sleep
 import numpy as np
 
 import bot.lib.lib as lib
-import bot.hardware.stepper_motor.py
+from bot.hardware.stepper_motor import Stepper_motor
 
 class etch_a_sketch(object):
     
     """Class for abstracting stepper motor settings."""
 
-    def _init_(self):
+    def __init__(self):
         
         self.logger = lib.get_logger()
         self.config = lib.get_config()
@@ -24,8 +24,8 @@ class etch_a_sketch(object):
         else:
             self.vert_motor = Stepper_motor(self.config["etch_a_sketch_motors"]["left_stepper"])
             self.horiz_motor = Stepper_motor(self.config["etch_a_sketch_motors"]["right_stepper"])
-            self.vert_motor.speed = self.hardware.Stepper_motor.speed(60)
-            self.horiz_motor.speed = self.hardware.Stepper_motor.speed(60)
+            self.vert_motor.speed = 60
+            self.horiz_motor.speed = 60
 
     @lib.api_call
     def drawI(self):

@@ -14,7 +14,7 @@ test_mode: {
 }
 
 rubiks : {
-    servo_pwm: 5, # P8_19
+    servo_pwm: 5, # P8_13 (same as color sensor)
     
     GPIO: {
         FWD: 11, # P8_32

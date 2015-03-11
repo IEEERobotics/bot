@@ -24,11 +24,11 @@ rubiks : {
 }
 
 simon: {
-    colors:{
+    colors: {
         # gpio nums for detectors.
         red: 30,        # P8 - 4
-        green: 60,      # P8 - 6
-        blue: 31,       # P8 - 8
+        blue: 60,      # P8 - 6
+        green: 31,       # P8 - 8
         yellow: 48},    # P8 - 10
     # Currently using 4 gpios for stepper motor.
     # TODO(AhmedSamara) switch to pwm once PCB is in
@@ -98,6 +98,19 @@ course: {
     }
 }
 
+pot_config: {  # ADC configuration
+    i2c_bus: 1,  # System I2C bus to use to talk to ADCs
+    i2c_addr: {pot1: 0x50},
+    i2c_registers: {# Default command bytes for reading each channel.
+        acr: {cmd: 0x10, init: 0x40},
+        yellow: {cmd: 0x03, init: 0xff},
+        green: {cmd: 0x02, init: 0xff},
+        blue: {cmd: 0x01, init: 0xff},
+        red: {cmd: 0x00, init: 0xff}
+    }
+}
+
+
 ir_select_gpios: [44, 26, 46, 65]  # GPIOs to select IR sensor units: [P8_12 (gpio44), P8_14 (gpio26), P8_16 (gpio46), P8_18 (gpio65)]
 ir_analog_input_gpios: {front: 39, back: 35, left: 67, right: 68}  # GPIO pins to read selected IR sensor units: P8_04 (gpio39), P8_06 (gpio35), P8_08 (gpio67), P8_10 (gpio68)
 ir_analog_adc_config: {  # ADC configuration
@@ -117,6 +130,7 @@ ir_analog_adc_config: {  # ADC configuration
     result_shift: 4,  # No. of bits to shift to the right after applying mask
 }
 ir_read_adc: true  # read accurate ADC values instead of binary GPIO values
+pot_read: true
 ir_verbose_output: false  # print verbose output to console (log level: INFO), for debugging & testing only
 logging: {log_file: bot/logs/bot.log, file_handler_level: DEBUG, stream_handler_level: INFO}  # Logging options
 strategy: bot/planner/strategies/strategy0.yaml
@@ -130,5 +144,6 @@ server_host: 127.0.0.1  # Default hostname clients connect to
 ctrl_server_port: 60000  # Port used to send control messages to the bot
 pub_server_port: 60001  # PubServer publishes bot data on this port
 irs_per_array: 8
+resistor_per_pot: 4
 color_sensor: {LED_PWM: 5}
 ir_thresh: 60

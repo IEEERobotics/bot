@@ -15,6 +15,7 @@ import bot.lib.lib as lib
 from bot.follower.follower import Follower
 import pub_server as pub_server_mod
 import bot.lib.messages as msgs
+from bot.activity_solver.simon_solver import SimonPlayer
 
 import bot.activity_solver.rubiks_solver as rubiks_mod
 
@@ -131,14 +132,20 @@ class CtrlServer(object):
 
         self.follower = Follower()
         self.rubiks_solver = rubiks_mod.RubiksSolver()
+        self.simon_solver = SimonPlayer()
 
         systems = {}
         systems["ctrl"] = self
         systems["follower"] = self.follower
         systems["driver"] = self.follower.driver
         systems["ir_hub"] = self.follower.ir_hub
+<<<<<<< HEAD
         systems["rubiks"] = self.rubiks_solver
 
+=======
+        systems["silmon solver"] = self.simon_solver
+        systems["pot"] = self.simon_solver.pot
+>>>>>>> master
         self.logger.debug("Systems: {}".format(systems))
         return systems
 

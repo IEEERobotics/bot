@@ -50,9 +50,9 @@ set_polarity 4 0
 run_pwm      4
 
 # rubiks cube gripper
-load_gpio 11
-load_gpio 89
-load_gpio 88
+load_gpio 11 # P8_32
+load_gpio 89 # P8_30
+load_gpio 88 # P8_28
 
 
 # IR analog input GPIOs

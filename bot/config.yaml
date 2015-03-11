@@ -7,14 +7,14 @@ test_mode: {
     ADC: true,
     DMCC: true,
     stepper: false,
-    motor: true,
+    motor: false,
     servo: false,
     solenoid: true,
     simon_player: false
 }
 
 rubiks : {
-    servo_pwm: 3, # P8_34 (EHRPWM-1B)
+    servo_pwm: 4, # P8_34 (EHRPWM-1B)
     
     GPIO: {
         FWD: 11, # P8_32

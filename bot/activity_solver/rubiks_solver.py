@@ -1,6 +1,8 @@
+import time
+
 import bot.lib.lib as lib
 import bot.hardware.servo as servo_mod
-import bbb as bbb_mod
+import bbb.gpio as gpio_mod
 
 class RubiksSolver(object):
     
@@ -11,16 +13,76 @@ class RubiksSolver(object):
 
         self.servo_pwm = self.config["rubiks"]["servo_pwm"]
         
-        self.rev_num   = self.config["rubiks"]["GPIO"]["PWR"]
+        self.rev_num   = self.config["rubiks"]["GPIO"]["REV"]
         self.fwd_num   = self.config["rubiks"]["GPIO"]["FWD"]
-
         self.pwr_num   = self.config["rubiks"]["GPIO"]["PWR"]
         
-        # Build low-level things
+        # Build servo that controlls gripper that turns cube.
         self.gripper = servo_mod.Servo(self.servo_pwm)
-        
+
         # Set to starting position
         self.gripper.position = 0
+
+        # gpio's that control motors of gripper.
+        # Note: we're not using motor.py, it assumes strange hardware.
+        # TODO(AhmedSamara): update motor.py to update standard hardware.
+        self.rev = gpio_mod.GPIO(self.rev_num)
+        self.fwd = gpio_mod.GPIO(self.fwd_num)
+        self.pwr = gpio_mod.GPIO(self.pwr_num)
+       
+        # det sirections
+        self.pwr.output()
+        self.fwd.output()
+        self.rev.output()
+         
+        # set initial value
+        self.pwr.set_value(0)
+        self.fwd.set_value(0)
+        self.rev.set_value(0)
+         
+    @lib.api_call
+    def close_gripper(self):
+        """Turns both motors into "forward" position to close arm.
+        
+        Gripper is attached to L298N H-bridge controller. with I1, I2
+
+        So when fwd=high, rev=low, moves forward.
+        """
+
+        
+        self.fwd.set_value(1)
+        self.rev.set_value(0)
+
+        # pause while grippers close
+        time.sleep(1)        
+
+    @lib.api_call
+    def set_motor(self, dir="off"):
+        """H bridge truth table
+        fwd rev  direction
+        0   0    off (stall?)
+        0   1    reverse
+        1   0    forward
+        1   1    off (stall? short ckt?)
+        """
+        
+        self.pwr.set_value(1)
+              
+        if dir=="fwd":
+            self.fwd.set_value(1)
+            self.rev.set_value(0)
+        elif dir=="rev":
+            self.fwd.set_value(0)
+            self.rev.set_value(1)
+        elif dir=="stall":
+            # Note: not sure if this is safe.
+            self.fwd.set_value(1)
+            self.rev.set_value(1)
+        elif dir=="off":
+            self.fwd.set_value(0)
+            self.rev.set_value(0)
+            self.pwr.set_value(0)
+
 
     @lib.api_call
     def move_arm(self, position):

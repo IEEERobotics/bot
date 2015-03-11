@@ -14,7 +14,7 @@ test_mode: {
 }
 
 rubiks : {
-    servo_pwm: 4, # P8_34 (EHRPWM-1B)
+    servo_pwm: 5, # P8_19
     
     GPIO: {
         FWD: 11, # P8_32

@@ -127,7 +127,6 @@ class CtrlServer(object):
         """
 
         self.follower = Follower()
-        self.simon_solver = SimonPlayer()
 
         systems = {}
         systems["ctrl"] = self

@@ -41,7 +41,7 @@ class RubiksSolver(object):
         self.rev.set_value(0)
          
     @lib.api_call
-    def close_gripper(self):
+    def close_clamp(self):
         """Turns both motors into "forward" position to close arm.
         
         Gripper is attached to L298N H-bridge controller. with I1, I2
@@ -93,4 +93,14 @@ class RubiksSolver(object):
     def rubiks_test(self):
         self.gripper.test()
 
+    @lib.api_call
+    def open_clamp(self):
+        self.set_motor("rev")
+        time.sleep(3)
+        self.set_motor("stop")
 
+    @lib.api_call
+    def solve(self):
+        self.close_clamp()
+        self.move_arm(180)
+        self.open_clamp()

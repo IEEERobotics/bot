@@ -139,13 +139,10 @@ class CtrlServer(object):
         systems["follower"] = self.follower
         systems["driver"] = self.follower.driver
         systems["ir_hub"] = self.follower.ir_hub
-<<<<<<< HEAD
         systems["rubiks"] = self.rubiks_solver
-
-=======
         systems["silmon solver"] = self.simon_solver
         systems["pot"] = self.simon_solver.pot
->>>>>>> master
+
         self.logger.debug("Systems: {}".format(systems))
         return systems
 

@@ -130,18 +130,12 @@ class CtrlServer(object):
 
         self.follower = Follower()
         
-        self.etch = etch_a_sketch()
-        
-        self.simon_solver = SimonPlayer()
 
         systems = {}
         systems["ctrl"] = self
         systems["follower"] = self.follower
         systems["driver"] = self.follower.driver
         systems["ir_hub"] = self.follower.ir_hub
-        systems["etch"] = self.etch
-        systems["silmon solver"] = self.simon_solver
-        systems["pot"] = self.simon_solver.pot
         self.logger.debug("Systems: {}".format(systems))
         return systems
 

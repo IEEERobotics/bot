@@ -15,7 +15,11 @@ import bot.lib.lib as lib
 from bot.follower.follower import Follower
 import pub_server as pub_server_mod
 import bot.lib.messages as msgs
+<<<<<<< HEAD
 from bot.activity_solver.etch_a_sketch import etch_a_sketch
+=======
+from bot.activity_solver.simon_solver import SimonPlayer
+>>>>>>> master
 
 def is_api_method(obj, name):
     """Tests whether named method exists in obj and is flagged for API export.
@@ -128,16 +132,26 @@ class CtrlServer(object):
         """
 
         self.follower = Follower()
+<<<<<<< HEAD
         
         self.etch = etch_a_sketch()
         
+=======
+        self.simon_solver = SimonPlayer()
+
+>>>>>>> master
         systems = {}
         systems["ctrl"] = self
         systems["follower"] = self.follower
         systems["driver"] = self.follower.driver
         systems["ir_hub"] = self.follower.ir_hub
+<<<<<<< HEAD
         systems["etch"] = self.etch
 
+=======
+        systems["silmon solver"] = self.simon_solver
+        systems["pot"] = self.simon_solver.pot
+>>>>>>> master
         self.logger.debug("Systems: {}".format(systems))
         return systems
 

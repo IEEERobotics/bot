@@ -7,6 +7,7 @@ the stepper motor is used for controlling that actuators position.
 import bot.lib.lib as lib
 import bbb as bbb_mod
 from bot.hardware.SimonSaysHardware import SimonSaysHardware
+from bot.hardware.pot import Pot
 
 from time import sleep
 
@@ -26,6 +27,8 @@ class SimonPlayer(object):
         for color in self.color_gpio:
             self.color_detectors[color] = \
                 bbb_mod.GPIO(self.color_gpio[color])
+
+        self.pot = Pot("pot1", self.color_detectors)
 
         # init all detectors as inputs
         for d in self.color_detectors:

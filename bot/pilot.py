@@ -7,6 +7,7 @@ import bot.client.ctrl_client as ctrl_client_mod
 import bot.client.sub_client as sub_client_mod
 
 import bot.activity_solver.simon_solver as simon_mod
+import bot.activity_solver.rubiks_solver as rubiks_mod
 import bot.activity_solver.etch_sketch_solver as etch_mod
 
 
@@ -66,11 +67,14 @@ class Pilot:
     def build_act_solvers(self):
         """ Instantiates and returns dict of objects related to activity solver.
         """
-        
-        # TODO(AhmedSamara): Build activity solvers for the rest of the activities.
-        acts = dict()
-        # Todo(AhemdSamara): Populate with solvers as they're made.
-        
+        self.simon_solver = simon_mod.SimonSolver()
+        self.rubiks_solver = rubiks_mod.RubiksSolver()
+                
+        acts = dict()        
+        acts["simon"]  = self.simon_solver
+        acts["rubiks"] = self.rubiks_solver
+
+         
         return acts
         
     def run(self):
@@ -78,19 +82,21 @@ class Pilot:
         start script will call, and pilot will handle all other logic.
         """
         
-        # Begin run.
-        
         # wait for Start signal to indicate time to run.
 
         self.acts = self.build_act_solvers()
 
         for activity in self.acts:
+            print "solving: {}".format(activity)
             # follow to intersection.
+            dir_of_intersection = \
+                self.call('follower', 'analog_state')
 
             # orient self toward activity.
-
+            self.call('driver', 'rough_rotate_90',
+                         {"direction":dir_of_intersection})
             # solve activity.
-
+            self.acts[activity].solve
             # turn 180
 
             # line follow back to path

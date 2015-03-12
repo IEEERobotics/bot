@@ -40,7 +40,9 @@ class Pot(object):
         self.name = name
         self.logger = lib.get_logger()
         self.config = lib.get_config()
-
+        
+        if self.config["test_mod"]["pot"]:
+            return
         # ADC configuration over I2C
         self.pot_config = self.config['pot_config']
         self.i2c_addr = self.pot_config['i2c_addr'][name]

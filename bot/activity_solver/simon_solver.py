@@ -90,9 +90,10 @@ class SimonPlayer(object):
         Simon is gripped.
         """
         round_no = 1
-        colors = {"blue" : 1, "red" : 2, "green" : 3, "yellow" : 4}
+        colors = {"yellow": 1, "blue" : 2, "red" : 3, "green" : 4}
         # 1) Press the start button
         self.simon.press_start()
+        self.pot.find_ambient_light()
  
         while True:
             try:

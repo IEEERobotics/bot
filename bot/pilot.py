@@ -39,10 +39,9 @@ class Pilot:
             sys.exit(-1)
 
         # Initialize other members
-        self.state = self.State.START
-        self.heading = 180
-        self.max_intersections = max_intersections  # total on course
-        self.intersections = 0  # no. of intersections seen
+        self.ITEM_BACKUP_TIME = 5 
+        # Order in which activities are solved.
+        self.acts = ["simon", "etch", "rubiks", "card"]
 
     def call(self, obj_name, method_name, param_dict=dict()):
         """Light wrapper around ctrl_client to handle result unpacking."""
@@ -64,44 +63,84 @@ class Pilot:
         self.call('ctrl', 'stop_full')
         sys.exit(1)
 
-    def build_act_solvers(self):
-        """ Instantiates and returns dict of objects related to activity solver.
-        """
-        self.simon_solver = simon_mod.SimonSolver()
-        self.rubiks_solver = rubiks_mod.RubiksSolver()
-                
-        acts = dict()        
-        acts["simon"]  = self.simon_solver
-        acts["rubiks"] = self.rubiks_solver
+    def drive(self, speed, direction):
+        self.call('driver', 'move', 
+                {'speed':speed, 'direction': direction})
 
-         
-        return acts
+    def wait_for_start(self):
+        """Waits for color sensor to say it sees start signal.
+        """
+
+        return self.call('color_sensor', 'watch_for_not_color', 
+                    {color:"red", timeout:180})
+
+    def follow_call(self):
+        """Helper function for calling line_follower.
+        Will kick out at intersection.
+        """
+        return dir_of_intersection = \
+                self.call('follower', 'analog_state')
+
+    def rotate_90(self, direction):
+        """call on driver api with whatever args are needed 
+        Pass either "cc" or "c".
+        """
         
+        return self.call('driver', 'rough_rotate_90',
+                         {'direction':direction}) 
+
+    def solve_activity(self, activity):
+        """pass name of activity to solve, will fix as needed.
+        Choices are:
+            etch, rubiks, simon, card
+        """
+
+        return self.call(activity, 'solve')
+
+    def follow_ignoring_turns(self):
+        while True:
+            turn_dir = self.follow()
+            
+            # Continue going around runs until you hit intersect
+            if turn_dir == "intersection":
+                break
+            else:
+                self.rotate_90(turn_dir)
+         
     def run(self):
         """Main pilot interface with outside world.
         start script will call, and pilot will handle all other logic.
         """
         
         # wait for Start signal to indicate time to run.
-
-        self.acts = self.build_act_solvers()
+        self.wait_for_start()
 
         for activity in self.acts:
             print "solving: {}".format(activity)
-            # follow to intersection.
-            dir_of_intersection = \
-                self.call('follower', 'analog_state')
+            # Follow to intersection.
+            self.follow_ignoring_turns() 
+           
+            # Orient self towards activity.
+            # TODO(AhmedSamara): determine how to actually do that.
+            # Possible Solutions: 
+            #  - series of switches to hardcode location.
+            #  - Follower telling location.
 
-            # orient self toward activity.
-            self.call('driver', 'rough_rotate_90',
-                         {"direction":dir_of_intersection})
-            # solve activity.
-            self.acts[activity].solve
-            # turn 180
+            self.solve_activity(activity)
+            
+            # Leave box and return to path.
+            self.drive(50, 180)
+            time.sleep(self.ITEM_BACKUP_TIME)
+            self.drive(0, 0)
 
+            self.rotate_90("right")
+            self.rotate_90("right")
+            
             # line follow back to path
+            self.follow_ignoring_turns()
 
-            # turn to path (note, alternating right/left
+            # turn to path
+            # Opposite of previous direction.
 
         # follow_to_block (finish line!)
 

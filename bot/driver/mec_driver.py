@@ -302,12 +302,12 @@ class MecDriver(driver.Driver):
         self.move(0,0)
 
     @lib.api_call
-    def rough_rotate_90(self, direction="cc", r_speed=50,r_time=1):
+    def rough_rotate_90(self, direction, r_speed=50,r_time=1):
         """rotates 90 degrees by blindly turning.
         """
 
         # decide direction of rotation.
-        if direction != "cc":
+        if direction == "right":
             r_speed = -r_speed
         
         self.rotate(r_speed)

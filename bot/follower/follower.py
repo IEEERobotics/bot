@@ -36,6 +36,7 @@ class Follower(object):
         self.color_sensor = color_sensor_mod.ColorSensor()
 
         # Build PIDs
+        # FIXME 1 no longer in use
         self.front_right = pid_mod.PID();
         self.front_right_error = 0.0
         self.front_left = pid_mod.PID();
@@ -51,6 +52,7 @@ class Follower(object):
         self.error = "NONE"
 
         # motor variables
+        # FIXME 2 same as before
         self.translate_speed = 75
         self.prev_rate = 0
 
@@ -825,6 +827,8 @@ class Follower(object):
         self.front_left_error = 0.0
         self.back_right_error = 0.0
         self.back_left_error = 0.0
+        left_count = 0
+        right_count = 0
 
         while True:
 
@@ -865,7 +869,7 @@ class Follower(object):
                     self.front_left_error = 80
                 elif(self.front_left_error <= -80):
                     self.front_left_error = -80
-            #else:
+            else:
                 self.front_right_error = (50 + self.front_right.pid(
                     0, self.bot_back_position, self.sampling_time))
 
@@ -908,7 +912,7 @@ class Follower(object):
             
                 # Call PID
                 self.back_left_error = (50 - self.back_left.pid(
-                    0, self.bot_fron_position, self.sampling_time))
+                    0, self.bot_front_position, self.sampling_time))
 
                 if(self.back_right_error >= 80):
                     self.back_right_error = 80
@@ -921,8 +925,32 @@ class Follower(object):
                     self.back_left_error = -80
 
             if back_hits == 0 and front_hits == 0:
-                self.driver.move(speed = 0, angle = 0) 
+                self.driver.move(speed = 0, angle = 0)
+                return "loss line"
 
+            if(right_hits > 1):
+                right_count = right_count + 1
+            else:
+                right_count = 0
+            
+            if(left_hits > 1):
+                left_count = left_count + 1
+            else:
+                left_count = 0
+
+
+            if(left_count > 4 or right_count > 4):
+                self.driver.move(speed = 0, angle = 0)
+                if(right_hits > 1 and left_hits > 3 and back_hits > 1):
+                    return "intersection back"
+                elif(front_hits > 1 and right_hits > 1 and back_hits > 1):
+                    return "intersectioni right"
+                elif(front_hits > 1 and left_hits > 3 and back_hits > 1):
+                    return "intersection left"
+                elif(left_hits > 3 and back_hits > 1):
+                    return " left turn"
+                elif(right_hits > 2 and back_hits > 1):
+                    return " right turn"
 
             self.driver.set_motor(name = "front_right", value = self.front_right_error)
             self.driver.set_motor(name = "front_left", value = self.front_left_error)
@@ -946,7 +974,6 @@ class Follower(object):
         if(value < 10):
             return
         index = self.array_block["front"].index(value)
-        print value
         #if value > 10:
         if index < 4:
             self.bot_front_position = 5.0 * (4.0 - index) * (4.0 - index) * (4.0 - index)

@@ -947,16 +947,16 @@ class Follower(object):
             elif(back_hits > 1 and front_hits == 0):
                 self.driver.move(speed = 0, angle = 0)
                 if(left_hit):
-                    return "left turn"
+                    return "left"
                 elif(right_hits):
-                    return "right turn"
+                    return "right"
 
             elif(back_hits > 1 and front_hits > 1):
                 self.driver.move(speed = 0, angle = 0)
                 if(left_hit):
-                    return "left turn intersection"
+                    return "left_int"
                 elif(right_hits):
-                    return "right turn intersection"
+                    return "right_int"
 
 
             self.driver.set_motor(name = "front_right", value = self.front_right_error)

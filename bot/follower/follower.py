@@ -927,30 +927,37 @@ class Follower(object):
             if back_hits == 0 and front_hits == 0:
                 self.driver.move(speed = 0, angle = 0)
                 return "loss line"
-
-            if(right_hits > 1):
-                right_count = right_count + 1
+           
+            print "left positino {}, right position {}".format(self.bot_left_position,self.bot_right_position)
+            print "front {}, back {}, left {}, right {}".format(front_hits,back_hits,left_hits,right_hits)
+             
+            if left_hits > 1 and self.bot_left_position < 0:  
+                left_hit = True
             else:
-                right_count = 0
-            
-            if(left_hits > 1):
-                left_count = left_count + 1
+                left_hit = False
+
+            if right_hits > 1 and self.bot_right_position < 0:
+                right_hit = True
             else:
-                left_count = 0
+                right_hit = False
 
-
-            if(left_count > 4 or right_count > 4):
+            if(left_hit and right_hit):
                 self.driver.move(speed = 0, angle = 0)
-                if(right_hits > 1 and left_hits > 3 and back_hits > 1):
-                    return "intersection back"
-                elif(front_hits > 1 and right_hits > 1 and back_hits > 1):
-                    return "intersectioni right"
-                elif(front_hits > 1 and left_hits > 3 and back_hits > 1):
-                    return "intersection left"
-                elif(left_hits > 3 and back_hits > 1):
-                    return " left turn"
-                elif(right_hits > 2 and back_hits > 1):
-                    return " right turn"
+                return "Two way intersection"
+            elif(back_hits > 1 and front_hits == 0):
+                self.driver.move(speed = 0, angle = 0)
+                if(left_hit):
+                    return "left turn"
+                elif(right_hits):
+                    return "right turn"
+
+            elif(back_hits > 1 and front_hits > 1):
+                self.driver.move(speed = 0, angle = 0)
+                if(left_hit):
+                    return "left turn intersection"
+                elif(right_hits):
+                    return "right turn intersection"
+
 
             self.driver.set_motor(name = "front_right", value = self.front_right_error)
             self.driver.set_motor(name = "front_left", value = self.front_left_error)
@@ -971,26 +978,48 @@ class Follower(object):
         self.bot_front_position = 0;
         self.bot_back_position = 0;
         value = max(self.array_block["front"])
-        if(value < 10):
-            return
-        index = self.array_block["front"].index(value)
-        #if value > 10:
-        if index < 4:
-            self.bot_front_position = 5.0 * (4.0 - index) * (4.0 - index) * (4.0 - index)
-        else:
-            self.bot_front_position = 5.0 * (3.0 - index) * (3.0 - index) * (3.0 - index)
+        if not (value < 10):
+            index = self.array_block["front"].index(value)
+            #if value > 10:
+            if index < 4:
+                self.bot_front_position = 5.0 * (4.0 - index) * (4.0 - index) * (4.0 - index)
+            else:
+                self.bot_front_position = 5.0 * (3.0 - index) * (3.0 - index) * (3.0 - index)
 
         value = max(self.array_block["back"])
-        if(value < 10):
-            return
-        index = self.array_block["back"].index(value)
-        #print value
-        #if value > 10:
-        if index < 4:
-            self.bot_back_position = 5.0 * (4.0 - index) * (4.0 - index) * (4.0 - index)
+        if not(value < 10):
+            index = self.array_block["back"].index(value)
+            #print value
+            #if value > 10:
+            if index < 4:
+                self.bot_back_position = 5.0 * (4.0 - index) * (4.0 - index) * (4.0 - index)
+            else:
+                self.bot_back_position = 5.0 * (3.0 - index) * (3.0 - index) * (3.0 - index)
+        
+        value = max(self.array_block["left"])
+        if not(value < 10):
+            index = self.array_block["left"].index(value)
+            #print value
+            #if value > 10:
+            if index < 4:
+                self.bot_left_position = (4.0 - index)
+            else:
+                self.bot_left_position = (3.0 - index)
         else:
-            self.bot_back_position = 5.0 * (3.0 - index) * (3.0 - index) * (3.0 - index)
+                self.bot_left_position = 0
 
+        value = max(self.array_block["right"])
+        if not(value < 10):
+            index = self.array_block["right"].index(value)
+            #print value
+            #if value > 10:
+            if index < 4:
+                self.bot_right_position = -1 * (4.0 - index)
+            else:
+                self.bot_right_position = -1 *  (3.0 - index)
+        else:
+                self.bot_right_position = 0
+               
 
     def count_num_of_hits(self, array):
         count = 0

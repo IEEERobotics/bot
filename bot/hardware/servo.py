@@ -1,9 +1,10 @@
 """Abstraction layer for servos."""
 
+import time
+
 import bbb.pwm as pwm_mod
 
 import bot.lib.lib as lib
-
 
 class Servo(object):
 

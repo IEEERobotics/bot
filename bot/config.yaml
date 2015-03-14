@@ -7,24 +7,24 @@ test_mode: {
     ADC: true,
     DMCC: true,
     stepper: false,
-    motor: true,
+    motor: false,
     servo: false,
     solenoid: true,
     simon_player: false
 }
 
 rubiks : {
-    servo_pwm: 6, # PWM number
+    servo_pwm: 5, # P8_13
     
     GPIO: {
-        FWD: 47,
-        REV: 27, 
-        PWR: 22 
+        FWD: 11, # P8_32
+        REV: 89, # P8_30 
+        PWR: 88  # P8_28 
     }
 }
 
 simon: {
-    colors:{
+    colors: {
         # gpio nums for detectors.
         red: 30,        # P8 - 4
         blue: 60,      # P8 - 6

@@ -9,6 +9,6 @@ load_gpio () {
   else
     echo "GPIO $num already exported"
   fi
-  echo out > ${gpio_sysfs}/gpio${num}/direction
-  echo 0 > ${gpio_sysfs}/gpio${num}/value
+  echo in > ${gpio_sysfs}/gpio${num}/direction
+  # echo 0 > ${gpio_sysfs}/gpio${num}/value
 }

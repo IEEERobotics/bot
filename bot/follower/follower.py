@@ -822,7 +822,8 @@ class Follower(object):
 
         self.back_right.set_k_values(kp = .03, kd = 0.009, ki = 0.0)
         self.back_left.set_k_values(kp = .03, kd = 0.009, ki = 0.0)
-        
+        front_bin = [[for x in range(8)] for x in range(3)]
+
         self.front_right_error = 0.0
         self.front_left_error = 0.0
         self.back_right_error = 0.0
@@ -836,6 +837,7 @@ class Follower(object):
             self.array_block = self.ir_hub.read_all()
             self.normaliza_arrays()
             self.track_position()
+
             
             # Get the current time of the CPU
             current_time = time()
@@ -847,9 +849,33 @@ class Follower(object):
             # Count the number of hits 
             front_hits = self.count_num_of_hits(self.array_block["front"])
             back_hits = self.count_num_of_hits(self.array_block["back"])
-            right_hits = self.count_num_of_hits(self.array_block["right"])
-            left_hits = self.count_num_of_hits(self.array_block["left"])
+            fornt_bin[2] = front_bin[1]
+            fornt_bin[1] = front_bin[0]
+            fornt_bin[0] = self.assign_bin(self.array_block["front"])
+            
+            #right_hits = self.count_num_of_hits(self.array_block["right"])
+            #left_hits = self.count_num_of_hits(self.array_block["left"])
             #print self.array_block
+
+            if not fornt_hits > 1:
+                if((fornt_bin[1][0] == 1 and front_bin[1][1] = 1) or (fornt_bin[2][0] == 1 and front_bin[2][1] = 1)):
+                    return "left turn"
+                if((fornt_bin[7][0] == 1 and front_bin[7][1] = 1) or (fornt_bin[6][0] == 1 and front_bin[6][1] = 1)):
+                    return "right turn"
+            elif(front_hits > 7):
+                return "block or t-intersection"
+            else:
+                if((fornt_bin[1][0] == 1 and front_bin[1][1] = 1) or (fornt_bin[2][0] == 1 and front_bin[2][1] = 1)):
+                    return "left turn at intersection"
+                if((fornt_bin[7][0] == 1 and front_bin[7][1] = 1) or (fornt_bin[6][0] == 1 and front_bin[6][1] = 1)):
+                    return "right turn at intersection"
+
+
+
+
+            if back_hits == 0 and front_hits == 0:
+                self.driver.move(speed = 0, angle = 0)
+                return "loss line"
              
             if(front_hits > 0):
                 # Call PID
@@ -924,39 +950,36 @@ class Follower(object):
                 elif(self.back_left_error <= -80):
                     self.back_left_error = -80
 
-            if back_hits == 0 and front_hits == 0:
-                self.driver.move(speed = 0, angle = 0)
-                return "loss line"
            
-            print "left positino {}, right position {}".format(self.bot_left_position,self.bot_right_position)
-            print "front {}, back {}, left {}, right {}".format(front_hits,back_hits,left_hits,right_hits)
+            #print "left positino {}, right position {}".format(self.bot_left_position,self.bot_right_position)
+            #print "front {}, back {}, left {}, right {}".format(front_hits,back_hits,left_hits,right_hits)
              
-            if left_hits > 1 and self.bot_left_position < 0:  
-                left_hit = True
-            else:
-                left_hit = False
+            #if left_hits > 1 and self.bot_left_position < 0:  
+            #    left_hit = True
+            #else:
+            #    left_hit = False
 
-            if right_hits > 1 and self.bot_right_position < 0:
-                right_hit = True
-            else:
-                right_hit = False
+            #if right_hits > 1 and self.bot_right_position < 0:
+            #    right_hit = True
+            #else:
+            #    right_hit = False
 
-            if(left_hit and right_hit):
-                self.driver.move(speed = 0, angle = 0)
-                return "Two way intersection"
-            elif(back_hits > 1 and front_hits == 0):
-                self.driver.move(speed = 0, angle = 0)
-                if(left_hit):
-                    return "left"
-                elif(right_hits):
-                    return "right"
+            #if(left_hit and right_hit):
+            #    self.driver.move(speed = 0, angle = 0)
+            #    return "Two way intersection"
+            #elif(back_hits > 1 and front_hits == 0):
+            #    self.driver.move(speed = 0, angle = 0)
+            #    if(left_hit):
+            #        return "left"
+            #    elif(right_hits):
+            #        return "right"
 
-            elif(back_hits > 1 and front_hits > 1):
-                self.driver.move(speed = 0, angle = 0)
-                if(left_hit):
-                    return "left_int"
-                elif(right_hits):
-                    return "right_int"
+            #elif(back_hits > 1 and front_hits > 1):
+            #    self.driver.move(speed = 0, angle = 0)
+            #    if(left_hit):
+            #        return "left_int"
+            #    elif(right_hits):
+            #        return "right_int"
 
 
             self.driver.set_motor(name = "front_right", value = self.front_right_error)
@@ -996,29 +1019,29 @@ class Follower(object):
             else:
                 self.bot_back_position = 5.0 * (3.0 - index) * (3.0 - index) * (3.0 - index)
         
-        value = max(self.array_block["left"])
-        if not(value < 10):
-            index = self.array_block["left"].index(value)
-            #print value
-            #if value > 10:
-            if index < 4:
-                self.bot_left_position = (4.0 - index)
-            else:
-                self.bot_left_position = (3.0 - index)
-        else:
-                self.bot_left_position = 0
+        #value = max(self.array_block["left"])
+        #if not(value < 10):
+        #    index = self.array_block["left"].index(value)
+        #    #print value
+        #    #if value > 10:
+        #    if index < 4:
+        #        self.bot_left_position = (4.0 - index)
+        #    else:
+        #        self.bot_left_position = (3.0 - index)
+        #else:
+        #        self.bot_left_position = 0
 
-        value = max(self.array_block["right"])
-        if not(value < 10):
-            index = self.array_block["right"].index(value)
-            #print value
-            #if value > 10:
-            if index < 4:
-                self.bot_right_position = -1 * (4.0 - index)
-            else:
-                self.bot_right_position = -1 *  (3.0 - index)
-        else:
-                self.bot_right_position = 0
+        #value = max(self.array_block["right"])
+        #if not(value < 10):
+        #    index = self.array_block["right"].index(value)
+        #    #print value
+        #    #if value > 10:
+        #    if index < 4:
+        #        self.bot_right_position = -1 * (4.0 - index)
+        #    else:
+        #        self.bot_right_position = -1 *  (3.0 - index)
+        #else:
+        #        self.bot_right_position = 0
                
 
     def count_num_of_hits(self, array):
@@ -1027,3 +1050,13 @@ class Follower(object):
             if value > 0:
                 count = count + 1
         return count
+
+
+    def assign_bin(self,a_array):
+        array = [0,0,0,0,0,0,0,0]
+        for index,value in enumerate(a_array):
+            if value > 50:
+                array[index] = 1
+        return array
+
+

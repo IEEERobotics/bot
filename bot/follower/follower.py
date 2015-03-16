@@ -36,6 +36,14 @@ class Follower(object):
         self.color_sensor = color_sensor_mod.ColorSensor()
 
         # Build PIDs
+        self.front_right = pid_mod.PID();
+        self.front_right_error = 0.0
+        self.front_left = pid_mod.PID();
+        self.front_left_error = 0.0
+        self.back_right = pid_mod.PID();
+        self.back_right_error = 0.0
+        self.back_left = pid_mod.PID();
+        self.back_left_error = 0.0
         self.strafe = pid_mod.PID()
         self.strafe_error = 0.0
         self.rotate_pid = pid_mod.PID()
@@ -168,13 +176,13 @@ class Follower(object):
                 return self.error
 
             # average states.
-            bot_position = (self.front_state + self.back_state)/2
+            bot_front_position = (self.front_state + self.back_state)/2
             # Get the current time of the CPU
             current_time = time()
             self.sampling_time = current_time - previous_time
             # Call PID
             self.strafe_error = self.strafe.pid(
-                0, bot_position, self.sampling_time)
+                0, bot_front_position, self.sampling_time)
             # calculate difference between array's for approx. pseudo angle
             bot_angle = (self.front_state - self.back_state)
             # Call Rotate PID
@@ -613,13 +621,13 @@ class Follower(object):
                 self.driver.move(0, 0)
                 return self.error
             # setup pid
-            bot_position = (self.left_state + self.right_state)/2
+            bot_front_position = (self.left_state + self.right_state)/2
             current_time = time()
             # Call PID
-            self.logger.info("bot_position = {}".format(bot_position))
+            self.logger.info("bot_front_position = {}".format(bot_front_position))
             position_error = forw_to_back_strafe.pid(
-                0, bot_position, self.sampling_time)
-            if(abs(bot_position) < 3):
+                0, bot_front_position, self.sampling_time)
+            if(abs(bot_front_position) < 3):
                 self.driver.move(0, 0)
                 break
             # Cap at 0 and 100
@@ -629,7 +637,7 @@ class Follower(object):
                 translate_angle = (0 + self.heading) % 360
             else:
                 translate_angle = (180 + self.heading) % 360
-            if(abs(bot_position) < 5):
+            if(abs(bot_front_position) < 5):
                 return
             self.logger.info("translate_speed = {}".format(translate_speed))
             self.logger.info("translate_angle = {}".format(translate_angle))
@@ -709,14 +717,14 @@ class Follower(object):
                     break
                 # calculate PID terms`
                 current_time = time()
-                bot_position = (self.front_state + self.back_state)/2
+                bot_front_position = (self.front_state + self.back_state)/2
                 # Call side_to_side PID
-                self.logger.info("bot_position = {}".format(bot_position))
+                self.logger.info("bot_front_position = {}".format(bot_front_position))
                 self.sampling_time = current_time - previous_time
                 position_error = side_to_side_strafe.pid(
-                    0, bot_position, self.sampling_time)
+                    0, bot_front_position, self.sampling_time)
                 # Report errors from strafe and rotate pid's
-                if(abs(bot_position) < 3):
+                if(abs(bot_front_position) < 3):
                     self.driver.move(0, 0)
                     break
                 # Cap at 0 and 100
@@ -726,7 +734,7 @@ class Follower(object):
                     translate_angle = (-90 + self.heading) % 360
                 else:
                     translate_angle = (-270 + self.heading) % 360
-                if(abs(bot_position) < 3):
+                if(abs(bot_front_position) < 3):
                     return
                     self.logger.info(
                         "position_error = {}".format(
@@ -797,3 +805,169 @@ class Follower(object):
             self.assign_states()
             self.driver.move(0, 0)
         return "DONE STRAFING TO LINE"
+
+
+
+
+    @lib.api_call
+    def analog_state(self):
+        """Make call to analog arrays"""
+        
+        # Take current time before reading ADC readings of the IRs            
+        previous_time = time()
+        self.front_right.set_k_values(kp = .2, kd = 0.1, ki = 0.0)
+        self.front_left.set_k_values(kp = .2, kd = 0.1, ki = 0.0)
+
+        self.back_right.set_k_values(kp = .03, kd = 0.009, ki = 0.0)
+        self.back_left.set_k_values(kp = .03, kd = 0.009, ki = 0.0)
+        
+        self.front_right_error = 0.0
+        self.front_left_error = 0.0
+        self.back_right_error = 0.0
+        self.back_left_error = 0.0
+
+        while True:
+
+            # Read ir arrays
+            self.array_block = self.ir_hub.read_all()
+            self.normaliza_arrays()
+            self.track_position()
+            
+            # Get the current time of the CPU
+            current_time = time()
+            self.sampling_time = current_time - previous_time
+
+            # Take current time before reading ADC readings of the IRs            
+            previous_time = time()
+
+            # Count the number of hits 
+            front_hits = self.count_num_of_hits(self.array_block["front"])
+            back_hits = self.count_num_of_hits(self.array_block["back"])
+            right_hits = self.count_num_of_hits(self.array_block["right"])
+            left_hits = self.count_num_of_hits(self.array_block["left"])
+            #print self.array_block
+             
+            if(front_hits > 0):
+                # Call PID
+                self.front_right_error = (50 + self.front_right.pid(
+                    0, self.bot_front_position, self.sampling_time))
+
+                # Call PID
+                self.front_left_error = (50 - self.front_left.pid(
+                    0, self.bot_front_position, self.sampling_time))
+
+                if(self.front_right_error >= 80):
+                    self.front_right_error = 80
+                elif(self.front_right_error <= -80):
+                    self.front_right_error = -80
+
+                if(self.front_left_error >= 80):
+                    self.front_left_error = 80
+                elif(self.front_left_error <= -80):
+                    self.front_left_error = -80
+            #else:
+                self.front_right_error = (50 + self.front_right.pid(
+                    0, self.bot_back_position, self.sampling_time))
+
+                # Call PID
+                self.front_left_error = (50 - self.front_left.pid(
+                    0, self.bot_back_position, self.sampling_time))
+
+                if(self.front_right_error >= 80):
+                    self.front_right_error = 80
+                elif(self.front_right_error <= -80):
+                    self.front_right_error = -80
+
+                if(self.front_left_error >= 80):
+                    self.front_left_error = 80
+                elif(self.front_left_error <= -80):
+                    self.front_left_error = -80
+
+            if(back_hits > 0):
+                # Call PID
+                self.back_right_error = (50 + self.back_right.pid(
+                    0, self.bot_back_position, self.sampling_time))
+            
+                # Call PID
+                self.back_left_error = (50 - self.back_left.pid(
+                    0, self.bot_back_position, self.sampling_time))
+
+                if(self.back_right_error >= 80):
+                    self.back_right_error = 80
+                elif(self.back_right_error <= -80):
+                    self.back_right_error = -80
+
+                if(self.back_left_error >= 80):
+                    self.back_left_error = 80
+                elif(self.back_left_error <= -80):
+                    self.back_left_error = -80
+            else:        
+                # Call PID
+                self.back_right_error = (50 + self.back_right.pid(
+                    0, self.bot_front_position, self.sampling_time))
+            
+                # Call PID
+                self.back_left_error = (50 - self.back_left.pid(
+                    0, self.bot_fron_position, self.sampling_time))
+
+                if(self.back_right_error >= 80):
+                    self.back_right_error = 80
+                elif(self.back_right_error <= -80):
+                    self.back_right_error = -80
+
+                if(self.back_left_error >= 80):
+                    self.back_left_error = 80
+                elif(self.back_left_error <= -80):
+                    self.back_left_error = -80
+
+            if back_hits == 0 and front_hits == 0:
+                self.driver.move(speed = 0, angle = 0) 
+
+
+            self.driver.set_motor(name = "front_right", value = self.front_right_error)
+            self.driver.set_motor(name = "front_left", value = self.front_left_error)
+            self.driver.set_motor(name = "back_right", value = self.back_right_error)
+            self.driver.set_motor(name = "back_left", value = self.back_left_error)
+
+    def normaliza_arrays(self):
+        """Uesd to mormaliza ir readings coming form the ir array"""
+        for array in self.array_block:
+            for position,value in enumerate(self.array_block[array]):
+                self.array_block[array][position] = (255 - value) - 100 
+                if(self.array_block[array][position] < 0):
+                    self.array_block[array][position] = 0
+                                            
+
+    def track_position(self):
+        """Trak the positon of the line"""
+        self.bot_front_position = 0;
+        self.bot_back_position = 0;
+        value = max(self.array_block["front"])
+        if(value < 10):
+            return
+        index = self.array_block["front"].index(value)
+        print value
+        #if value > 10:
+        if index < 4:
+            self.bot_front_position = 5.0 * (4.0 - index) * (4.0 - index) * (4.0 - index)
+        else:
+            self.bot_front_position = 5.0 * (3.0 - index) * (3.0 - index) * (3.0 - index)
+
+        value = max(self.array_block["back"])
+        if(value < 10):
+            return
+        index = self.array_block["back"].index(value)
+        #print value
+        #if value > 10:
+        if index < 4:
+            self.bot_back_position = 5.0 * (4.0 - index) * (4.0 - index) * (4.0 - index)
+        else:
+            self.bot_back_position = 5.0 * (3.0 - index) * (3.0 - index) * (3.0 - index)
+
+
+    def count_num_of_hits(self, array):
+        count = 0
+        for value in array:
+            if value > 0:
+                count = count + 1
+        return count

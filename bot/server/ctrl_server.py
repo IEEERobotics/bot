@@ -18,6 +18,9 @@ import bot.lib.messages as msgs
 from bot.activity_solver.etch_a_sketch import etch_a_sketch
 from bot.activity_solver.simon_solver import SimonPlayer
 
+import bot.activity_solver.rubiks_solver as rubiks_mod
+
+
 def is_api_method(obj, name):
     """Tests whether named method exists in obj and is flagged for API export.
 
@@ -130,6 +133,7 @@ class CtrlServer(object):
 
         self.follower = Follower()
         
+        self.rubiks_solver = rubiks_mod.RubiksSolver()
 
         systems = {}
         systems["ctrl"] = self
@@ -137,6 +141,8 @@ class CtrlServer(object):
         systems["driver"] = self.follower.driver
         systems["ir_hub"] = self.follower.ir_hub
         systems["etch_a_sketch"]=self.etch_a_sketch
+        systems["rubiks"] = self.rubiks_solver
+
         self.logger.debug("Systems: {}".format(systems))
         return systems
 

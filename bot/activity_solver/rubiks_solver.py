@@ -7,7 +7,6 @@ import bbb.gpio as gpio_mod
 class RubiksSolver(object):
     
     
-    CLAMP_TIME = 10
 
     def __init__(self):
         
@@ -22,6 +21,7 @@ class RubiksSolver(object):
         
         # Build servo that controlls gripper that turns cube.
         self.gripper = servo_mod.Servo(self.servo_pwm)
+        self.CLAMP_TIME = 10
 
         # Set to starting position
         self.gripper.position = 0

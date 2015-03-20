@@ -14,6 +14,18 @@ test_mode: {
     simon_player: false
 }
 
+# switches attached to GPIO pins will be used to encode directions of
+# activities at run setup time.
+# Convention:
+#   HIGH = right turn
+#   LOW  = left turn
+act_directions: {
+    simon: 78,
+    etch: 76,
+    rubiks: 74,
+    card: 72 
+} 
+
 rubiks : {
     servo_pwm: 4, # P8_34 (EHRPWM-1B)
     

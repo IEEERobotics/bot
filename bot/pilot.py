@@ -106,6 +106,7 @@ class Pilot:
                 break
             else:
                 self.rotate_90(turn_dir)
+        return turn_dir
          
     def run(self):
         """Main pilot interface with outside world.

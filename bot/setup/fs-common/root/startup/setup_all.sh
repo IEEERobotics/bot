@@ -9,19 +9,6 @@ source $dir/adc.sh
 # Gun laser: P8_35 (gpio8)
 load_gpio 8
 
-# Etch a sketch motors.
-# left
-load_gpio 44
-load_gpio 26
-load_gpio 46
-load_gpio 65
-
-# right
-load_gpio 49
-load_gpio 15
-load_gpio 117
-load_gpio 14
-
 # Simon Arm - Stepper-motor(1) : P8_37 (gpio78)
 load_gpio 78
 
@@ -55,12 +42,12 @@ set_duty     5 10000000
 set_polarity 5 0
 run_pwm      5  
 
-# rubiks cube servo: P8_34 (pwm4/EHR1B)
-load_pwm     
-set_period   4 20000000
-set_duty     4 10000000
-set_polarity 4 0
-run_pwm      4
+# rubiks cube servo: P8_34 
+load_pwm     6 
+set_period   6 20000000
+set_duty     6 10000000
+set_polarity 6 0
+run_pwm      6
 
 # rubiks cube gripper
 load_gpio 11 # P8_32

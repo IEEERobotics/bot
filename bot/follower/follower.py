@@ -808,21 +808,18 @@ class Follower(object):
             self.driver.move(0, 0)
         return "DONE STRAFING TO LINE"
 
-
-
-
     @lib.api_call
     def analog_state(self):
         """Make call to analog arrays"""
-        
-        # Take current time before reading ADC readings of the IRs            
+
+        # Take current time before reading ADC readings of the IRs
         previous_time = time()
         self.front_right.set_k_values(kp = .2, kd = 0.1, ki = 0.0)
         self.front_left.set_k_values(kp = .2, kd = 0.1, ki = 0.0)
 
         self.back_right.set_k_values(kp = .03, kd = 0.009, ki = 0.0)
         self.back_left.set_k_values(kp = .03, kd = 0.009, ki = 0.0)
-        front_bin = [[for x in range(8)] for x in range(3)]
+        self.front_bin = [[0 for x in range(8)] for y in range(3)]
 
         self.front_right_error = 0.0
         self.front_left_error = 0.0
@@ -838,45 +835,57 @@ class Follower(object):
             self.normaliza_arrays()
             self.track_position()
 
-            
+
             # Get the current time of the CPU
             current_time = time()
             self.sampling_time = current_time - previous_time
 
-            # Take current time before reading ADC readings of the IRs            
+            # Take current time before reading ADC readings of the IRs
             previous_time = time()
 
-            # Count the number of hits 
+            # Count the number of hits
             front_hits = self.count_num_of_hits(self.array_block["front"])
             back_hits = self.count_num_of_hits(self.array_block["back"])
-            fornt_bin[2] = front_bin[1]
-            fornt_bin[1] = front_bin[0]
-            fornt_bin[0] = self.assign_bin(self.array_block["front"])
-            
+            self.front_bin[2] = self.front_bin[1]
+            self.front_bin[1] = self.front_bin[0]
+            self.front_bin[0] = self.assign_bin(self.array_block["front"])
+
             #right_hits = self.count_num_of_hits(self.array_block["right"])
             #left_hits = self.count_num_of_hits(self.array_block["left"])
             #print self.array_block
 
-            if not fornt_hits > 1:
-                if((fornt_bin[1][0] == 1 and front_bin[1][1] = 1) or (fornt_bin[2][0] == 1 and front_bin[2][1] = 1)):
+            if not front_hits > 1:
+                if((self.front_bin[1][0] == 1 \
+                    and self.front_bin[1][1] == 1) \
+                    or (self.front_bin[2][0] == 1 \
+                        and self.front_bin[2][1] == 1)):
                     return "left turn"
-                if((fornt_bin[7][0] == 1 and front_bin[7][1] = 1) or (fornt_bin[6][0] == 1 and front_bin[6][1] = 1)):
+
+                if((self.front_bin[0][7] == 1 \
+                    and self.front_bin[1][7] == 1) \
+                    or (self.front_bin[0][6] == 1 \
+                    and self.front_bin[1][6] == 1)):
                     return "right turn"
+
             elif(front_hits > 7):
                 return "block or t-intersection"
+
             else:
-                if((fornt_bin[1][0] == 1 and front_bin[1][1] = 1) or (fornt_bin[2][0] == 1 and front_bin[2][1] = 1)):
+                if((self.front_bin[1][0] == 1 \
+                    and self.front_bin[1][1] == 1) \
+                    or (self.front_bin[2][0] == 1 \
+                        and self.front_bin[2][1] == 1)):
                     return "left turn at intersection"
-                if((fornt_bin[7][0] == 1 and front_bin[7][1] = 1) or (fornt_bin[6][0] == 1 and front_bin[6][1] = 1)):
+                if((self.front_bin[7][0] == 1 \
+                    and self.front_bin[7][1] == 1) \
+                    or (self.front_bin[6][0] == 1 \
+                        and self.front_bin[6][1] == 1)):
                     return "right turn at intersection"
-
-
-
 
             if back_hits == 0 and front_hits == 0:
                 self.driver.move(speed = 0, angle = 0)
                 return "loss line"
-             
+
             if(front_hits > 0):
                 # Call PID
                 self.front_right_error = (50 + self.front_right.pid(
@@ -917,7 +926,7 @@ class Follower(object):
                 # Call PID
                 self.back_right_error = (50 + self.back_right.pid(
                     0, self.bot_back_position, self.sampling_time))
-            
+
                 # Call PID
                 self.back_left_error = (50 - self.back_left.pid(
                     0, self.bot_back_position, self.sampling_time))
@@ -931,11 +940,11 @@ class Follower(object):
                     self.back_left_error = 80
                 elif(self.back_left_error <= -80):
                     self.back_left_error = -80
-            else:        
+            else:
                 # Call PID
                 self.back_right_error = (50 + self.back_right.pid(
                     0, self.bot_front_position, self.sampling_time))
-            
+
                 # Call PID
                 self.back_left_error = (50 - self.back_left.pid(
                     0, self.bot_front_position, self.sampling_time))
@@ -950,11 +959,11 @@ class Follower(object):
                 elif(self.back_left_error <= -80):
                     self.back_left_error = -80
 
-           
+
             #print "left positino {}, right position {}".format(self.bot_left_position,self.bot_right_position)
             #print "front {}, back {}, left {}, right {}".format(front_hits,back_hits,left_hits,right_hits)
-             
-            #if left_hits > 1 and self.bot_left_position < 0:  
+
+            #if left_hits > 1 and self.bot_left_position < 0:
             #    left_hit = True
             #else:
             #    left_hit = False
@@ -982,19 +991,23 @@ class Follower(object):
             #        return "right_int"
 
 
-            self.driver.set_motor(name = "front_right", value = self.front_right_error)
-            self.driver.set_motor(name = "front_left", value = self.front_left_error)
-            self.driver.set_motor(name = "back_right", value = self.back_right_error)
-            self.driver.set_motor(name = "back_left", value = self.back_left_error)
+            self.driver.set_motor(name = "front_right",
+                                 value = self.front_right_error)
+            self.driver.set_motor(name = "front_left",
+                                 value = self.front_left_error)
+            self.driver.set_motor(name = "back_right",
+                                 value = self.back_right_error)
+            self.driver.set_motor(name = "back_left",
+                                 value = self.back_left_error)
 
     def normaliza_arrays(self):
         """Uesd to mormaliza ir readings coming form the ir array"""
         for array in self.array_block:
             for position,value in enumerate(self.array_block[array]):
-                self.array_block[array][position] = (255 - value) - 100 
+                self.array_block[array][position] = (255 - value) - 100
                 if(self.array_block[array][position] < 0):
                     self.array_block[array][position] = 0
-                                            
+
 
     def track_position(self):
         """Trak the positon of the line"""
@@ -1005,9 +1018,11 @@ class Follower(object):
             index = self.array_block["front"].index(value)
             #if value > 10:
             if index < 4:
-                self.bot_front_position = 5.0 * (4.0 - index) * (4.0 - index) * (4.0 - index)
+                self.bot_front_position = 5.0 * (4.0 - index) \
+                                    * (4.0 - index) * (4.0 - index)
             else:
-                self.bot_front_position = 5.0 * (3.0 - index) * (3.0 - index) * (3.0 - index)
+                self.bot_front_position = 5.0 * (3.0 - index) \
+                                    * (3.0 - index) * (3.0 - index)
 
         value = max(self.array_block["back"])
         if not(value < 10):
@@ -1015,10 +1030,12 @@ class Follower(object):
             #print value
             #if value > 10:
             if index < 4:
-                self.bot_back_position = 5.0 * (4.0 - index) * (4.0 - index) * (4.0 - index)
+                self.bot_back_position = 5.0 * (4.0 - index) \
+                                    * (4.0 - index) * (4.0 - index)
             else:
-                self.bot_back_position = 5.0 * (3.0 - index) * (3.0 - index) * (3.0 - index)
-        
+                self.bot_back_position = 5.0 * (3.0 - index) \
+                                    * (3.0 - index) * (3.0 - index)
+
         #value = max(self.array_block["left"])
         #if not(value < 10):
         #    index = self.array_block["left"].index(value)
@@ -1042,7 +1059,7 @@ class Follower(object):
         #        self.bot_right_position = -1 *  (3.0 - index)
         #else:
         #        self.bot_right_position = 0
-               
+
 
     def count_num_of_hits(self, array):
         count = 0

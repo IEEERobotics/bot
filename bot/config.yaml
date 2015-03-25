@@ -1,11 +1,11 @@
 # Not all hardware is used all the time
 test_mode: {
-    color_sensor: true,
+    color_sensor: false,
     ultrasonics: true,
-    ir: { front: true, back: true, right: true, left: true},
-    IR: true,
-    ADC: true,
-    DMCC: true,
+    ir: { front: false, back: false, right: false, left: false},
+    IR: false,
+    ADC: false,
+    DMCC: false,
     stepper: false,
     motor: false,
     servo: false,

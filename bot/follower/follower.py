@@ -57,7 +57,7 @@ class Follower(object):
         self.prev_rate = 0
 
         # state variables
-        self.heading = None  # must be initialize by callee
+        self.heading = None  # must be initialize by caller
         self.front_state = Follower.No_Line
         self.back_state = Follower.No_Line
         self.left_state = Follower.No_Line
@@ -139,87 +139,6 @@ class Follower(object):
         self.strafe.clear_error()
         self.rotate_pid.clear_error()
         return
-
-    @lib.api_call
-    def follow(self, heading, on_x=False):
-        """Follow line along given heading"""
-        # reset errors
-        self.reset_errors()
-        self.on_x = on_x
-        # Get the initial conditioni
-        self.heading = heading
-        previous_time = time()
-        # Init front_PID
-        self.strafe.set_k_values(10, 0, .5)
-        # Inti rotate_PID
-        self.rotate_pid.set_k_values(7, 0, 1)
-        # Get current heading
-        self.heading = heading
-        # Continue until an error condition
-        count_object = 0
-
-        while True:
-            # Assign the current states to the correct heading
-            self.assign_states()
-            # Check for error conditions
-            if self.error != "NONE":
-                # require two succesive large_object readings to exit
-                if self.error == "LARGE_OBJECT" and count_object < 1:
-                    count_object += 1
-                    continue
-                self.update_exit_state()
-                self.logger.info("Error: {}".format(self.error))
-                self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format(
-                    self.front_state,
-                    self.back_state,
-                    self.left_state,
-                    self.right_state))
-                self.driver.move(0, 0)
-                return self.error
-
-            # average states.
-            bot_front_position = (self.front_state + self.back_state)/2
-            # Get the current time of the CPU
-            current_time = time()
-            self.sampling_time = current_time - previous_time
-            # Call PID
-            self.strafe_error = self.strafe.pid(
-                0, bot_front_position, self.sampling_time)
-            # calculate difference between array's for approx. pseudo angle
-            bot_angle = (self.front_state - self.back_state)
-            # Call Rotate PID
-            self.rotate_error = self.rotate_pid.pid(
-                0, bot_angle, self.sampling_time)
-            # Report errors from strafe and rotate pid's
-            self.logger.info(" StrafeErr: {}, RotErr: {}".format(
-                self.strafe_error,
-                self.rotate_error))
-            # Update motors
-            self.motors(bot_angle)
-            # Take the current time set it equal to the previous time
-            previous_time = current_time
-
-    @lib.api_call
-    def rotate_on_x(self, direction="left", speed=100, time=0.95):
-        # After center_on_x, rotate in the commanded directions
-        # by 90 degrees.
-        if(direction == "left"):
-            sign = 1
-        elif(direction == "right"):
-            sign = -1
-        else:
-            self.logger.error("Bad param direction, please use left or right")
-            return "DONE"
-
-        # sign turns in correct direction
-        self.rotate(sign*speed)
-
-        sleep(time)
-
-        self.driver.move(0, 0)
-
-        self.center_on_intersection()
-        return "Done"
 
     @lib.api_call
     def report_states(self):
@@ -807,7 +726,19 @@ class Follower(object):
             self.assign_states()
             self.driver.move(0, 0)
         return "DONE STRAFING TO LINE"
+        
+    @lib.api_call
+    def has_left_branch(self):
 
+    @lib.api_call
+    def has_right_branch(self):
+        """Detects whether or not the path has a sharp right/left
+        turn. 
+        note: Does not differentiate between turn/intersection.
+        """
+        
+        
+         
     @lib.api_call
     def analog_state(self):
         """Make call to analog arrays"""
@@ -829,18 +760,16 @@ class Follower(object):
         right_count = 0
 
         while True:
-
             # Read ir arrays
             self.array_block = self.ir_hub.read_all()
-            self.normaliza_arrays()
+            self.normalize_arrays()
             self.track_position()
-
 
             # Get the current time of the CPU
             current_time = time()
             self.sampling_time = current_time - previous_time
 
-            # Take current time before reading ADC readings of the IRs
+            # time before reading the IRs
             previous_time = time()
 
             # Count the number of hits
@@ -942,12 +871,12 @@ class Follower(object):
                     self.back_left_error = -80
             else:
                 # Call PID
-                self.back_right_error = (50 + self.back_right.pid(
-                    0, self.bot_front_position, self.sampling_time))
+                self.back_right_error = 50 + \
+                    self.back_right.pid(0, self.bot_front_position, self.sampling_time)
 
                 # Call PID
-                self.back_left_error = (50 - self.back_left.pid(
-                    0, self.bot_front_position, self.sampling_time))
+                self.back_left_error = 50 - \
+                    self.back_left.pid(0, self.bot_front_position, self.sampling_time)
 
                 if(self.back_right_error >= 80):
                     self.back_right_error = 80
@@ -959,38 +888,6 @@ class Follower(object):
                 elif(self.back_left_error <= -80):
                     self.back_left_error = -80
 
-
-            #print "left positino {}, right position {}".format(self.bot_left_position,self.bot_right_position)
-            #print "front {}, back {}, left {}, right {}".format(front_hits,back_hits,left_hits,right_hits)
-
-            #if left_hits > 1 and self.bot_left_position < 0:
-            #    left_hit = True
-            #else:
-            #    left_hit = False
-
-            #if right_hits > 1 and self.bot_right_position < 0:
-            #    right_hit = True
-            #else:
-            #    right_hit = False
-
-            #if(left_hit and right_hit):
-            #    self.driver.move(speed = 0, angle = 0)
-            #    return "Two way intersection"
-            #elif(back_hits > 1 and front_hits == 0):
-            #    self.driver.move(speed = 0, angle = 0)
-            #    if(left_hit):
-            #        return "left"
-            #    elif(right_hits):
-            #        return "right"
-
-            #elif(back_hits > 1 and front_hits > 1):
-            #    self.driver.move(speed = 0, angle = 0)
-            #    if(left_hit):
-            #        return "left_int"
-            #    elif(right_hits):
-            #        return "right_int"
-
-
             self.driver.set_motor(name = "front_right",
                                  value = self.front_right_error)
             self.driver.set_motor(name = "front_left",
@@ -1000,14 +897,13 @@ class Follower(object):
             self.driver.set_motor(name = "back_left",
                                  value = self.back_left_error)
 
-    def normaliza_arrays(self):
+    def normalize_arrays(self):
         """Uesd to mormaliza ir readings coming form the ir array"""
         for array in self.array_block:
             for position,value in enumerate(self.array_block[array]):
                 self.array_block[array][position] = (255 - value) - 100
                 if(self.array_block[array][position] < 0):
                     self.array_block[array][position] = 0
-
 
     def track_position(self):
         """Trak the positon of the line"""
@@ -1060,7 +956,6 @@ class Follower(object):
         #else:
         #        self.bot_right_position = 0
 
-
     def count_num_of_hits(self, array):
         count = 0
         for value in array:
@@ -1068,12 +963,10 @@ class Follower(object):
                 count = count + 1
         return count
 
-
     def assign_bin(self,a_array):
         array = [0,0,0,0,0,0,0,0]
         for index,value in enumerate(a_array):
             if value > 50:
                 array[index] = 1
         return array
-
 

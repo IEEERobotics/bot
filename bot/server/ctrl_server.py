@@ -135,6 +135,8 @@ class CtrlServer(object):
         
         self.rubiks_solver = rubiks_mod.RubiksSolver()
 
+        self.etch_a_sketch = etch_a_sketch()
+
         systems = {}
         systems["ctrl"] = self
         systems["follower"] = self.follower

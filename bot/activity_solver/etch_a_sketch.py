@@ -33,7 +33,7 @@ class etch_a_sketch(object):
         while (x<6):
             self.vert_motor.clockwise
             x+=1
-        time.sleep(1)
+        sleep(1)
 
     @lib.api_call
     def drawE(self):
@@ -49,7 +49,7 @@ class etch_a_sketch(object):
             self.horiz_motor.clockwise
         for x in xrange(1,2):
             self.vert_motor.clockwise
-        time.sleep(1)
+        sleep(1)
         
 
     

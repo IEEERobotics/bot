@@ -99,27 +99,6 @@ class Follower(object):
     def get_rotate_error(self):
         return self.rotate_error
 
-    @lib.api_call
-    def wait_for_start(self):
-        """Poll color senor unti green start signal lights up."""
-        return self.color_sensor.watch_for_color("green")
-
-    @lib.api_call
-    def is_on_line(self):
-        return (not self.lost_line)  # TODO: Use IR sensors to perform check
-
-    @lib.api_call
-    def is_on_x(self):
-        return self.intersection  # TODO: Use IR sensors to perform check
-
-    @lib.api_call
-    def is_on_blue(self):
-        return True  # TODO: Use color sensor
-
-    @lib.api_call
-    def is_on_red(self):
-        return True  # TODO: Use color sensor
-
     def reset_errors(self):
         self.error = "NONE"
         # state variables
@@ -675,34 +654,6 @@ class Follower(object):
         # end top while loop
 
     @lib.api_call
-    def center_on_blue_block(self, heading=180):
-        # Assumes Front array (from heading) is on blue block
-        self.heading = heading
-        # Assign the current states to the correct heading
-        self.assign_states()
-        # Check for error conditions
-        if(self.error != "NONE" and self.error != "LARGE_OBJECT"):
-            self.update_exit_state()
-            self.logger.info("Error: {}".format(self.error))
-            self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format(
-                self.front_state,
-                self.back_state,
-                self.left_state,
-                self.right_state))
-            self.driver.move(0, 0)
-            return self.error
-        # Move forward until off block
-        direction = 180 - heading
-        while self.front_state == Follower.Large_Object:
-            self.driver.move(60, direction)
-            sleep(0.25)
-            self.assign_states()
-        self.driver.move(0, 0)
-        # After off block, use center on line to straigten
-        self.center_on_line(heading)
-        return "DONE CENTER ON BLUE BLOCK"
-
-    @lib.api_call
     def get_result(self):
         self.assign_states()
         return self.error
@@ -736,9 +687,8 @@ class Follower(object):
         turn. 
         note: Does not differentiate between turn/intersection.
         """
-        
-        
-         
+        if self.
+
     @lib.api_call
     def analog_state(self):
         """Make call to analog arrays"""
@@ -931,30 +881,6 @@ class Follower(object):
             else:
                 self.bot_back_position = 5.0 * (3.0 - index) \
                                     * (3.0 - index) * (3.0 - index)
-
-        #value = max(self.array_block["left"])
-        #if not(value < 10):
-        #    index = self.array_block["left"].index(value)
-        #    #print value
-        #    #if value > 10:
-        #    if index < 4:
-        #        self.bot_left_position = (4.0 - index)
-        #    else:
-        #        self.bot_left_position = (3.0 - index)
-        #else:
-        #        self.bot_left_position = 0
-
-        #value = max(self.array_block["right"])
-        #if not(value < 10):
-        #    index = self.array_block["right"].index(value)
-        #    #print value
-        #    #if value > 10:
-        #    if index < 4:
-        #        self.bot_right_position = -1 * (4.0 - index)
-        #    else:
-        #        self.bot_right_position = -1 *  (3.0 - index)
-        #else:
-        #        self.bot_right_position = 0
 
     def count_num_of_hits(self, array):
         count = 0

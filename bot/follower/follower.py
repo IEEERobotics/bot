@@ -738,15 +738,18 @@ class Follower(object):
                     and self.front_bin[1][1] == 1) \
                     or (self.front_bin[2][0] == 1 \
                         and self.front_bin[2][1] == 1)):
+                    self.driver.move(0,0)
                     return "left turn"
 
                 if((self.front_bin[0][7] == 1 \
                     and self.front_bin[1][7] == 1) \
                     or (self.front_bin[0][6] == 1 \
                     and self.front_bin[1][6] == 1)):
+                    self.driver.move(0,0)
                     return "right turn"
 
             elif(front_hits > 7):
+                self.driver.move(0,0)
                 return "block or t-intersection"
 
             else:
@@ -754,11 +757,13 @@ class Follower(object):
                     and self.front_bin[1][1] == 1) \
                     or (self.front_bin[2][0] == 1 \
                         and self.front_bin[2][1] == 1)):
+                    self.driver.move(0,0)
                     return "left turn at intersection"
                 if((self.front_bin[0][7] == 1 \
                     and self.front_bin[1][7] == 1) \
                     or (self.front_bin[0][6] == 1 \
                         and self.front_bin[1][6] == 1)):
+                    self.driver.move(0,0)
                     return "right turn at intersection"
 
             if back_hits == 0 and front_hits == 0:

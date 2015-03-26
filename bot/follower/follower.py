@@ -679,17 +679,6 @@ class Follower(object):
         return "DONE STRAFING TO LINE"
         
     @lib.api_call
-    def has_left_branch(self):
-
-    @lib.api_call
-    def has_right_branch(self):
-        """Detects whether or not the path has a sharp right/left
-        turn. 
-        note: Does not differentiate between turn/intersection.
-        """
-        if self.
-
-    @lib.api_call
     def analog_state(self):
         """Make call to analog arrays"""
 

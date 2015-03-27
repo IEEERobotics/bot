@@ -1,6 +1,6 @@
 # Not all hardware is used all the time
 test_mode: {
-    color_sensor: false,
+    color_sensor: true,
     ultrasonics: true,
     ir: { front: false, back: false, right: false, left: false},
     IR: false,

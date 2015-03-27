@@ -718,42 +718,45 @@ class Follower(object):
             self.front_bin[1] = self.front_bin[0]
             self.front_bin[0] = self.assign_bin(self.array_block["front"])
 
+            print "fornt hits {}".format(self.front_bin[0])
             #right_hits = self.count_num_of_hits(self.array_block["right"])
             #left_hits = self.count_num_of_hits(self.array_block["left"])
             #print self.array_block
 
-            if not front_hits > 1:
-                if((self.front_bin[1][0] == 1 \
-                    and self.front_bin[1][1] == 1) \
-                    or (self.front_bin[2][0] == 1 \
-                        and self.front_bin[2][1] == 1)):
-                    self.driver.move(0,0)
-                    return "left turn"
+            #if not front_hits > 1:
+            #    if((self.front_bin[1][0] == 1 \
+            #        and self.front_bin[1][1] == 1) \
+            #        or (self.front_bin[2][0] == 1 \
+            #            and self.front_bin[2][1] == 1)):
+            #        self.driver.move(0,0)
+            #        return "left turn"
 
-                if((self.front_bin[0][7] == 1 \
-                    and self.front_bin[1][7] == 1) \
-                    or (self.front_bin[0][6] == 1 \
-                    and self.front_bin[1][6] == 1)):
-                    self.driver.move(0,0)
-                    return "right turn"
+            #    if((self.front_bin[0][7] == 1 \
+            #        and self.front_bin[1][7] == 1) \
+            #        or (self.front_bin[0][6] == 1 \
+            #        and self.front_bin[1][6] == 1)):
+            #        self.driver.move(0,0)
+            #        return "right turn"
 
-            elif(front_hits > 7):
+            if(front_hits > 5):
+                self.driver.move(60,180)
+                sleep(.01)
                 self.driver.move(0,0)
                 return "block or t-intersection"
 
-            else:
-                if((self.front_bin[1][0] == 1 \
-                    and self.front_bin[1][1] == 1) \
-                    or (self.front_bin[2][0] == 1 \
-                        and self.front_bin[2][1] == 1)):
-                    self.driver.move(0,0)
-                    return "left turn at intersection"
-                if((self.front_bin[0][7] == 1 \
-                    and self.front_bin[1][7] == 1) \
-                    or (self.front_bin[0][6] == 1 \
-                        and self.front_bin[1][6] == 1)):
-                    self.driver.move(0,0)
-                    return "right turn at intersection"
+            #else:
+            #    if((self.front_bin[1][0] == 1 \
+            #        and self.front_bin[1][1] == 1) \
+            #        or (self.front_bin[2][0] == 1 \
+            #            and self.front_bin[2][1] == 1)):
+            #        self.driver.move(0,0)
+            #        return "left turn at intersection"
+            #    if((self.front_bin[0][7] == 1 \
+            #        and self.front_bin[1][7] == 1) \
+            #        or (self.front_bin[0][6] == 1 \
+            #            and self.front_bin[1][6] == 1)):
+            #        self.driver.move(0,0)
+            #        return "right turn at intersection"
 
             if back_hits == 0 and front_hits == 0:
                 self.driver.move(speed = 0, angle = 0)
@@ -879,7 +882,7 @@ class Follower(object):
     def count_num_of_hits(self, array):
         count = 0
         for value in array:
-            if value > 0:
+            if value > 50:
                 count = count + 1
         return count
 

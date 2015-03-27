@@ -890,3 +890,17 @@ class Follower(object):
                 array[index] = 1
         return array
 
+    @lib.api_call
+    def check_side_for_branch(self, side):
+        """Checks to see if there is a branch on the left.
+        :returns: True or False
+        """
+        array_block = self.ir_hub.read_all()
+        bin_block   = self.assign_bin(array_block[side])
+        
+        hits = self.count_num_of_hits(bin_block)
+        print "Hits: ", hits 
+        
+        if hits <= 6:
+            return True
+        return False        

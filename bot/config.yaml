@@ -2,8 +2,8 @@
 test_mode: {
     color_sensor: true,
     ultrasonics: true,
-    ir: { front: true, back: true, right: true, left: true},
-    IR: true,
+    ir: { front: false, back: false, right: false, left: false},
+    IR: false,
     ADC: true,
     DMCC: true,
     stepper: false,
@@ -115,7 +115,7 @@ ir_select_gpios: [44, 26, 46, 65]  # GPIOs to select IR sensor units: [P8_12 (gp
 ir_analog_input_gpios: {front: 39, back: 35, left: 67, right: 68}  # GPIO pins to read selected IR sensor units: P8_04 (gpio39), P8_06 (gpio35), P8_08 (gpio67), P8_10 (gpio68)
 ir_analog_adc_config: {  # ADC configuration
     i2c_bus: 1,  # System I2C bus to use to talk to ADCs
-    i2c_addr: {left: 0x4b, right: 0x49, back: 0x48, front: 0x4a},
+    i2c_addr: {left: 0x49, right: 0x4b, back: 0x4a, front: 0x48},
     i2c_registers: {# Default command bytes for reading each channel.
         ch0: {cmd: 0x8c},
         ch1: {cmd: 0xcc},

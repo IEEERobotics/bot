@@ -40,10 +40,21 @@ simon: {
 }
 
 dmcc_drive_motors: {
-    back_left: { board_num: 0, motor_num: 1 },
-    back_right: { board_num: 0, motor_num: 2, invert: True },
+    # back_left: { board_num: 1, motor_num: 1 },
+    # back_right: { board_num: 1, motor_num: 2, invert: True },
+    # front_left: { board_num: 0, motor_num: 1 },
+    # front_right: { board_num: 0, motor_num: 2, invert: True }
+
+    # front_left: { board_num: 1, motor_num: 1 },
+    # back_left: { board_num: 1, motor_num: 2, invert: True },
+    # front_right: { board_num: 0, motor_num: 1 },
+    # back_right: { board_num: 0, motor_num: 2, invert: True }
+
     front_left: { board_num: 1, motor_num: 1 },
-    front_right: { board_num: 1, motor_num: 2, invert: True }
+    back_left: { board_num: 1, motor_num: 2 },
+    front_right: { board_num: 0, motor_num: 1, invert: True},
+    back_right: { board_num: 0, motor_num: 2, invert: True }
+
 }
 
 turret: {

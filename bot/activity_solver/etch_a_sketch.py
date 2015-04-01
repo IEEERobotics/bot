@@ -24,8 +24,8 @@ class etch_a_sketch(object):
         else:
             self.vert_motor = Stepper_motor(self.config["etch_a_sketch_motors"]["left_stepper"])
             self.horiz_motor = Stepper_motor(self.config["etch_a_sketch_motors"]["right_stepper"])
-            self.vert_motor.speed = 60
-            self.horiz_motor.speed = 60
+            self.vert_motor.speed = 80
+            self.horiz_motor.speed = 80
 
     @lib.api_call
     def drawI(self):

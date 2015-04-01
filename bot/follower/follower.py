@@ -894,16 +894,39 @@ class Follower(object):
         return array
 
     @lib.api_call
-    def check_side_for_branch(self, side):
+    def check_for_branch(self, side):
         """Checks to see if there is a branch on the left.
         :returns: True or False
         """
         array_block = self.ir_hub.read_all()
-        bin_block   = self.assign_bin(array_block[side])
-        
-        hits = self.count_num_of_hits(bin_block)
+        s_array = array_block[side]
+
+        hits = self.count_num_of_hits(s_array)
         print "Hits: ", hits 
         
         if hits <= 6:
             return True
-        return False        
+        return False       
+        
+    @lib.api_call
+    def find_dir_of_turn(self):
+        """Determines whether a turn is on the right or left
+        """
+        
+        if (self.check_for_branch("right") \
+            and self.check_for_branch("left")):
+            return "error: too many intersections"
+
+        elif not self.check_for_branch("right") \
+            and not self.check_for_branch("left"):
+            return "error: no branches"
+
+        elif  self.check_for_branch("right"):
+            return "right"
+
+        elif self.check_for_branch("left"):
+            return "left"
+
+        else:
+            return "error: No condition found. Line lost."
+

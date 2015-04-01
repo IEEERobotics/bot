@@ -20,11 +20,11 @@ test_mode: {
 #   HIGH = right turn
 #   LOW  = left turn
 act_directions: {
-    simon: 78,
     etch: 76,
     rubiks: 74,
     card: 72 
-} 
+}
+
 
 rubiks : {
     servo_pwm: 4, # P8_34 (EHRPWM-1B)
@@ -160,5 +160,7 @@ ctrl_server_port: 60000  # Port used to send control messages to the bot
 pub_server_port: 60001  # PubServer publishes bot data on this port
 irs_per_array: 8
 resistor_per_pot: 4
-color_sensor: {LED_PWM: 5}
+color_sensor: {LED_PWM: 5,
+               ready_signal: 78 
+                }
 ir_thresh: 60

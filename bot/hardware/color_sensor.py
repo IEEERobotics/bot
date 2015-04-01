@@ -46,10 +46,17 @@ class ColorSensor(I2CDevice):
             self.pwm = pwm_mod.PWM(self.pwm_num)
             # Duty cycle = 50% (from 20msec)
             self.pwm.duty = 1000000
+
+            # Setup ready signal GPIO:
+            self.gpio_num = self.bot_config["color_sensor"]["ready_signal"]
+            self.ready_gpio = gpio_mod.GPIO(self.gpio_num)
+            self.ready_gpio.input()
+
         else:
             self.logger.debug("Running in test mode")
             # Fake device at address "0x00"
             I2CDevice.__init__(self, 1, 0x00, config='tcs3472_i2c.yaml')
+        
 
 
         # Gets base values for comparisons to future readings.
@@ -85,6 +92,18 @@ class ColorSensor(I2CDevice):
         b /= c
         c /= self.max_c  # normalize c to [0, 1] range
         return valid, c, r, g, b  # return valid flag if someone's interested
+
+    @lib.api_call
+    def wait_for_ready(self, timeout=122):
+        """Waits for ready switch to be activates before moving on.
+        """
+        t0 = time.sleep()
+        while True:
+            if time.time()- t0 > timeout:
+                break
+            if self.ready_gpio:
+                return True
+        return False
 
     @lib.api_call
     def led_brightness(self, brightness):

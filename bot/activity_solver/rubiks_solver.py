@@ -21,7 +21,7 @@ class RubiksSolver(object):
         
         # Build servo that controlls gripper that turns cube.
         self.gripper = servo_mod.Servo(self.servo_pwm)
-        self.CLAMP_TIME = 10
+        self.CLAMP_TIME = 3
 
         # Set to starting position
         self.gripper.position = 0
@@ -46,7 +46,7 @@ class RubiksSolver(object):
     @lib.api_call
     def open_clamp(self):
         self.set_motor("rev")
-        time.sleep(CLAMP_TIME)
+        time.sleep(self.CLAMP_TIME)
         self.set_motor("off")
 
     @lib.api_call
@@ -61,7 +61,7 @@ class RubiksSolver(object):
         
         self.set_motor("fwd")
         # pause while grippers close
-        time.sleep(CLAMP_TIME)
+        time.sleep(self.CLAMP_TIME)
         self.set_motor("off")        
 
     @lib.api_call

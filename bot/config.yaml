@@ -41,7 +41,7 @@ simon: {
 }
 
 etch_a_sketch_motors: {
-    left_stepper: [44, 26, 25, 65],
+    left_stepper: [44, 26, 46, 65],
     right_stepper: [49, 15, 117, 14]
 }
 

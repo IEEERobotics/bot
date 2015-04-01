@@ -738,7 +738,7 @@ class Follower(object):
             #        self.driver.move(0,0)
             #        return "right turn"
 
-            if(front_hits > 5):
+            if(front_hits > 3):
                 self.driver.move(60,180)
                 sleep(.01)
                 self.driver.move(0,0)

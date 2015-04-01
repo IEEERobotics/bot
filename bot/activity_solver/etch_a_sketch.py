@@ -31,24 +31,24 @@ class etch_a_sketch(object):
     def drawI(self):
         x = 0
         while (x<6):
-            self.vert_motor.clockwise
+            self.vert_motor.clockwise()
             x+=1
         sleep(1)
 
     @lib.api_call
     def drawE(self):
         for x in xrange(1,13):
-            self.horiz_motor.counter_clockwise
+            self.horiz_motor.counter_clockwise()
         for x in xrange(1,7):
-            self.horiz_motor.clockwise
+            self.horiz_motor.clockwise()
         for x in xrange(1,2):
-            self.vert_motor.clockwise
+            self.vert_motor.clockwise()
         for x in xrange(1,7):
-            self.horiz_motor.counter_clockwise
+            self.horiz_motor.counter_clockwise()
         for x in xrange(1,7):
-            self.horiz_motor.clockwise
+            self.horiz_motor.clockwise()
         for x in xrange(1,2):
-            self.vert_motor.clockwise
+            self.vert_motor.clockwise()
         sleep(1)
         
 

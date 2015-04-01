@@ -2,13 +2,13 @@
 
 import sys
 
-import bot.lib.lib as lib
-import bot.client.ctrl_client as ctrl_client_mod
-import bot.client.sub_client as sub_client_mod
+import lib.lib as lib
+import client.ctrl_client as ctrl_client_mod
+import client.sub_client as sub_client_mod
 
-import bot.activity_solver.simon_solver as simon_mod
-import bot.activity_solver.rubiks_solver as rubiks_mod
-import bot.activity_solver.etch_sketch_solver as etch_mod
+import activity_solver.simon_solver as simon_mod
+import activity_solver.rubiks_solver as rubiks_mod
+import activity_solver.etch_sketch_solver as etch_mod
 
 
 class Pilot:
@@ -72,14 +72,16 @@ class Pilot:
         """
 
         return self.call('color_sensor', 'watch_for_not_color', 
-                    {color:"red", timeout:180})
+                    {'color':'red', "timeout":180})
 
-    def follow_call(self):
+    def follow(self):
         """Helper function for calling line_follower.
         Will kick out at intersection.
         """
-        return dir_of_intersection = \
+        dir_of_intersection = \
                 self.call('follower', 'analog_state')
+
+        return dir_of_intersection
 
     def rotate_90(self, direction):
         """call on driver api with whatever args are needed 
@@ -100,14 +102,8 @@ class Pilot:
     def follow_ignoring_turns(self):
         while True:
             turn_dir = self.follow()
+    
             
-            # Continue going around runs until you hit intersect
-            if turn_dir == "intersection":
-                break
-            else:
-                self.rotate_90(turn_dir)
-        return turn_dir
-         
     def run(self):
         """Main pilot interface with outside world.
         start script will call, and pilot will handle all other logic.

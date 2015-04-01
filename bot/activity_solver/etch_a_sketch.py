@@ -55,7 +55,7 @@ class etch_a_sketch(object):
     
     @lib.api_call
     def draw(self):
-        while true:
+        for x in xrange(1,100):
             self.drawI()
             self.drawE()
             self.drawE()

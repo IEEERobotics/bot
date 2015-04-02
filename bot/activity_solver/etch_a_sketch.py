@@ -27,7 +27,7 @@ class etch_a_sketch(object):
             self.vert_motor.speed = 80
             self.horiz_motor.speed = 80
 
-        if (self.vert_motor.speed==80) && (self.horiz_motor.speed ==80):
+        if (self.vert_motor.speed==80):
             print "Speed Assigned"
 
     @lib.api_call

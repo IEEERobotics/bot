@@ -149,7 +149,7 @@ class MecDriver(driver.Driver):
         # rotation works fine
 
     @lib.api_call
-    def move(self, speed, angle):
+    def move(self, speed, angle=0):
         """Move holonomically without rotation.
 
         :param speed: Magnitude of robot's translation speed (% of max).

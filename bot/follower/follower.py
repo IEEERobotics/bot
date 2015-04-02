@@ -739,8 +739,8 @@ class Follower(object):
             #        return "right turn"
 
             if(front_hits > 3):
-                self.driver.move(60,180)
-                sleep(.01)
+                # self.driver.move(60,180)
+                # sleep(.001)
                 self.driver.move(0,0)
                 return "block or t-intersection"
 
@@ -942,7 +942,10 @@ class Follower(object):
             # self.driver.jerk(speed=60,angle=0,duration=0.1)
             turn_dir = self.find_dir_of_turn()
             if turn_dir == "right" or turn_dir == "left":
-                self.driver.rotate_to_line()
+                # self.rotate_to_line(turn_dir)
+                self.driver.rough_rotate_90(turn_dir, r_time=0.6)
+                # Move out of intersection
+                self.driver.drive(60, angle=60, duration=0.1) 
             else:
                 self.driver.move(0,0)
                 break
@@ -961,6 +964,12 @@ class Follower(object):
          
         while not self.check_for_branch("front"):
             self.logger.debug("looking for line")
+        
+        # right slightly to insure centerred on line.
+        self.driver.rotate(speed)
+        sleep(0.1)
 
+        # throw in hard reverse to stop immediately
+        self.driver.rotate(-speed)
         self.driver.rotate(0)
 

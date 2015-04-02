@@ -289,7 +289,7 @@ class MecDriver(driver.Driver):
         self.set_motor("back_right", back_right)
 
     @lib.api_call
-    def drive(self, speed, angle, duration):
+    def drive(self, speed=50, angle=0, duration=1):
         """Moves at given speed and angle for set duration (in seconds)."""
         self.move(speed, angle)  # start moving
         sleep(duration)  # wait for desired duration (in seconds)

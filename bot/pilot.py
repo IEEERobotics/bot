@@ -101,16 +101,8 @@ class Pilot:
         return self.call(activity, 'solve')
 
     def follow_around_turns(self):
-
-        while True:
-            # follows line until anomaly.
-            self.follow()
-            turn_dir = self.find_dir_of_turn()
-            if turn_dir == "right" or turn_dir == "left":
-                self.rotate_90(turn_dir)
-            else:
-                return turn_dir
-
+        return self.call('follower','follow_around_turns')
+        
     def find_dir_of_turn(self):
         return self.call('follower','find_dir_of_turn')
         
@@ -124,19 +116,16 @@ class Pilot:
 
         for activity in self.acts:
             print "solving: {}".format(activity)
+
             # Follow to intersection.
             self.follow_around_turns() 
-           
-            # Orient self towards activity.
-            # TODO(AhmedSamara): determine how to actually do that.
-            # Possible Solutions: 
-            #  - series of switches to hardcode location.
-            #  - Follower telling location.
+            
+            self.rotate_90(self.find_dir_of_turn())
 
             self.solve_activity(activity)
             
             # Leave box and return to path.
-            self.drive(50, 180)
+            self.drive(70, 180)
             time.sleep(self.ITEM_BACKUP_TIME)
             self.drive(0, 0)
 

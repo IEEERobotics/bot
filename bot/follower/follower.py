@@ -718,7 +718,7 @@ class Follower(object):
             self.front_bin[1] = self.front_bin[0]
             self.front_bin[0] = self.assign_bin(self.array_block["front"])
 
-            print "fornt hits {}".format(self.front_bin[0])
+            # print "fornt hits {}".format(self.front_bin[0])
             #right_hits = self.count_num_of_hits(self.array_block["right"])
             #left_hits = self.count_num_of_hits(self.array_block["left"])
             #print self.array_block
@@ -882,7 +882,7 @@ class Follower(object):
     def count_num_of_hits(self, array):
         count = 0
         for value in array:
-            if value > 50:
+            if value > 70:
                 count = count + 1
         return count
 
@@ -902,7 +902,6 @@ class Follower(object):
         s_array = array_block[side]
 
         hits = self.count_num_of_hits(s_array)
-        print "Hits: ", hits 
         
         if hits <= 6:
             return True
@@ -921,8 +920,8 @@ class Follower(object):
             and not self.check_for_branch("left"):
             return "error: no branches"
 
-        elif self.check_for_branch("right") \
-            and self.check_for_branch("left")\
+        elif (self.check_for_branch("right") \
+                or self.check_for_branch("left"))\
             and self.check_for_branch("front"):
             return "intersection"
 
@@ -934,4 +933,34 @@ class Follower(object):
 
         else:
             return "error: No condition found. Line lost."
+
+    @lib.api_call
+    def follow_ignoring_turns(self):
+        while True:
+            state = self.analog_state()
+            # Inch forward to be square on int
+            # self.driver.jerk(speed=60,angle=0,duration=0.1)
+            turn_dir = self.find_dir_of_turn()
+            if turn_dir == "right" or turn_dir == "left":
+                self.driver.rotate_to_line()
+            else:
+                self.driver.move(0,0)
+                break
+        return state
+
+    @lib.api_call
+    def rotate_to_line(self, direction, speed=70):
+        """Rotates in given direction until line is found."""
+
+        # Correct speed to match direction
+        if direction == "right":
+            speed = -speed
+
+        self.driver.rotate(speed)
+        sleep(0.1) # allow time to leave current intersection
+         
+        while not self.check_for_branch("front"):
+            self.logger.debug("looking for line")
+
+        self.driver.rotate(0)
 

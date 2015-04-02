@@ -33,6 +33,10 @@ class etch_a_sketch(object):
     @lib.api_call
     def verify(self):
         print "Object built"
+        if (self.ver_motor.speed==80):
+            print "ver_motor built"
+        if (self.horiz_motor.speed==80):
+            print "horiz_motor built"
 
     @lib.api_call
     def drawI(self):

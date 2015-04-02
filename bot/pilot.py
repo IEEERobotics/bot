@@ -1,6 +1,7 @@
 """Autonomous control client that solves IEEE Hardware Competition 2014."""
 
 import sys
+import time
 
 import lib.lib as lib
 import client.ctrl_client as ctrl_client_mod
@@ -99,11 +100,20 @@ class Pilot:
 
         return self.call(activity, 'solve')
 
-    def follow_ignoring_turns(self):
+    def follow_around_turns(self):
+
         while True:
-            turn_dir = self.follow()
-    
-            
+            # follows line until anomaly.
+            self.follow()
+            turn_dir = self.find_dir_of_turn()
+            if turn_dir == "right" or turn_dir == "left":
+                self.rotate_90(turn_dir)
+            else:
+                return turn_dir
+
+    def find_dir_of_turn(self):
+        return self.call('follower','find_dir_of_turn')
+        
     def run(self):
         """Main pilot interface with outside world.
         start script will call, and pilot will handle all other logic.
@@ -115,7 +125,7 @@ class Pilot:
         for activity in self.acts:
             print "solving: {}".format(activity)
             # Follow to intersection.
-            self.follow_ignoring_turns() 
+            self.follow_around_turns() 
            
             # Orient self towards activity.
             # TODO(AhmedSamara): determine how to actually do that.
@@ -134,7 +144,7 @@ class Pilot:
             self.rotate_90("right")
             
             # line follow back to path
-            self.follow_ignoring_turns()
+            self.follow_around_turns()
 
             # turn to path
             # Opposite of previous direction.

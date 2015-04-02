@@ -97,11 +97,10 @@ class ColorSensor(I2CDevice):
     def wait_for_ready(self, timeout=122):
         """Waits for ready switch to be activates before moving on.
         """
-        t0 = time.sleep()
-        while True:
-            if time.time()- t0 > timeout:
-                break
-            if self.ready_gpio:
+        t0 = time.time()
+        print "value: ", self.ready_gpio.get_value()
+        while time.time()- t0 > timeout:
+            if self.ready_gpio.get_value():
                 return True
         return False
 

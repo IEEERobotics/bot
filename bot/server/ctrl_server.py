@@ -17,6 +17,7 @@ import pub_server as pub_server_mod
 import bot.lib.messages as msgs
 
 import bot.activity_solver.rubiks_solver as rubiks_mod
+import bot.hardware.color_sensor as color_sensor_mod
 
 
 def is_api_method(obj, name):
@@ -131,6 +132,7 @@ class CtrlServer(object):
 
         self.follower = Follower()
         self.rubiks_solver = rubiks_mod.RubiksSolver()
+        self.color_sensor = color_sensor_mod.ColorSensor()
 
         systems = {}
         systems["ctrl"] = self
@@ -138,6 +140,7 @@ class CtrlServer(object):
         systems["driver"] = self.follower.driver
         systems["ir_hub"] = self.follower.ir_hub
         systems["rubiks"] = self.rubiks_solver
+        systems["color"] = self.color_sensor
 
         self.logger.debug("Systems: {}".format(systems))
         return systems

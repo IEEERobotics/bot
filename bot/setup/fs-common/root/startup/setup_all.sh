@@ -77,5 +77,18 @@ load_gpio 60   # P9_12 green color reader
 load_gpio 31   # P9_13 blue color reader
 load_gpio 48   # P9_15 yellow color reader
 
+# Simon Arm actuator GPIOs
+load_gpio 62
+load_gpio 36
+load_gpio 32
+load_gpio 86
+load_gpio 87
+load_gpio 10
+load_gpio 8
+load_gpio 9
+load_gpio 38
+load_gpio 34
+
+
 enable_adcs
 load_slot BB-BONE-PRU-01

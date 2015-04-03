@@ -11,6 +11,14 @@ import bot.driver.mec_driver as mec_driver_mod
 import pid as pid_mod
 import bot.hardware.color_sensor as color_sensor_mod
 
+import error_cases as ec_mod
+
+class LineLostError(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
 
 class Follower(object):
 
@@ -24,6 +32,7 @@ class Follower(object):
 
     # Variables for read_binary calls
     White_Black = True  # False  # True= white line, False= black line
+    set_speed = 50
 
     def __init__(self):
         # Build logger
@@ -739,8 +748,8 @@ class Follower(object):
             #        return "right turn"
 
             if(front_hits > 3):
-                # self.driver.move(60,180)
-                # sleep(.001)
+                self.driver.move(60,180)
+                sleep(.001)
                 self.driver.move(0,0)
                 return "block or t-intersection"
 
@@ -818,11 +827,11 @@ class Follower(object):
                     self.back_left_error = -80
             else:
                 # Call PID
-                self.back_right_error = 50 + \
+                self.back_right_error = self.set_speed + \
                     self.back_right.pid(0, self.bot_front_position, self.sampling_time)
 
                 # Call PID
-                self.back_left_error = 50 - \
+                self.back_left_error = self.set_speed - \
                     self.back_left.pid(0, self.bot_front_position, self.sampling_time)
 
                 if(self.back_right_error >= 80):
@@ -882,14 +891,14 @@ class Follower(object):
     def count_num_of_hits(self, array):
         count = 0
         for value in array:
-            if value > 70:
+            if value > 90:
                 count = count + 1
         return count
 
     def assign_bin(self,a_array):
         array = [0,0,0,0,0,0,0,0]
         for index,value in enumerate(a_array):
-            if value > 50:
+            if value > 90:
                 array[index] = 1
         return array
 
@@ -908,8 +917,37 @@ class Follower(object):
         return False       
         
     @lib.api_call
+    def is_intersection(self):
+        """Determines whether an anomaly is a turn or an intersection.
+        """
+        if (self.check_for_branch("right") \
+                or self.check_for_branch("left"))\
+            and self.check_for_branch("front"):
+            return True
+        return False
+
+    @lib.api_call
+    def find_dir_of_int(self):
+        if not (
+            (self.check_for_branch("right") \
+                or self.check_for_branch("left"))\
+            and self.check_for_branch("front")):
+           return "error: not intersection"
+
+        elif self.check_for_branch("right")\
+            and self.check_for_branch("left"):
+            return "error: branches in both dirs.111"
+        
+        elif self.check_for_branch("right"):
+            return "right"
+
+        elif self.check_for_branch("left"):
+            return "left"
+  
+    @lib.api_call
     def find_dir_of_turn(self):
         """Determines whether a turn is on the right or left
+        :returns: right, left, intersection, error
         """
         
         if (self.check_for_branch("right") \
@@ -942,10 +980,10 @@ class Follower(object):
             # self.driver.jerk(speed=60,angle=0,duration=0.1)
             turn_dir = self.find_dir_of_turn()
             if turn_dir == "right" or turn_dir == "left":
-                # self.rotate_to_line(turn_dir)
-                self.driver.rough_rotate_90(turn_dir, r_time=0.6)
+                self.rotate_to_line(turn_dir)
+                # self.driver.rough_rotate_90(turn_dir, r_time=0.6)
                 # Move out of intersection
-                self.driver.drive(60, angle=60, duration=0.1) 
+                self.driver.drive(60, angle=0, duration=0.09) 
             else:
                 self.driver.move(0,0)
                 break
@@ -967,9 +1005,24 @@ class Follower(object):
         
         # right slightly to insure centerred on line.
         self.driver.rotate(speed)
-        sleep(0.1)
+        sleep(0.5)
 
         # throw in hard reverse to stop immediately
         self.driver.rotate(-speed)
         self.driver.rotate(0)
 
+    @lib.api_call
+    def recover_to_line(self, state):
+        """states:
+            lost: bot has no idea where it is. 
+            front_known: front is still on line, but is unable to follow
+            because it thinks it's on an intersection
+        """
+        
+        if state == "front_known":
+            # Inch forward and examine side arrays
+            self.driver.jerk() 
+            line_dir = self.find_dir_of_turn()
+            if line_dir == "right" or line_dir == "left":
+                self.driver.rough_rotate_90(line_dir)
+                 

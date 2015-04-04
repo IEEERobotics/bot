@@ -36,6 +36,7 @@ class Follower(object):
         self.color_sensor = color_sensor_mod.ColorSensor()
 
         # Build PIDs
+        # FIXME 1 no longer in use
         self.front_right = pid_mod.PID();
         self.front_right_error = 0.0
         self.front_left = pid_mod.PID();
@@ -51,11 +52,12 @@ class Follower(object):
         self.error = "NONE"
 
         # motor variables
+        # FIXME 2 same as before
         self.translate_speed = 75
         self.prev_rate = 0
 
         # state variables
-        self.heading = None  # must be initialize by callee
+        self.heading = None  # must be initialize by caller
         self.front_state = Follower.No_Line
         self.back_state = Follower.No_Line
         self.left_state = Follower.No_Line
@@ -97,27 +99,6 @@ class Follower(object):
     def get_rotate_error(self):
         return self.rotate_error
 
-    @lib.api_call
-    def wait_for_start(self):
-        """Poll color senor unti green start signal lights up."""
-        return self.color_sensor.watch_for_color("green")
-
-    @lib.api_call
-    def is_on_line(self):
-        return (not self.lost_line)  # TODO: Use IR sensors to perform check
-
-    @lib.api_call
-    def is_on_x(self):
-        return self.intersection  # TODO: Use IR sensors to perform check
-
-    @lib.api_call
-    def is_on_blue(self):
-        return True  # TODO: Use color sensor
-
-    @lib.api_call
-    def is_on_red(self):
-        return True  # TODO: Use color sensor
-
     def reset_errors(self):
         self.error = "NONE"
         # state variables
@@ -137,87 +118,6 @@ class Follower(object):
         self.strafe.clear_error()
         self.rotate_pid.clear_error()
         return
-
-    @lib.api_call
-    def follow(self, heading, on_x=False):
-        """Follow line along given heading"""
-        # reset errors
-        self.reset_errors()
-        self.on_x = on_x
-        # Get the initial conditioni
-        self.heading = heading
-        previous_time = time()
-        # Init front_PID
-        self.strafe.set_k_values(10, 0, .5)
-        # Inti rotate_PID
-        self.rotate_pid.set_k_values(7, 0, 1)
-        # Get current heading
-        self.heading = heading
-        # Continue until an error condition
-        count_object = 0
-
-        while True:
-            # Assign the current states to the correct heading
-            self.assign_states()
-            # Check for error conditions
-            if self.error != "NONE":
-                # require two succesive large_object readings to exit
-                if self.error == "LARGE_OBJECT" and count_object < 1:
-                    count_object += 1
-                    continue
-                self.update_exit_state()
-                self.logger.info("Error: {}".format(self.error))
-                self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format(
-                    self.front_state,
-                    self.back_state,
-                    self.left_state,
-                    self.right_state))
-                self.driver.move(0, 0)
-                return self.error
-
-            # average states.
-            bot_front_position = (self.front_state + self.back_state)/2
-            # Get the current time of the CPU
-            current_time = time()
-            self.sampling_time = current_time - previous_time
-            # Call PID
-            self.strafe_error = self.strafe.pid(
-                0, bot_front_position, self.sampling_time)
-            # calculate difference between array's for approx. pseudo angle
-            bot_angle = (self.front_state - self.back_state)
-            # Call Rotate PID
-            self.rotate_error = self.rotate_pid.pid(
-                0, bot_angle, self.sampling_time)
-            # Report errors from strafe and rotate pid's
-            self.logger.info(" StrafeErr: {}, RotErr: {}".format(
-                self.strafe_error,
-                self.rotate_error))
-            # Update motors
-            self.motors(bot_angle)
-            # Take the current time set it equal to the previous time
-            previous_time = current_time
-
-    @lib.api_call
-    def rotate_on_x(self, direction="left", speed=100, time=0.95):
-        # After center_on_x, rotate in the commanded directions
-        # by 90 degrees.
-        if(direction == "left"):
-            sign = 1
-        elif(direction == "right"):
-            sign = -1
-        else:
-            self.logger.error("Bad param direction, please use left or right")
-            return "DONE"
-
-        # sign turns in correct direction
-        self.rotate(sign*speed)
-
-        sleep(time)
-
-        self.driver.move(0, 0)
-
-        self.center_on_intersection()
-        return "Done"
 
     @lib.api_call
     def report_states(self):
@@ -754,34 +654,6 @@ class Follower(object):
         # end top while loop
 
     @lib.api_call
-    def center_on_blue_block(self, heading=180):
-        # Assumes Front array (from heading) is on blue block
-        self.heading = heading
-        # Assign the current states to the correct heading
-        self.assign_states()
-        # Check for error conditions
-        if(self.error != "NONE" and self.error != "LARGE_OBJECT"):
-            self.update_exit_state()
-            self.logger.info("Error: {}".format(self.error))
-            self.logger.info("FS: {}, BS: {}, lS: {}, RS: {}".format(
-                self.front_state,
-                self.back_state,
-                self.left_state,
-                self.right_state))
-            self.driver.move(0, 0)
-            return self.error
-        # Move forward until off block
-        direction = 180 - heading
-        while self.front_state == Follower.Large_Object:
-            self.driver.move(60, direction)
-            sleep(0.25)
-            self.assign_states()
-        self.driver.move(0, 0)
-        # After off block, use center on line to straigten
-        self.center_on_line(heading)
-        return "DONE CENTER ON BLUE BLOCK"
-
-    @lib.api_call
     def get_result(self):
         self.assign_states()
         return self.error
@@ -805,48 +677,91 @@ class Follower(object):
             self.assign_states()
             self.driver.move(0, 0)
         return "DONE STRAFING TO LINE"
-
-
-
-
+        
     @lib.api_call
     def analog_state(self):
         """Make call to analog arrays"""
-        
-        # Take current time before reading ADC readings of the IRs            
+
+        # Take current time before reading ADC readings of the IRs
         previous_time = time()
         self.front_right.set_k_values(kp = .2, kd = 0.1, ki = 0.0)
         self.front_left.set_k_values(kp = .2, kd = 0.1, ki = 0.0)
 
         self.back_right.set_k_values(kp = .03, kd = 0.009, ki = 0.0)
         self.back_left.set_k_values(kp = .03, kd = 0.009, ki = 0.0)
-        
+        self.front_bin = [[0 for x in range(8)] for y in range(3)]
+
         self.front_right_error = 0.0
         self.front_left_error = 0.0
         self.back_right_error = 0.0
         self.back_left_error = 0.0
+        left_count = 0
+        right_count = 0
 
         while True:
-
             # Read ir arrays
             self.array_block = self.ir_hub.read_all()
-            self.normaliza_arrays()
+            self.normalize_arrays()
             self.track_position()
-            
+
             # Get the current time of the CPU
             current_time = time()
             self.sampling_time = current_time - previous_time
 
-            # Take current time before reading ADC readings of the IRs            
+            # time before reading the IRs
             previous_time = time()
 
-            # Count the number of hits 
+            # Count the number of hits
             front_hits = self.count_num_of_hits(self.array_block["front"])
             back_hits = self.count_num_of_hits(self.array_block["back"])
-            right_hits = self.count_num_of_hits(self.array_block["right"])
-            left_hits = self.count_num_of_hits(self.array_block["left"])
+            self.front_bin[2] = self.front_bin[1]
+            self.front_bin[1] = self.front_bin[0]
+            self.front_bin[0] = self.assign_bin(self.array_block["front"])
+
+            print "fornt hits {}".format(self.front_bin[0])
+            #right_hits = self.count_num_of_hits(self.array_block["right"])
+            #left_hits = self.count_num_of_hits(self.array_block["left"])
             #print self.array_block
-             
+
+            #if not front_hits > 1:
+            #    if((self.front_bin[1][0] == 1 \
+            #        and self.front_bin[1][1] == 1) \
+            #        or (self.front_bin[2][0] == 1 \
+            #            and self.front_bin[2][1] == 1)):
+            #        self.driver.move(0,0)
+            #        return "left turn"
+
+            #    if((self.front_bin[0][7] == 1 \
+            #        and self.front_bin[1][7] == 1) \
+            #        or (self.front_bin[0][6] == 1 \
+            #        and self.front_bin[1][6] == 1)):
+            #        self.driver.move(0,0)
+            #        return "right turn"
+
+            if(front_hits > 3):
+                self.driver.move(60,180)
+                sleep(.01)
+                self.driver.move(0,0)
+                return "block or t-intersection"
+
+            #else:
+            #    if((self.front_bin[1][0] == 1 \
+            #        and self.front_bin[1][1] == 1) \
+            #        or (self.front_bin[2][0] == 1 \
+            #            and self.front_bin[2][1] == 1)):
+            #        self.driver.move(0,0)
+            #        return "left turn at intersection"
+            #    if((self.front_bin[0][7] == 1 \
+            #        and self.front_bin[1][7] == 1) \
+            #        or (self.front_bin[0][6] == 1 \
+            #            and self.front_bin[1][6] == 1)):
+            #        self.driver.move(0,0)
+            #        return "right turn at intersection"
+
+            if back_hits == 0 and front_hits == 0:
+                self.driver.move(speed = 0, angle = 0)
+                return "loss line"
+
             if(front_hits > 0):
                 # Call PID
                 self.front_right_error = (50 + self.front_right.pid(
@@ -865,7 +780,7 @@ class Follower(object):
                     self.front_left_error = 80
                 elif(self.front_left_error <= -80):
                     self.front_left_error = -80
-            #else:
+            else:
                 self.front_right_error = (50 + self.front_right.pid(
                     0, self.bot_back_position, self.sampling_time))
 
@@ -887,7 +802,7 @@ class Follower(object):
                 # Call PID
                 self.back_right_error = (50 + self.back_right.pid(
                     0, self.bot_back_position, self.sampling_time))
-            
+
                 # Call PID
                 self.back_left_error = (50 - self.back_left.pid(
                     0, self.bot_back_position, self.sampling_time))
@@ -901,14 +816,14 @@ class Follower(object):
                     self.back_left_error = 80
                 elif(self.back_left_error <= -80):
                     self.back_left_error = -80
-            else:        
+            else:
                 # Call PID
-                self.back_right_error = (50 + self.back_right.pid(
-                    0, self.bot_front_position, self.sampling_time))
-            
+                self.back_right_error = 50 + \
+                    self.back_right.pid(0, self.bot_front_position, self.sampling_time)
+
                 # Call PID
-                self.back_left_error = (50 - self.back_left.pid(
-                    0, self.bot_fron_position, self.sampling_time))
+                self.back_left_error = 50 - \
+                    self.back_left.pid(0, self.bot_front_position, self.sampling_time)
 
                 if(self.back_right_error >= 80):
                     self.back_right_error = 80
@@ -920,54 +835,75 @@ class Follower(object):
                 elif(self.back_left_error <= -80):
                     self.back_left_error = -80
 
-            if back_hits == 0 and front_hits == 0:
-                self.driver.move(speed = 0, angle = 0) 
+            self.driver.set_motor(name = "front_right",
+                                 value = self.front_right_error)
+            self.driver.set_motor(name = "front_left",
+                                 value = self.front_left_error)
+            self.driver.set_motor(name = "back_right",
+                                 value = self.back_right_error)
+            self.driver.set_motor(name = "back_left",
+                                 value = self.back_left_error)
 
-
-            self.driver.set_motor(name = "front_right", value = self.front_right_error)
-            self.driver.set_motor(name = "front_left", value = self.front_left_error)
-            self.driver.set_motor(name = "back_right", value = self.back_right_error)
-            self.driver.set_motor(name = "back_left", value = self.back_left_error)
-
-    def normaliza_arrays(self):
+    def normalize_arrays(self):
         """Uesd to mormaliza ir readings coming form the ir array"""
         for array in self.array_block:
             for position,value in enumerate(self.array_block[array]):
-                self.array_block[array][position] = (255 - value) - 100 
+                self.array_block[array][position] = (255 - value) - 100
                 if(self.array_block[array][position] < 0):
                     self.array_block[array][position] = 0
-                                            
 
     def track_position(self):
         """Trak the positon of the line"""
         self.bot_front_position = 0;
         self.bot_back_position = 0;
         value = max(self.array_block["front"])
-        if(value < 10):
-            return
-        index = self.array_block["front"].index(value)
-        print value
-        #if value > 10:
-        if index < 4:
-            self.bot_front_position = 5.0 * (4.0 - index) * (4.0 - index) * (4.0 - index)
-        else:
-            self.bot_front_position = 5.0 * (3.0 - index) * (3.0 - index) * (3.0 - index)
+        if not (value < 10):
+            index = self.array_block["front"].index(value)
+            #if value > 10:
+            if index < 4:
+                self.bot_front_position = 5.0 * (4.0 - index) \
+                                    * (4.0 - index) * (4.0 - index)
+            else:
+                self.bot_front_position = 5.0 * (3.0 - index) \
+                                    * (3.0 - index) * (3.0 - index)
 
         value = max(self.array_block["back"])
-        if(value < 10):
-            return
-        index = self.array_block["back"].index(value)
-        #print value
-        #if value > 10:
-        if index < 4:
-            self.bot_back_position = 5.0 * (4.0 - index) * (4.0 - index) * (4.0 - index)
-        else:
-            self.bot_back_position = 5.0 * (3.0 - index) * (3.0 - index) * (3.0 - index)
-
+        if not(value < 10):
+            index = self.array_block["back"].index(value)
+            #print value
+            #if value > 10:
+            if index < 4:
+                self.bot_back_position = 5.0 * (4.0 - index) \
+                                    * (4.0 - index) * (4.0 - index)
+            else:
+                self.bot_back_position = 5.0 * (3.0 - index) \
+                                    * (3.0 - index) * (3.0 - index)
 
     def count_num_of_hits(self, array):
         count = 0
         for value in array:
-            if value > 0:
+            if value > 50:
                 count = count + 1
         return count
+
+    def assign_bin(self,a_array):
+        array = [0,0,0,0,0,0,0,0]
+        for index,value in enumerate(a_array):
+            if value > 50:
+                array[index] = 1
+        return array
+
+    @lib.api_call
+    def check_side_for_branch(self, side):
+        """Checks to see if there is a branch on the left.
+        :returns: True or False
+        """
+        array_block = self.ir_hub.read_all()
+        bin_block   = self.assign_bin(array_block[side])
+        
+        hits = self.count_num_of_hits(bin_block)
+        print "Hits: ", hits 
+        
+        if hits <= 6:
+            return True
+        return False        

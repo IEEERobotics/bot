@@ -34,12 +34,15 @@ class Micromotor(object):
         self.gpio_1.output()
         self.gpio_2.output()
 
+    @lib.api_call
     def forward(self):
         """The motor move clockwise.
 
         """
         self.gpio_1.set_value(1)
+        self.gpio_2.set_value(0)
 
+    @lib.api_call
     def stop(self):
         """Stop the motor when it is moving.
 
@@ -47,8 +50,9 @@ class Micromotor(object):
         self.gpio_1.set_value(0)
         self.gpio_2.set_value(0)
 
+    @lib.api_call
     def backward(self):
         """The motor moves counter_clockwise.
-
         """
         self.gpio_2.set_value(1)
+        self.gpio_1.set_value(0)

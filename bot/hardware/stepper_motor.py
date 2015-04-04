@@ -40,6 +40,11 @@ class Stepper_motor(object):
             self.gpio_3 = gpio.GPIO(gpio_pins[2])
             self.gpio_4 = gpio.GPIO(gpio_pins[3])
 
+        self.gpio_1.output()
+        self.gpio_2.output()
+        self.gpio_3.output()
+        self.gpio_4.output()
+
     def clockwise(self): 
         """The motor rotates clockwise.
 

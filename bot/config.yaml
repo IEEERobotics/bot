@@ -5,7 +5,7 @@ test_mode: {
     ir: { front: false, back: false, right: false, left: false},
     IR: false,
     ADC: false,
-    DMCC: false,
+    DMCC: true,
     stepper: false,
     motor: false,
     servo: false,
@@ -14,7 +14,7 @@ test_mode: {
 }
 
 rubiks : {
-    servo_pwm: 5, # P8_13
+    servo_pwm: 2, # P9_21
     
     GPIO: {
         FWD: 11, # P8_32
@@ -33,7 +33,7 @@ simon: {
     # Currently using 4 gpios for stepper motor.
     # TODO(AhmedSamara) switch to pwm once PCB is in
     
-    servo: 2,            # TODO(vijay)P9 - 29 or 21?? also change 
+    servo: 1,            # TODO(vijay)P9 - 29 or 21?? also change 
                          # servo pwm number to 1
 
     stepper: [78, 76, 74, 72]

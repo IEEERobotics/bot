@@ -9,6 +9,7 @@ load_gpio () {
   else
     echo "GPIO $num already exported"
   fi
+  # GPIO set to in (High-impedence) by default. 
+  # Prevents unexpected current draw during startup.
   echo in > ${gpio_sysfs}/gpio${num}/direction
-  # echo 0 > ${gpio_sysfs}/gpio${num}/value
 }

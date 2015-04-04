@@ -11,14 +11,7 @@ import bot.driver.mec_driver as mec_driver_mod
 import pid as pid_mod
 import bot.hardware.color_sensor as color_sensor_mod
 
-import error_cases as ec_mod
-
-class LineLostError(Exception):
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return repr(self.value)
+from error_cases import LineLostError
 
 class Follower(object):
 
@@ -33,6 +26,8 @@ class Follower(object):
     # Variables for read_binary calls
     White_Black = True  # False  # True= white line, False= black line
     set_speed = 50
+
+    thresh = 50
 
     def __init__(self):
         # Build logger
@@ -769,7 +764,9 @@ class Follower(object):
 
             if back_hits == 0 and front_hits == 0:
                 self.driver.move(speed = 0, angle = 0)
-                return "loss line"
+                print "lost line"
+                raise LineLostError("reading: {}".format(
+                                        self.array_block()))
 
             if(front_hits > 0):
                 # Call PID
@@ -973,6 +970,16 @@ class Follower(object):
             return "error: No condition found. Line lost."
 
     @lib.api_call
+    def is_centerred_on_line(self):
+        """Checks to see if bot is reasonably within center line.
+        """
+        arr_block = self.ir_hub.read_all()
+        if arr_block['front'][4] < self.thresh \
+            or arr_block['front'][5] < self.thresh:
+            return True
+        return False 
+        
+    @lib.api_call
     def follow_ignoring_turns(self):
         while True:
             state = self.analog_state()
@@ -980,6 +987,7 @@ class Follower(object):
             # self.driver.jerk(speed=60,angle=0,duration=0.1)
             turn_dir = self.find_dir_of_turn()
             if turn_dir == "right" or turn_dir == "left":
+                self.driver.drive(60,0,0.1) 
                 self.rotate_to_line(turn_dir)
                 # self.driver.rough_rotate_90(turn_dir, r_time=0.6)
                 # Move out of intersection
@@ -987,7 +995,6 @@ class Follower(object):
             else:
                 self.driver.move(0,0)
                 break
-        return state
 
     @lib.api_call
     def rotate_to_line(self, direction, speed=70):
@@ -998,31 +1005,28 @@ class Follower(object):
             speed = -speed
 
         self.driver.rotate(speed)
-        sleep(0.1) # allow time to leave current intersection
+        sleep(0.09) # allow time to leave current intersection
          
-        while not self.check_for_branch("front"):
+        while not self.is_centerred_on_line():
             self.logger.debug("looking for line")
         
-        # right slightly to insure centerred on line.
-        self.driver.rotate(speed)
-        sleep(0.5)
-
         # throw in hard reverse to stop immediately
         self.driver.rotate(-speed)
         self.driver.rotate(0)
 
+    
     @lib.api_call
-    def recover_to_line(self, state):
-        """states:
-            lost: bot has no idea where it is. 
-            front_known: front is still on line, but is unable to follow
-            because it thinks it's on an intersection
-        """
+    def recover(self):
         
-        if state == "front_known":
-            # Inch forward and examine side arrays
-            self.driver.jerk() 
-            line_dir = self.find_dir_of_turn()
-            if line_dir == "right" or line_dir == "left":
-                self.driver.rough_rotate_90(line_dir)
-                 
+        # case where nothing is known 
+        if self.check_for_branch('front') and \
+            (not self.check_for_branch('left')
+            and not self.check_for_branch('right')):
+             return
+
+        # Front has lost line, use sides to recover
+        elif not self.check_for_branch('front') and \
+                self.check_for_branch('left') and \
+                not self.check_for_branch('right'):
+            self.mec_driver.rotate_to_line()
+            

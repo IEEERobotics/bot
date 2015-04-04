@@ -14,17 +14,6 @@ test_mode: {
     simon_player: false
 }
 
-# switches attached to GPIO pins will be used to encode directions of
-# activities at run setup time.
-# Convention:
-#   HIGH = right turn
-#   LOW  = left turn
-act_directions: {
-    etch: 76,
-    rubiks: 74,
-    card: 72 
-}
-
 
 rubiks : {
     servo_pwm: 4, # P8_34 (EHRPWM-1B)
@@ -53,20 +42,11 @@ simon: {
 }
 
 dmcc_drive_motors: {
-    # back_left: { board_num: 1, motor_num: 1 },
-    # back_right: { board_num: 1, motor_num: 2, invert: True },
-    # front_left: { board_num: 0, motor_num: 1 },
-    # front_right: { board_num: 0, motor_num: 2, invert: True }
-
-    # front_left: { board_num: 1, motor_num: 1 },
-    # back_left: { board_num: 1, motor_num: 2, invert: True },
-    # front_right: { board_num: 0, motor_num: 1 },
-    # back_right: { board_num: 0, motor_num: 2, invert: True }
 
     front_left: { board_num: 1, motor_num: 1 },
     back_left: { board_num: 1, motor_num: 2 },
     front_right: { board_num: 0, motor_num: 1, invert: True},
-    back_right: { board_num: 0, motor_num: 2, invert: True }
+    back_right: { board_num: 0, motor_num: 2, invert: True}
 
 }
 

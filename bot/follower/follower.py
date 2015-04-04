@@ -982,7 +982,11 @@ class Follower(object):
     @lib.api_call
     def follow_ignoring_turns(self):
         while True:
-            state = self.analog_state()
+            try:
+                state = self.analog_state()
+            except LineLostError:
+                self.recover()
+
             # Inch forward to be square on int
             # self.driver.jerk(speed=60,angle=0,duration=0.1)
             turn_dir = self.find_dir_of_turn()
@@ -1012,6 +1016,7 @@ class Follower(object):
         
         # throw in hard reverse to stop immediately
         self.driver.rotate(-speed)
+        sleep(0.05)
         self.driver.rotate(0)
 
     
@@ -1028,5 +1033,9 @@ class Follower(object):
         elif not self.check_for_branch('front') and \
                 self.check_for_branch('left') and \
                 not self.check_for_branch('right'):
-            self.mec_driver.rotate_to_line()
+            self.rotate_to_line('left')
             
+        elif not self.check_for_branch('front') and \
+            not self.check_for_branch('left') and \
+            self.check_for_branch('right'):
+            self.rotate_to_line('right')

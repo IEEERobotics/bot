@@ -2,7 +2,7 @@
 """
 
 import bot.lib.lib as lib
-import bot.hardware.pot import Pot
+from bot.hardware.pot import Pot
 
 class LightDetector(object):
 
@@ -47,7 +47,7 @@ class LightDetector(object):
         while True:
             try:
                 for d in self.color_detectors:
-                    if(self.color_detectos[d].get_value() != 0)
+                    if(self.color_detectos[d].get_value() != 0):
                         return d
             except KeyboardInterrupt:
                 break

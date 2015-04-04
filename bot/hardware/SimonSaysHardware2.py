@@ -39,47 +39,46 @@ class SimonSaysHardware2(object):
     @lib.api_call
     def press_start(self):
         self.motor1.forward()
-        self.timer.sleep(1)
+        time.sleep(1)
         self.motor1.stop()
         self.motor1.backward()
-        self.timer.sleep(1)
+        time.sleep(1)
         self.motor1.stop()
 
     @lib.api_call
     def press_red(self):
         self.motor2.forward()
-        self.timer.sleep(1)
+        time.sleep(1)
         self.motor2.stop()
         self.motor2.backward()
-        self.timer.sleep(1)
+        time.sleep(1)
         self.motor2.stop()
 
- 
     @lib.api_call
     def press_blue(self):
         self.motor3.forward()
-        self.timer.sleep(1)
+        time.sleep(1)
         self.motor3.stop()
         self.motor3.backward()
-        self.timer.sleep(1)
+        time.sleep(1)
         self.motor3.stop()
 
  
     @lib.api_call
     def press_green(self):
         self.motor4.forward()
-        self.timer.sleep(1)
+        time.sleep(1)
         self.motor4.stop()
         self.motor4.backward()
-        self.timer.sleep(1)
+        time.sleep(1)
         self.motor4.stop()
 
  
     @lib.api_call
     def press_yellow(self):
         self.motor5.forward()
-        self.timer.sleep(1)
+        time.sleep(1)
         self.motor5.stop()
         self.motor5.backward()
-        self.timer.sleep(1)
+        time.sleep(1)
         self.motor5.stop()

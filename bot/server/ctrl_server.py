@@ -17,7 +17,7 @@ import pub_server as pub_server_mod
 import bot.lib.messages as msgs
 
 import bot.activity_solver.rubiks_solver as rubiks_mod
-
+import bot.hardware.SimonSaysHardware2 as s_mod
 
 def is_api_method(obj, name):
     """Tests whether named method exists in obj and is flagged for API export.
@@ -131,6 +131,7 @@ class CtrlServer(object):
 
         self.follower = Follower()
         self.rubiks_solver = rubiks_mod.RubiksSolver()
+        self.simon_hardware = s_mod.SimonSaysHardware2()
 
         systems = {}
         systems["ctrl"] = self
@@ -138,6 +139,7 @@ class CtrlServer(object):
         systems["driver"] = self.follower.driver
         systems["ir_hub"] = self.follower.ir_hub
         systems["rubiks"] = self.rubiks_solver
+        systems["simon_gripper"] = self.simon_hardware
 
         self.logger.debug("Systems: {}".format(systems))
         return systems

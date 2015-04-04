@@ -42,12 +42,12 @@ set_duty     5 10000000
 set_polarity 5 0
 run_pwm      5  
 
-# rubiks cube servo: P8_34 
-load_pwm     5 
-set_period   5 20000000
-set_duty     5 10000000
-set_polarity 5 0
-run_pwm      5
+# rubiks cube servo: P9_21 
+load_pwm     2 
+set_period   2 20000000
+set_duty     2 10000000
+set_polarity 2 0
+run_pwm      2
 
 # rubiks cube gripper
 load_gpio 11 # P8_32

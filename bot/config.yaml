@@ -36,10 +36,10 @@ simon: {
     
     # TODO(Vijay) Fill in the values for the motor GPIO
 
-    motor1 : [62,36]
-    motor2 : [32,86]
-    motor3 : [87,10]
-    motor4 : [9,8]
+    motor1 : [62,36],
+    motor2 : [32,86],
+    motor3 : [87,10],
+    motor4 : [9,8],
     motor5 : [38,34]
     
 }

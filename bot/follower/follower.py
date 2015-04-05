@@ -1024,10 +1024,11 @@ class Follower(object):
     def recover(self):
         
         # case where nothing is known 
+        # find better solution than flailing blindly
         if self.check_for_branch('front') and \
             (not self.check_for_branch('left')
             and not self.check_for_branch('right')):
-             return
+             self.rotate_to_line('left') 
 
         # Front has lost line, use sides to recover
         elif not self.check_for_branch('front') and \

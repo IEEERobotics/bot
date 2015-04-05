@@ -5,8 +5,7 @@ test_mode: {
     ir: { front: false, back: false, right: false, left: false},
     IR: false,
     ADC: false,
-    pot: false,
-    DMCC: false,
+    DMCC: true,
     stepper: false,
     motor: false,
     servo: false,
@@ -14,9 +13,9 @@ test_mode: {
     simon_player: false
 }
 
-
 rubiks : {
     servo_pwm: 2, # P9_21
+    
     GPIO: {
         FWD: 11, # P8_32
         REV: 89, # P8_30 
@@ -34,18 +33,27 @@ simon: {
     # Currently using 4 gpios for stepper motor.
     # TODO(AhmedSamara) switch to pwm once PCB is in
     
-    servo: 1,            # TODO(vijay)P9 - 29 or 21?? also change 
+    servo: 2,            # TODO(vijay)P9 - 29 or 21?? also change 
                          # servo pwm number to 1
 
     stepper: [78, 76, 74, 72]
 }
 
 dmcc_drive_motors: {
+    # back_left: { board_num: 1, motor_num: 1 },
+    # back_right: { board_num: 1, motor_num: 2, invert: True },
+    # front_left: { board_num: 0, motor_num: 1 },
+    # front_right: { board_num: 0, motor_num: 2, invert: True }
+
+    # front_left: { board_num: 1, motor_num: 1 },
+    # back_left: { board_num: 1, motor_num: 2, invert: True },
+    # front_right: { board_num: 0, motor_num: 1 },
+    # back_right: { board_num: 0, motor_num: 2, invert: True }
 
     front_left: { board_num: 1, motor_num: 1 },
     back_left: { board_num: 1, motor_num: 2 },
     front_right: { board_num: 0, motor_num: 1, invert: True},
-    back_right: { board_num: 0, motor_num: 2, invert: True}
+    back_right: { board_num: 0, motor_num: 2, invert: True }
 
 }
 
@@ -83,12 +91,21 @@ ultrasonics: {
 }
 
 course: {
-    # The direction for each activity from course
-    path: {
-        simon: left,
-        etch: right,
-        rubiks: left,
-        card: left
+    ncsu: &ncsu {
+        x_size: 1.1786,  # in meters, ncsu course: 46.4"
+        y_size: 2.4257  # in meters, official spec: 95.5"
+    },
+    official: &official {
+        x_size: 1.2065,  # in meters, official spec: 47.5"
+        y_size: 2.4257  # in meters, official spec: 95.5"
+    },
+    default: *ncsu,
+    # bonding box of valid firing locations (for gunner)
+    firing_box: { 
+        y_min: 0.889,  # 35"
+        y_max: 1.55,  # 60"
+        x_min: 0.3,  # ~12"
+        x_max: 1.07   # 42"
     }
 }
 
@@ -139,7 +156,5 @@ ctrl_server_port: 60000  # Port used to send control messages to the bot
 pub_server_port: 60001  # PubServer publishes bot data on this port
 irs_per_array: 8
 resistor_per_pot: 4
-color_sensor: {LED_PWM: 5,
-               ready_signal: 78 
-                }
+color_sensor: {LED_PWM: 5}
 ir_thresh: 60

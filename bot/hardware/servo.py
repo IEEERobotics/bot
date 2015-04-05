@@ -60,12 +60,13 @@ class Servo(object):
         position = ((duty - 1000000) / 1000000) * 180 where
         1000000 <= duty <= 2000000
 
-        TODO(dfarrell07): This needs to be calibrated.
+        TODO(Vijay): Servo calibrated for rubix cube servo.
+        Needs recalibration in case of other servo usage.
 
         :returns: Position of servo as an angle 0-180.
 
         """
-        return int(round(((self.pwm.duty - 1000000) / 1000000.) * 180))
+        return int(round(((self.pwm.duty - 575000) / 1525000.) * 180))
 
     @position.setter
     def position(self, position):
@@ -73,7 +74,8 @@ class Servo(object):
 
         duty = 1000000 + 1000000 * (position / 180)
 
-        TODO(dfarrell07): This needs to be calibrated.
+        TODO(Vijay): Servo calibrated for rubix cube servo.
+        Needs recalibration in case of other servo usage.
 
         :param position: Position to move the servo to (0-180 degrees).
         :type position: int

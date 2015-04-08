@@ -57,7 +57,7 @@ class DMCCMotorSet(dict):
                 self.logger.error(
                     "Bad motor definition for motor: '{}'".format(
                         name))
-                raise KeyError
+                raise
 
         self.logger.debug("Setup {}".format(self))
 

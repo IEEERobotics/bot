@@ -15,6 +15,8 @@ import bot.lib.lib as lib
 from bot.follower.follower import Follower
 import pub_server as pub_server_mod
 import bot.lib.messages as msgs
+from bot.activity_solver.etch_a_sketch import etch_a_sketch
+from bot.activity_solver.simon_solver import SimonPlayer
 
 import bot.activity_solver.rubiks_solver as rubiks_mod
 
@@ -130,13 +132,17 @@ class CtrlServer(object):
         """
 
         self.follower = Follower()
+        
         self.rubiks_solver = rubiks_mod.RubiksSolver()
+
+        self.etch_a_sketch = etch_a_sketch()
 
         systems = {}
         systems["ctrl"] = self
         systems["follower"] = self.follower
         systems["driver"] = self.follower.driver
         systems["ir_hub"] = self.follower.ir_hub
+        systems["etch_a_sketch"]=self.etch_a_sketch
         systems["rubiks"] = self.rubiks_solver
 
         self.logger.debug("Systems: {}".format(systems))

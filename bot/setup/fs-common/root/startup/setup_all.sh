@@ -77,5 +77,13 @@ load_gpio 60   # P9_12 green color reader
 load_gpio 31   # P9_13 blue color reader
 load_gpio 48   # P9_15 yellow color reader
 
+# Etch_a_sketch
+load_gpio 44   # P8_12
+load_gpio 26   # P8_14
+load_gpio 46   # P8_16
+load_gpio 65   # P8_18
+load_gpio 15   # P9_23
+load_gpio 14   # P9_26 
+
 enable_adcs
 load_slot BB-BONE-PRU-01

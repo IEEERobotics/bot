@@ -984,24 +984,26 @@ class Follower(object):
         while True:
             try:
                 state = self.analog_state()
+            
+                # Inch forward to be square on int
+                # self.driver.jerk(speed=60,angle=0,duration=0.1)
+                turn_dir = self.find_dir_of_turn()
+                if turn_dir == "right" or turn_dir == "left":
+                    self.driver.drive(60,0,0.1) 
+                    self.rotate_to_line(turn_dir)
+                    # self.driver.rough_rotate_90(turn_dir, r_time=0.6)
+                    # Move out of intersection
+                    self.driver.drive(60, angle=0, duration=0.09) 
+                else:
+                    self.driver.move(0,0)
+                    break
             except LineLostError:
+                self.logger.error("Line lost, attempting to recover")
                 self.recover()
 
-            # Inch forward to be square on int
-            # self.driver.jerk(speed=60,angle=0,duration=0.1)
-            turn_dir = self.find_dir_of_turn()
-            if turn_dir == "right" or turn_dir == "left":
-                self.driver.drive(60,0,0.1) 
-                self.rotate_to_line(turn_dir)
-                # self.driver.rough_rotate_90(turn_dir, r_time=0.6)
-                # Move out of intersection
-                self.driver.drive(60, angle=0, duration=0.09) 
-            else:
-                self.driver.move(0,0)
-                break
 
     @lib.api_call
-    def rotate_to_line(self, direction, speed=70):
+    def rotate_to_line(self, direction, speed=50):
         """Rotates in given direction until line is found."""
 
         # Correct speed to match direction
@@ -1009,7 +1011,7 @@ class Follower(object):
             speed = -speed
 
         self.driver.rotate(speed)
-        sleep(0.09) # allow time to leave current intersection
+        sleep(0.3) # allow time to leave current intersection
          
         while not self.is_centerred_on_line():
             self.logger.debug("looking for line")

@@ -122,9 +122,12 @@ class Pilot:
             print "solving: {}".format(activity)
 
             # Follow to intersection.
-            self.follow_ignoring_turns() 
+            self.follow_ignoring_turns()
             
-            self.rotate_to_line(self.find_dir_of_turn())
+            # keep track of direction of branch for returning to main path.
+            act_dir = self.find_dir_of_turn() 
+            
+            self.rotate_to_line(act_dir)
 
             self.solve_activity(activity)
             
@@ -139,9 +142,16 @@ class Pilot:
             # line follow back to path
             self.follow_ignoring_turns()
 
-            # turn to path
-            turn_dir = self.find_dir_of_turn()
-            self.rotate_to_line(turn_dir)
+            # turn back to path
+            if act_dir == 'left':
+                self.rotate_to_line('right')
+            elif act_dir == 'right':
+                self.rotate_to_line('left')
+            else:
+                # error case but somehow possible.
+                # Guess turn direction.
+                self.rotate_to_line('right')
+
 
         self.follow_ignoring_turns()
 

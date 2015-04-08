@@ -7,14 +7,16 @@ test_mode: {
     ADC: false,
     DMCC: false,
     stepper: false,
+    micromotor: false,
     motor: false,
     servo: false,
     solenoid: true,
-    simon_player: false
+    simon_player: false,
+    etch_a_sketch: false
 }
 
 rubiks : {
-    servo_pwm: 2, # P9_21
+    servo_pwm: 2, # P8_13
     
     GPIO: {
         FWD: 11, # P8_32
@@ -34,9 +36,17 @@ simon: {
     # TODO(AhmedSamara) switch to pwm once PCB is in
     
     servo: 2,            # TODO(vijay)P9 - 29 or 21?? also change 
-                         # servo pwm number to 1
+    motor1 : [62,36],
+    motor2 : [32,86],
+    motor3 : [87,10],
+    motor4 : [9,8],
+    motor5 : [38,34]
+    
+}
 
-    stepper: [78, 76, 74, 72]
+etch_a_sketch_motors: {
+    left_stepper: [44, 26, 46, 65],
+    right_stepper: [49, 15, 117, 14]
 }
 
 dmcc_drive_motors: {

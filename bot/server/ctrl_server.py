@@ -15,10 +15,12 @@ import bot.lib.lib as lib
 from bot.follower.follower import Follower
 import pub_server as pub_server_mod
 import bot.lib.messages as msgs
+from bot.activity_solver.etch_a_sketch import etch_a_sketch
+from bot.activity_solver.simon_solver import SimonPlayer
 
 import bot.activity_solver.rubiks_solver as rubiks_mod
 import bot.hardware.color_sensor as color_sensor_mod
-
+import bot.hardware.SimonSaysHardware2 as s_mod
 
 def is_api_method(obj, name):
     """Tests whether named method exists in obj and is flagged for API export.
@@ -131,16 +133,21 @@ class CtrlServer(object):
         """
 
         self.follower = Follower()
+        
         self.rubiks_solver = rubiks_mod.RubiksSolver()
         self.color_sensor = color_sensor_mod.ColorSensor()
+        self.simon_hardware = s_mod.SimonSaysHardware2()
+        self.etch_a_sketch = etch_a_sketch()
 
         systems = {}
         systems["ctrl"] = self
         systems["follower"] = self.follower
         systems["driver"] = self.follower.driver
         systems["ir_hub"] = self.follower.ir_hub
+        systems["etch_a_sketch"]=self.etch_a_sketch
         systems["rubiks"] = self.rubiks_solver
         systems["color"] = self.color_sensor
+        systems["simon_gripper"] = self.simon_hardware
 
         self.logger.debug("Systems: {}".format(systems))
         return systems

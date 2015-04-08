@@ -90,9 +90,10 @@ class SimonPlayer(object):
         Simon is gripped.
         """
         round_no = 1
-        colors = {"blue" : 1, "red" : 2, "green" : 3, "yellow" : 4}
+        colors = {"yellow": 1, "blue" : 2, "red" : 3, "green" : 4}
         # 1) Press the start button
         self.simon.press_start()
+        self.pot.find_ambient_light()
  
         while True:
             try:
@@ -109,8 +110,8 @@ class SimonPlayer(object):
                     actual_position = (colors[sensor_reading] \
                         + self.simon.position -1) % 4
                     if(actual_position == 0):
-                        actual_reading = 4
-                    pos[i] = actual_reading
+                        actual_position = 4
+                    pos[i] = actual_position
 
                 # 4) Call the self.turn() method with the position numbers
                 # the specified number of times
@@ -118,9 +119,12 @@ class SimonPlayer(object):
                     self.simon.turn(pos[i])
                 # 5) Increment round_no
                 round_no = round_no + 1
+
+                if(round_no > 5):
+                    break
             except KeyboardInterrupt:
                 break
         # reset to position 1 before exiting
         self.simon.turn(1)
         # SIDE-EFFECT: Actuator is going to reset to position 1
-        # press the button before exiting
+        # and press the button before exiting

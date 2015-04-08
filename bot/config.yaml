@@ -7,6 +7,7 @@ test_mode: {
     ADC: false,
     DMCC: true,
     stepper: false,
+    micromotor: false,
     motor: false,
     servo: false,
     solenoid: true,
@@ -34,10 +35,19 @@ simon: {
     # Currently using 4 gpios for stepper motor.
     # TODO(AhmedSamara) switch to pwm once PCB is in
     
+<<<<<<< HEAD
     servo: 1,            # TODO(vijay)P9 - 29 or 21?? also change 
                          # servo pwm number to 1
+=======
+    # TODO(Vijay) Fill in the values for the motor GPIO
+>>>>>>> SimonSaysServo
 
-    stepper: [78, 76, 74, 72]
+    motor1 : [62,36],
+    motor2 : [32,86],
+    motor3 : [87,10],
+    motor4 : [9,8],
+    motor5 : [38,34]
+    
 }
 
 etch_a_sketch_motors: {

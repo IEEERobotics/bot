@@ -84,6 +84,18 @@ load_gpio 46   # P8_16
 load_gpio 65   # P8_18
 load_gpio 15   # P9_23
 load_gpio 14   # P9_26 
+# Simon Arm actuator GPIOs
+load_gpio 62
+load_gpio 36
+load_gpio 32
+load_gpio 86
+load_gpio 87
+load_gpio 10
+load_gpio 8
+load_gpio 9
+load_gpio 38
+load_gpio 34
+
 
 enable_adcs
 load_slot BB-BONE-PRU-01

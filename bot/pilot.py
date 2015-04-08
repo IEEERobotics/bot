@@ -64,9 +64,9 @@ class Pilot:
         self.call('ctrl', 'stop_full')
         sys.exit(1)
 
-    def drive(self, speed, direction):
+    def move(self, speed, angle):
         self.call('driver', 'move', 
-                {'speed':speed, 'direction': direction})
+                {'speed':speed, 'angle': angle})
 
     def wait_for_start(self):
         """Waits for color sensor to say it sees start signal.
@@ -100,45 +100,50 @@ class Pilot:
 
         return self.call(activity, 'solve')
 
-    def follow_around_turns(self):
-        return self.call('follower','follow_around_turns')
+    def follow_ignoring_turns(self):
+        return self.call('follower','follow_ignoring_turns')
         
     def find_dir_of_turn(self):
         return self.call('follower','find_dir_of_turn')
-        
+       
+    def rotate_to_line(self, direction):
+        return self.call('follower','rotate_to_line', {'direction':direction})
+
     def run(self):
         """Main pilot interface with outside world.
         start script will call, and pilot will handle all other logic.
         """
         
         # wait for Start signal to indicate time to run.
-        self.wait_for_start()
+        # self.wait_for_start()
+        time.sleep(5)
 
         for activity in self.acts:
             print "solving: {}".format(activity)
 
             # Follow to intersection.
-            self.follow_around_turns() 
+            self.follow_ignoring_turns() 
             
-            self.rotate_90(self.find_dir_of_turn())
+            self.rotate_to_line(self.find_dir_of_turn())
 
             self.solve_activity(activity)
             
             # Leave box and return to path.
-            self.drive(70, 180)
+            self.move(70, 180)
             time.sleep(self.ITEM_BACKUP_TIME)
-            self.drive(0, 0)
+            self.move(0, 0)
 
-            self.rotate_90("right")
-            self.rotate_90("right")
+            self.rotate_90('right')
+            self.rotate_to_line('right')
             
             # line follow back to path
-            self.follow_around_turns()
+            self.follow_ignoring_turns()
 
             # turn to path
-            # Opposite of previous direction.
+            turn_dir = self.find_dir_of_turn()
+            self.rotate_to_line(turn_dir)
 
-        # follow_to_block (finish line!)
+        self.follow_ignoring_turns()
 
 if __name__ == "__main__":
     Pilot().run()

@@ -41,6 +41,9 @@ class DMCCMotorSet(dict):
                 lambda: pyDMCC.DMCC(
                     0, verify=False, bus=None, logger=self.logger))
 
+
+        self.logger.debug("DMCC Motor conf: {}".format(dmccs))
+       
         self.motors = {}
         for name, conf in motor_config.items():
             if 'invert' in conf.keys():

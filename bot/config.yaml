@@ -5,7 +5,7 @@ test_mode: {
     ir: { front: false, back: false, right: false, left: false},
     IR: false,
     ADC: false,
-    DMCC: true,
+    DMCC: false,
     stepper: false,
     motor: false,
     servo: false,

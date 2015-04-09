@@ -4,10 +4,13 @@ import bot.lib.lib as lib
 import bot.hardware.servo as servo_mod
 import bbb.gpio as gpio_mod
 
+    
+START_POSITION = 215
+SOLVE_POSITION = 0
+
 class RubiksSolver(object):
     
     
-
     def __init__(self):
         
         self.config = lib.get_config()
@@ -21,10 +24,10 @@ class RubiksSolver(object):
         
         # Build servo that controlls gripper that turns cube.
         self.gripper = servo_mod.Servo(self.servo_pwm)
-        self.CLAMP_TIME = 3
+        self.CLAMP_TIME = 3.5
 
         # Set to starting position
-        self.gripper.position = 0
+        self.gripper.position = START_POSITION
 
         # gpio's that control motors of gripper.
         # Note: we're not using motor.py, it assumes strange hardware.
@@ -104,5 +107,12 @@ class RubiksSolver(object):
     @lib.api_call
     def solve(self):
         self.close_clamp()
-        self.move_arm(180)
+        time.sleep(1)
+        self.move_arm(SOLVE_POSITION)
+        time.sleep(1)
         self.open_clamp()
+
+    @lib.api_call
+    def reset(self):
+        self.open_clamp()
+        self.move_arm(START_POSITION)

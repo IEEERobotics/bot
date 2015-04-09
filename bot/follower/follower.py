@@ -982,6 +982,7 @@ class Follower(object):
     @lib.api_call
     def follow_ignoring_turns(self):
         while True:
+            self.recover()
             try:
                 state = self.analog_state()
             
@@ -1021,24 +1022,55 @@ class Follower(object):
         sleep(0.05)
         self.driver.rotate(0)
 
+    @lib.api_call
+    def drive_to_line(self, speed=50, angle=0):
+        """Drives in certain direction blindly until line is found."""
+
+        self.driver.move(speed,angle)
+        while not self.is_centerred_on_line():
+            self.logger.debug("looking for line")
+
+        self.driver.hard_stop(speed,angle)
     
     @lib.api_call
     def recover(self):
+        """When recovery is needed, this function continually calls itself until problem is solved.
+        """
+
+        readings = self.ir_hub.read_all()
         
         # case where nothing is known 
         # find better solution than flailing blindly
-        if self.check_for_branch('front') and \
-            (not self.check_for_branch('left')
-            and not self.check_for_branch('right')):
-             self.rotate_to_line('left') 
+        if     not self.check_for_branch('front') and not self.check_for_branch('back') \
+           and not self.check_for_branch('right') and not self.check_for_branch('left'):
+             self.rotate_to_line('left')
+             self.recover() 
 
         # Front has lost line, use sides to recover
         elif not self.check_for_branch('front') and \
-                self.check_for_branch('left') and \
-                not self.check_for_branch('right'):
+                self.check_for_branch('left') and not self.check_for_branch('right'):
             self.rotate_to_line('left')
-            
-        elif not self.check_for_branch('front') and \
-            not self.check_for_branch('left') and \
-            self.check_for_branch('right'):
+            self.recover()            
+        elif not self.check_for_branch('front') and not self.check_for_branch('left') \
+              and self.check_for_branch('right'):
             self.rotate_to_line('right')
+            self.recover()
+
+        # Front sees something big, side's do not.
+        # most likely on turn/int, but sides not over it yet.
+        # inch forward.
+        elif self.count_num_of_hits(readings['front']) < 6 \
+                and not self.check_for_branch('left') \
+                and not self.check_for_branch('right'):
+            self.logger.debug("attempting recover from front view")
+            sleep(0.1)
+            self.driver.drive(60,0,0.1)
+            self.recover()
+
+        # Back sees something big, front doesn't.
+        # most likely overshoot.
+        elif self.count_num_of_hits(readings['back']) < 6 \
+                and not self.check_for_branch('front'):
+            self.logger.debug("Correcting overshoot")
+            self.drive_to_line()
+            self.recover()

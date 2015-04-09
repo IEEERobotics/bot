@@ -6,7 +6,7 @@ import bbb.gpio as gpio_mod
 
     
 START_POSITION = 215
-SOLVE_POSITION = 0
+SOLVE_POSITION = 17
 
 class RubiksSolver(object):
     

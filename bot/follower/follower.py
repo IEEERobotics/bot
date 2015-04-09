@@ -27,7 +27,7 @@ class Follower(object):
     White_Black = True  # False  # True= white line, False= black line
     set_speed = 50
 
-    thresh = 50
+    THRESH = 60
 
     def __init__(self):
         # Build logger
@@ -895,7 +895,7 @@ class Follower(object):
     def assign_bin(self,a_array):
         array = [0,0,0,0,0,0,0,0]
         for index,value in enumerate(a_array):
-            if value > 90:
+            if value > self.THRESH:
                 array[index] = 1
         return array
 
@@ -974,8 +974,8 @@ class Follower(object):
         """Checks to see if bot is reasonably within center line.
         """
         arr_block = self.ir_hub.read_all()
-        if arr_block['front'][4] < self.thresh \
-            or arr_block['front'][5] < self.thresh:
+        if arr_block['front'][4] < self.THRESH \
+            or arr_block['front'][5] < self.THRESH:
             return True
         return False 
         
@@ -1039,20 +1039,40 @@ class Follower(object):
 
         readings = self.ir_hub.read_all()
         
-        # case where nothing is known 
-        # find better solution than flailing blindly
-        if     not self.check_for_branch('front') and not self.check_for_branch('back') \
-           and not self.check_for_branch('right') and not self.check_for_branch('left'):
-             self.rotate_to_line('left')
-             self.recover() 
+        # Terminating condition.
+        # Lined up on line normally.
+        if self.check_for_branch('front') and self.check_for_branch('back') \
+            and not self.check_for_branch('right') and not self.check_for_branch('left'):
+            self.logger.debug("successfully recovered to line")
+            return True
+
+        # Front sees line, one of sides does.
+        elif    self.check_for_branch('front') and not self.check_for_branch('back') \
+                and self.check_for_branch('right') and not self.check_for_branch('left'):
+            self.logger.debug("recovering from crooked alignment, line on right")
+            self.drive_to_line(50, -90)
+        elif self.check_for_branch('front') and not self.check_for_branch('back') \
+                and not self.check_for_branch('right') and self.check_for_branch('left'):
+            self.logger.debug("recovering from crooked alignment, line on right")
+            self.drive_to_line(50, 90)
+
+        # Sides see line but front/back do not
+        # Terminating condition
+        elif not self.check_for_branch('front') and not self.check_for_branch('back') \
+             and self.check_for_branch('right') and     self.check_for_branch('left'):
+            self.logger.debug("Sides see line but front/back do not")
+            # Todo: Store history of readings to intelligently pick dir instead of guess.
+            self.rotate_to_line('right')
 
         # Front has lost line, use sides to recover
         elif not self.check_for_branch('front') and \
                 self.check_for_branch('left') and not self.check_for_branch('right'):
+            self.logger.debug("Front has lost lines, using sides to recover")
             self.rotate_to_line('left')
             self.recover()            
         elif not self.check_for_branch('front') and not self.check_for_branch('left') \
               and self.check_for_branch('right'):
+            self.logger.debug("Front has lost lines, using sides to recover")
             self.rotate_to_line('right')
             self.recover()
 
@@ -1060,17 +1080,23 @@ class Follower(object):
         # most likely on turn/int, but sides not over it yet.
         # inch forward.
         elif self.count_num_of_hits(readings['front']) < 6 \
-                and not self.check_for_branch('left') \
-                and not self.check_for_branch('right'):
-            self.logger.debug("attempting recover from front view")
+                and not self.check_for_branch('left') and not self.check_for_branch('right'):
+            self.logger.debug("Front sees something big, side's do not, inch fwd.")
             sleep(0.1)
             self.driver.drive(60,0,0.1)
+            self.recover()
+
+        # Back sees large object, sides see nothing.
+        elif self.count_num_of_hits(readings['back']) < 6 \
+            and not self.check_for_branch('left') and not self.check_for_branch('right'):
+            self.logger.debug("Back sees large object, sides see nothing.")
+            self.rotate_to_line('right')
             self.recover()
 
         # Back sees something big, front doesn't.
         # most likely overshoot.
         elif self.count_num_of_hits(readings['back']) < 6 \
                 and not self.check_for_branch('front'):
-            self.logger.debug("Correcting overshoot")
-            self.drive_to_line()
+            self.logger.debug("Back sees something big, front doesn't. Correcting overshoot.")
+            self.drive_to_line(speed=50, angle=180)
             self.recover()

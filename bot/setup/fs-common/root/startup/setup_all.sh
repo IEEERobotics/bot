@@ -45,7 +45,7 @@ run_pwm      5
 # rubiks cube servo: P9_21 
 load_pwm     2 
 set_period   2 20000000
-set_duty     2 2194444  
+set_duty     2 2396527  
 set_polarity 2 0
 run_pwm      2
 

@@ -19,8 +19,8 @@ rubiks : {
     servo_pwm: 2, # P8_13
     
     GPIO: {
-        FWD: 11, # P8_32
-        REV: 89, # P8_30 
+        REV: 11, # P8_32
+        FWD: 89, # P8_30 
         PWR: 88  # P8_28 
     }
 }

@@ -215,6 +215,14 @@ class MecDriver(driver.Driver):
         self.set_motor("back_right", back_right)
 
     @lib.api_call
+    def hard_stop(self,current_speed, current_angle=0):
+        """Allow for immediate stopping by throwing in hard reverse before stopping"""
+
+        self.move(100, (current_angle + 180) % 180)
+        sleep(0.1)
+        self.move(0,0)
+
+    @lib.api_call
     def move_forward_strafe(self, forward, strafe):
         # Scale down speed by sqrt(2) to make sure we're in range
         # NOTE(napratin, 9/27): Scaling down is not required since we clamp

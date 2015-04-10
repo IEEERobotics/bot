@@ -985,7 +985,7 @@ class Follower(object):
     @lib.api_call
     def follow_ignoring_turns(self):
         while True:
-            self.recover()
+            # self.recover()
             try:
                 state = self.analog_state()
                 print "Ir array reading"
@@ -994,15 +994,15 @@ class Follower(object):
                 # self.driver.jerk(speed=60,angle=0,duration=0.1)
                 turn_dir = self.find_dir_of_turn()
                 if turn_dir == "right" or turn_dir == "left":
-                    self.driver.drive(60,0,0.1) 
                     self.rotate_to_line(turn_dir)
+                    self.driver.drive(60,0,0.1) 
                     # self.driver.rough_rotate_90(turn_dir, r_time=0.6)
                     # Move out of intersection
-                    self.recover()
-                    self.driver.drive(60, angle=0, duration=0.09) 
-                    self.recover()
+                    # self.driver.drive(60, angle=0, duration=0.1) 
+                    # self.recover()
                 else:
-                    self.recover()
+                    break
+                #    self.recover()
             except LineLostError:
                 self.logger.error("Line lost, attempting to recover")
                 self.recover()
@@ -1043,6 +1043,12 @@ class Follower(object):
         """
 
         readings = self.ir_hub.read_all()
+
+        # experiment with breaking any time front is detected.
+
+        if self.check_for_branch('front'):
+            print "no need for recovery"
+            return
         
         if   not self.check_for_branch('front') and not self.check_for_branch('back') \
              and not self.check_for_branch('left') and not self.check_for_branch('right'):
@@ -1117,16 +1123,16 @@ class Follower(object):
          and not self.check_for_branch('back') \
          and not self.check_for_branch('left') \
          and     self.check_for_branch('right'):
-             self.logger.debug("C9: Rotate right")
-             self.rotate_to_line('right')
+             self.logger.debug("C9: front/side. inch towards")
+             self.driver.drive(60,90,0.1)
              self.recover()
 
         elif     self.check_for_branch('front') \
          and not self.check_for_branch('back') \
          and     self.check_for_branch('left') \
          and not self.check_for_branch('right'):
-             self.logger.debug("C10: Rotate left")
-             self.rotate_to_line('left')
+             self.logger.debug("C10: shift left")
+             self.driver.drive(60,-90,0.1)
              self.recover()
         
         elif     self.check_for_branch('front') \

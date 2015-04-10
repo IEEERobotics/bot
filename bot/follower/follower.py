@@ -1077,7 +1077,7 @@ class Follower(object):
          and not self.check_for_branch('left') \
          and not self.check_for_branch('right'):
             self.logger.debug("C4: back known: Inch back") 
-            self.drive(60,180,0.1)
+            self.driver.drive(60,180,0.1)
             self.recover()
 
         elif not self.check_for_branch('front') \
@@ -1118,7 +1118,7 @@ class Follower(object):
          and not self.check_for_branch('left') \
          and     self.check_for_branch('right'):
              self.logger.debug("C9: Rotate right")
-             self.driver.rotate_to_line('right')
+             self.rotate_to_line('right')
              self.recover()
 
         elif     self.check_for_branch('front') \

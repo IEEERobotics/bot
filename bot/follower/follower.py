@@ -1044,23 +1044,11 @@ class Follower(object):
 
         readings = self.ir_hub.read_all()
         
-        # Terminating condition.
-        # Lined up on line normally.
-        if self.check_for_branch('front'):
+
+        if self.check_for_branch('front') and self.check_for_branch('back') \
+                not self.check_for_branch('right') and not self.check_for_branch('left'):
             self.logger.debug("successfully recovered to line")
             return True
-
-        # Front sees line, one of sides does.
-        elif self.check_for_branch('front') and not self.check_for_branch('back') \
-                and self.check_for_branch('right') and not self.check_for_branch('left'):
-            self.logger.debug("recovering from crooked alignment, line on right")
-            self.drive_to_line(50, 90)
-            self.recover()
-        elif self.check_for_branch('front') and not self.check_for_branch('back') \
-                and not self.check_for_branch('right') and self.check_for_branch('left'):
-            self.logger.debug("recovering from crooked alignment, line on right")
-            self.drive_to_line(50, -90)
-            self.recover()
 
         # Sides see line but front/back do not
         elif not self.check_for_branch('front') and not self.check_for_branch('back') \
@@ -1074,32 +1062,14 @@ class Follower(object):
             # Todo: Store history of readings to intelligently pick dir instead of guess.
             self.rotate_to_line('left')
             self.recover()
-
-        # Front has lost line, use sides to recover
-        elif not self.check_for_branch('front') and self.check_for_branch('left') \
-              and not self.check_for_branch('right'):
-            self.logger.debug("Front has lost lines, using sides to recover")
-            self.rotate_to_line('left')
-            self.recover()
-        elif not self.check_for_branch('front') and not self.check_for_branch('left') \
-              and self.check_for_branch('right'):
-            self.logger.debug("Front has lost lines, using sides to recover")
+        elif not self.check_for_branch('front') and not self.check_for_branch('back') \
+                and self.check_for_branch('right') and self.check_for_branch('left'):
+            self.logger.debug("Bot was completely sideways. Guessing dir")
             self.rotate_to_line('right')
             self.recover()
 
-        # Front sees something big, side's do not.
-        # most likely on turn/int, but sides not over it yet.
-        # inch forward.
-        elif self.count_num_of_hits(readings['front']) < 6 \
-                and not self.check_for_branch('left') and not self.check_for_branch('right'):
-            self.logger.debug("Front sees something big, side's do not, inch fwd.")
-            sleep(0.1)
-            self.driver.drive(60,0,0.1)
-            self.recover()
-
         # Back sees large object, sides see nothing.
-        elif self.check_for_branch('back') \
-             and not self.check_for_branch('front')\
+        elif self.check_for_branch('back') and not self.check_for_branch('front')\
              and not self.check_for_branch('left') and not self.check_for_branch('right'):
             self.logger.debug(
                     "Back sees large ({}) object, sides see nothing. Inch bkwd.".format(

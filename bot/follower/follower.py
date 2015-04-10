@@ -1044,37 +1044,55 @@ class Follower(object):
 
         readings = self.ir_hub.read_all()
         
-
-        if self.check_for_branch('front') and self.check_for_branch('back') \
-                not self.check_for_branch('right') and not self.check_for_branch('left'):
-            self.logger.debug("successfully recovered to line")
-            return True
-
-        # Sides see line but front/back do not
-        elif not self.check_for_branch('front') and not self.check_for_branch('back') \
-                and self.check_for_branch('right') and not self.check_for_branch('left'):
-            self.logger.debug("Sides see line but front/back do not")
-            self.rotate_to_line('right')
-            self.recover()
-        elif not self.check_for_branch('front') and not self.check_for_branch('back') \
-                 and not self.check_for_branch('right') and self.check_for_branch('left'):
-            self.logger.debug("Sides see line but front/back do not")
-            # Todo: Store history of readings to intelligently pick dir instead of guess.
-            self.rotate_to_line('left')
-            self.recover()
-        elif not self.check_for_branch('front') and not self.check_for_branch('back') \
-                and self.check_for_branch('right') and self.check_for_branch('left'):
-            self.logger.debug("Bot was completely sideways. Guessing dir")
-            self.rotate_to_line('right')
-            self.recover()
-
-        # Back sees large object, sides see nothing.
-        elif self.check_for_branch('back') and not self.check_for_branch('front')\
+        if   not self.check_for_branch('front') and not self.check_for_branch('back') \
              and not self.check_for_branch('left') and not self.check_for_branch('right'):
-            self.logger.debug(
-                    "Back sees large ({}) object, sides see nothing. Inch bkwd.".format(
-                            self.count_num_of_hits(readings['back'])))
-            self.driver.drive(60,180,0.1)
+            self.logger.debug("completely lost. Flailing") 
+            
+        elif not self.check_for_branch('front') \
+         and not self.check_for_branch('back') \
+         and not self.check_for_branch('left') \
+         and     self.check_for_branch('right'):
+            self.logger.debug("C2: right known: rotate right") 
+            self.rotate_to_line('right')
+
+        elif not self.check_for_branch('front') \
+         and not self.check_for_branch('back') \
+         and     self.check_for_branch('left') \
+         and not self.check_for_branch('right'):
+            self.logger.debug("C3: left known: rotate left")
+            self.rotate_to_line('left') 
+
+        elif not self.check_for_branch('front') \
+         and not self.check_for_branch('back') \
+         and     self.check_for_branch('left') \
+         and     self.check_for_branch('right'):
+            self.logger.debug("C4: sides known: roate right") 
+            self.rotate_to_line('right')
+
+        elif not self.check_for_branch('front') \
+         and     self.check_for_branch('back') \
+         and not self.check_for_branch('left') \
+         and not self.check_for_branch('right'):
+            self.logger.debug("C5: back known: Inch back") 
+            self.drive(60,180,0.1)
             self.recover()
 
+        elif not self.check_for_branch('front') \
+         and      self.check_for_branch('back') \
+         and not self.check_for_branch('left') \
+         and     self.check_for_branch('right'):
+            self.logger.debug("C6: ") 
 
+        elif not self.check_for_branch('front') \
+         and     self.check_for_branch('back') \
+         and     self.check_for_branch('left') \
+         and not self.check_for_branch('right'):
+            self.logger.debug("completely lost. Flailing") 
+
+        elif not self.check_for_branch('front') \
+         and     self.check_for_branch('back') \
+         and     self.check_for_branch('left') \
+         and     self.check_for_branch('right'):
+            self.logger.debug("completely lost. Flailing") 
+
+ 

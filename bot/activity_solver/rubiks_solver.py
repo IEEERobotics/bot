@@ -8,7 +8,7 @@ import bbb.gpio as gpio_mod
 START_POSITION = 210
 SOLVE_POSITION = 17
 CLAMP_TIME = 3.7 
-HALF_CLAMP = CLAMP_TIME/2
+HALF_CLAMP = int(CLAMP_TIME/2)
 
 class RubiksSolver(object):
     
@@ -37,7 +37,7 @@ class RubiksSolver(object):
         self.fwd = gpio_mod.GPIO(self.fwd_num)
         self.pwr = gpio_mod.GPIO(self.pwr_num)
        
-        # det sirections
+        # set directions
         self.pwr.output()
         self.fwd.output()
         self.rev.output()
@@ -55,7 +55,7 @@ class RubiksSolver(object):
 
     @lib.api_call
     def close_clamp(self):
-        """Turns both motors into "forward" position to close arm.
+        """Turns both gpio's into "forward" position to close arm.
         
         Gripper is attached to L298N H-bridge controller. with I1, I2
 
@@ -83,9 +83,11 @@ class RubiksSolver(object):
         if dir=="fwd":
             self.fwd.set_value(1)
             self.rev.set_value(0)
+            self.pwr.set_value(1)
         elif dir=="rev":
             self.fwd.set_value(0)
             self.rev.set_value(1)
+            self.pwr.set_value(1)
         elif dir=="stall":
             # Note: not sure if this is safe.
             self.fwd.set_value(1)

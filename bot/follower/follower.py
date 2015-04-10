@@ -1081,18 +1081,23 @@ class Follower(object):
          and      self.check_for_branch('back') \
          and not self.check_for_branch('left') \
          and     self.check_for_branch('right'):
-            self.logger.debug("C6: ") 
+            self.logger.debug("C6: back/right known: rotate right") 
+            self.rotate_to_line('right')
+            self.recover()
 
         elif not self.check_for_branch('front') \
          and     self.check_for_branch('back') \
          and     self.check_for_branch('left') \
          and not self.check_for_branch('right'):
-            self.logger.debug("completely lost. Flailing") 
+            self.logger.debug("C7: back/left known: rotate right") 
+            self.rotate_to_line('left')
+            self.recover()       
 
+        # Todo: SHould this be a end condition?
         elif not self.check_for_branch('front') \
          and     self.check_for_branch('back') \
          and     self.check_for_branch('left') \
          and     self.check_for_branch('right'):
-            self.logger.debug("completely lost. Flailing") 
-
- 
+            self.logger.debug("C8: front only known: inch fwd")
+            self.drive(60,0,0.1)
+            self.recover()

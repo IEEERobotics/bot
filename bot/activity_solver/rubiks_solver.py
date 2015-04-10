@@ -5,8 +5,10 @@ import bot.hardware.servo as servo_mod
 import bbb.gpio as gpio_mod
 
     
-START_POSITION = 215
+START_POSITION = 210
 SOLVE_POSITION = 17
+CLAMP_TIME = 3.7 
+HALF_CLAMP = CLAMP_TIME/2
 
 class RubiksSolver(object):
     
@@ -24,7 +26,6 @@ class RubiksSolver(object):
         
         # Build servo that controlls gripper that turns cube.
         self.gripper = servo_mod.Servo(self.servo_pwm)
-        self.CLAMP_TIME = 3.5
 
         # Set to starting position
         self.gripper.position = START_POSITION
@@ -49,7 +50,7 @@ class RubiksSolver(object):
     @lib.api_call
     def open_clamp(self):
         self.set_motor("rev")
-        time.sleep(self.CLAMP_TIME)
+        time.sleep(HALF_CLAMP)
         self.set_motor("off")
 
     @lib.api_call
@@ -64,7 +65,7 @@ class RubiksSolver(object):
         
         self.set_motor("fwd")
         # pause while grippers close
-        time.sleep(self.CLAMP_TIME)
+        time.sleep(HALF_CLAMP)
         self.set_motor("off")        
 
     @lib.api_call

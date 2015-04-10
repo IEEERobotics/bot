@@ -151,6 +151,8 @@ class IRHub(object):
         # Read every channel of every adc.
         for arr in self.config["ir_analog_adc_config"]["i2c_addr"]:
             self.reading[arr] = self.read_array(arr)
+
+        self.logger.debug(self.reading)
         return self.reading
         
     @lib.api_call

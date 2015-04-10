@@ -717,7 +717,10 @@ class Follower(object):
 
             # Count the number of hits
             front_hits = self.count_num_of_hits(self.array_block["front"])
-            back_hits = self.count_num_of_hits(self.array_block["back"])
+            back_hits  = self.count_num_of_hits(self.array_block["back"])
+            right_hits = self.count_num_of_hits(self.array_block['right'])
+            left_hits  = self.count_num_of_hits(self.array_block['left'])
+
             self.front_bin[2] = self.front_bin[1]
             self.front_bin[1] = self.front_bin[0]
             self.front_bin[0] = self.assign_bin(self.array_block["front"])
@@ -742,7 +745,7 @@ class Follower(object):
             #        self.driver.move(0,0)
             #        return "right turn"
 
-            if(front_hits > 3):
+            if front_hits > 4 or back_hits > 4 or right_hits > 2 or left_hits > 2:
                 self.driver.move(60,180)
                 sleep(.001)
                 self.driver.move(0,0)
@@ -985,10 +988,12 @@ class Follower(object):
             self.recover()
             try:
                 state = self.analog_state()
-            
+                print "Ir array reading"
+                print self.ir_hub.read_all() 
                 # Inch forward to be square on int
                 # self.driver.jerk(speed=60,angle=0,duration=0.1)
                 turn_dir = self.find_dir_of_turn()
+                self.recover()
                 if turn_dir == "right" or turn_dir == "left":
                     self.driver.drive(60,0,0.1) 
                     self.rotate_to_line(turn_dir)
@@ -1042,7 +1047,7 @@ class Follower(object):
         # Terminating condition.
         # Lined up on line normally.
         if self.check_for_branch('front') and self.check_for_branch('back') \
-            and not self.check_for_branch('right') and not self.check_for_branch('left'):
+             and not self.check_for_branch('right') and not self.check_for_branch('left'):
             self.logger.debug("successfully recovered to line")
             return True
 
@@ -1059,10 +1064,17 @@ class Follower(object):
         # Sides see line but front/back do not
         # Terminating condition
         elif not self.check_for_branch('front') and not self.check_for_branch('back') \
-             and self.check_for_branch('right') and     self.check_for_branch('left'):
+                and self.check_for_branch('right') and not self.check_for_branch('left'):
             self.logger.debug("Sides see line but front/back do not")
             # Todo: Store history of readings to intelligently pick dir instead of guess.
             self.rotate_to_line('right')
+            self.recover()
+        elif not self.check_for_branch('front') and not self.check_for_branch('back') \
+                 and not self.check_for_branch('right') and self.check_for_branch('left'):
+            self.logger.debug("Sides see line but front/back do not")
+            # Todo: Store history of readings to intelligently pick dir instead of guess.
+            self.rotate_to_line('left')
+            self.recover()
 
         # Front has lost line, use sides to recover
         elif not self.check_for_branch('front') and \
@@ -1088,7 +1100,7 @@ class Follower(object):
 
         # Back sees large object, sides see nothing.
         elif self.count_num_of_hits(readings['back']) < 6 \
-            and not self.check_for_branch('left') and not self.check_for_branch('right'):
+             and not self.check_for_branch('left') and not self.check_for_branch('right'):
             self.logger.debug("Back sees large object, sides see nothing.")
             self.rotate_to_line('right')
             self.recover()

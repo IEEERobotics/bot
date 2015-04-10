@@ -61,7 +61,7 @@ class etch_a_sketch(object):
         sleep(1)
     
     @lib.api_call
-    def draw(self):
+    def solve(self):
         self.drawI()
         self.drawE()
         self.drawE()

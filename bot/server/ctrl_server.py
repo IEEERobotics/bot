@@ -140,14 +140,14 @@ class CtrlServer(object):
         self.etch_a_sketch = etch_a_sketch()
 
         systems = {}
-        systems["ctrl"] = self
+        systems["ctrl"]     = self
         systems["follower"] = self.follower
-        systems["driver"] = self.follower.driver
-        systems["ir_hub"] = self.follower.ir_hub
-        systems["etch_a_sketch"]=self.etch_a_sketch
-        systems["rubiks"] = self.rubiks_solver
-        systems["color"] = self.color_sensor
-        systems["simon_gripper"] = self.simon_hardware
+        systems["driver"]   = self.follower.driver
+        systems["ir_hub"]   = self.follower.ir_hub
+        systems["etch"]     = self.etch_a_sketch
+        systems["rubiks"]   = self.rubiks_solver
+        systems["color"]    = self.color_sensor
+        systems["simon"]    = self.simon_hardware
 
         self.logger.debug("Systems: {}".format(systems))
         return systems

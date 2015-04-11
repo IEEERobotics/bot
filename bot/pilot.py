@@ -68,6 +68,10 @@ class Pilot:
         self.call('driver', 'move', 
                 {'speed':speed, 'angle': angle})
 
+    def drive(self, speed, angle, duration):
+        return self.call('driver', 'drive', 
+            {'speed':speed, 'angle':angle, 'duration':duration})
+
     def wait_for_start(self):
         """Waits for color sensor to say it sees start signal.
         """
@@ -105,9 +109,15 @@ class Pilot:
         
     def find_dir_of_turn(self):
         return self.call('follower','find_dir_of_turn')
+
+    def find_dir_of_int(self):
+        return self.call('follower','find_dir_of_int')
        
     def rotate_to_line(self, direction):
         return self.call('follower','rotate_to_line', {'direction':direction})
+
+    def wait_for_ready(self):
+        return self.call('color_sensor','wait_for_ready')
 
     def run(self):
         """Main pilot interface with outside world.
@@ -116,7 +126,8 @@ class Pilot:
         
         # wait for Start signal to indicate time to run.
         # self.wait_for_start()
-        time.sleep(5)
+        time.sleep(15)
+        self.drive(60,0,3) # Leave starting block
 
         for activity in self.acts:
             print "solving: {}".format(activity)
@@ -129,7 +140,15 @@ class Pilot:
             
             self.rotate_to_line(act_dir)
 
-            self.solve_activity(activity)
+            # Activities we aren't solving.
+            if activity == 'card':
+                self.drive(60,0,1)
+                time.sleep(1)
+                self.drive(60,180,1)
+            elif activity == 'simon':
+                self.logger.debug("Not doing simon")
+            else:
+                self.solve_activity(activity)
             
             # Leave box and return to path.
             self.move(70, 180)

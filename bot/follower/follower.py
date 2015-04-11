@@ -749,7 +749,7 @@ class Follower(object):
                     or self.is_centerred_on_line('right'): # or right_hits > 2 or left_hits > 2:
                 sleep(0.01)
                 self.driver.move(60,180)
-                sleep(0.001)
+                sleep(0.01)
                 self.driver.move(0,0)
                 return "block or t-intersection"
 
@@ -998,7 +998,6 @@ class Follower(object):
                     # self.driver.rough_rotate_90(turn_dir, r_time=0.6)
                     # Move out of intersection
                     # self.driver.drive(60, angle=0, duration=0.1) 
-                    self.recover()
                 else:
                     break
                 #    self.recover()
@@ -1018,7 +1017,8 @@ class Follower(object):
         self.driver.rotate(speed)
         sleep(0.3) # allow time to leave current intersection
          
-        while not self.is_centerred_on_line():
+        while not self.is_centerred_on_line() \
+                or self.check_for_branch('back'):
             self.logger.debug("looking for line")
         
         # throw in hard reverse to stop immediately

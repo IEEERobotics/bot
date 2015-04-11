@@ -25,7 +25,7 @@ class Follower(object):
 
     # Variables for read_binary calls
     White_Black = True  # False  # True= white line, False= black line
-    set_speed = 50
+    set_speed = 35
 
     THRESH = 60
 
@@ -745,9 +745,11 @@ class Follower(object):
             #        self.driver.move(0,0)
             #        return "right turn"
 
-            if front_hits > 4 or back_hits > 4 or right_hits > 2 or left_hits > 2:
+            if front_hits > 3 or self.is_centerred_on_line('left') \
+                    or self.is_centerred_on_line('right'): # or right_hits > 2 or left_hits > 2:
+                sleep(0.01)
                 self.driver.move(60,180)
-                sleep(.001)
+                sleep(0.001)
                 self.driver.move(0,0)
                 return "block or t-intersection"
 
@@ -973,12 +975,12 @@ class Follower(object):
             return "error: No condition found. Line lost."
 
     @lib.api_call
-    def is_centerred_on_line(self):
+    def is_centerred_on_line(self, side='front'):
         """Checks to see if bot is reasonably within center line.
         """
         arr_block = self.ir_hub.read_all()
-        if arr_block['front'][4] < self.THRESH \
-            or arr_block['front'][5] < self.THRESH:
+        if arr_block[side][4] < self.THRESH \
+            or arr_block[side][5] < self.THRESH:
             return True
         return False 
         
@@ -988,18 +990,15 @@ class Follower(object):
             # self.recover()
             try:
                 state = self.analog_state()
-                print "Ir array reading"
-                print self.ir_hub.read_all() 
                 # Inch forward to be square on int
                 # self.driver.jerk(speed=60,angle=0,duration=0.1)
                 turn_dir = self.find_dir_of_turn()
                 if turn_dir == "right" or turn_dir == "left":
                     self.rotate_to_line(turn_dir)
-                    self.driver.drive(60,0,0.1) 
                     # self.driver.rough_rotate_90(turn_dir, r_time=0.6)
                     # Move out of intersection
                     # self.driver.drive(60, angle=0, duration=0.1) 
-                    # self.recover()
+                    self.recover()
                 else:
                     break
                 #    self.recover()
@@ -1024,7 +1023,7 @@ class Follower(object):
         
         # throw in hard reverse to stop immediately
         self.driver.rotate(-speed)
-        sleep(0.05)
+        sleep(0.09)
         self.driver.rotate(0)
 
     @lib.api_call
@@ -1046,9 +1045,9 @@ class Follower(object):
 
         # experiment with breaking any time front is detected.
 
-        if self.check_for_branch('front'):
-            print "no need for recovery"
-            return
+        #if self.check_for_branch('front'):
+        #    print "no need for recovery"
+        #    return
         
         if   not self.check_for_branch('front') and not self.check_for_branch('back') \
              and not self.check_for_branch('left') and not self.check_for_branch('right'):
@@ -1087,7 +1086,7 @@ class Follower(object):
             self.recover()
 
         elif not self.check_for_branch('front') \
-         and      self.check_for_branch('back') \
+         and     self.check_for_branch('back') \
          and not self.check_for_branch('left') \
          and     self.check_for_branch('right'):
             self.logger.debug("C5: back/right known: rotate right") 
@@ -1112,28 +1111,31 @@ class Follower(object):
             self.driver.rough_rotate_90('right')
             self.recover()
 
-        elif    self.check_for_branch('front') \
-         and not self.check_for_branch('back') \
-         and not self.check_for_branch('left') \
+        elif     self.check_for_branch('front') \
+         and not self.check_for_branch('back')  \
+         and not self.check_for_branch('left')  \
          and not self.check_for_branch('right'):
              self.logger.debug("C8: Inch forward")
              self.driver.drive(60,0,0.1)
-            
+             self.recover()
+
         elif    self.check_for_branch('front') \
          and not self.check_for_branch('back') \
          and not self.check_for_branch('left') \
          and     self.check_for_branch('right'):
-             self.logger.debug("C9: front/side. inch towards")
-             self.driver.drive(60,90,0.1)
-             self.recover()
+             #self.logger.debug("C9: front/side. inch towards")
+             #self.driver.drive(60,90,0.1)
+             #self.recover()
+             return
 
         elif     self.check_for_branch('front') \
          and not self.check_for_branch('back') \
          and     self.check_for_branch('left') \
          and not self.check_for_branch('right'):
-             self.logger.debug("C10: shift left")
-             self.driver.drive(60,-90,0.1)
-             self.recover()
+             #self.logger.debug("C10: shift left")
+             #self.driver.drive(60,-90,0.1)
+             #self.recover()
+             return
         
         elif     self.check_for_branch('front') \
          and     self.check_for_branch('back') \
@@ -1145,4 +1147,4 @@ class Follower(object):
         else:
             self.logger.debug("Recovered successfully. Now following line - Cases 11 - 14")
             return
-
+	    

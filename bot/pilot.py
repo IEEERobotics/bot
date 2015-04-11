@@ -40,7 +40,7 @@ class Pilot:
             sys.exit(-1)
 
         # Initialize other members
-        self.ITEM_BACKUP_TIME = 5 
+        self.ITEM_BACKUP_TIME = 0.2 
         # Order in which activities are solved.
         self.acts = ["simon", "etch", "rubiks", "card"]
 
@@ -126,36 +126,39 @@ class Pilot:
         
         # wait for Start signal to indicate time to run.
         # self.wait_for_start()
-        time.sleep(15)
-        self.drive(60,0,3) # Leave starting block
+        time.sleep(4)
+        self.drive(40,0,0.7) # Leave starting block
 
         for activity in self.acts:
-            print "solving: {}".format(activity)
 
             # Follow to intersection.
             self.follow_ignoring_turns()
             
             # keep track of direction of branch for returning to main path.
-            act_dir = self.find_dir_of_turn() 
+            act_dir = self.find_dir_of_int() 
             
             self.rotate_to_line(act_dir)
 
+            # go to act.
+            self.follow_ignoring_turns()
+
             # Activities we aren't solving.
             if activity == 'card':
-                self.drive(60,0,1)
+                self.drive(40,0,0.2)
                 time.sleep(1)
-                self.drive(60,180,1)
+                self.drive(40,180,0.2)
             elif activity == 'simon':
                 self.logger.debug("Not doing simon")
             else:
                 self.solve_activity(activity)
             
             # Leave box and return to path.
-            self.move(70, 180)
+            self.move(40, 180)
             time.sleep(self.ITEM_BACKUP_TIME)
             self.move(0, 0)
 
             self.rotate_90('right')
+            time.sleep(0.5)
             self.rotate_to_line('right')
             
             # line follow back to path
@@ -173,6 +176,7 @@ class Pilot:
 
 
         self.follow_ignoring_turns()
+        self.drive(40,0,0.5)
 
 if __name__ == "__main__":
     Pilot().run()

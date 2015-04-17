@@ -126,7 +126,8 @@ class Pilot:
         
         # wait for Start signal to indicate time to run.
         # self.wait_for_start()
-        time.sleep(4)
+        time.sleep(10)
+        self.wait_for_ready()
         self.drive(40,0,0.7) # Leave starting block
 
         for activity in self.acts:

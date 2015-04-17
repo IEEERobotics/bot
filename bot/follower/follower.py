@@ -960,11 +960,6 @@ class Follower(object):
             and not self.check_for_branch("left"):
             return "error: no branches"
 
-        elif (self.check_for_branch("right") \
-                or self.check_for_branch("left"))\
-            and self.check_for_branch("front"):
-            return "intersection"
-
         elif  self.check_for_branch("right"):
             return "right"
 

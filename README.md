@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/IEEERobotics/bot2014.svg?branch=master)](https://travis-ci.org/IEEERobotics/bot2014)
 
+[For meetings, news, and google hangouts, check our calender](https://www.google.com/calendar/embed?src=bmNzdS5lZHVfazY1dm5lZTBjcHQ5cmhvbTlzOGQ4dGlna3NAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ), and join our [email list](https://groups.google.com/a/ncsu.edu/forum/?hl=en#!forum/group-ieee-robotics-announce).
+
 # Bot2014
 
 Code for the NCSU IEEE Robotics Team's robot(s).

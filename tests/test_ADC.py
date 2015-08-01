@@ -3,11 +3,12 @@
 import time
 from unittest import TestCase, expectedFailure
 import struct
+import os
 
 import bot.lib.lib as lib
 import bot.hardware.ADC as adc_mod
 
-config_file = path.dirname(path.realpath(__file__))+"/test_config.yaml"
+config_file = os.path.dirname(os.path.realpath(__file__))+"/test_config.yaml"
 config = lib.get_config(config_file)
 
 class TestADC(test_bot.TestBot):

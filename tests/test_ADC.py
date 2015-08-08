@@ -7,6 +7,8 @@ import os
 
 import bot.lib.lib as lib
 import bot.hardware.ADC as adc_mod
+import tests.test_bot as test_bot
+
 
 config_file = os.path.dirname(os.path.realpath(__file__))+"/test_config.yaml"
 config = lib.get_config(config_file)

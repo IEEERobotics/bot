@@ -1,4 +1,6 @@
-# Not all hardware is used all the time
+# Used when running unit tests
+testing : false
+# Used for testing individual pices of hardware
 test_mode: {
     color_sensor: true,
     ultrasonics: true,

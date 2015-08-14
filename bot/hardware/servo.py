@@ -57,8 +57,8 @@ class Servo(object):
     def position(self):
         """Getter for servo's position as an angle.
 
-        position = ((duty - 1000000) / 1000000) * 180 where
-        1000000 <= duty <= 2000000
+        position = ((duty - 580000) / 2320000) * 180 where
+        580000 <= duty <= 2900000
 
         TODO(Vijay): Servo calibrated for rubix cube servo.
         Needs recalibration in case of other servo usage.
@@ -66,7 +66,7 @@ class Servo(object):
         :returns: Position of servo as an angle 0-180.
 
         """
-        return int(round(((self.pwm.duty - 575000) / 1525000.) * 180))
+        return int(round(((self.pwm.duty - 580000) / 2320000.) * 180))
 
     @position.setter
     def position(self, position):
@@ -81,7 +81,7 @@ class Servo(object):
         :type position: int
 
         """
-        if position > 275:
+        if position > 180:
             self.logger.warning("Invalid pos {}, using 180.".format(position))
             position = 180
         elif position < 0:
@@ -90,7 +90,7 @@ class Servo(object):
             position = 0
 
         # Set duty
-        self.pwm.duty = int(round(575000 + 1525000 * (position / 180.)))
+        self.pwm.duty = int(round(580000 + 2320000 * (position / 180.)))
         self.logger.debug("Updated {}".format(self))
 
     @lib.api_call

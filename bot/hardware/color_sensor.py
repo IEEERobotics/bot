@@ -27,11 +27,6 @@ class ColorSensor(I2CDevice):
         """Initialized I2C device, LED brightness PWM pin."""
         self.logger = lib.get_logger()
         self.bot_config = lib.get_config()
-        # Setup ready signal GPIO:
-        self.gpio_num = self.bot_config["color_sensor"]["ready_signal"]
-        self.ready_gpio = gpio_mod.GPIO(self.gpio_num)
-        self.ready_gpio.input()
-
 
         # Handle off-bone runs
         self.testing = self.bot_config["test_mode"]["color_sensor"]
@@ -52,6 +47,10 @@ class ColorSensor(I2CDevice):
             self.pwm = pwm_mod.PWM(self.pwm_num)
             # Duty cycle = 50% (from 20msec)
             self.pwm.duty = 1000000
+            # Setup ready signal GPIO:
+            self.gpio_num = self.bot_config["color_sensor"]["ready_signal"]
+            self.ready_gpio = gpio_mod.GPIO(self.gpio_num)
+            self.ready_gpio.input()
 
         else:
             self.logger.debug("Running in test mode")

@@ -99,6 +99,8 @@ class IRHub(object):
         :raises ValueError: If n isn't between 0 and num_ir_units-1
 
         """
+        if (n < 0 or n > self.num_ir_units-1):
+            raise ValueError("invalid input parameter")
 
         for name, array in self.arrays.iteritems():
             try:

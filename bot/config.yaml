@@ -4,17 +4,18 @@ testing : false
 test_mode: {
     color_sensor: true,
     ultrasonics: true,
-    ir: { front: false, back: false, right: false, left: false},
-    IR: false,
-    ADC: false,
-    DMCC: false,
-    stepper: false,
-    micromotor: false,
-    motor: false,
-    servo: false,
+    ir: { front: true, back: true, right: true, left: true},
+    IR: true,
+    ADC: true,
+    DMCC: true,
+    stepper: true,
+    micromotor: true,
+    motor: true,
+    servo: true,
     solenoid: true,
-    simon_player: false,
-    etch_a_sketch: false
+    simon_player: true,
+    etch_a_sketch: true,
+    wheelgun: true
 }
 
 rubiks : {

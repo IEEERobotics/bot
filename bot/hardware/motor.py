@@ -46,7 +46,7 @@ class Motor(object):
         self.invert(inverted)
 
         # Load system configuration
-        config = lib.get_config()
+        config = lib.get_config("bot/config.yaml")
 
         if config["test_mode"]["motor"]:
             # Get dir of simulated hardware files from config

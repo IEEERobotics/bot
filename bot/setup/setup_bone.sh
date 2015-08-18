@@ -105,7 +105,7 @@ if [ "$bot_specific" = true ]; then
     update-rc.d masquerade defaults
     export DEBIAN_FRONTEND=noninteractive
     DPKG_OPTS=Dpkg::Options::="--force-confold"
-    apt-get -y purge udhcpd
+    #apt-get -y purge udhcpd breaks usb connection
     apt-get -y -o ${DPKG_OPTS} install hostapd dnsmasq
     hostname -F /etc/hostname
 fi

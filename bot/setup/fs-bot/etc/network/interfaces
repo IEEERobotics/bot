@@ -19,7 +19,7 @@ iface wlan0 inet static
 
 #location of hostapd config file
 #contains details of the hosted wireless network
-hostapd /etc/etc/hostapd/hostapd.conf
+hostapd /etc/hostapd/hostapd.conf
     address 10.2.1.1
     netmask 255.255.255.0
 

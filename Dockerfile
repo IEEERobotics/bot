@@ -28,7 +28,7 @@ ADD . /opt/bot
 
 # Due to issue #112, tests must be run before server can start
 # The tests create simulated hardware files required by server in test mode
-RUN cd /opt/bot && tox -epy27 2>&1
+# RUN cd /opt/bot && tox -epy27 2>&1
 
 # Expose server port
 EXPOSE 60000

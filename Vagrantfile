@@ -21,7 +21,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                                                              python-dev \
                                                              python-yaml \
                                                              python-numpy \
-                                                             python3.2"
+                                                             "
     config.vm.provision "shell", inline: "pip install -r /home/vagrant/bot/requirements.txt"
 
         # VM with various useful tools
@@ -36,7 +36,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                                                                  tmux \
                                                                  screen \
                                                                  nmap \
-                                                                 tree"
+                                                                 tree \ 
+								 python-tox \
+								 python-spyinx
+								 "
 
 
 end

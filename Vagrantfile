@@ -38,7 +38,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                                                                  nmap \
                                                                  tree \ 
 								 python-tox \
-								 python-spyinx
+								 python-sphinx
 								 "
 
 

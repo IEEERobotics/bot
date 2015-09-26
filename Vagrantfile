@@ -6,11 +6,12 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Build Vagrant box based on Fedora 20
     # TODO: Upgrade Vagrant to Debian 8 and install pypy once it's out.
-    config.vm.box = "chef/debian-7.7"
+    config.vm.box = "ubuntu/trusty64"
 
-    config.vm.synced_folder ".", "/vagrant", disabled: true
     config.vm.synced_folder ".", "/home/vagrant/bot"
 
+    config.vm.network :private_network, ip: "192.168.33.11"
+    config.vm.network "forwarded_port", guest: 80, host: 1234
     config.vm.provision "shell", inline: "apt-get update"
     config.vm.provision "shell", inline: "apt-get install -y python-pip \
                                                              python-smbus \
@@ -20,14 +21,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                                                              python-dev \
                                                              python-yaml \
                                                              python-numpy \
-                                                             python3.2"
+                                                             "
     config.vm.provision "shell", inline: "pip install -r /home/vagrant/bot/requirements.txt"
 
-    config.vm.define "base" do |base|
-        # Just the shared config above
-    end
-
-    config.vm.define "tooled" do |tooled|
         # VM with various useful tools
         # This will take longer to build. It's recommended that folks who
         # already have a reasonable local dev environment use the base
@@ -40,7 +36,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                                                                  tmux \
                                                                  screen \
                                                                  nmap \
-                                                                 tree"
-    end
+                                                                 tree \ 
+								 python-tox \
+								 python-sphinx
+								 "
+
 
 end

@@ -26,60 +26,6 @@ class TestBot(unittest.TestCase):
         lib.set_testing(True)
 
         # Write known values to all simulated hardware files
-        self.setup_turret_servos()
-        self.setup_laser()
-        self.setup_gun_trigger()
-        self.setup_ir_select_gpios()
-        self.setup_ir_analog_input_gpios()
-
-    def setup_turret_servos(self):
-        """Set turret servo simulation files to known state."""
-        run = "1\n"
-        duty_ns = "15000000\n"
-        period_ns = "20000000\n"
-        polarity = "0\n"
-        for servo_conf in self.config["turret"]["servos"].values():
-            self.setup_pwm(
-                servo_conf["PWM"], run, duty_ns, period_ns, polarity)
-
-    def setup_laser(self):
-        """Set gun lasor simulation files to known state."""
-        self.setup_gpio(self.config["gun"]["laser_gpio"])
-
-    def setup_gun_trigger(self):
-        """Set gun trigger GPIO simulation files to known state."""
-        for gpio_num in self.config["gun"]["trigger_gpios"].itervalues():
-            self.setup_gpio(gpio_num)
-
-    def setup_ir_select_gpios(self):
-        """Set IR GPIO simulation files to known state.
-
-        These GPIO pins are used to select which IR units
-        are selected for reading.
-
-        """
-        for gpio_num in self.config["ir_select_gpios"]:
-            self.setup_gpio(gpio_num)
-
-    def setup_ir_analog_input_gpios(self):
-        """Set IR GPIO simulation files to known state.
-
-        These GPIO pints are used to read the currently
-        selected IR unit on an analog IR array.
-
-        """
-        for gpio_num in self.config["ir_analog_input_gpios"].values():
-            self.setup_gpio(gpio_num)
-
-    def setup_ir_digital_input_gpios(self):
-        """Set IR GPIO simulation files to known state.
-
-        These GPIO pints are used to read the currently
-        selected IR unit on a digital IR array.
-
-        """
-        for gpio_num in self.config["ir_digital_input_gpios"].values():
-            self.setup_gpio(gpio_num)
 
     def setup_pwm(self, pwm_num, run, duty_ns, period_ns, polarity):
         """Set files that simulate BBB PWMs to known state.

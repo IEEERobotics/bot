@@ -24,7 +24,7 @@ class Servo(object):
         self.pwm_num = pwm_num
 
         # Load config
-        config = lib.get_config()
+        config = lib.get_config("bot/config.yaml")
 
         if config["test_mode"]["servo"]:
             # Get dir of simulated hardware files from config

@@ -1,6 +1,7 @@
 """Test cases for servo abstraction class."""
 
 from random import randint
+from os import path
 
 import bot.lib.lib as lib
 import bot.hardware.servo as s_mod
@@ -13,8 +14,9 @@ class TestPosition(test_bot.TestBot):
 
     def setUp(self):
         """Setup test hardware files and build servo object."""
-        # Run general bot test setup
         super(TestPosition, self).setUp()
+        config = path.dirname(path.realpath(__file__))+"/test_config.yaml"
+        self.config = lib.get_config(config)
 
         # Build servo in testing mode
         self.pwm_num = self.config['test_servo']

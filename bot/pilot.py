@@ -1,4 +1,10 @@
-"""Autonomous control client that solves IEEE Hardware Competition 2014."""
+"""Autonomous control client that solves IEEE Hardware Competition 2014.
+
+UPDATE (Vijay - 9/27/15): Pilot does not work since the last year's 
+code has been erased. This file is here for reference and is expected to
+be modified for IEEE Hardware Competition 2016.
+Please do not instantiate Pilot before it is fixed.
+"""
 
 import sys
 import time

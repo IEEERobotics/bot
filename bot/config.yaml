@@ -3,65 +3,14 @@ testing : false
 # Used for testing individual pices of hardware
 test_mode: {
     color_sensor: true,
-    ultrasonics: true,
-    ir: { front: true, back: true, right: true, left: true},
-    IR: true,
     ADC: true,
     DMCC: true,
     stepper: true,
-    micromotor: true,
     motor: true,
     servo: true,
-    solenoid: true,
-    simon_player: true,
-    etch_a_sketch: true,
-    wheelgun: true
-}
-
-rubiks : {
-    servo_pwm: 2, # P8_13
-    
-    GPIO: {
-        FWD: 11, # P8_32
-        REV: 89, # P8_30 
-        PWR: 88  # P8_28 
-    }
-}
-
-simon: {
-    colors: {
-        # gpio nums for detectors.
-        red: 30,        # P8 - 4
-        blue: 60,      # P8 - 6
-        green: 31,       # P8 - 8
-        yellow: 48},    # P8 - 10
-    # Currently using 4 gpios for stepper motor.
-    # TODO(AhmedSamara) switch to pwm once PCB is in
-    
-    servo: 2,            # TODO(vijay)P9 - 29 or 21?? also change 
-    motor1 : [62,36],
-    motor2 : [32,86],
-    motor3 : [87,10],
-    motor4 : [9,8],
-    motor5 : [38,34]
-    
-}
-
-etch_a_sketch_motors: {
-    left_stepper: [44, 26, 46, 65],
-    right_stepper: [49, 15, 117, 14]
 }
 
 dmcc_drive_motors: {
-    # back_left: { board_num: 1, motor_num: 1 },
-    # back_right: { board_num: 1, motor_num: 2, invert: True },
-    # front_left: { board_num: 0, motor_num: 1 },
-    # front_right: { board_num: 0, motor_num: 2, invert: True }
-
-    # front_left: { board_num: 1, motor_num: 1 },
-    # back_left: { board_num: 1, motor_num: 2, invert: True },
-    # front_right: { board_num: 0, motor_num: 1 },
-    # back_right: { board_num: 0, motor_num: 2, invert: True }
 
     front_left: { board_num: 1, motor_num: 1 },
     back_left: { board_num: 1, motor_num: 2 },
@@ -70,92 +19,6 @@ dmcc_drive_motors: {
 
 }
 
-turret: {
-    servos: {
-        yaw:   { PWM: 2, min: 20, max: 160 }, # Pan : P9_42 (pwm2/ecap0)
-        pitch: { PWM: 4, min: 20, max: 180 }  # Tilt: P9_16 (pwm4)
-    }
-}
-
-gun: {
-    max_trigger_duration: 0.25,  # Maximum duration a trigger pin can be high
-    laser_gpio: 8,  # Gun laser: P8_35 (gpio8)
-    trigger_gpios: {
-        retract: 74,  # Gun trigger - retract: P8_41 (gpio74)
-        advance: 72   # Gun trigger - advance: P8_43 (gpio72)
-    },
-    dmcc_wheel_motors: {
-        right: { board_num: 1, motor_num: 1 },
-        left: { board_num: 1, motor_num: 2, invert: True },
-    }
-}
-
-# location [x, y] is in meters, assumes 30cm x 30cm bot with right = +X axis, top = +Y axis
-# offset is the PRU data memory offset containing the sensor result
-ultrasonics: {
-    pru_num: 0,
-    pru_file: "bot/pru/ultrasonic.bin",
-    sensors: {
-        front: { offset: 0, xy: [  0.0,  0.15], dir: [ 0.0,  1.0] },
-        back:  { offset: 8, xy: [  0.0, -0.15], dir: [ 0.0, -1.0] },
-        left:  { offset: 16, xy: [-0.15,     0], dir: [-1.0,  0.0] },
-        right: { offset: 24, xy: [ 0.15,   0.0], dir: [ 1.0,  0.0] }
-    }
-}
-
-course: {
-    ncsu: &ncsu {
-        x_size: 1.1786,  # in meters, ncsu course: 46.4"
-        y_size: 2.4257  # in meters, official spec: 95.5"
-    },
-    official: &official {
-        x_size: 1.2065,  # in meters, official spec: 47.5"
-        y_size: 2.4257  # in meters, official spec: 95.5"
-    },
-    default: *ncsu,
-    # bonding box of valid firing locations (for gunner)
-    firing_box: { 
-        y_min: 0.889,  # 35"
-        y_max: 1.55,  # 60"
-        x_min: 0.3,  # ~12"
-        x_max: 1.07   # 42"
-    }
-}
-
-pot_config: {  # ADC configuration
-    i2c_bus: 1,  # System I2C bus to use to talk to ADCs
-    i2c_addr: {pot1: 0x50},
-    i2c_registers: {# Default command bytes for reading each channel.
-        acr: {cmd: 0x10, init: 0x40},
-        yellow: {cmd: 0x03, init: 0xff},
-        green: {cmd: 0x02, init: 0xff},
-        blue: {cmd: 0x01, init: 0xff},
-        red: {cmd: 0x00, init: 0xff}
-    }
-}
-
-
-ir_select_gpios: [44, 26, 46, 65]  # GPIOs to select IR sensor units: [P8_12 (gpio44), P8_14 (gpio26), P8_16 (gpio46), P8_18 (gpio65)]
-ir_analog_input_gpios: {front: 39, back: 35, left: 67, right: 68}  # GPIO pins to read selected IR sensor units: P8_04 (gpio39), P8_06 (gpio35), P8_08 (gpio67), P8_10 (gpio68)
-ir_analog_adc_config: {  # ADC configuration
-    i2c_bus: 1,  # System I2C bus to use to talk to ADCs
-    i2c_addr: {left: 0x49, right: 0x4b, back: 0x4a, front: 0x48},
-    i2c_registers: {# Default command bytes for reading each channel.
-        ch0: {cmd: 0x8c},
-        ch1: {cmd: 0xcc},
-        ch2: {cmd: 0x9c},
-        ch3: {cmd: 0xdc},
-        ch4: {cmd: 0xac},
-        ch5: {cmd: 0xec},
-        ch6: {cmd: 0xbc},
-        ch7: {cmd: 0xfc}
-    },
-    result_mask: 0x0ff0,  # Mask to apply to conversion result
-    result_shift: 4,  # No. of bits to shift to the right after applying mask
-}
-ir_read_adc: true  # read accurate ADC values instead of binary GPIO values
-pot_read: true
-ir_verbose_output: false  # print verbose output to console (log level: INFO), for debugging & testing only
 logging: {log_file: bot/logs/bot.log, file_handler_level: DEBUG, stream_handler_level: INFO}  # Logging options
 strategy: bot/planner/strategies/strategy0.yaml
 targeting: bot/gunner/targeting/targeting0.yaml
@@ -167,8 +30,4 @@ server_bind_host: "*"  # Special hostname servers bind to, for listening on all 
 server_host: 127.0.0.1  # Default hostname clients connect to
 ctrl_server_port: 60000  # Port used to send control messages to the bot
 pub_server_port: 60001  # PubServer publishes bot data on this port
-irs_per_array: 8
-resistor_per_pot: 4
-color_sensor: {LED_PWM: 5,
-                ready_signal: 72}
-ir_thresh: 60
+color_sensor: {LED_PWM: 5, ready_signal: 72}

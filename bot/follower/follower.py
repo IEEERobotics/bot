@@ -1,4 +1,9 @@
-"""Logic for line following."""
+"""Logic for line following.
+
+UPDATE:(Vijay - 9/27/15) - Follower is outdated since we won't be line-following
+for IEEE Hardware Competition 2016. This file has been left here for reference;
+Please do not instantiate it until it's fixed.
+"""
 
 import sys
 from time import time

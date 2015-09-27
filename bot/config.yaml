@@ -20,8 +20,6 @@ dmcc_drive_motors: {
 }
 
 logging: {log_file: bot/logs/bot.log, file_handler_level: DEBUG, stream_handler_level: INFO}  # Logging options
-strategy: bot/planner/strategies/strategy0.yaml
-targeting: bot/gunner/targeting/targeting0.yaml
 test_pwm_base_dir: bot/simulator/pins/pwm/pwm
 test_gpio_base_dir: bot/simulator/pins/gpio/gpio
 test_adc_base_dir: bot/simulator/pins/adc

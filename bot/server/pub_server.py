@@ -1,4 +1,7 @@
-"""Server for publishing data about the bot."""
+"""Server for publishing data about the bot.
+
+UPDATE (Vijay - 9/27/15): PubServer is outdated.
+"""
 
 import sys
 import os

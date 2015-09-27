@@ -20,7 +20,7 @@ class DMCCMotorSet(dict):
             <motor_name>: { board_num: [0-3], motor_num: [1-2] }
 
         """
-        self.config = lib.get_config()
+        self.config = lib.get_config("bot/config.yaml")
         self.logger = lib.get_logger()
         self.is_testing = self.config["test_mode"]["DMCC"]
 

@@ -1,6 +1,7 @@
 """Test cases for servo abstraction class."""
 
 from random import randint
+from os import path
 
 import bot.lib.lib as lib
 import bot.hardware.servo as s_mod
@@ -13,11 +14,13 @@ class TestPosition(test_bot.TestBot):
 
     def setUp(self):
         """Setup test hardware files and build servo object."""
-        # Run general bot test setup
         super(TestPosition, self).setUp()
+        config = path.dirname(path.realpath(__file__))+"/test_config.yaml"
+        self.config = lib.get_config(config)
 
         # Build servo in testing mode
-        self.pwm_num = self.config['turret']['servos']['yaw']['PWM']
+        self.pwm_num = self.config['test_servo']
+        self.setup_pwm(self.pwm_num, "1\n", "150\n", "200\n", "0\n")
         self.servo = s_mod.Servo(self.pwm_num)
 
     def tearDown(self):
@@ -56,7 +59,7 @@ class TestPosition(test_bot.TestBot):
             # Confirm that motor was set correctly
             cur_pwm = self.get_pwm(self.pwm_num)
             duty = int(cur_pwm["duty_ns"])
-            read_pos = int(round(((duty - 1000000) / 1000000.) * 180))
+            read_pos = int(round(((duty - 580000) / 2320000.) * 180))
             assert read_pos == test_pos, "{} != {}".format(read_pos, test_pos)
 
     def test_over_max(self):

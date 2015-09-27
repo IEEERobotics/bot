@@ -28,10 +28,7 @@ class TestDMCCMotorSet(TestCase):
     def test_multiple_config(self):
         drive_conf = self.config['dmcc_drive_motors']
         drive_motor_set = DMCCMotorSet(drive_conf)
-        turret_conf = self.config['dmcc_turret_motors']
-        turret_motor_set = DMCCMotorSet(turret_conf)
         self.assertEqual(len(drive_motor_set.motors), 4)
-        self.assertEqual(len(turret_motor_set.motors), 2)
 
     def test_bad_config(self):
         motor_conf = self.config['dmcc_bad_motor_def']

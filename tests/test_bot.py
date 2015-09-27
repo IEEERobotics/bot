@@ -26,6 +26,7 @@ class TestBot(unittest.TestCase):
         lib.set_testing(True)
 
         # Write known values to all simulated hardware files
+        self.setup_pwm(2,"1\n","15000000\n" , "20000000\n", "0\n") 
 
     def setup_pwm(self, pwm_num, run, duty_ns, period_ns, polarity):
         """Set files that simulate BBB PWMs to known state.

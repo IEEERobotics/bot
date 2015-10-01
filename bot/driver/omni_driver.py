@@ -1,7 +1,6 @@
 """TODO: Write this"""
 
 import bot.driver as driver
-import bot.lib.lib as lib
 from bot.hardware.dmcc_motor import DMCCMotorSet
 
 

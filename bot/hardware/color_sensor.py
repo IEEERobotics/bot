@@ -36,8 +36,8 @@ class ColorSensor(I2CDevice):
             # Setup I2C
             I2CDevice.__init__(self, 1, 0x29, config='tcs3472_i2c.yaml')
             enable = self.registers['ENABLE']
-            id = self.registers['ID']
-            status = self.registers['STATUS']
+            # id = self.registers['ID']
+            # status = self.registers['STATUS']
             enable.write('PON', 'Enable')
             enable.write('AEN', 'Enable')
             enable = self.registers['ENABLE']  # TODO: Is this needed?
@@ -56,8 +56,6 @@ class ColorSensor(I2CDevice):
             self.logger.debug("Running in test mode")
             # Fake device at address "0x00"
             I2CDevice.__init__(self, 1, 0x00, config='tcs3472_i2c.yaml')
-        
-
 
         # Gets base values for comparisons to future readings.
         self.get_baseline()
@@ -99,7 +97,7 @@ class ColorSensor(I2CDevice):
         """
         t0 = time.time()
         print "value: ", self.ready_gpio.get_value()
-        while time.time()- t0 > timeout:
+        while time.time() - t0 > timeout:
             if self.ready_gpio.get_value():
                 return True
         return False
@@ -242,11 +240,11 @@ class ColorSensor(I2CDevice):
         :returns: Name of color found.
         """
 
-        if detects_color("green"):
+        if self.detects_color("green"):
             return "green"
-        elif detects_color("red"):
+        elif self.detects_color("red"):
             return "red"
-        elif detects_color("blue"):
+        elif self.detects_color("blue"):
             return "blue"
 
     @lib.api_call
@@ -287,9 +285,9 @@ class ColorSensor(I2CDevice):
             percent_red,\
             percent_green, percent_blue = self.get_percentage()
 
-        total_color = self.color["red"] \
-            + self.color["green"] \
-            + self.color["blue"]
+        # total_color = self.color["red"] \
+        #    + self.color["green"] \
+        #    + self.color["blue"]
 
         total_base = self.br + self.bg + self.bb
 

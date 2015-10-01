@@ -18,7 +18,7 @@ class TestGetConfig(test_bot.TestBot):
     def test_invalid(self):
         """Test proper failure for fake config file."""
         with self.assertRaises(IOError):
-            config = lib.get_config("fake.yaml")
+            lib.get_config("fake.yaml")
 
 
 class TestWriteConfig(test_bot.TestBot):

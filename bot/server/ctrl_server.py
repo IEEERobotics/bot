@@ -17,6 +17,7 @@ import bot.lib.messages as msgs
 
 from bot.driver.mec_driver import MecDriver
 
+
 def is_api_method(obj, name):
     """Tests whether named method exists in obj and is flagged for API export.
 
@@ -128,10 +129,10 @@ class CtrlServer(object):
         """
 
         self.driver = MecDriver()
-        
+
         systems = {}
-        systems["ctrl"]     = self
-        systems["driver"]   = self.driver
+        systems["ctrl"] = self
+        systems["driver"] = self.driver
 
         self.logger.debug("Systems: {}".format(systems))
         return systems

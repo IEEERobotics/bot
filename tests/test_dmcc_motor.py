@@ -5,7 +5,6 @@ from unittest import TestCase, expectedFailure
 
 import pyDMCC
 
-import tests.test_bot as test_bot
 from bot.hardware.dmcc_motor import DMCCMotorSet, DMCCMotor
 import bot.lib.lib as lib
 
@@ -33,7 +32,7 @@ class TestDMCCMotorSet(TestCase):
     def test_bad_config(self):
         motor_conf = self.config['dmcc_bad_motor_def']
         with self.assertRaises(KeyError):
-            drive_motor_set = DMCCMotorSet(motor_conf)
+            DMCCMotorSet(motor_conf)
 
 
 class TestDMCCMotor(TestCase):

@@ -1,6 +1,5 @@
 """Module for unittest parent class."""
 
-import sys
 import os
 import unittest
 

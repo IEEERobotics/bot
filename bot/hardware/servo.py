@@ -6,6 +6,7 @@ import bbb.pwm as pwm_mod
 
 import bot.lib.lib as lib
 
+
 class Servo(object):
 
     """Class for abstracting servo settings."""

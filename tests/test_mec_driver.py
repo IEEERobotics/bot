@@ -3,7 +3,6 @@
 from math import fabs, hypot, atan2, degrees
 from unittest import expectedFailure
 
-import bot.lib.lib as lib
 from bot.driver.mec_driver import MecDriver  # For convenience
 import tests.test_bot as test_bot
 
@@ -65,8 +64,6 @@ class TestRotate(test_bot.TestBot):
                     MecDriver.max_speed
 
     def test_move(self):
-        speed_error_margin = (MecDriver.max_speed -
-                              MecDriver.min_speed) * 0.05
         angle_error_margin = (MecDriver.max_angle -
                               MecDriver.min_angle) * 0.05
         for test_speed in xrange(MecDriver.min_speed + 1,
@@ -127,8 +124,6 @@ class TestRotate(test_bot.TestBot):
         self.assertEqual(self.md.speed, 0)
 
     def test_move_forward_strafe(self):
-        speed_error_margin = (MecDriver.max_speed -
-                              MecDriver.min_speed) * 0.05
         angle_error_margin = (MecDriver.max_angle -
                               MecDriver.min_angle) * 0.05
 

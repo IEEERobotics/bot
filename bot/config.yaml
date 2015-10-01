@@ -1,6 +1,6 @@
-# Used when running unit tests
+# Used when running unit tests and ctrl server.
 testing : false
-# Used for testing individual pices of hardware
+# Used for testing individual pices of hardware.
 test_mode: {
     color_sensor: true,
     ADC: true,

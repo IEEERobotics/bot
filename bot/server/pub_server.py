@@ -4,7 +4,6 @@ UPDATE (Vijay - 9/27/15): PubServer is outdated.
 """
 
 import sys
-import os
 import threading
 from time import sleep
 

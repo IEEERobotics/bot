@@ -12,6 +12,7 @@ ser=serial.Serial(port='/dev/ttyO1',baudrate=115200)
 sock = socket(AF_INET, SOCK_DGRAM)
 sock.bind(('', 5001))
 data, addr = sock.recvfrom(1)
+
 print 'received ping from', addr
 try:
 	ser.open()

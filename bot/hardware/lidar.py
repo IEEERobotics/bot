@@ -3,7 +3,7 @@ from time import time,sleep
 
 #TODO add timeouts, specifically to readPacket
 
-class lidar:
+class Lidar:
     
     def __init__(self,port='/dev/ttyO1'):
         self.ser=serial.Serial(port,baudrate=115200)
@@ -49,6 +49,7 @@ class lidar:
         for r in range(revs): #scan for revs # of revolutions
             for x in range(90):
                 packet=self.readPacket()
+                if packet is None:continue
                 index=4*(ord(packet[0])-0xA0)#packet # from 0-89
                 packet=packet[3:19]#truncate packet to just distance and strength data
                 for i in range(4):

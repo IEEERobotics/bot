@@ -7,7 +7,16 @@ from time import time, sleep
 from socket import socket, AF_INET, SOCK_DGRAM
 import sys
 def check(pack):
-	while
+	pack = [0xFA]+map(ord,pack)
+	dlist=[]
+	for t in xrange(10):
+		dlist.append(pack[2*t]+(pack[2*t+1]<<8))
+	chk = 0
+	for d in dlist:
+		chk = (chk<<1) + d
+	csum = (chk & 0x7FFF) + (chk>>15)
+	csum = csum & 0x7FFF
+	return csum == (pack[20] + (pack[21]<<8))
 ser=serial.Serial(port='/dev/ttyO1',baudrate=115200)
 sock = socket(AF_INET, SOCK_DGRAM)
 sock.bind(('', 5001))

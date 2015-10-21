@@ -22,15 +22,15 @@ class Lidar (Proximity_Sensor):
     # Checks the packet to its checksum. Argument excludes start byte
     def check(self, pack):
         pack = [0xFA] + map(ord, pack)
-	dlist = []
-	for t in xrange(10):
-	    dlist.append(pack[2*t] + (pack[2*t+1]<<8))
-	chk = 0
-	for d in dlist:
-	    chk = (chk<<1) + d
-	csum = (chk & 0x7FFF) + (chk>>15)
-	csum = csum & 0x7FFF
-	return csum == (pack[20] + (pack[21]<<8))
+        dlist = []
+        for t in xrange(10):
+            dlist.append(pack[2*t] + (pack[2*t+1]<<8))
+        chk = 0
+        for d in dlist:
+            chk = (chk<<1) + d
+        csum = (chk & 0x7FFF) + (chk>>15)
+        csum = csum & 0x7FFF
+        return csum == (pack[20] + (pack[21]<<8))
     
     def read_packet(self):
         self.ser.read(self.ser.inWaiting())

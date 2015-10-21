@@ -72,8 +72,8 @@ class Lidar (Proximity_Sensor):
         
     # overrides Proximity_Sensor
     def fetch_raw_data(self):
-        dist = self.get_distance()
-        ts = [t for t in xrange(360) if dist[t] > 0]
+        dists = self.get_distance()
+        ts = [t for t in xrange(360) if dists[t] > 0]
         rs = [dist[t] for t in ts]
         raw_data = np.zeros((len(ts), 2))
         raw_data[:, 0] = np.array(rs)

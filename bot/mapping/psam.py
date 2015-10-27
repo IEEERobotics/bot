@@ -36,15 +36,14 @@ class Proximity_Sensor(object):
         """ Returns translated offset data in robot's coordinate system """
         # Get list of r and theta vectors (in radians)
         offset_rs = offset_data[:, 0]
-        offset_ts = offset_data[:, 1] * np.pi / 180.
+        offset_ts = offset_data[:, 1]
 
         # Get device offset
         robot_r, robot_theta = self.get_offset_from_origin()
-        robot_t = robot_theta * np.pi / 180.
 
         # Calculate in temporary cartesian space
-        x = offset_rs*np.sin(offset_ts) + robot_r*np.cos(robot_t)
-        y = offset_rs*np.cos(offset_ts) + robot_r*np.cos(robot_t)
+        x = offset_rs*np.sin(offset_ts) + robot_r*np.cos(robot_theta)
+        y = offset_rs*np.cos(offset_ts) + robot_r*np.cos(robot_theta)
 
         # Convert back to polar coordinate system
         new_rs = np.sqrt(np.square(x) + np.square(y))
@@ -54,4 +53,4 @@ class Proximity_Sensor(object):
 
     def translate_raw_data(self, raw_data):
         """ Returns translated raw data in sensor's coordinate system """
-        pass
+        return raw_data

@@ -58,7 +58,7 @@ class Pilot:
         sys.exit(1)
 
     def find_start_condition(self):
-        self.call('switch', 'detect_switch_orientation')
+        return self.call('switch', 'detect_switch_orientation')
 
     def move(self, speed, angle):
         self.call('driver', 'move',
@@ -98,11 +98,15 @@ class Pilot:
 
         #self.call('switch', 'test')
         val = self.find_start_condition()
+        print val
         # Only on of these values will occur. Find which
-        if val is 0 or 3:
-            self.call("switch", "test")
+        if ((val == 0) or (val==3)):
             self.ctrl_client.exit_server()
             return
-        
+        elif (val == 1 or val==2):
+            self.call('nav', 'test_tun')
+            self.ctrl_client.exit_server()
+            return
+
 if __name__ == "__main__":
     Pilot().run()

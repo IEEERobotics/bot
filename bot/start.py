@@ -76,7 +76,7 @@ if args.pilot:
 
 if args.cli:
     # Build addresses of remote resources
-    config = lib.get_config("config.yaml")
+    config = lib.get_config()
     ctrl_addr = "{protocol}://{host}:{port}".format(
         protocol=config["server_protocol"],
         host=config["server_host"],

@@ -10,6 +10,12 @@ test_mode: {
     servo: true,
 }
 
+arm_configurations: {
+    pwm_pins: [1, 2, 3, 4, 5, 6]
+
+}
+
+
 dmcc_drive_motors: {
 
     front_left: { board_num: 1, motor_num: 1 },

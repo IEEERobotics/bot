@@ -7,11 +7,11 @@ from bot.hardware.servo import Servo
 
 
 
-class robot_arm(object):
+class RobotArm(object):
 
 
    """An object that resembles a robotic arm with n joints"""
-    def __init__(servo_assignments):
+    def __init__(self, servo_assignments):
 
         for pwm in servo_assignments:
 
@@ -19,7 +19,7 @@ class robot_arm(object):
             
     
     @lib.api_call
-    def set_joint_angle(joint, angle):
+    def set_joint_angle(self, joint, angle):
         """Sets the angle of an individual joint
 
         :param joint: Number of the joint (lowest joint being 1)

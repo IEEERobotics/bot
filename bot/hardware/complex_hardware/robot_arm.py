@@ -265,7 +265,6 @@ class RobotArm(object):
         #print Theta_next
 
         while (dist > 1):
-            #print '=============================================================='
 
             theA = Theta_next[0]
             theB = Theta_next[1]

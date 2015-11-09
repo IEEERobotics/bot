@@ -10,7 +10,7 @@ test_mode: {
     servo: true,
 }
 
-arm_configurations: {
+dagu_arm: {
     pwm_pins: [1, 2, 3, 4, 5, 6]
 
 }

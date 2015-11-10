@@ -1,6 +1,6 @@
 #!/bin/bash
 # Install standard software, do git configuration
-
+# https://learn.adafruit.com/setting-up-wifi-with-beaglebone-black/overview
 
 sudo apt-get update && apt-get -y upgrade
 

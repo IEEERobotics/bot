@@ -18,6 +18,18 @@ source $dir/adc.sh
 # set_polarity 5 0
 # run_pwm      5  
 
+
+# Export all 6 PWM for robotic arm.
+for i in $(seq 1 6);
+    load_pwm i
+    set_period   i 20000000
+    set_duty     i 10000000
+    set_polarity i 0
+    run_pwm      i 
+done
+
+
+
 ## ADC example
 # enable_adcs
 # load_slot BB-BONE-PRU-01

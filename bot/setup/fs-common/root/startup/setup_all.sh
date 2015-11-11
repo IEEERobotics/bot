@@ -20,7 +20,8 @@ source $dir/adc.sh
 
 
 # Export all 6 PWM for robotic arm.
-for i in $(seq 1 6);
+for i in $(seq 1 6)
+do
     load_pwm i
     set_period   i 20000000
     set_duty     i 10000000

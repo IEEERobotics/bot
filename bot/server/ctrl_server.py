@@ -17,6 +17,7 @@ import bot.lib.messages as msgs
 
 from bot.driver.mec_driver import MecDriver
 from bot.hardware.complex_hardware import RobotArm
+from bot.hardware.servo_cape import ServoCape
 
 def is_api_method(obj, name):
     """Tests whether named method exists in obj and is flagged for API export.
@@ -130,11 +131,14 @@ class CtrlServer(object):
 
         self.driver = MecDriver()
         self.arm = RobotArm(self.config["dagu_arm"])
- 
+        self.cape = ServoCape(self.confif["dage_arm"]["servo_cape"])
+         
         systems = {}
         systems["ctrl"] = self
         systems["driver"] = self.driver
         systems["arm"] = self.arm
+        systems["servo_cape"] = self.cape
+
         self.logger.debug("Systems: {}".format(systems))
         return systems
 

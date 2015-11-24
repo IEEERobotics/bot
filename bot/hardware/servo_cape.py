@@ -7,17 +7,16 @@ import bot.lib.lib as lib
 import smbus
 
 
-class servo_cape(object):
+class ServoCape(object):
     """init device"""
     self.logger = lib.get_logger()
     self.bot_config = lib.get_config()
 
 
-    def __init__(self, i2c_bus, i2c_address):
+    def __init__(self, cape_config):
         """Initialize vars"""
 
         self.logger = lib.get_logger()
-        self.bot_config = lib.get_config()
 
         self.bus_num = i2c_bus
 

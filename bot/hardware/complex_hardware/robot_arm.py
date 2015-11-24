@@ -3,22 +3,26 @@
 import simpy
 ﻿import sympy
 import bot.lib.lib as lib
-from bot.hardware.servo import Servo
+from bot.hardware.servo_cape import ServoCape
 from calcFKposition import *
 
 
 class RobotArm(object):
 
    """An object that resembles a robotic arm with n joints"""
-    def __init__(self, servo_assignments):
-
-        for pwm in servo_assignments:
-
-            self.joint_servos.append(Servo(pwm)) 
-            
+    def __init__(self, arm_config):
+        
+        self.logger = lib.get_logger()
+        self.bot_config = lib.get_config()
+        
+        self.servo_cape 
+            = ServoCape(self.bot_config["dagu_arm"]["servo_cape"])     
+        # Empty list of zeros representing each joint   
+        self.joints = [0]*self.bot_config["dagu_arm"]["dof"]
+        
     
     @lib.api_call
-    def set_joint_angle(self, joint, angle):
+    def set_joint_angle(self, angles):
         """Sets the angle of an individual joint
 
         :param joint: Number of the joint (lowest joint being 1)
@@ -27,7 +31,18 @@ class RobotArm(object):
         :type angle: int
         """
 
-        self.joint_servos[joint].position = angle 
+        # TODO(figure out how to calculate angles properly)
+        duty_min = 3
+        duty_max = 14.5
+        duty_span = duty_max - duty_min
+        
+        duty_cycles = []
+        for angle in angles:
+            duty_cycles.append(
+                100 - ((angle / 180) * duty_span + duty_min))
+
+        self.servo_cape.set_duty_cycles(angles)
+         
 
     def calcFKposition(theta1, theta2, theta3, theta4, theta5, L1, L2, L3, L4, L5, L6):
     """ Finds the current xyz given the lengths and theta values

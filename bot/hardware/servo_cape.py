@@ -36,5 +36,7 @@ class servo_cape(object):
         """Recieves set of duty cycles as chars vals 0-255.
         correspond to values """
 
-        self.bus.write_i2c_block_data(self.bus, self.reg,
-                                         joint_angles)
+        #TODO(Ahmed) find way to write all angles at once.
+        for angle in joint_angles:
+            bus.write_byte(self.addr, angle)
+            time.sleep(0.1)

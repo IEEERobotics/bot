@@ -8,13 +8,13 @@ from calcFKposition import *
 
 class RobotArm(object):
 
-   """An object that resembles a robotic arm with n joints"""
+    """An object that resembles a robotic arm with n joints"""
     def __init__(self, arm_config):
         
         self.logger = lib.get_logger()
         self.bot_config = lib.get_config()
         
-        self.servo_cape 
+        self.servo_cape \
             = ServoCape(self.bot_config["dagu_arm"]["servo_cape"])     
         # Empty list of zeros representing each joint   
         self.joints = [0]*5
@@ -44,16 +44,16 @@ class RobotArm(object):
          
 
     def calcFKposition(self, theta1, theta2, theta3, theta4, theta5, L1, L2, L3, L4, L5, L6):
-    """ Finds the current xyz given the lengths and theta values
+        """ Finds the current xyz given the lengths and theta values
 
-    :param thetaX:  angle of joint x
-    :type thetaX:   double
-    :param LX:      length of arm x
-    :type LX:       double
+        :param thetaX:  angle of joint x
+        :type thetaX:   double
+        :param LX:      length of arm x
+        :type LX:       double
 
-    :returns: 3x1 matrix of xyz location
+        :returns: 3x1 matrix of xyz location
 
-    """
+        """
 
         Px = ((1 / 2.) * L2 * cos(theta1 - theta2) +
             (1 / 2.) * L2 * cos(theta1 + theta2) +

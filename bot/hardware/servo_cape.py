@@ -40,4 +40,4 @@ class ServoCape(object):
         try:
             self.bus.write_i2c_block_data(self.address, self.reg, joint_angles)
         except IOError as err:
-        return self.errMsg()
+            return self.errMsg()

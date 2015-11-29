@@ -17,7 +17,7 @@ class RobotArm(object):
         self.servo_cape 
             = ServoCape(self.bot_config["dagu_arm"]["servo_cape"])     
         # Empty list of zeros representing each joint   
-        self.joints = [0]*self.bot_config["dagu_arm"]["dof"]
+        self.joints = [0]*5
         
     
     @lib.api_call
@@ -43,7 +43,7 @@ class RobotArm(object):
         self.servo_cape.set_duty_cycles(angles)
          
 
-    def calcFKposition(theta1, theta2, theta3, theta4, theta5, L1, L2, L3, L4, L5, L6):
+    def calcFKposition(self, theta1, theta2, theta3, theta4, theta5, L1, L2, L3, L4, L5, L6):
     """ Finds the current xyz given the lengths and theta values
 
     :param thetaX:  angle of joint x
@@ -96,7 +96,7 @@ class RobotArm(object):
         P = Matrix([Px, Py, Pz])
         return P
 
-    def InverseKinematics(X_goal,Y_goal, Z_goal):
+    def InverseKinematics(self, X_goal,Y_goal, Z_goal):
 
     	""" This function takes the current position of the arm (assumed at 180*)
 	        and a desired coordinate for the arm and outputs the angles of the serv$
@@ -259,7 +259,7 @@ class RobotArm(object):
             
     
         #print "DONE"
-        ThetaArray = [(Theta_next[0]*180/pi).evalf(),(Theta_next[1]*180/pi).evalf(), (Theta_next[2]*180/pi).evalf(), (Theta_next[3]*180/pi).evalf(), (Theta_next[4]*180/pi).evalf()]
-        return ThetaArray
+        ThetaArray = [int((Theta_next[0]*180/pi).evalf()), int((Theta_next[1]*180/pi).evalf()), int((Theta_next[2]*180/pi).evalf()), int((Theta_next[3]*180/pi).evalf()), int((Theta_next[4]*180/pi).evalf())]
+        self.servo_cape.write_angles(Theta_array)
 
 

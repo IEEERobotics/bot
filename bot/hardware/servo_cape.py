@@ -22,7 +22,7 @@ class ServoCape(object):
 
         if self.bot_config["test_mode"]["servo_cape"]:
             self.logger.debug("running in test mode")
-        else 
+        else: 
             self.logger.debug("non test-mode, real hardware")
 
     @lib.api_call

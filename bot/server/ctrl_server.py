@@ -16,7 +16,7 @@ import pub_server as pub_server_mod
 import bot.lib.messages as msgs
 
 from bot.driver.mec_driver import MecDriver
-from bot.hardware.complex_hardware import RobotArm
+from bot.hardware.complex_hardware.robot_arm import RobotArm
 from bot.hardware.servo_cape import ServoCape
 
 def is_api_method(obj, name):

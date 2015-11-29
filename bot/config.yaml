@@ -8,6 +8,7 @@ test_mode: {
     stepper: true,
     motor: true,
     servo: true,
+    servo_cape: true
 }
 
 dagu_arm: {

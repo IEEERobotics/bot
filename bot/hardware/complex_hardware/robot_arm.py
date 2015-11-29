@@ -3,7 +3,6 @@
 import sympy
 import bot.lib.lib as lib
 from bot.hardware.servo_cape import ServoCape
-from calcFKposition import *
 
 
 class RobotArm(object):

@@ -14,13 +14,11 @@ class ServoCape(object):
 
         self.logger = lib.get_logger()
         self.bot_config = lib.get_config()
-        
-        self.bus_num = i2c_bus
 
-        self.bus  = SMBus(self.bus_num)
-        self.addr = i2c_address
+        self.bus  = smbus.SMBus(self.bot_config["dagu_arm"]["servo_cape"]["i2c_bus"])
+        self.addr = self.bot_config["dagu_arm"]["servo_cape"]["i2c_addr"]
         #TODO(Ahmed): Figure out how to use regs
-        self.reg = 123
+        self.reg = 0xFF
 
         if self.bot_config["test_mode"]["servo_cape"]:
             self.logger.debug("running in test mode")
@@ -28,11 +26,10 @@ class ServoCape(object):
             self.logger.debug("non test-mode, real hardware")
 
     @lib.api_call
-    def set_duty_cycles(self, joint_angles):
-        """Recieves set of duty cycles as chars vals 0-255.
+    def write_angles(self, joint_angles):
+        """Recieves a list of duty cycles as chars vals 0-255.
         correspond to values """
-
-        #TODO(Ahmed) find way to write all angles at once.
-        for angle in joint_angles:
-            bus.write_byte(self.addr, angle)
-            time.sleep(0.1)
+        try:
+            self.bus.write_i2c_block_data(self.address, self.reg, joint_angles)
+        except IOError as err:
+        return self.errMsg()

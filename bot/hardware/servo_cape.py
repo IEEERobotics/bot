@@ -38,6 +38,6 @@ class ServoCape(object):
             if(joint_angles[i] < 0):
                 joint_angles[i] = 0
         try:
-            self.bus.write_i2c_block_data(self.address, self.reg, joint_angles)
+            self.bus.write_i2c_block_data(self.addr, self.reg, joint_angles)
         except IOError as err:
             return self.errMsg()

@@ -95,6 +95,7 @@ class RobotArm(object):
         P = Matrix([Px, Py, Pz])
         return P
 
+    @lib.api_call
     def InverseKinematics(self, X_goal,Y_goal, Z_goal):
 
     	""" This function takes the current position of the arm (assumed at 180*)

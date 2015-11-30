@@ -261,6 +261,6 @@ class RobotArm(object):
     
         #print "DONE"
         ThetaArray = [int((Theta_next[0]*180/pi).evalf()), int((Theta_next[1]*180/pi).evalf()), int((Theta_next[2]*180/pi).evalf()), int((Theta_next[3]*180/pi).evalf()), int((Theta_next[4]*180/pi).evalf())]
-        self.servo_cape.write_angles(Theta_array)
+        self.servo_cape.write_angles(ThetaArray)
 
 

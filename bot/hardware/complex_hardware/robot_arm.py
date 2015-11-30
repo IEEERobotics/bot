@@ -8,6 +8,8 @@ from bot.hardware.servo_cape import ServoCape
 
 class RobotArm(object):
 
+    self.default_angles = [90]*5
+
     """An object that resembles a robotic arm with n joints"""
     def __init__(self, arm_config):
         
@@ -39,9 +41,15 @@ class RobotArm(object):
         for angle in angles:
             duty_cycles.append(
                 100 - ((angle / 180) * duty_span + duty_min))
-
+        
+        self.joints = angles
         self.servo_cape.set_duty_cycles(angles)
-         
+
+    @lib.api_call
+    def reset_home_position(self):
+        """sets angles back to default position."""
+        
+        self.set_joint_angle(self.default_angles)                 
 
     def calcFKposition(self, theta1, theta2, theta3, theta4, theta5, L1, L2, L3, L4, L5, L6):
         """ Finds the current xyz given the lengths and theta values

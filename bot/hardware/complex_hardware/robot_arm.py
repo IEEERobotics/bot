@@ -1,6 +1,7 @@
 """Encapsulates functionality of moving around robot arm"""
 
 import sympy
+from sympy import *
 import bot.lib.lib as lib
 from bot.hardware.servo_cape import ServoCape
 

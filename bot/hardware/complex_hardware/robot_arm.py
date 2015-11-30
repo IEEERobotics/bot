@@ -139,7 +139,7 @@ class RobotArm(object):
         
         Theta_cur = Matrix([[theA], [theB], [theC], [theD], [theE]])
         
-        [x_cur, y_cur, z_cur] = calcFKposition(
+        [x_cur, y_cur, z_cur] = self.calcFKposition(
             theA, theB, theC, theD, theE, l1, l2, l3, l4, l5, l6)
         
         x_cur = x_cur.evalf(5)
@@ -226,7 +226,7 @@ class RobotArm(object):
             theE = pi / 2
             Theta_cur1 = Matrix([theA, theB, theC, theD, theE])
     
-            [x_cur, y_cur, z_cur] = calcFKposition(
+            [x_cur, y_cur, z_cur] = self.calcFKposition(
                 theA, theB, theC, theD, theE, l1, l2, l3, l4, l5, l6)
     		
             #print "Forward Kinematics Position"

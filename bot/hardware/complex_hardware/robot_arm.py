@@ -21,35 +21,17 @@ class RobotArm(object):
         # Empty list of zeros representing each joint   
         self.joints = [0]*5
         
-    
-    @lib.api_call
-    def set_joint_angle(self, angles):
-        """Sets the angle of an individual joint
-
-        :param joint: Number of the joint (lowest joint being 1)
-        :type joint: int
-        :param angle: angle to be set (in degrees)
-        :type angle: int
-        """
-
-        # TODO(figure out how to calculate angles properly)
-        duty_min = 3
-        duty_max = 14.5
-        duty_span = duty_max - duty_min
-        
-        duty_cycles = []
-        for angle in angles:
-            duty_cycles.append(
-                100 - ((angle / 180) * duty_span + duty_min))
-        
-        self.joints = angles
-        self.servo_cape.set_duty_cycles(angles)
-
     @lib.api_call
     def reset_home_position(self):
         """sets angles back to default position."""
         
-        self.set_joint_angle(self.default_angles)                 
+        self.servo_cape.write_angles(self.default_angles)       
+    
+    @lib.api_call
+    def demo(self, demo_number):
+        """runs demos 1-5"""
+        self.servo_cape.transmit_block([demo_number])        
+    
 
     def calcFKposition(self, theta1, theta2, theta3, theta4, theta5, L1, L2, L3, L4, L5, L6):
         """ Finds the current xyz given the lengths and theta values

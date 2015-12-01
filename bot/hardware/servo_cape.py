@@ -8,6 +8,15 @@ import smbus
 
 
 class ServoCape(object):
+    """Protocol:
+       byte 1: command type
+           options:
+           1: angles (5 following 5 bytes are the angle values)
+           2: demo1
+           3: demo2
+           4: demo3
+           5: demo4
+    """
 
     def __init__(self, cape_config):
         """Initialize vars"""
@@ -26,18 +35,28 @@ class ServoCape(object):
             self.logger.debug("non test-mode, real hardware")
 
     @lib.api_call
+    def transmit_block(self, array):
+        try:
+            self.bus.write_i2c_block_data(self.addr,
+                                          self.reg,
+                                          array)
+        except IOError as err:
+            return self.errMsg()
+
+
+    @lib.api_call
     def write_angles(self, joint_angles):
         """Recieves a list of duty cycles as chars vals 0-255.
         correspond to values """
-        
-        i = 0
-        while (i > 5):
+       
+        joint_angles[0] = 1 # Set command byte
+        i = 1
+        while (i > 6):
             joint_angles[i] += 90
             if(joint_angles[i] > 180):
                 joint_angles[i] = 180
             if(joint_angles[i] < 0):
                 joint_angles[i] = 0
-        try:
-            self.bus.write_i2c_block_data(self.addr, self.reg, joint_angles)
-        except IOError as err:
-            return self.errMsg()
+
+        # Append command byte
+        self.transmit_block([1] + joint_angles)

@@ -8,11 +8,11 @@ from bot.hardware.servo_cape import ServoCape
 
 class RobotArm(object):
 
-    self.default_angles = [90]*5
 
     """An object that resembles a robotic arm with n joints"""
     def __init__(self, arm_config):
         
+        self.default_angles = [90]*5
         self.logger = lib.get_logger()
         self.bot_config = lib.get_config()
         
@@ -30,7 +30,7 @@ class RobotArm(object):
     @lib.api_call
     def demo(self, demo_number):
         """runs demos 1-5"""
-        self.servo_cape.transmit_block([demo_number])        
+        self.servo_cape.transmit_block([2] + [demo_number])        
     
 
     def calcFKposition(self, theta1, theta2, theta3, theta4, theta5, L1, L2, L3, L4, L5, L6):

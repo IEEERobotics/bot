@@ -41,7 +41,7 @@ class ServoCape(object):
                                           self.reg,
                                           array)
         except IOError as err:
-            return self.errMsg()
+            return err
 
 
     @lib.api_call
@@ -49,9 +49,8 @@ class ServoCape(object):
         """Recieves a list of duty cycles as chars vals 0-255.
         correspond to values """
        
-        joint_angles[0] = 1 # Set command byte
-        i = 1
-        while (i > 6):
+        i = 0
+        while (i > 5):
             joint_angles[i] += 90
             if(joint_angles[i] > 180):
                 joint_angles[i] = 180

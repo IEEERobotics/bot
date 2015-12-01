@@ -131,13 +131,11 @@ class CtrlServer(object):
 
         self.driver = MecDriver()
         self.arm = RobotArm(self.config["dagu_arm"])
-        self.cape = ServoCape(self.config["dagu_arm"]["servo_cape"])
          
         systems = {}
         systems["ctrl"] = self
         systems["driver"] = self.driver
         systems["arm"] = self.arm
-        systems["servo_cape"] = self.cape
 
         self.logger.debug("Systems: {}".format(systems))
         return systems

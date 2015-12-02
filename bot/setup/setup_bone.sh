@@ -2,7 +2,7 @@
 # Install standard software, do git configuration
 
 # Each should only contain the packages that are added at that level
-base="git python-yaml libzmq-dev python-zmq python-simplejson python-smbus python-virtualenv python-pip python-numpy python-dev build-essential vim vim-tiny less cmake"
+base="git python-yaml libzmq-dev python-zmq python-simplejson python-smbus python-virtualenv python-pip python-numpy python-dev build-essential vim vim-tiny less cmake pyyaml python-zmq"
 extra="vim-nox ipython tmux screen nmap tree i2c-tools wireless-tools grc"
 
 while getopts aubh opt; do
@@ -198,6 +198,8 @@ python_module() {
 python_module i2c_device
 python_module DMCC_Library
 python_module pypruss
+
+pip install sympy
 
 echo "==============="
 echo "Cleaining up..."

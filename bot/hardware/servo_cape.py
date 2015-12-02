@@ -41,6 +41,7 @@ class ServoCape(object):
                                           self.reg,
                                           array)
         except IOError as err:
+            self.logger.debug(err)
             return err
 
 

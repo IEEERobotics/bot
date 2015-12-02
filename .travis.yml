@@ -36,5 +36,7 @@ notifications:
             - jasteve4@ncsu.edu
             - vkthiaga@ncsu.edu
             - zchen10@ncsu.edu
+            - brgoldba@ncsu.edu
+            - whduncan@ncsu.edu
     on_success: change
     on_failure: always

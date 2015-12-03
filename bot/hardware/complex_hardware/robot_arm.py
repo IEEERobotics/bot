@@ -20,12 +20,17 @@ class RobotArm(object):
             = ServoCape(self.bot_config["dagu_arm"]["servo_cape"])     
         # Empty list of zeros representing each joint   
         self.joints = [0]*5
+
+    @lib.api_call
+    def set_angles(self,angles):
+        array = [angles,angles,angles,angles,angles]
+        self.servo_cape.transmit_block([1] + array)
         
     @lib.api_call
     def reset_home_position(self):
         """sets angles back to default position."""
         
-        self.servo_cape.write_angles(self.default_angles)       
+        self.servo_cape.transmit_block([1] + [90,90,90,90,90])       
     
     @lib.api_call
     def demo(self, demo_number):

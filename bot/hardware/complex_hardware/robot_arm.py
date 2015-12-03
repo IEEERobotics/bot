@@ -27,8 +27,40 @@ class RobotArm(object):
         self.servo_cape.transmit_block([0] + array)
         
     @lib.api_call
-    def set_angles(self, array):
+    def grab(self):
+        self.servo_cape.transmit_block([5] + [0,0,0,0,0])
+        
+    @lib.api_call   
+    def release(self):
+        self.servo_cape.transmit_block([6] + [0,0,0,0,0])
+        
+    @lib.api_call
+    def set_angles(self):
+        A1 = (input("What is Servo 1's angle?: "))
+        if (A1 < 0 or A1> 180):
+            print "Error: Servo Angle 1 is out of range."
+            return
+        A2 = (input("What is Servo 1's angle?: "))
+        if (A2 < 0 or A2> 180):
+            print "Error: Servo Angle 1 is out of range."
+            return
+        A3 = (input("What is Servo 1's angle?: "))
+        if (A3 < 0 or A3> 180):
+            print "Error: Servo Angle 1 is out of range."
+            return
+        A4 = (input("What is Servo 1's angle?: "))
+        if (A4 < 0 or A4> 180):
+            print "Error: Servo Angle 1 is out of range."
+            return
+        A5 = (input("What is Servo 1's angle?: "))
+        if (A5 < 0 or A5> 180):
+            print "Error: Servo Angle 1 is out of range."
+            return
+        
+        
+        array = [A1,A2,A3,A4,A5]
         self.servo_cape.transmit_block([0] + array)
+        
         
     @lib.api_call
     def reset_home_position(self):

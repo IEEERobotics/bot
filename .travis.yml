@@ -38,5 +38,6 @@ notifications:
             - zchen10@ncsu.edu
             - brgoldba@ncsu.edu
             - whduncan@ncsu.edu
+            - smketrin@ncsu.edu
     on_success: change
     on_failure: always

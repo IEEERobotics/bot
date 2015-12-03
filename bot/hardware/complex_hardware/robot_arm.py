@@ -23,14 +23,12 @@ class RobotArm(object):
 
     @lib.api_call
     def set_angles(self,angles):
-        array = [angles,angles,angles,angles,angles]
-        self.servo_cape.transmit_block([1] + array)
+        self.servo_cape.transmit_block([0] + array)
         
     @lib.api_call
     def reset_home_position(self):
         """sets angles back to default position."""
-        
-        self.servo_cape.transmit_block([1] + [90,90,90,90,90])       
+        self.set_angles([90,90,90,90,90])     
     
     @lib.api_call
     def demo(self, demo_number):

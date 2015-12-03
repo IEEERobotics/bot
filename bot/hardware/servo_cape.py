@@ -9,13 +9,10 @@ import smbus
 
 class ServoCape(object):
     """Protocol:
-       byte 1: command type
-           options:
-           1: angles (5 following 5 bytes are the angle values)
-           2: demo1
-           3: demo2
-           4: demo3
-           5: demo4
+    Cape expects to recieve a 6 byte array
+    if the first byte is 0x00
+        next 5 bytes are servo angles.
+    otherwise the number of a demo.
     """
 
     def __init__(self, cape_config):

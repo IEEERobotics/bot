@@ -35,7 +35,8 @@ class RobotArm(object):
     @lib.api_call
     def demo(self, demo_number):
         """runs demos 1-5"""
-        self.servo_cape.transmit_block([2] + [demo_number])        
+        self.servo_cape.transmit_block([demo_number]
+                                         + [0]*5)        
     
 
     def calcFKposition(self, theta1, theta2, theta3, theta4, theta5, L1, L2, L3, L4, L5, L6):

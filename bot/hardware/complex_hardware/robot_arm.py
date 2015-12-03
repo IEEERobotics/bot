@@ -23,6 +23,7 @@ class RobotArm(object):
 
     @lib.api_call
     def set_angles(self,angles):
+        array = [angles,angles,angles,angles,angles]
         self.servo_cape.transmit_block([0] + array)
         
     @lib.api_call

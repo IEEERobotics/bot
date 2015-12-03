@@ -42,23 +42,3 @@ class ServoCape(object):
             return err
 
 
-    @lib.api_call
-    def write_angles(self, joint_angles):
-        """Recieves a list of duty cycles as chars vals 0-255.
-        correspond to values """
-       
-        i = 0
-        while (i > 5):
-            joint_angles[i] += 90
-            if(joint_angles[i] > 180):
-                joint_angles[i] = 180
-            if(joint_angles[i] < 0):
-                joint_angles[i] = 0
-
-        # Append command byte
-        try:
-            self.bus.write_i2c_block_data(self.addr,
-                                          self.reg,
-                                          [0] + joint_angles)
-        except IOError as err:
-            return err

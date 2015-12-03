@@ -22,8 +22,12 @@ class RobotArm(object):
         self.joints = [0]*5
 
     @lib.api_call
-    def set_angles(self,angles):
-        array = [angles,angles,angles,angles,angles]
+    def set_angles_test(self,A1,A2,A3,A4,A5):
+        array = [A1,A2,A3,A4,A5]
+        self.servo_cape.transmit_block([0] + array)
+        
+    @lib.api_call
+    def set_angles(self, array):
         self.servo_cape.transmit_block([0] + array)
         
     @lib.api_call

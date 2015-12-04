@@ -77,7 +77,7 @@ class RobotArm(object):
         print "9                Exit"
         print ""
         while(1):
-            demo_number = (input("Please input your deisired operation number: "))
+            demo_number = (input("Please input your desired operation number: "))
             if (demo_number is "exit"):
                 return
             elif (demo_number > 9 or demo_number < 0):
@@ -86,7 +86,7 @@ class RobotArm(object):
             elif (demo_number == 9):
                 return
             elif (demo_number == 1):
-                set_angles()
+                self.set_angles()
             else:
                 self.demo(demo_number - 1)
         

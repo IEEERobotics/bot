@@ -31,30 +31,57 @@ class RobotArm(object):
         
     @lib.api_call
     def set_angles(self):
-        A1 = (input("What is Servo 1's angle?: "))
-        if (A1 < 0 or A1> 180):
-            print "Error: Servo Angle 1 is out of range."
-            return
-        A2 = (input("What is Servo 2's angle?: "))
-        if (A2 < 0 or A2> 180):
-            print "Error: Servo Angle 2 is out of range."
-            return
-        A3 = (input("What is Servo 3's angle?: "))
-        if (A3 < 0 or A3> 180):
-            print "Error: Servo Angle 3 is out of range."
-            return
-        A4 = (input("What is Servo 4's angle?: "))
-        if (A4 < 0 or A4> 180):
-            print "Error: Servo Angle 4 is out of range."
-            return
-        A5 = (input("What is Servo 5's angle?: "))
-        if (A5 < 0 or A5> 180):
-            print "Error: Servo Angle 5 is out of range."
-            return
+        while(1):
+            A1 = (input("What is Servo 1's angle?: "))
+            if (A1 < 0 or A1> 180):
+                print "Error: Given angle is out of range."
+                continue
+            else:
+                break
+                
+        while(1):
+            A2 = (input("What is Servo 2's angle?: "))
+            if (A2 < 0 or A2> 180):
+                print "Error: Given angle is out of range."
+                continue
+            else:
+                break
+                
+        while(1):
+            A3 = (input("What is Servo 3's angle?: "))
+            if (A3 < 0 or A3> 180):
+                print "Error: Given angle is out of range."
+                continue
+            else:
+                break
+                
+        while(1):
+            A4 = (input("What is Servo 4's angle?: "))
+            if (A4 < 0 or A4> 180):
+                print "Error: Given angle is out of range."
+                continue
+            else:
+                break
+                
+        while(1):
+            A5 = (input("What is Servo 5's angle?: "))
+            if (A5 < 0 or A5> 180):
+                print "Error: Given angle is out of range."
+                continue
+            else:
+                break
+                
+        while(1):
+            answer = input("Do you want to send these angles?(y/n)")
+            if (answer is "n"):
+                return
+            elif (answer is "y"):
+                array = [A1,A2,A3,A4,A5]
+                self.servo_cape.transmit_block([0] + array)
+                return
+            else:
+                print "Error: Invalid reply. Please answer in y/n format."
         
-        
-        array = [A1,A2,A3,A4,A5]
-        self.servo_cape.transmit_block([0] + array)
         
         
     @lib.api_call
@@ -69,10 +96,10 @@ class RobotArm(object):
         print "1                Input custom angles"
         print "2                Block grap demo"
         print "3                Wave"
-        print "4                Stand up strait"
+        print "4                Stand up straight"
         print "5                Grab"
         print "6                Release"
-        print "7                Show range of servos (Warning: will hit box!)"
+        print "7                Show range of servos"
         print "8                Initial position"
         print "9                Exit"
         print ""

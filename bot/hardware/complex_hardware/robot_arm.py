@@ -1,5 +1,7 @@
-"""Encapsulates functionality of moving around robot arm"""
 
+
+"""Encapsulates functionality of moving around robot arm"""
+import os
 import sympy
 from sympy import *
 import bot.lib.lib as lib
@@ -72,10 +74,10 @@ class RobotArm(object):
                 break
                 
         while(1):
-            answer = input("Do you want to send these angles?(y/n)")
-            if (answer is "n"):
+            answer = raw_input("Do you want to send these angles(y/n)?: ")
+            if (answer == 'n'):
                 return
-            elif (answer is "y"):
+            elif (answer == "y"):
                 array = [A1,A2,A3,A4,A5]
                 self.servo_cape.transmit_block([0] + array)
                 return
@@ -91,6 +93,7 @@ class RobotArm(object):
         
     @lib.api_call
     def Arm_Demo(self):
+        os.system('clear')
         print "Welcome to the Team 26: Robotic Arm Mainipulation and Vision demo function."
         print "Demo number      Function       "
         print "1                Input custom angles"

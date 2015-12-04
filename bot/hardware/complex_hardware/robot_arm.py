@@ -20,11 +20,6 @@ class RobotArm(object):
             = ServoCape(self.bot_config["dagu_arm"]["servo_cape"])     
         # Empty list of zeros representing each joint   
         self.joints = [0]*5
-
-    @lib.api_call
-    def set_angles_test(self,A1,A2,A3,A4,A5):
-        array = [A1,A2,A3,A4,A5]
-        self.servo_cape.transmit_block([0] + array)
         
     @lib.api_call
     def grab(self):
@@ -65,11 +60,37 @@ class RobotArm(object):
     @lib.api_call
     def reset_home_position(self):
         """sets angles back to default position."""
-        self.servo_cape.transmit_block([0] + [90,90,90,90,90]) 
-    
+        self.servo_cape.transmit_block([0] + [90,90,90,90,90])
+        
+    @lib.api_call
+    def Arm_Demo(self):
+        print "Welcome to the Team 26: Robotic Arm Mainipulation and Vision Function."
+        print "Demo number      Function       "
+        print "1                Input custom angles"
+        print "2                Block grap demo"
+        print "3                Wave"
+        print "4                Stand up strait"
+        print "5                Grab"
+        print "6                Release"
+        print "7                Show range of servos (Warning: will hit box!)"
+        print "8                Initial position"
+        print ""
+        while(1):
+            demo _number = input("Please input your deisired operation number: ")
+            if (demo_number > 8 or demo_number < 0):
+                print "Number not within valid range (1-8)."
+                continue
+            elif (demo_number is "exit"):
+                return
+            else:
+                self.demo(demo_number - 1)
+        
+        
+        
+        
     @lib.api_call
     def demo(self, demo_number):
-        """runs demos 1-5"""
+        """runs demos 1-7"""
         self.servo_cape.transmit_block([demo_number]
                                          + [0]*5)        
     

@@ -64,7 +64,7 @@ class RobotArm(object):
         
     @lib.api_call
     def Arm_Demo(self):
-        print "Welcome to the Team 26: Robotic Arm Mainipulation and Vision Function."
+        print "Welcome to the Team 26: Robotic Arm Mainipulation and Vision demo function."
         print "Demo number      Function       "
         print "1                Input custom angles"
         print "2                Block grap demo"
@@ -74,14 +74,19 @@ class RobotArm(object):
         print "6                Release"
         print "7                Show range of servos (Warning: will hit box!)"
         print "8                Initial position"
+        print "9                Exit"
         print ""
         while(1):
-            demo _number = input("Please input your deisired operation number: ")
-            if (demo_number > 8 or demo_number < 0):
-                print "Number not within valid range (1-8)."
-                continue
-            elif (demo_number is "exit"):
+            demo_number = (input("Please input your deisired operation number: "))
+            if (demo_number is "exit"):
                 return
+            elif (demo_number > 9 or demo_number < 0):
+                print "Number not within valid range (1-9)."
+                continue
+            elif (demo_number == 9):
+                return
+            elif (demo_number == 1):
+                set_angles()
             else:
                 self.demo(demo_number - 1)
         

@@ -40,21 +40,21 @@ class RobotArm(object):
         if (A1 < 0 or A1> 180):
             print "Error: Servo Angle 1 is out of range."
             return
-        A2 = (input("What is Servo 1's angle?: "))
+        A2 = (input("What is Servo 2's angle?: "))
         if (A2 < 0 or A2> 180):
-            print "Error: Servo Angle 1 is out of range."
+            print "Error: Servo Angle 2 is out of range."
             return
-        A3 = (input("What is Servo 1's angle?: "))
+        A3 = (input("What is Servo 3's angle?: "))
         if (A3 < 0 or A3> 180):
-            print "Error: Servo Angle 1 is out of range."
+            print "Error: Servo Angle 3 is out of range."
             return
-        A4 = (input("What is Servo 1's angle?: "))
+        A4 = (input("What is Servo 4's angle?: "))
         if (A4 < 0 or A4> 180):
-            print "Error: Servo Angle 1 is out of range."
+            print "Error: Servo Angle 4 is out of range."
             return
-        A5 = (input("What is Servo 1's angle?: "))
+        A5 = (input("What is Servo 5's angle?: "))
         if (A5 < 0 or A5> 180):
-            print "Error: Servo Angle 1 is out of range."
+            print "Error: Servo Angle 5 is out of range."
             return
         
         

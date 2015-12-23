@@ -2,7 +2,7 @@
 testing : false
 # Used for testing individual pices of hardware.
 test_mode: {
-    color_sensor: true,
+    slider_switch: true,
     ADC: true,
     DMCC: true,
     stepper: true,
@@ -15,6 +15,11 @@ arm_configurations: {
 
 }
 
+# TODO: decide on gpio pin numbers
+slider_switch: {
+    left_gpio: 30,
+    right_gpio: 60
+}
 
 dmcc_drive_motors: {
 

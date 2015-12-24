@@ -33,7 +33,9 @@ class Switch():
     def detect_switch_orientation(self):
         """Detect which way the slide switch is oriented
         """
-        if self.left_course_gpio.get_value():
+        if self.left_course_gpio.get_value() and self.right_course_gpio.get_value():
+            return 0
+        elif self.left_course_gpio.get_value():
             return 1
         elif self.right_course_gpio.get_value():
             return 2

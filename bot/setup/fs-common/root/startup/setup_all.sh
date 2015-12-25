@@ -29,7 +29,8 @@ do
     run_pwm      i 
 done
 
-
+load_gpio 30
+load_gpio 60
 
 ## ADC example
 # enable_adcs

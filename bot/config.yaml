@@ -25,6 +25,15 @@ dmcc_drive_motors: {
 
 }
 
+omni_drive_motors: {
+
+    north: { board_num: 1, motor_num: 1 },
+    south: { board_num: 1, motor_num: 2 },
+    east: { board_num: 0, motor_num: 1, invert: True},
+    west: { board_num: 0, motor_num: 2, invert: True }
+
+}
+
 logging: {log_file: bot/logs/bot.log, file_handler_level: DEBUG, stream_handler_level: INFO}  # Logging options
 test_pwm_base_dir: bot/simulator/pins/pwm/pwm
 test_gpio_base_dir: bot/simulator/pins/gpio/gpio

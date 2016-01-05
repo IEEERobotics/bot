@@ -4,9 +4,9 @@ testing : false
 test_mode: {
     slider_switch: true,
     ADC: true,
-    DMCC: true,
+    DMCC: false,
     stepper: true,
-    motor: true,
+    motor: false,
     servo: true,
 }
 
@@ -27,6 +27,15 @@ dmcc_drive_motors: {
     back_left: { board_num: 1, motor_num: 2 },
     front_right: { board_num: 0, motor_num: 1, invert: True},
     back_right: { board_num: 0, motor_num: 2, invert: True }
+
+}
+
+omni_drive_motors: {
+
+    north: { board_num: 1, motor_num: 2 },
+    south: { board_num: 0, motor_num: 2 , invert: True},
+    east: { board_num: 0, motor_num: 1, invert: True},
+    west: { board_num: 1, motor_num: 1 }
 
 }
 

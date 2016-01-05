@@ -15,8 +15,8 @@ import bot.lib.lib as lib
 import pub_server as pub_server_mod
 import bot.lib.messages as msgs
 
-from bot.driver.mec_driver import MecDriver
 from bot.hardware.switch import Switch
+from bot.driver.omni_driver import OmniDriver
 
 
 def is_api_method(obj, name):
@@ -129,8 +129,8 @@ class CtrlServer(object):
 
         """
 
-        self.driver = MecDriver()
         self.switch = Switch()
+        self.driver = OmniDriver()
 
         systems = {}
         systems["ctrl"] = self

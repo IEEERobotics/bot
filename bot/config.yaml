@@ -4,9 +4,9 @@ testing : false
 test_mode: {
     color_sensor: true,
     ADC: true,
-    DMCC: true,
+    DMCC: false,
     stepper: true,
-    motor: true,
+    motor: false,
     servo: true,
 }
 
@@ -27,10 +27,10 @@ dmcc_drive_motors: {
 
 omni_drive_motors: {
 
-    north: { board_num: 1, motor_num: 1 },
-    south: { board_num: 1, motor_num: 2 },
+    north: { board_num: 1, motor_num: 2 },
+    south: { board_num: 0, motor_num: 2 , invert: True},
     east: { board_num: 0, motor_num: 1, invert: True},
-    west: { board_num: 0, motor_num: 2, invert: True }
+    west: { board_num: 1, motor_num: 1 }
 
 }
 

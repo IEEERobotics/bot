@@ -1,6 +1,6 @@
 """TODO: Write this"""
 import bot.lib.lib as lib
-import bot.driver as driver
+import bot.driver.driver as driver
 from bot.hardware.dmcc_motor import DMCCMotorSet
 from time import sleep
 from math import sin, cos, pi, fabs, hypot, atan2, degrees
@@ -51,8 +51,8 @@ class OmniDriver(driver.Driver):
     #finding velocity is dependant on how we actually orient the chassis
    
 # ''' Because we don't know about orientation
-    @property
-    def speed(self):
+    # @property
+    # def speed(self):
         """
         Getter for bot's current overall speed as % of max
             (same as duty cycle).
@@ -60,7 +60,7 @@ class OmniDriver(driver.Driver):
             :returns: Current bot speed as percent of max real speed.
             
         """
-        raise NotImplemented
+        # raise NotImplemented
         # # Combine wheel velocity vectors, return magnitude
         # #if chassis is set on a square where all wheels are perpendicular
         #
@@ -74,8 +74,8 @@ class OmniDriver(driver.Driver):
 
 #    still need to figure out when wheels are at an angle '''
 
-    @property
-    def angle(self):
+    # @property
+    # def angle(self):
         """Getter for bot's current overall direction of movement.
 
         Combines wheel velocity vectors and returns angle (corrected
@@ -84,7 +84,7 @@ class OmniDriver(driver.Driver):
         :returns: Current bot angle in degrees.
 
         """
-        raise NotImplemented
+        # raise NotImplemented
         # # Note: Mecannum wheels must be oriented as per http://goo.gl/B1KEUV
         # v_forward_right = self.get_motor("front_left") + \
         #     self.get_motor("back_right")
@@ -97,14 +97,14 @@ class OmniDriver(driver.Driver):
         # # TODO: Correct this so that zero angle is returned
         # #   (instead of -45) even when speed is near-zero
 
-    @lib.api_call
-    def get_rotation(self):
+    # @lib.api_call
+    # def get_rotation(self):
         """Getter for bot's current overall speed of rotation.
 
         :returns: Rotation speed in [min_angular_rate max_angular_rate].
 
         """
-        raise NotImplemented
+        # raise NotImplemented
         # # Return difference between left and right velocities
         # # Note: Mecannum wheels must be oriented as per http://goo.gl/B1KEUV
         # v_left = self.get_motor("front_left") + \
@@ -120,7 +120,7 @@ class OmniDriver(driver.Driver):
         # # TODO: Verify math; v/4 to take mean?
         # return rotation
 
-    rotation_rate = property(get_rotation)
+    # rotation_rate = property(get_rotation)
 
     @lib.api_call
     def rotate(self, rate):
@@ -128,29 +128,20 @@ class OmniDriver(driver.Driver):
         Pass (angular) rate as -100 to +100
         (positive is counterclockwise).
         """
-        raise NotImplemented
-        # # Validate params
-        # self.logger.debug("Rotating with angular rate: {}".format(rate))
-        # try:
-        #     assert MecDriver.min_angular_rate <= rate <= \
-        #         MecDriver.max_angular_rate
-        # except AssertionError:
-        #     raise AssertionError("Angular rate is out of bounds")
-        #
-        # # if rate == 0:  # TODO deadband (epsilon) check?
-        #
-        # self.set_motor("front_left", -rate)
-        # self.set_motor("front_right", rate)
-        # self.set_motor("back_left", -rate)
-        # self.set_motor("back_right", rate)
-        #
-        # # NOTE(napratin, 9/17):
-        # # Set motor directions, based on http://goo.gl/B1KEUV
-        # # Also see MecanumWheelDirection.png
-        # # Only 2 wheels need to be turned on for each direction, but using all
-        # # 4 wheels in a conventional differential
-        # # rotation works fine
-
+        #NOTE(Vijay): to be tested
+        # Validate params
+        self.logger.debug("Rotating with angular rate: {}".format(rate))
+        try:
+            assert OmniDriver.min_angular_rate <= rate <= \
+                OmniDriver.max_angular_rate
+        except AssertionError:
+            raise AssertionError("Angular rate is out of bounds")
+       
+        self.set_motor("north", -rate)
+        self.set_motor("south", rate)
+        self.set_motor("west", -rate)
+        self.set_motor("east", rate)
+       
     @lib.api_call
     def move(self, speed, angle=0):
         """Move holonomically without rotation.
@@ -160,64 +151,63 @@ class OmniDriver(driver.Driver):
         :param angle: Angle of translation in degrees (90=left, 270=right).
         :type angle: float
         """
-        raise NotImplemented
-        # # Validate params
-        # self.logger.debug("speed: {}, angle: {}".format(speed, angle))
-        # try:
-        #     assert MecDriver.min_speed <= speed <= MecDriver.max_speed
-        # except AssertionError:
-        #     raise AssertionError("Speed is out of bounds")
-        #
-        # # Angle bounds may be unnecessary
-        #
-        # try:
-        #     assert MecDriver.min_angle <= angle <= MecDriver.max_angle
-        # except AssertionError:
-        #     raise AssertionError("Angle is out of bounds")
-        #
-        # # Handle zero speed, prevent divide-by-zero error
-        # if speed == 0:  # TODO deadband (epsilon) check?
-        #     self.logger.debug("Special case for speed == 0")
-        #     self.set_motor("front_left", 0)
-        #     self.set_motor("front_right", 0)
-        #     self.set_motor("back_left", 0)
-        #     self.set_motor("back_right", 0)
-        #     return
-        #
-        # # Calculate motor speeds
-        # # Formulae from Mecanumdrive.pdf in google drive.
-        # # TODO Check math: why are all the phase offsets +pi/4?
-        # front_left = speed * sin(angle * pi / 180 + pi / 4)
-        # front_right = speed * cos(angle * pi / 180 + pi / 4)
-        # back_left = speed * cos(angle * pi / 180 + pi / 4)
-        # back_right = speed * sin(angle * pi / 180 + pi / 4)
-        # self.logger.debug((
-        #     "pre-scale : front_left: {:6.2f}, front_right: {:6.2f},"
-        #     " back_left: {:6.2f}, back_right: {:6.2f}").format(
-        #         front_left, front_right, back_left, back_right))
-        #
-        # # Find largest motor speed,
-        # # use that to normalize multipliers and maintain maximum efficiency
-        # max_wheel_speed = max(
-        #     [fabs(front_left), fabs(front_right),
-        #         fabs(back_left), fabs(back_right)]
-        # )
-        # front_left = front_left * speed / max_wheel_speed
-        # front_right = front_right * speed / max_wheel_speed
-        # back_left = back_left * speed / max_wheel_speed
-        # back_right = back_right * speed / max_wheel_speed
-        # self.logger.debug(
-        #     ("post-scale: front_left: {:6.2f}, front_right: {:6.2f},"
-        #         " back_left: {:6.2f}, back_right: {:6.2f}").format(
-        #             front_left, front_right, back_left, back_right))
-        #
-        # # Set motor speeds
-        # self.set_motor("front_left", front_left)
-        # self.set_motor("front_right", front_right)
-        # self.set_motor("back_left", back_left)
-        # self.set_motor("back_right", back_right)
+        #TODO(Vijay): Test this functionality
+        # Validate params
+        self.logger.debug("speed: {}, angle: {}".format(speed, angle))
+        try:
+            assert OmniDriver.min_speed <= speed <= OmniDriver.max_speed
+        except AssertionError:
+            raise AssertionError("Speed is out of bounds")
+       
+        # Angle bounds may be unnecessary
+        
+        try:
+            assert OmniDriver.min_angle <= angle <= OmniDriver.max_angle
+        except AssertionError:
+            raise AssertionError("Angle is out of bounds")
+        
+        # Handle zero speed, prevent divide-by-zero error
+        if speed == 0:  # TODO deadband (epsilon) check?
+            self.logger.debug("Special case for speed == 0")
+            self.set_motor("north", 0)
+            self.set_motor("south", 0)
+            self.set_motor("east", 0)
+            self.set_motor("west", 0)
+            return
+        
+        # Calculate motor speeds
+        north = speed * -sin(angle * pi / 180)
+        south = speed * -sin(angle * pi / 180)
+        west = speed * cos(angle * pi / 180)
+        east = speed * cos(angle * pi / 180)
+        self.logger.debug((
+            "pre-scale : north: {:6.2f}, south: {:6.2f},"
+            " east: {:6.2f}, west: {:6.2f}").format(
+                north, south, east, west))
+        
+        # Find largest motor speed,
+        # use that to normalize multipliers and maintain maximum efficiency
+        max_wheel_speed = max(
+            [fabs(north), fabs(south),
+                fabs(east), fabs(west)]
+        )
+        north = north * speed / max_wheel_speed
+        south = south * speed / max_wheel_speed
+        west = west * speed / max_wheel_speed
+        east = east * speed / max_wheel_speed
+        self.logger.debug(
+            ("post-scale: north: {:6.2f}, south: {:6.2f},"
+                " west: {:6.2f}, east: {:6.2f}").format(
+                    north, south, west, east))
+       
+        # Set motor speeds
+        self.set_motor("north", north)
+        self.set_motor("south", south)
+        self.set_motor("west", west)
+        self.set_motor("east", east)
 
-    @lib.api_call
+    # @lib.api_call
+    # NOTE(Vijay): Not yet implemented
     def hard_stop(self, current_speed, current_angle=0):
         """Allow for immediate stopping by throwing in hard
         reverse before stopping"""
@@ -226,7 +216,8 @@ class OmniDriver(driver.Driver):
         sleep(0.1)
         self.move(0, 0)
 
-    @lib.api_call
+    # @lib.api_call
+    # NOTE (Vijay): not yet implemented
     def move_forward_strafe(self, forward, strafe):
         # Scale down speed by sqrt(2) to make sure we're in range
         # NOTE(napratin, 9/27): Scaling down is not required since we clamp
@@ -240,8 +231,8 @@ class OmniDriver(driver.Driver):
         angle = degrees(atan2(strafe, forward)) % 360
         self.move(speed, angle)
 
-    @lib.api_call
-    def compound_move(self, translate_speed, translate_angle, angular_rate):
+    # @lib.api_call
+    # def compound_move(self, translate_speed, translate_angle, angular_rate):
         """Translate and move at same time.
 
         Note: I have no idea how to predict where the bot ends up
@@ -252,7 +243,7 @@ class OmniDriver(driver.Driver):
         TODO(napratin, 2/28): Check angular_rate range.
         NOTE: DEPRACATED (Sprint 2016)
         """
-        raise NotImplemented
+        # raise NotImplemented
         # # Speeds should add up to max_speed (100)
         # # TODO: Should this be fabs(rotate_speed)?
         # total_speed = translate_speed + angular_rate

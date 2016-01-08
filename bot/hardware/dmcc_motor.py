@@ -8,6 +8,7 @@ import bot.lib.lib as lib
 
 
 class DMCCMotorSet(dict):
+
     """A single interface to a collection of DMCCs and associated motors."""
 
     def __init__(self, motor_config):
@@ -20,7 +21,7 @@ class DMCCMotorSet(dict):
             <motor_name>: { board_num: [0-3], motor_num: [1-2] }
 
         """
-        self.config = lib.get_config()
+        self.config = lib.get_config("bot/config.yaml")
         self.logger = lib.get_logger()
         self.is_testing = self.config["test_mode"]["DMCC"]
 
@@ -41,9 +42,8 @@ class DMCCMotorSet(dict):
                 lambda: pyDMCC.DMCC(
                     0, verify=False, bus=None, logger=self.logger))
 
-
         self.logger.debug("DMCC Motor conf: {}".format(dmccs))
-       
+
         self.motors = {}
         for name, conf in motor_config.items():
             if 'invert' in conf.keys():

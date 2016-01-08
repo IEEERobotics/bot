@@ -1,6 +1,11 @@
-"""Logic for line following."""
+"""Logic for line following.
 
-import sys
+UPDATE:(Vijay - 9/27/15) - Follower is outdated since we won't be
+line-following for IEEE Hardware Competition 2016. This file has
+been left here for reference;
+Please do not instantiate it until it's fixed.
+"""
+
 from time import time
 from time import sleep
 import numpy as np
@@ -12,6 +17,7 @@ import pid as pid_mod
 import bot.hardware.color_sensor as color_sensor_mod
 
 from error_cases import LineLostError
+
 
 class Follower(object):
 
@@ -41,13 +47,13 @@ class Follower(object):
 
         # Build PIDs
         # FIXME 1 no longer in use
-        self.front_right = pid_mod.PID();
+        self.front_right = pid_mod.PID()
         self.front_right_error = 0.0
-        self.front_left = pid_mod.PID();
+        self.front_left = pid_mod.PID()
         self.front_left_error = 0.0
-        self.back_right = pid_mod.PID();
+        self.back_right = pid_mod.PID()
         self.back_right_error = 0.0
-        self.back_left = pid_mod.PID();
+        self.back_left = pid_mod.PID()
         self.back_left_error = 0.0
         self.strafe = pid_mod.PID()
         self.strafe_error = 0.0
@@ -87,6 +93,7 @@ class Follower(object):
         ir_readings = self.ir_hub.read_binary(Follower.White_Black)
         for name, reading in ir_readings.iteritems():
             reading_arr = np.int_(reading)  # convert readings to numpy array
+            np_reading = 4
             reading_sum = np.sum(np_reading)  # = no. of units lit
             if reading_sum > 0:
                 self.ir_agg[name] = (
@@ -156,7 +163,6 @@ class Follower(object):
         # Increase in speed after each oscillation cycle.
         # Todo(Ahmed): Find reasonable constants.
         osc_speed = 10
-        osc_increment = 10
 
         # The oscillation directions, perpendicular to parameter "heading"
         angle1 = heading + 90
@@ -173,7 +179,7 @@ class Follower(object):
                 angle1, angle2))
 
         # Heading may be unecessary.
-        # # Test headings for valid 0,360 values.
+        # Test headings for valid 0,360 values.
         # assert 0 <= angle1 <= 360, "angle1 is {}".format(angle1)
         # assert 0 <= angle2 <= 360, "angle2 is {}".format(angle2)
 
@@ -487,7 +493,7 @@ class Follower(object):
 
     # Prevent rapid sign changes in rotate calls
     def rotate(self, rate):
-        if(self.prev_rate*rate < 0):
+        if(self.prev_rate * rate < 0):
             self.driver.move(0, 0)
             sleep(0.2)
         self.prev_rate = rate
@@ -505,7 +511,6 @@ class Follower(object):
         forw_to_back_strafe = pid_mod.PID()
         # Init front_PID
         forw_to_back_strafe.set_k_values(5.5, 0.5, 2)
-        previous_time = time()
         while True:
             # kill momentum before reading
             self.driver.move(0, 0)
@@ -525,10 +530,10 @@ class Follower(object):
                 self.driver.move(0, 0)
                 return self.error
             # setup pid
-            bot_front_position = (self.left_state + self.right_state)/2
-            current_time = time()
+            bot_front_position = (self.left_state + self.right_state) / 2
             # Call PID
-            self.logger.info("bot_front_position = {}".format(bot_front_position))
+            self.logger.info(
+                "bot_front_position = {}".format(bot_front_position))
             position_error = forw_to_back_strafe.pid(
                 0, bot_front_position, self.sampling_time)
             if(abs(bot_front_position) < 3):
@@ -547,7 +552,6 @@ class Follower(object):
             self.logger.info("translate_angle = {}".format(translate_angle))
             self.driver.move(translate_speed, translate_angle)
             # Take the current time set it equal to the previous time
-            previous_time = current_time
         return "DONE"
 
     @lib.api_call
@@ -621,9 +625,10 @@ class Follower(object):
                     break
                 # calculate PID terms`
                 current_time = time()
-                bot_front_position = (self.front_state + self.back_state)/2
+                bot_front_position = (self.front_state + self.back_state) / 2
                 # Call side_to_side PID
-                self.logger.info("bot_front_position = {}".format(bot_front_position))
+                self.logger.info(
+                    "bot_front_position = {}".format(bot_front_position))
                 self.sampling_time = current_time - previous_time
                 position_error = side_to_side_strafe.pid(
                     0, bot_front_position, self.sampling_time)
@@ -681,26 +686,24 @@ class Follower(object):
             self.assign_states()
             self.driver.move(0, 0)
         return "DONE STRAFING TO LINE"
-        
+
     @lib.api_call
     def analog_state(self):
         """Make call to analog arrays"""
 
         # Take current time before reading ADC readings of the IRs
         previous_time = time()
-        self.front_right.set_k_values(kp = .2, kd = 0.1, ki = 0.0)
-        self.front_left.set_k_values(kp = .2, kd = 0.1, ki = 0.0)
+        self.front_right.set_k_values(kp=.2, kd=0.1, ki=0.0)
+        self.front_left.set_k_values(kp=.2, kd=0.1, ki=0.0)
 
-        self.back_right.set_k_values(kp = .03, kd = 0.009, ki = 0.0)
-        self.back_left.set_k_values(kp = .03, kd = 0.009, ki = 0.0)
+        self.back_right.set_k_values(kp=.03, kd=0.009, ki=0.0)
+        self.back_left.set_k_values(kp=.03, kd=0.009, ki=0.0)
         self.front_bin = [[0 for x in range(8)] for y in range(3)]
 
         self.front_right_error = 0.0
         self.front_left_error = 0.0
         self.back_right_error = 0.0
         self.back_left_error = 0.0
-        left_count = 0
-        right_count = 0
 
         while True:
             # Read ir arrays
@@ -717,20 +720,18 @@ class Follower(object):
 
             # Count the number of hits
             front_hits = self.count_num_of_hits(self.array_block["front"])
-            back_hits  = self.count_num_of_hits(self.array_block["back"])
-            right_hits = self.count_num_of_hits(self.array_block['right'])
-            left_hits  = self.count_num_of_hits(self.array_block['left'])
+            back_hits = self.count_num_of_hits(self.array_block["back"])
 
             self.front_bin[2] = self.front_bin[1]
             self.front_bin[1] = self.front_bin[0]
             self.front_bin[0] = self.assign_bin(self.array_block["front"])
 
             # print "fornt hits {}".format(self.front_bin[0])
-            #right_hits = self.count_num_of_hits(self.array_block["right"])
-            #left_hits = self.count_num_of_hits(self.array_block["left"])
-            #print self.array_block
+            # right_hits = self.count_num_of_hits(self.array_block["right"])
+            # left_hits = self.count_num_of_hits(self.array_block["left"])
+            # print self.array_block
 
-            #if not front_hits > 1:
+            # if not front_hits > 1:
             #    if((self.front_bin[1][0] == 1 \
             #        and self.front_bin[1][1] == 1) \
             #        or (self.front_bin[2][0] == 1 \
@@ -746,14 +747,14 @@ class Follower(object):
             #        return "right turn"
 
             if front_hits > 3 or self.is_centerred_on_line('left') \
-                    or self.is_centerred_on_line('right'): # or right_hits > 2 or left_hits > 2:
+                    or self.is_centerred_on_line('right'):
                 sleep(0.01)
-                self.driver.move(60,180)
+                self.driver.move(60, 180)
                 sleep(0.01)
-                self.driver.move(0,0)
+                self.driver.move(0, 0)
                 return "block or t-intersection"
 
-            #else:
+            # else:
             #    if((self.front_bin[1][0] == 1 \
             #        and self.front_bin[1][1] == 1) \
             #        or (self.front_bin[2][0] == 1 \
@@ -768,10 +769,10 @@ class Follower(object):
             #        return "right turn at intersection"
 
             if back_hits == 0 and front_hits == 0:
-                self.driver.move(speed = 0, angle = 0)
+                self.driver.move(speed=0, angle=0)
                 print "lost line"
                 raise LineLostError("reading: {}".format(
-                                        self.array_block()))
+                    self.array_block()))
 
             if(front_hits > 0):
                 # Call PID
@@ -830,11 +831,13 @@ class Follower(object):
             else:
                 # Call PID
                 self.back_right_error = self.set_speed + \
-                    self.back_right.pid(0, self.bot_front_position, self.sampling_time)
+                    self.back_right.pid(
+                        0, self.bot_front_position, self.sampling_time)
 
                 # Call PID
                 self.back_left_error = self.set_speed - \
-                    self.back_left.pid(0, self.bot_front_position, self.sampling_time)
+                    self.back_left.pid(
+                        0, self.bot_front_position, self.sampling_time)
 
                 if(self.back_right_error >= 80):
                     self.back_right_error = 80
@@ -846,49 +849,49 @@ class Follower(object):
                 elif(self.back_left_error <= -80):
                     self.back_left_error = -80
 
-            self.driver.set_motor(name = "front_right",
-                                 value = self.front_right_error)
-            self.driver.set_motor(name = "front_left",
-                                 value = self.front_left_error)
-            self.driver.set_motor(name = "back_right",
-                                 value = self.back_right_error)
-            self.driver.set_motor(name = "back_left",
-                                 value = self.back_left_error)
+            self.driver.set_motor(name="front_right",
+                                  value=self.front_right_error)
+            self.driver.set_motor(name="front_left",
+                                  value=self.front_left_error)
+            self.driver.set_motor(name="back_right",
+                                  value=self.back_right_error)
+            self.driver.set_motor(name="back_left",
+                                  value=self.back_left_error)
 
     def normalize_arrays(self):
         """Uesd to mormaliza ir readings coming form the ir array"""
         for array in self.array_block:
-            for position,value in enumerate(self.array_block[array]):
+            for position, value in enumerate(self.array_block[array]):
                 self.array_block[array][position] = (255 - value) - 100
                 if(self.array_block[array][position] < 0):
                     self.array_block[array][position] = 0
 
     def track_position(self):
         """Trak the positon of the line"""
-        self.bot_front_position = 0;
-        self.bot_back_position = 0;
+        self.bot_front_position = 0
+        self.bot_back_position = 0
         value = max(self.array_block["front"])
         if not (value < 10):
             index = self.array_block["front"].index(value)
-            #if value > 10:
+            # if value > 10:
             if index < 4:
                 self.bot_front_position = 5.0 * (4.0 - index) \
-                                    * (4.0 - index) * (4.0 - index)
+                    * (4.0 - index) * (4.0 - index)
             else:
                 self.bot_front_position = 5.0 * (3.0 - index) \
-                                    * (3.0 - index) * (3.0 - index)
+                    * (3.0 - index) * (3.0 - index)
 
         value = max(self.array_block["back"])
         if not(value < 10):
             index = self.array_block["back"].index(value)
-            #print value
-            #if value > 10:
+            # print value
+            # if value > 10:
             if index < 4:
                 self.bot_back_position = 5.0 * (4.0 - index) \
-                                    * (4.0 - index) * (4.0 - index)
+                    * (4.0 - index) * (4.0 - index)
             else:
                 self.bot_back_position = 5.0 * (3.0 - index) \
-                                    * (3.0 - index) * (3.0 - index)
+                    * (3.0 - index) * (3.0 - index)
 
     def count_num_of_hits(self, array):
         count = 0
@@ -897,9 +900,9 @@ class Follower(object):
                 count = count + 1
         return count
 
-    def assign_bin(self,a_array):
-        array = [0,0,0,0,0,0,0,0]
-        for index,value in enumerate(a_array):
+    def assign_bin(self, a_array):
+        array = [0, 0, 0, 0, 0, 0, 0, 0]
+        for index, value in enumerate(a_array):
             if value > self.THRESH:
                 array[index] = 1
         return array
@@ -913,54 +916,54 @@ class Follower(object):
         s_array = array_block[side]
 
         hits = self.count_num_of_hits(s_array)
-        
+
         if hits <= 6:
             return True
-        return False       
-        
+        return False
+
     @lib.api_call
     def is_intersection(self):
         """Determines whether an anomaly is a turn or an intersection.
         """
-        if (self.check_for_branch("right") \
-                or self.check_for_branch("left"))\
-            and self.check_for_branch("front"):
+        if (self.check_for_branch("right")
+            or self.check_for_branch("left"))\
+                and self.check_for_branch("front"):
             return True
         return False
 
     @lib.api_call
     def find_dir_of_int(self):
         if not (
-            (self.check_for_branch("right") \
-                or self.check_for_branch("left"))\
-            and self.check_for_branch("front")):
-           return "error: not intersection"
+                (self.check_for_branch("right")
+                    or self.check_for_branch("left"))
+                and self.check_for_branch("front")):
+            return "error: not intersection"
 
         elif self.check_for_branch("right")\
-            and self.check_for_branch("left"):
+                and self.check_for_branch("left"):
             return "error: branches in both dirs.111"
-        
+
         elif self.check_for_branch("right"):
             return "right"
 
         elif self.check_for_branch("left"):
             return "left"
-  
+
     @lib.api_call
     def find_dir_of_turn(self):
         """Determines whether a turn is on the right or left
         :returns: right, left, intersection, error
         """
-        
-        if (self.check_for_branch("right") \
-            and self.check_for_branch("left")):
+
+        if (self.check_for_branch("right")
+                and self.check_for_branch("left")):
             return "error: too many intersections"
 
         elif not self.check_for_branch("right") \
-            and not self.check_for_branch("left"):
+                and not self.check_for_branch("left"):
             return "error: no branches"
 
-        elif  self.check_for_branch("right"):
+        elif self.check_for_branch("right"):
             return "right"
 
         elif self.check_for_branch("left"):
@@ -975,16 +978,15 @@ class Follower(object):
         """
         arr_block = self.ir_hub.read_all()
         if arr_block[side][4] < self.THRESH \
-            or arr_block[side][5] < self.THRESH:
+                or arr_block[side][5] < self.THRESH:
             return True
-        return False 
-        
+        return False
+
     @lib.api_call
     def follow_ignoring_turns(self):
         while True:
             # self.recover()
             try:
-                state = self.analog_state()
                 # Inch forward to be square on int
                 # self.driver.jerk(speed=60,angle=0,duration=0.1)
                 turn_dir = self.find_dir_of_turn()
@@ -992,14 +994,13 @@ class Follower(object):
                     self.rotate_to_line(turn_dir)
                     # self.driver.rough_rotate_90(turn_dir, r_time=0.6)
                     # Move out of intersection
-                    # self.driver.drive(60, angle=0, duration=0.1) 
+                    # self.driver.drive(60, angle=0, duration=0.1)
                 else:
                     self.recover()
                     break
             except LineLostError:
                 self.logger.error("Line lost, attempting to recover")
                 self.recover()
-
 
     @lib.api_call
     def rotate_to_line(self, direction, speed=50):
@@ -1010,12 +1011,12 @@ class Follower(object):
             speed = -speed
 
         self.driver.rotate(speed)
-        sleep(0.3) # allow time to leave current intersection
-         
+        sleep(0.3)  # allow time to leave current intersection
+
         while not self.is_centerred_on_line() \
                 or self.check_for_branch('back'):
             self.logger.debug("looking for line")
-        
+
         # throw in hard reverse to stop immediately
         self.driver.rotate(-speed)
         sleep(0.09)
@@ -1025,121 +1026,120 @@ class Follower(object):
     def drive_to_line(self, speed=50, angle=0):
         """Drives in certain direction blindly until line is found."""
 
-        self.driver.move(speed,angle)
+        self.driver.move(speed, angle)
         while not self.is_centerred_on_line():
             self.logger.debug("looking for line")
 
-        self.driver.hard_stop(speed,angle)
-    
+        self.driver.hard_stop(speed, angle)
+
     @lib.api_call
     def recover(self):
-        """When recovery is needed, this function continually calls itself until problem is solved.
+        """When recovery is needed, this function continually
+        calls itself until problem is solved.
         """
-
-        readings = self.ir_hub.read_all()
-
         # experiment with breaking any time front is detected.
 
-        #if self.check_for_branch('front'):
+        # if self.check_for_branch('front'):
         #    print "no need for recovery"
         #    return
-        
-        if  not self.check_for_branch('front') \
-            and not self.check_for_branch('back') \
-            and not self.check_for_branch('left') \
-            and not self.check_for_branch('right'):
-            self.logger.debug("completely lost. Flailing") 
-            
+
+        if not self.check_for_branch('front') \
+                and not self.check_for_branch('back') \
+                and not self.check_for_branch('left') \
+                and not self.check_for_branch('right'):
+            self.logger.debug("completely lost. Flailing")
+
         elif not self.check_for_branch('front') \
-         and not self.check_for_branch('back') \
-         and not self.check_for_branch('left') \
-         and     self.check_for_branch('right'):
-            self.logger.debug("C1: right known: rotate right") 
+                and not self.check_for_branch('back') \
+                and not self.check_for_branch('left') \
+                and self.check_for_branch('right'):
+            self.logger.debug("C1: right known: rotate right")
             self.rotate_to_line('right')
             self.recover()
 
         elif not self.check_for_branch('front') \
-         and not self.check_for_branch('back') \
-         and     self.check_for_branch('left') \
-         and not self.check_for_branch('right'):
+                and not self.check_for_branch('back') \
+                and self.check_for_branch('left') \
+                and not self.check_for_branch('right'):
             self.logger.debug("C2: left known: rotate left")
-            self.rotate_to_line('left') 
+            self.rotate_to_line('left')
             self.recover()
 
         elif not self.check_for_branch('front') \
-         and not self.check_for_branch('back') \
-         and     self.check_for_branch('left') \
-         and     self.check_for_branch('right'):
-            self.logger.debug("C3: sides known: roate right") 
+                and not self.check_for_branch('back') \
+                and self.check_for_branch('left') \
+                and self.check_for_branch('right'):
+            self.logger.debug("C3: sides known: roate right")
             self.rotate_to_line('right')
             self.recover()
 
         elif not self.check_for_branch('front') \
-         and     self.check_for_branch('back') \
-         and not self.check_for_branch('left') \
-         and not self.check_for_branch('right'):
-            self.logger.debug("C4: back known: Inch back") 
-            self.driver.drive(60,180,0.1)
+                and self.check_for_branch('back') \
+                and not self.check_for_branch('left') \
+                and not self.check_for_branch('right'):
+            self.logger.debug("C4: back known: Inch back")
+            self.driver.drive(60, 180, 0.1)
             self.recover()
 
         elif not self.check_for_branch('front') \
-         and     self.check_for_branch('back') \
-         and not self.check_for_branch('left') \
-         and     self.check_for_branch('right'):
-            self.logger.debug("C5: back/right known: rotate right") 
+                and self.check_for_branch('back') \
+                and not self.check_for_branch('left') \
+                and self.check_for_branch('right'):
+            self.logger.debug("C5: back/right known: rotate right")
             self.rotate_to_line('right')
 
         elif not self.check_for_branch('front') \
-         and     self.check_for_branch('back') \
-         and     self.check_for_branch('left') \
-         and not self.check_for_branch('right'):
-            self.logger.debug("C6: back/left known: rotate right") 
+                and self.check_for_branch('back') \
+                and self.check_for_branch('left') \
+                and not self.check_for_branch('right'):
+            self.logger.debug("C6: back/left known: rotate right")
             self.rotate_to_line('left')
 
         # Todo: SHould this be a end condition?
         elif not self.check_for_branch('front') \
-         and     self.check_for_branch('back') \
-         and     self.check_for_branch('left') \
-         and     self.check_for_branch('right'):
+                and self.check_for_branch('back') \
+                and self.check_for_branch('left') \
+                and self.check_for_branch('right'):
             self.logger.debug("C7: front only known: inch fwd")
             self.driver.rough_rotate_90('right')
             self.driver.rough_rotate_90('right')
             self.recover()
 
-        elif     self.check_for_branch('front') \
-         and not self.check_for_branch('back')  \
-         and not self.check_for_branch('left')  \
-         and not self.check_for_branch('right'):
-             self.logger.debug("C8: Inch forward")
-             self.driver.drive(60,0,0.1)
-             self.recover()
+        elif self.check_for_branch('front') \
+                and not self.check_for_branch('back')  \
+                and not self.check_for_branch('left')  \
+                and not self.check_for_branch('right'):
+            self.logger.debug("C8: Inch forward")
+            self.driver.drive(60, 0, 0.1)
+            self.recover()
 
-        elif    self.check_for_branch('front') \
-         and not self.check_for_branch('back') \
-         and not self.check_for_branch('left') \
-         and     self.check_for_branch('right'):
-             #self.logger.debug("C9: front/side. inch towards")
-             #self.driver.drive(60,90,0.1)
-             #self.recover()
-             return
+        elif self.check_for_branch('front') \
+                and not self.check_for_branch('back') \
+                and not self.check_for_branch('left') \
+                and self.check_for_branch('right'):
+            # self.logger.debug("C9: front/side. inch towards")
+            # self.driver.drive(60,90,0.1)
+            # self.recover()
+            return
 
-        elif     self.check_for_branch('front') \
-         and not self.check_for_branch('back') \
-         and     self.check_for_branch('left') \
-         and not self.check_for_branch('right'):
-             #self.logger.debug("C10: shift left")
-             #self.driver.drive(60,-90,0.1)
-             #self.recover()
-             return
-        
-        elif     self.check_for_branch('front') \
-         and     self.check_for_branch('back') \
-         and     self.check_for_branch('left') \
-         and     self.check_for_branch('right'):
-             self.logger.debug("C15: Reached activity area. Take appropriate action.")
-             return
+        elif self.check_for_branch('front') \
+                and not self.check_for_branch('back') \
+                and self.check_for_branch('left') \
+                and not self.check_for_branch('right'):
+            # self.logger.debug("C10: shift left")
+            # self.driver.drive(60,-90,0.1)
+            # self.recover()
+            return
+
+        elif self.check_for_branch('front') \
+                and self.check_for_branch('back') \
+                and self.check_for_branch('left') \
+                and self.check_for_branch('right'):
+            self.logger.debug(
+                "C15: Reached activity area. Take appropriate action.")
+            return
 
         else:
-            self.logger.debug("Recovered successfully. Now following line - Cases 11 - 14")
+            self.logger.debug(
+                "Recovered successfully. Now following line - Cases 11 - 14")
             return
-	    

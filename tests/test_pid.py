@@ -1,9 +1,5 @@
 """Test case for pid"""
 
-import sys
-import os
-import unittest
-
 import bot.lib.lib as lib
 import tests.test_bot as test_bot
 import bot.follower.pid as pid_mod
@@ -63,4 +59,4 @@ class TestPID(test_bot.TestBot):
             test_output[index] = self.pid.pid(0, test_inputs[index], difftime)
             assert abs(test_output[index] - output_value[index]) <= \
                 .001, "{} != {}, {}".format(
-                    test_output[index], output_value[index], n)
+                    test_output[index], output_value[index], 1)

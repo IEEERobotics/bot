@@ -1,10 +1,10 @@
 """Pass low-level move commands to motors with mecanum wheels."""
 
-from math import sin, cos, pi, fabs, sqrt, hypot, atan2, degrees
-from time import sleep, time
+from math import sin, cos, pi, fabs, hypot, atan2, degrees
+from time import sleep
 
-import bot.driver.driver as driver
 import bot.lib.lib as lib
+import bot.driver.driver as driver
 from bot.hardware.dmcc_motor import DMCCMotorSet
 
 
@@ -42,7 +42,7 @@ class MecDriver(driver.Driver):
             self.motors["front_left"],
             self.motors["back_right"],
             self.motors["back_left"])
-    
+
     @lib.api_call
     def get_motor(self, name):
         if self.mode == 'power':
@@ -215,12 +215,13 @@ class MecDriver(driver.Driver):
         self.set_motor("back_right", back_right)
 
     @lib.api_call
-    def hard_stop(self,current_speed, current_angle=0):
-        """Allow for immediate stopping by throwing in hard reverse before stopping"""
+    def hard_stop(self, current_speed, current_angle=0):
+        """Allow for immediate stopping by throwing in hard
+        reverse before stopping"""
 
         self.move(100, (current_angle + 180) % 180)
         sleep(0.1)
-        self.move(0,0)
+        self.move(0, 0)
 
     @lib.api_call
     def move_forward_strafe(self, forward, strafe):
@@ -307,17 +308,17 @@ class MecDriver(driver.Driver):
     def rotate_t(self, r_speed, r_time=999):
         self.rotate(r_speed)
         sleep(r_time)
-        self.move(0,0)
+        self.move(0, 0)
 
     @lib.api_call
-    def rough_rotate_90(self, direction, r_speed=50,r_time=1):
+    def rough_rotate_90(self, direction, r_speed=50, r_time=1):
         """rotates 90 degrees by blindly turning.
         """
 
         # decide direction of rotation.
         if direction == "right":
             r_speed = -r_speed
-        
+
         self.rotate(r_speed)
         sleep(r_time)
         self.rotate(0)

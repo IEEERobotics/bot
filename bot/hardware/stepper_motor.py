@@ -4,7 +4,7 @@
 import bot.lib.lib as lib
 import time
 import bbb.gpio as gpio
-import threading
+
 
 class Stepper_motor(object):
 
@@ -45,7 +45,7 @@ class Stepper_motor(object):
         self.gpio_3.output()
         self.gpio_4.output()
 
-    def clockwise(self): 
+    def clockwise(self):
         """The motor rotates clockwise.
 
         """
@@ -53,51 +53,51 @@ class Stepper_motor(object):
         self.gpio_2.set_value(0)
         self.gpio_3.set_value(0)
         self.gpio_4.set_value(0)
-        time.sleep(self.time_int/10000.0)
+        time.sleep(self.time_int / 10000.0)
 
         self.gpio_1.set_value(1)
         self.gpio_2.set_value(1)
         self.gpio_3.set_value(0)
         self.gpio_4.set_value(0)
-        time.sleep(self.time_int/10000.0)
+        time.sleep(self.time_int / 10000.0)
 
         self.gpio_1.set_value(0)
         self.gpio_2.set_value(1)
         self.gpio_3.set_value(0)
         self.gpio_4.set_value(0)
-        time.sleep(self.time_int/10000.0)
+        time.sleep(self.time_int / 10000.0)
 
         self.gpio_1.set_value(0)
         self.gpio_2.set_value(1)
         self.gpio_3.set_value(1)
         self.gpio_4.set_value(0)
-        time.sleep(self.time_int/10000.0)
+        time.sleep(self.time_int / 10000.0)
 
         self.gpio_1.set_value(0)
         self.gpio_2.set_value(0)
         self.gpio_3.set_value(1)
         self.gpio_4.set_value(0)
-        time.sleep(self.time_int/10000.0)
+        time.sleep(self.time_int / 10000.0)
 
         self.gpio_1.set_value(0)
         self.gpio_2.set_value(0)
         self.gpio_3.set_value(1)
         self.gpio_4.set_value(1)
-        time.sleep(self.time_int/10000.0)
+        time.sleep(self.time_int / 10000.0)
 
         self.gpio_1.set_value(0)
         self.gpio_2.set_value(0)
         self.gpio_3.set_value(0)
         self.gpio_4.set_value(1)
-        time.sleep(self.time_int/10000.0)
+        time.sleep(self.time_int / 10000.0)
 
         self.gpio_1.set_value(1)
         self.gpio_2.set_value(0)
         self.gpio_3.set_value(0)
         self.gpio_4.set_value(1)
-        time.sleep(self.time_int/10000.0)
+        time.sleep(self.time_int / 10000.0)
 
-    def counter_clockwise(self): 
+    def counter_clockwise(self):
         """Rotates the motor counter clockwise
 
         """
@@ -105,49 +105,49 @@ class Stepper_motor(object):
         self.gpio_3.set_value(0)
         self.gpio_2.set_value(0)
         self.gpio_1.set_value(0)
-        time.sleep(self.time_int/10000.0)
+        time.sleep(self.time_int / 10000.0)
 
         self.gpio_4.set_value(1)
         self.gpio_3.set_value(1)
         self.gpio_2.set_value(0)
         self.gpio_1.set_value(0)
-        time.sleep(self.time_int/10000.0)
+        time.sleep(self.time_int / 10000.0)
 
         self.gpio_4.set_value(0)
         self.gpio_3.set_value(1)
         self.gpio_2.set_value(0)
         self.gpio_1.set_value(0)
-        time.sleep(self.time_int/10000.0)
+        time.sleep(self.time_int / 10000.0)
 
         self.gpio_4.set_value(0)
         self.gpio_3.set_value(1)
         self.gpio_2.set_value(1)
         self.gpio_1.set_value(0)
-        time.sleep(self.time_int/10000.0)
+        time.sleep(self.time_int / 10000.0)
 
         self.gpio_4.set_value(0)
         self.gpio_3.set_value(0)
         self.gpio_2.set_value(1)
         self.gpio_1.set_value(0)
-        time.sleep(self.time_int/10000.0)
+        time.sleep(self.time_int / 10000.0)
 
         self.gpio_4.set_value(0)
         self.gpio_3.set_value(0)
         self.gpio_2.set_value(1)
         self.gpio_1.set_value(1)
-        time.sleep(self.time_int/10000.0)
+        time.sleep(self.time_int / 10000.0)
 
         self.gpio_4.set_value(0)
         self.gpio_3.set_value(0)
         self.gpio_2.set_value(0)
         self.gpio_1.set_value(1)
-        time.sleep(self.time_int/10000.0)
+        time.sleep(self.time_int / 10000.0)
 
         self.gpio_4.set_value(1)
         self.gpio_3.set_value(0)
         self.gpio_2.set_value(0)
         self.gpio_1.set_value(1)
-        time.sleep(self.time_int/10000.0)
+        time.sleep(self.time_int / 10000.0)
 
     @property
     def speed(self):
@@ -156,7 +156,7 @@ class Stepper_motor(object):
         :returns: Speed of the motor.
 
         """
-        return int(round(10000. - self.time_int)/100.)
+        return int(round(10000. - self.time_int) / 100.)
 
     @speed.setter
     def speed(self, speed):
@@ -174,14 +174,14 @@ class Stepper_motor(object):
             speed = 0
 
         # Set time interval
-        self.time_int = 10001.0-(speed*100.)
+        self.time_int = 10001.0 - (speed * 100.)
 
     def rotate_90_clockwise(self):
-        """Rotates the motor 90 degrees in the 
+        """Rotates the motor 90 degrees in the
         clockwise direction.
 
         """
-        for i in range(0,128):
+        for i in range(0, 128):
             self.clockwise()
 
     def rotate_90_counter_clockwise(self):
@@ -189,7 +189,7 @@ class Stepper_motor(object):
         counter_clockwise direction.
 
         """
-        for i in range(0,128):
+        for i in range(0, 128):
             self.counter_clockwise()
 
     @lib.api_call
@@ -197,9 +197,9 @@ class Stepper_motor(object):
         """Test function for the motor. Makes the
         motor rotate clockwise until a
         Keyboard interrupt. """
-        #try:
+        # try:
         #    while True:
         #        self.clockwise()
-        #except KeyboardInterrupt:
+        # except KeyboardInterrupt:
         #    print "Done."
         self.rotate_90_clockwise()

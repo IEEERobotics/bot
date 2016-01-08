@@ -2,8 +2,6 @@
 
 from time import time
 import zmq
-from simplejson.decoder import JSONDecodeError
-
 import lib.messages as msgs
 
 

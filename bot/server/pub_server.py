@@ -1,7 +1,9 @@
-"""Server for publishing data about the bot."""
+"""Server for publishing data about the bot.
+
+UPDATE (Vijay - 9/27/15): PubServer is outdated.
+"""
 
 import sys
-import os
 import threading
 from time import sleep
 
@@ -55,10 +57,7 @@ class PubServer(threading.Thread):
         self.logger = lib.get_logger()
 
         # Unpack required objects from systems
-        self.gunner = systems["gunner"]
-        self.follower = systems["follower"]
         self.driver = systems["driver"]
-        self.ir_hub = systems["ir_hub"]
 
         # Build ZMQ publisher socket
         self.context = zmq.Context()
@@ -100,12 +99,6 @@ class PubServer(threading.Thread):
                 self.driver.motors["back_left"].get_direction,
             "drive_motor_dir_fl":
                 self.driver.motors["front_left"].get_direction,
-            "turret_detail": self.gunner.turret.__str__,
-            "turret_yaw": self.gunner.turret.get_yaw,
-            "turret_pitch": self.gunner.turret.get_pitch,
-            # May tieup IRs, bad if line following
-            "ir": self.ir_hub.read_all,
-            "ir_cached": self.ir_hub.read_cached  # May give slightly old data
         }
 
     def run(self):

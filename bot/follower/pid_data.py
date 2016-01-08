@@ -14,32 +14,21 @@ n1 represents the relative coordinate for the front IR
 
 n2 represents the relative coordinate for the back IR """
 
-import sys
+from math import atan
 
-from time import time
 
 class PID_data(object):
-
-    def __init__(self,d,l,w):
+    def __init__(self, d, l, w):
         self.n1 = 0
         self.n2 = 0
-        self.d  = d
+        self.d = d
         self.l = l
         self.w = w
-        self.ttheta=0
+        self.ttheta = 0
         self.N1 = 0
         self.N2 = 0
-#        self.theta = 0
-#        self.s = 0
 
-"""    def cal_value(self,N1,N2)
-        self.n1 = N1-4.5
-        self.n2 = N2-4.5
-        self.ttheta = (self.n1-self.n2)*self.d/self.l
-        
-   
-"""
-    def IR_switch(self,a)
+    def IR_switch(self, a):
         self.N1[7] = a["front"][0]
         self.N1[6] = a["front"][1]
         self.N1[5] = a["front"][2]
@@ -56,31 +45,26 @@ class PID_data(object):
         self.N2[3] = a["back"][3]
         self.N2[2] = a["back"][2]
         self.N2[1] = a["back"][1]
-        self.N2[0] = a["back"][0]        
-        
-    def IR_index(self,IR)
-        i=0
-#        if (sum[IR]>=2)
-        if (IR[i]==0)
-            i=i+1
-        else (IR[i]=1)
-            N=i
-     
-        
-    def propa_error(self,N1,N2)
-        self.n1 = self.N1-3.5
-        self.n2 = self.N2-4.5
-        self.ttheta = (self.n1-self.n2)*self.d/self.l
+        self.N2[0] = a["back"][0]
+
+    def IR_index(self, IR):
+        i = 0
+        if (IR[i] == 0):
+            i = i + 1
+        else:
+            return i
+
+    def propa_error(self, N1, N2):
+        self.n1 = self.N1 - 3.5
+        self.n2 = self.N2 - 4.5
+        self.ttheta = (self.n1 - self.n2) * self.d / self.l
         theta = atan(self.ttheta)
         return theta
-     
-    def rotate_error(self,N1,N2)
-        self.n1 = N1-4.5
-        self.n2 = N2-4.5
-        self.ttheta = (self.n1-self.n2)*self.d/self.l
-        s = abs(-self.l*self.ttheta-self.n2)/((1+self.ttheta^2)^0.5)
+
+    def rotate_error(self, N1, N2):
+        self.n1 = N1 - 4.5
+        self.n2 = N2 - 4.5
+        self.ttheta = (self.n1 - self.n2) * self.d / self.l
+        s = abs(-self.l * self.ttheta - self.n2) / \
+            ((1 + self.ttheta ^ 2) ^ 0.5)
         return s
-        
-        
-
-

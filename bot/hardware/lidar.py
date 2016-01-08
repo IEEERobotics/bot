@@ -1,12 +1,11 @@
 import serial
-from psam import Proximity_Sensor
 import numpy as np
 import bot.lib.lib as lib
 
 # TODO add timeouts, specifically to readPacket
 
 
-class Lidar (Proximity_Sensor):
+class Lidar (object):
 
     def __init__(self, port='/dev/ttyO1'):
         self.ser = serial.Serial(port, baudrate=115200)

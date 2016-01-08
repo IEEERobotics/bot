@@ -2,7 +2,7 @@ import serial
 import numpy as np
 import bot.lib.lib as lib
 
-# TODO add timeouts, specifically to read_packet
+# TODO add timeouts, specifically to readPacket
 
 
 class Lidar (object):
@@ -46,11 +46,12 @@ class Lidar (object):
             return None
         return packet
 
+    @lib.api_call
     def get_distance(self, revs=1):
         self.dist = [0]*360
         for r in range(revs):  # scan for revs # of revolutions
             for x in range(90):
-                packet = self.read_packet()
+                packet = self.readPacket()
                 if packet is None:
                     continue
                 index = 4*(ord(packet[0]) - 0xA0)  # packet # from 0-89
@@ -71,7 +72,7 @@ class Lidar (object):
 
     # returns the speed in RPM
     def get_speed(self):
-        packet = self.read_packet()
+        packet = self.readPacket()
         if packet is None:
             return -1
         return (ord(packet[1]) + (ord(packet[2]) << 8)) / 64.0

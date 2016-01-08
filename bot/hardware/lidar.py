@@ -92,7 +92,7 @@ class Lidar (Proximity_Sensor):
         file_name='frame '
         for i in xrange(num):
             frame=self.get_distance(1)
-            file_handle=open(filename+str(i)+'.txt','w')
+            file_handle=open(file_name+str(i)+'.txt','w')
             #print frame data to file
             file_handle.write(frame)
             file_handle.close()

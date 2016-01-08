@@ -1,6 +1,7 @@
 import serial
 from psam import Proximity_Sensor
 import numpy as np
+import bot.lib.lib as lib
 
 # TODO add timeouts, specifically to readPacket
 
@@ -85,3 +86,14 @@ class Lidar (Proximity_Sensor):
         raw_data[:, 0] = np.array(rs)
         raw_data[:, 1] = np.array(ts)
         return raw_data
+
+    @lib.api_call
+    def capture_frames(self,num):
+        file_name='frame '
+        for i in xrange(num):
+            frame=self.get_distance(1)
+            file_handle=open(filename+str(i)+'.txt','w')
+            #print frame data to file
+            file_handle.write(frame)
+            file_handle.close()
+        

@@ -37,8 +37,8 @@ class OmniDriver(driver.Driver):
     @lib.api_call
     def get_position(self, name):
         """Rapper for dmcc"""
-        for motor in self.motors:
-            print motor.position
+        
+        return self.motors[name].position
 
          
     @lib.api_call

@@ -33,7 +33,14 @@ class OmniDriver(driver.Driver):
             self.motors["south"],
             self.motors["east"],
             self.motors["west"])
-    
+   
+    @lib.api_call
+    def get_position(self, name):
+        """Rapper for dmcc"""
+        for motor in self.motors:
+            print motor.position
+
+         
     @lib.api_call
     def get_motor(self, name):
         if self.mode == 'power':

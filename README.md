@@ -8,6 +8,7 @@ Code for the NCSU IEEE Robotics Team's robot(s).
 
 - [Bot](#user-content-bot2014)
     - [Overview](#user-content-overview)
+    - [Contributing](#user-content-Contributing)
     - [Code Style](#user-content-code-style)
     - [Docstring Style](#user-content-docstring-style)
     - [Testing](#user-content-testing)
@@ -23,7 +24,16 @@ Code for the NCSU IEEE Robotics Team's robot(s).
 
 This is the main codebase for the IEEE Robotics Team. Don't be intimidated! We've recently done some cool work to make your life as a dev much, much easier. You can use [Vagrant] and/or [Docker] to trivially stand up a standardized, batteries-included dev environment. You can also be confident your changes haven't broken anything by running our Tox-driven unittests while developing. Once you push your code, all tests will automatically be run in our [Travis] Continuous Integration environment, which will handle emailing folks when things break and updating the build status badge at the top of this README. Unfamiliar with the codebase? No worries, it's incredibly well documented! Look for docstrings at the top of every module, class and method. Looking for some non-code docs? Check out our GitHub-hosted [wiki]! Need a task to work on, or need to report a bug, request a feature or ask a question? Head over to our GitHub [Issue] tracker!
 
-All we ask in return is that you do your best to keep the codebase healthy by writing unittests, documenting your code with docstrings and in-line comments, following [PEP8] style conventions, and being a good community member by keeping the [wiki] up-to-date, the [Issue] tracker clean and our build status badge green. Happy hacking!
+All we ask in return is that you do your best to keep the codebase healthy by writing unittests, documenting your code with docstrings and in-line comments, following [PEP8] style conventions, and being a good community member by keeping the [wiki] up-to-date, the [Issue] tracker clean and our build status badge green. Happy hacking!    
+
+## Contributing 
+1. Read the [Start guide](https://github.com/IEEERobotics/bot/wiki/Beginners-Guide)
+  * Add to, or edit, the start guide if you find problems.
+2. If you have questions, feel free to post to the [Issue] tracker, no matter how trivial it is.    
+  * This is considered the 'official' channel of communications for the club.  
+  * If you run into a problem or are confused, it's likely other people are also confused and running into the same problem. 
+  * This doesn't just have to be for code! All disciplines and majors on this team are organized through github.  
+
 
 ## Code Style
 

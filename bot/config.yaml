@@ -39,6 +39,10 @@ omni_drive_motors: {
 
 }
 
+IR : { 
+    active : ["East Top", "East Bottom"]
+}
+
 logging: {log_file: bot/logs/bot.log, file_handler_level: DEBUG, stream_handler_level: INFO}  # Logging options
 test_pwm_base_dir: bot/simulator/pins/pwm/pwm
 test_gpio_base_dir: bot/simulator/pins/gpio/gpio

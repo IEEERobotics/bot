@@ -6,7 +6,7 @@ class IR(object):
     """ interface for IR rangefinder."""
 
     def __init__(self):
-        self.hash_values = {"East Top" : 3, "East Bottom" : 4}
+        self.hash_values = {"East Top" : 9, "East Bottom" : 8}
         self.config = lib.get_config()
         self.bus = smbus.SMBus(1)
 
@@ -22,6 +22,7 @@ class IR(object):
         data = [second[i]* 256 + first[i] for i in xrange(len(first))]
         return data
 
+    @lib.api_call
     def read_values(self):
         for i in range(20):
             ms[i] = s.read_byte(8)        

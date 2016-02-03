@@ -30,3 +30,9 @@ class Side(object):
         error = self.pid.pid(target, diff + target, timestep)
 
         return error
+
+    def get_distance(self):
+        vals = self.get_values()
+        sens1 = vals[self.sensor1]
+        sens2 = vals[self.sensor2]
+        return (sens1 + sens2 / 2)

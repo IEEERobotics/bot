@@ -19,6 +19,8 @@ from bot.hardware.switch import Switch
 from bot.driver.omni_driver import OmniDriver
 from bot.hardware.IR import IR
 
+from bot.navigation.nav import Navigation
+
 def is_api_method(obj, name):
     """Tests whether named method exists in obj and is flagged for API export.
 
@@ -132,12 +134,14 @@ class CtrlServer(object):
         self.switch = Switch()
         self.driver = OmniDriver()
         self.IR = IR()
-
+        self.nav = Navigation()
+        
         systems = {}
         systems["ctrl"] = self
         systems["driver"] = self.driver
         systems["switch"] = self.switch
-        systems["IR"] = self.IR
+        #systems["IR"] = self.IR
+        systems["nav"] = self.nav
 
         self.logger.debug("Systems: {}".format(systems))
         return systems

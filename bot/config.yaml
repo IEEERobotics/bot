@@ -16,10 +16,20 @@ dagu_arm: {
     servo_cape: {
         i2c_bus: 1,
         i2c_addr: 0x10
-    }
+    },
+    camera_model: logitech_c270
 }
 
+# Camera being used on arm
+# Generated using https://github.com/AhmedSamara/OpenCV-camera-calibration
+logitech_c270: {
+     camera_matrix: [[1.9961704327353971e+03, 0.0, 3.1950000000000000e+02],
+                     [0.0, 1.9961704327353971e+03, 2.3950000000000000e+02],
+                     [0.0, 0.0,       1.0]],
 
+    distortion_coefficients: [1.8175523764227883e+00, -8.7919484257162480e+01, 0.0, 0.0, 1.2459859993672681e+03]
+    
+}
 
 dmcc_drive_motors: {
 

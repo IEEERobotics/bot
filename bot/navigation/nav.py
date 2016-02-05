@@ -1,11 +1,11 @@
 from bot.hardware.IR import IR
 from side import Side
 from bot.omni_driver import OmniDriver
-
+from time import sleep
 
 class Navigation(object):
     def __init__(self):
-        self.device = IR() # INSTANCIATE ONLY ONCE
+        self.device = IR() #INSTANCIATE ONLY ONCE
         self.north = Side("North Left", "North Right", self.device.read_values)
         self.sourth = Side("South Left", "South Right", self.device.read_values)
         self.east = Side("East Top", "East Bottom", self.device.read_values)
@@ -53,19 +53,32 @@ class Navigation(object):
     @lib.api_call
     def move_dead(self, direction, speed):
         direction = direction.lower()
-        dirs = {"north": 0, "west": 90, "south": 180, "east": 270}
+        dirs = { "north": 0, "west": 90, "south": 180, "east": 270 }
         self.driver.move(speed, dirs[direction])
         self.moving = True
 
     @lib.api_call
-    def move_until_side(self, direction, side, target):
+    def drive_dead(self, direction, speed, duration):
+        self.move_dead(direction, speed)
+        sleep(duration)
+        self.stop()
+
+    @lib.api_call
+    def move_until_wall(self, direction, side, target):
         direction = direction.lower()
-        move_side = self.sides[direction]
+        mov_side = self.sides[direction]
+        mov_target = mov_side.get_distance()
         self.moving = True
         while self.moving:
-            self.move_correct(direction, side, target, 50)
-            if move_side.get_distance() <= target:
+            self.move_correct(direction, side, mov_target, 50)
+            if mov_side.get_distance() <= target:
                 self.stop()
+
+    def move_to_position(self, x, y):
+        self.move_until_wall(self, "west", "north", x)
+        sleep(0.5)
+        self.move_until_wall(self, "north", "west", y)
+        sleep(0.5)
 
     @lib.api_call
     def stop(self):

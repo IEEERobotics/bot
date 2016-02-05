@@ -2,11 +2,11 @@
 testing : false
 # Used for testing individual pices of hardware.
 test_mode: {
-    color_sensor: true,
+    slider_switch: true,
     ADC: true,
-    DMCC: true,
+    DMCC: false,
     stepper: true,
-    motor: true,
+    motor: false,
     servo: true,
     servo_cape: true
 }
@@ -27,8 +27,15 @@ logitech_c270: {
                      [0.0, 1.9961704327353971e+03, 2.3950000000000000e+02],
                      [0.0, 0.0,       1.0]],
 
-    distortion_coefficients: [1.8175523764227883e+00, -8.7919484257162480e+01, 0.0, 0.0, 1.2459859993672681e+03]
+
+distortion_coefficients: [1.8175523764227883e+00, -8.7919484257162480e+01, 0.0, 0.0, 1.2459859993672681e+03]
     
+}
+
+# TODO: decide on gpio pin numbers
+slider_switch: {
+    left_gpio: 30,
+    right_gpio: 60
 }
 
 dmcc_drive_motors: {
@@ -37,6 +44,15 @@ dmcc_drive_motors: {
     back_left: { board_num: 1, motor_num: 2 },
     front_right: { board_num: 0, motor_num: 1, invert: True},
     back_right: { board_num: 0, motor_num: 2, invert: True }
+
+}
+
+omni_drive_motors: {
+
+    north: { board_num: 1, motor_num: 2 },
+    south: { board_num: 0, motor_num: 2 , invert: True},
+    east: { board_num: 0, motor_num: 1, invert: True},
+    west: { board_num: 1, motor_num: 1 }
 
 }
 

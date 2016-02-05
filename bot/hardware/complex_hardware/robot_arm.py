@@ -57,7 +57,7 @@ class RobotArm(object):
                             [ l/2,  l/2, 0]])
          
     @lib.api_call
-    def infinite_loop(self, frame):
+    def follow_qr(self, frame):
 
 
         while True:

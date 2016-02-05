@@ -5,7 +5,7 @@ from bot.omni_driver import OmniDriver
 
 class Navigation(object):
     def __init__(self):
-        self.device = IR() #INSTANCIATE ONLY ONCE
+        self.device = IR() # INSTANCIATE ONLY ONCE
         self.north = Side("North Left", "North Right", self.device.read_values)
         self.sourth = Side("South Left", "South Right", self.device.read_values)
         self.east = Side("East Top", "East Bottom", self.device.read_values)
@@ -22,7 +22,7 @@ class Navigation(object):
         # speed >= 0
         side = side.lower()
         err = self.sides[side].get_correction(target, direction)
-        
+
         if side == "north":
             pass
         elif side == "south":
@@ -65,7 +65,7 @@ class Navigation(object):
         while self.moving:
             self.move_correct(direction, side, target, 50)
             if move_side.get_distance() <= target:
-                self.stop()   
+                self.stop()
 
     @lib.api_call
     def stop(self):

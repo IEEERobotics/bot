@@ -13,6 +13,8 @@ import time
 
 import bot.lib.lib as lib
 from bot.hardware.servo_cape import ServoCape
+from bot.hardware.qr_code import QRCode
+
 
 class RobotArm(object):
 
@@ -73,17 +75,16 @@ class RobotArm(object):
             z_im = zbar.Image(width, height, 'Y800', raw)
             
             # Find codes in image
+            # Identify target QR
+            self.codes = []
+
             self.scanner.scan(z_im)
             for symbol in z_im:
-                tl, bl, br, tr = [item for item in symbol.location]
-                points = np.float32([[tl[0], tl[1]],
-                                     [tr[0], tr[1]],
-                                     [bl[0], bl[1]],
-                                     [br[0], br[1]]])
-
-                rvec, tvec = cv2.solvePnP(self.verts, points
-                                          , self.cam_matrix
-                                          , self.distcoeffs)
+                self.codes.append(QRCode(symbol))
+    
+            rvec, tvec = cv2.solvePnP(self.verts, points
+                                      , self.cam_matrix
+                                      , self.distcoeffs)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break

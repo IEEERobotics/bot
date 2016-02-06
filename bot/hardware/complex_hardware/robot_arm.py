@@ -40,7 +40,7 @@ class RobotArm(object):
 
         # QR scanning tools.
         self.scanner = zbar.ImageScanner()
-        scanner.parse_config('enable')
+        self.scanner.parse_config('enable')
 
         # Figure out what camera is being used
         cam_model = arm_config["camera_model"]

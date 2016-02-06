@@ -23,16 +23,16 @@ dagu_arm: {
 # Camera being used on arm
 # Generated using https://github.com/AhmedSamara/OpenCV-camera-calibration
 logitech_c270: {
-     camera_matrix: [[8.0792012531407818e+02, 0.0, 3.1950000000000000e+02],
-                     [0.0, 8.0792012531407818e+02, 2.3950000000000000e+02],
+     camera_matrix: [[7.4642581162250872e+02, 0.0, 3.1950000000000000e+02],
+                     [0.0, 7.4642581162250872e+02, 2.3950000000000000e+02],
                      [0.0, 0.0,       1.0]],
 
 
-    distortion_coefficients: [-2.5270839161968561e-01
-                             , 7.9500908841531919e+00
+    distortion_coefficients: [-1.4966172788115398e-01
+                             , 8.0158182766703362e-02
                              , 0.0
                              , 0.0
-                             , -5.7250126941290183e+01]
+                             , -4.7361169759214666e-01]
     
 }
 

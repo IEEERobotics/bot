@@ -38,6 +38,10 @@ class QRCode(object):
         self.rvec = []
         self.tvec = []
 
+    def __str__(self):
+        return "value: %s \n Location: %s \n Verts: %s" % \
+                (self.value, self.centroid_location, self.points)
+
     @property
     def rvec(self):
         return self._rvec

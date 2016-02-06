@@ -62,6 +62,7 @@ class RobotArm(object):
     def follow_qr(self, frame):
 
 
+        self.codes = []
         while True:
             ret, frame = self.cam.read()        
             # Direct conversion cv -> zbar images did not work.
@@ -76,15 +77,15 @@ class RobotArm(object):
             
             # Find codes in image
             # Identify target QR
-            self.codes = []
 
             self.scanner.scan(z_im)
             for symbol in z_im:
                 self.codes.append(QRCode(symbol))
-    
-            rvec, tvec = cv2.solvePnP(self.verts, points
-                                      , self.cam_matrix
-                                      , self.distcoeffs)
+   
+            for c in self.codes: 
+                rvec, tvec = cv2.solvePnP(self.verts, c.points
+                                          , self.cam_matrix
+                                          , self.dist_coeffs)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break

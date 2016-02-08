@@ -17,6 +17,7 @@ import bot.lib.messages as msgs
 
 from bot.hardware.switch import Switch
 from bot.driver.omni_driver import OmniDriver
+from bot.driver.rail_driver import RailDriver
 
 from bot.hardware.complex_hardware.robot_arm import RobotArm
 from bot.hardware.servo_cape import ServoCape
@@ -132,7 +133,8 @@ class CtrlServer(object):
         """
 
         self.switch = Switch()
-        self.driver = OmniDriver()
+        #self.driver = OmniDriver()
+        self.driver = RailDriver()
         self.arm = RobotArm(self.config["dagu_arm"])
 
         systems = {}

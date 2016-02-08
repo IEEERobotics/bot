@@ -16,7 +16,6 @@ import pub_server as pub_server_mod
 import bot.lib.messages as msgs
 
 from bot.hardware.switch import Switch
-from bot.driver.omni_driver import OmniDriver
 
 from bot.hardware.complex_hardware.robot_arm import RobotArm
 from bot.hardware.servo_cape import ServoCape
@@ -132,12 +131,9 @@ class CtrlServer(object):
         """
 
         self.switch = Switch()
-        self.driver = OmniDriver()
         self.arm = RobotArm(self.config["dagu_arm"])
-
         systems = {}
         systems["ctrl"] = self
-        systems["driver"] = self.driver
         systems["switch"] = self.switch
         systems["arm"] = self.arm
 

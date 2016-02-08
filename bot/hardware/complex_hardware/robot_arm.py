@@ -279,7 +279,7 @@ class RobotArm(object):
     while(True):
         x_disp, y_disp, z_disp = self.get_displacement()
         print "Checking Alignment with x_disp = ", x_disp
-        if abs(x_disp) > .1:
+        if abs(x_disp) > .2:
             self.dof(x_disp)
         else:
         break

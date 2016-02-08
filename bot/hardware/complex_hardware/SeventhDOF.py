@@ -1,6 +1,6 @@
 import os, sys
 from time import sleep
-from DMCC_Library import pyDMCC
+import pyDMCC
 
 
 class Rail_Mover:

@@ -1,6 +1,6 @@
 import os, sys
 import pprint 
-from DMCC_Library import pyDMCC
+import pyDMCC
 from SeventhDOF import Rail_Mover
 
 

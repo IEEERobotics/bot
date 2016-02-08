@@ -13,7 +13,8 @@ while True:
     if Input == -1:
         break
     elif Input == 0:
-        Rail.ResetToHome()
+    
+    	Rail.ResetToHome()
     elif Input <= 4: 
         Position = Input
         Rail.Orientor(Position)

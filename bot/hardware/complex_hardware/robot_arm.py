@@ -6,7 +6,7 @@ import sympy
 from sympy import *
 import bot.lib.lib as lib
 from bot.hardware.servo_cape import ServoCape
-
+from SeventhDOF import Rail_Mover
 
 class RobotArm(object):
 
@@ -22,6 +22,7 @@ class RobotArm(object):
             = ServoCape(self.bot_config["dagu_arm"]["servo_cape"])     
         # Empty list of zeros representing each joint   
         self.joints = [0]*5
+	self.rail = Rail_Mover()  
         
     @lib.api_call
     def grab(self):

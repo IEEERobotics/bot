@@ -34,25 +34,8 @@ class RobotArm(object):
         # Empty list of zeros representing each joint   
         self.joints = self.HOME
 
-        # Image processing 
-        self.cam = cv2.VideoCapture(0)
+        self.camera = Camera(arm_config["camera"])
 
-        # Camera dimensions had to be set manually
-        self.cam.set(3,1280)
-        self.cam.set(4,720)
-
-        # QR scanning tools.
-        self.scanner = zbar.ImageScanner()
-        self.scanner.parse_config('enable')
-
-        # Figure out what camera is being used
-        cam_model = arm_config["camera_model"]
-
-        # Constants based on calibration for image processing
-        self.cam_matrix  = np.float32(
-                        self.bot_config[cam_model]["camera_matrix"])
-        self.dist_coeffs = np.float32(
-                        self.bot_config[cam_model]["distance_coefficients"])
         self.rail = Rail_Mover()  
         
         # initialize vertices of QR code

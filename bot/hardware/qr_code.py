@@ -1,5 +1,6 @@
 import cv2
 import zbar
+from math import sqrt
 
 import numpy as np
 
@@ -33,32 +34,28 @@ class QRCode(object):
                                  [-l/2,  l/2, 0],
                                  [l/2,  -l/2, 0],
                                  [l/2,   l/2, 0]])
-        
-        # Find args
         self.rvec = []
         self.tvec = []
-
+        self.displacement = []
+        self.displacement_2d = []
+        
     def __str__(self):
         return "value: %s \n Location: %s \n Verts: %s" % \
                 (self.value, self.centroid_location, self.points)
 
     @property
-    def rvec(self):
-        return self._rvec
-    @rvec.setter
-    def rvec(self, value):
-        self._rvec = value
-
-    @property
     def tvec(self):
-        return self._tvec
+        return self.__tvec
+
     @tvec.setter
-    def tvec(self, value):
-       self._tvec = value
+    def tvec(self, vec):
+        self.__tvec = vec
+        self.displacement_2d = sqrt(tvec[0]**2 + tvec[1]**2)
+        self.displacement = sqrt(tvec[0]**2 + tvec[1]**2 + tvec[3]**2)
 
     @property
     def points(self):
-        return self._points
+        return self.__points
 
     @points.setter
     def points(self, value):
@@ -75,4 +72,3 @@ class QRCode(object):
         X = x_sum / 4
         Y = y_sum /4
         self.centroid_location =  (X, Y)
- 

@@ -38,31 +38,6 @@ class RobotArm(object):
 
         self.rail = Rail_Mover()  
         
-        # initialize vertices of QR code
-        l = 1.5
-        self.qr_verts = np.float32([[-l/2, -l/2, 0],
-                            [-l/2,  l/2, 0],
-                            [ l/2, -l/2, 0],
-                            [ l/2,  l/2, 0]])
-
-    @lib.api_call
-    def draw_qr_on_frame(self, zbar_dat, draw_frame):
-
-        self.scanner.scan(zbar_dat)
-        for symbol in zbar_dat:
-            tl, bl, br, tr = [item for item in symbol.location]
-            points = np.float32([[tl[0], tl[1]],
-                                 [tr[0], tr[1]],
-                                 [bl[0], bl[1]],
-                                 [br[0], br[1]]])
-
-            cv2.line(draw_frame, tl, bl, (100,0,255), 8, 8)
-            cv2.line(draw_frame, bl, br, (100,0,255), 8, 8)
-            cv2.line(draw_frame, br, tr, (100,0,255), 8, 8)
-            cv2.line(draw_frame, tr, tl, (100,0,255), 8, 8)
-
-        return draw_frame
-
     @lib.api_call
     def grab(self):
  
@@ -165,7 +140,7 @@ class RobotArm(object):
     def demo(self, demo_number):
         """runs demos 1-7"""
         self.servo_cape.transmit_block([demo_number]
-                                         + [0]*5)        
+                                         + self.JUNK_BUFFER)        
     
     def basic_control(self, signal):
         #Start signal recieved
@@ -198,7 +173,7 @@ class RobotArm(object):
         self.set_pos(self.DEFAULT_LOOK)
         #Read from webcam
         time.sleep(2)
-        ret = self.readQR()
+        ret = self.camera.readQR()
         
         #No QRs found
         if ret == None:

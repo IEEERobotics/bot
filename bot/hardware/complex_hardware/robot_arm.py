@@ -45,7 +45,6 @@ class RobotArm(object):
         # Figure out what camera is being used
         cam_model = arm_config["camera"]
         self.cam = Camera(self.bot_config[cam_model])
-        
         self.rail = Rail_Mover()  
         
         # initialize vertices of QR code
@@ -59,10 +58,6 @@ class RobotArm(object):
         # DO NOT SEND ANGLES ANY OTHER WAY
         self.joints = self.HOME
 
-        camera_model = arm_config["camera"]
-        self.camera = Camera(self.bot_config[camera_model])
-        self.rail = Rail_Mover()  
-        
         self.hopper = [None, None, None, None]
 
     @lib.api_call

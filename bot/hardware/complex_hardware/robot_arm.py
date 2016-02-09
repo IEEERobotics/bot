@@ -57,7 +57,9 @@ class RobotArm(object):
         # Angles of all of the joints. 
         # DO NOT SEND ANGLES ANY OTHER WAY
         self.joints = self.HOME
-        self.camera = Camera(arm_config["camera"])
+
+        camera_model = arm_config["camera"]
+        self.camera = Camera(bot_config[camera_model])
         self.rail = Rail_Mover()  
         
         self.hopper = [None, None, None, None]

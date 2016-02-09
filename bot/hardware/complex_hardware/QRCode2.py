@@ -1,7 +1,4 @@
 import os
-import sympy
-from sympy import *
-
 import zbar
 from PIL import Image
 import cv2

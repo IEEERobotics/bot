@@ -27,7 +27,8 @@ class Camera:
         self.scanner.parse_config('enable')
 
         # Figure out what camera is being used
-        cam_model = arm_config["camera_model"]
+        self.bot_config = lib.get_config()
+        cam_model = bot_config["camera_model"]
 
         # Constants based on calibration for image processing
         self.cam_matrix  = np.float32(

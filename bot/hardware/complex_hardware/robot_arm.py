@@ -59,7 +59,7 @@ class RobotArm(object):
         self.joints = self.HOME
 
         camera_model = arm_config["camera"]
-        self.camera = Camera(bot_config[camera_model])
+        self.camera = Camera(self.bot_config[camera_model])
         self.rail = Rail_Mover()  
         
         self.hopper = [None, None, None, None]

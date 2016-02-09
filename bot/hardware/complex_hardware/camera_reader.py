@@ -172,16 +172,16 @@ class Camera(object):
                                           , self.cam_matrix
                                           , self.dist_coeffs)
 
-                cv2.line(frame, tl, bl, (100,0,255), 8, 8)
-                cv2.line(frame, bl, br, (100,0,255), 8, 8)
-                cv2.line(frame, br, tr, (100,0,255), 8, 8)
-                cv2.line(frame, tr, tl, (100,0,255), 8, 8)
+                #cv2.line(frame, tl, bl, (100,0,255), 8, 8)
+                #cv2.line(frame, bl, br, (100,0,255), 8, 8)
+                #cv2.line(frame, br, tr, (100,0,255), 8, 8)
+                #cv2.line(frame, tr, tl, (100,0,255), 8, 8)
 
                 QRList.append(QRCode(tvec, rvec, symbol.data, tr)) 
                 count += 1
             if count == 0:
                 #print "NO QR FOUND"
-                cv2.imshow('test', frame)
+                #cv2.imshow('test', frame)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
                 continue
@@ -216,8 +216,8 @@ class Camera(object):
             print "X:     ", targetQR.tvec[0]
             print "Y:     ", targetQR.tvec[1]
             print "====================================="
-            cv2.circle(frame,targetQR.tr, 10, (0,255,0), -1)
-            cv2.imshow('test', frame)
+            #cv2.circle(frame,targetQR.tr, 10, (0,255,0), -1)
+            #cv2.imshow('test', frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
                 

@@ -28,7 +28,7 @@ class Camera:
 
         # Figure out what camera is being used
         self.bot_config = lib.get_config()
-        cam_model = bot_config["camera_model"]
+        cam_model = self.bot_config["camera_model"]
 
         # Constants based on calibration for image processing
         self.cam_matrix  = np.float32(

@@ -190,6 +190,32 @@ class RobotArm(object):
         self.servo_cape.transmit_block([demo_number]
                                          + [0]*5)        
     
+    
+    def rail_test(self):
+        
+        while True:
+            time.sleep(2.5)
+            ret = self.readQR()
+
+            #No QRs found
+            if ret == None:
+                time.sleep(2)
+                ret = self.readQR()
+                if ret == None:
+                    print "No QRCode Found"
+                    return
+
+            #adjust 7DOF to center on QR
+            while(True):
+                disp_x = ret.tvec[0]
+                print "Checking Alignment with x_disp = ", x_disp
+                if abs(x_disp) > .2:
+                    self.rail.DisplacementConverter(x_disp)
+                else:
+                break
+    
+    
+    
     def basic_control(self, signal):
         #Start signal recieved
         barge_level = signal

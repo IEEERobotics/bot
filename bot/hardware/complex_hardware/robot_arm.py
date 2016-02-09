@@ -283,7 +283,7 @@ class RobotArm(object):
             if abs(x_disp) > .2:
                 self.rail.DisplacementConverter(x_disp)
             else:
-            break
+                break
             
         #Once Aligned: extend arm fully to grab position
         self.demo(grab_pos)

@@ -18,9 +18,9 @@ class QRCode(object):
         """
 
     def __init__(self, symbol, size):
+
         # Raw object from zbar.
-        self.symbol = symbol
-        
+        self.symbol = symbol        
         self.value = self.symbol.data
 
         # Begin Processing symbol
@@ -34,8 +34,8 @@ class QRCode(object):
                                  [-l/2,  l/2, 0],
                                  [l/2,  -l/2, 0],
                                  [l/2,   l/2, 0]])
-        self.rvec = []
-        self.tvec = []
+        self.rvec = [999]*3
+        self.tvec = [999]*3
         self.displacement = []
         self.displacement_2d = []
         
@@ -50,8 +50,8 @@ class QRCode(object):
     @tvec.setter
     def tvec(self, vec):
         self.__tvec = vec
-        self.displacement_2d = sqrt(tvec[0]**2 + tvec[1]**2)
-        self.displacement = sqrt(tvec[0]**2 + tvec[1]**2 + tvec[3]**2)
+        self.displacement_2d = sqrt(vec[0]**2 + vec[1]**2)
+        self.displacement = sqrt(vec[0]**2 + vec[1]**2 + vec[2]**2)
 
     @property
     def points(self):
@@ -60,7 +60,7 @@ class QRCode(object):
     @points.setter
     def points(self, value):
         """Numpy array of corners of QR code. """
-        self._points = np.float32(value)
+        self.__points = np.float32(value)
  
     def set_centroid_location(self):
         x_sum = 0

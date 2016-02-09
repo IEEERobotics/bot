@@ -17,7 +17,7 @@ dagu_arm: {
         i2c_bus: 1,
         i2c_addr: 0x10
     },
-    camera_model: logitech_c270
+    camera: logitech_c270
 }
 
 # Camera being used on arm

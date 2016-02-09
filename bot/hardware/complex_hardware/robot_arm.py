@@ -1,5 +1,4 @@
 
-
 """Encapsulates functionality of moving around robot arm"""
 import os
 
@@ -20,6 +19,8 @@ class RobotArm(object):
 
     JUNK_BUFFER = [0]*5
     HOME = [90]*5
+    GRAB = 5
+
 
     """An object that resembles a robotic arm with n joints"""
     def __init__(self, arm_config):
@@ -39,24 +40,6 @@ class RobotArm(object):
         self.hopper = [None, None, None, None]
 
     @lib.api_call
-    def draw_qr_on_frame(self, zbar_dat, draw_frame):
-
-        self.scanner.scan(zbar_dat)
-        for symbol in zbar_dat:
-            tl, bl, br, tr = [item for item in symbol.location]
-            points = np.float32([[tl[0], tl[1]],
-                                 [tr[0], tr[1]],
-                                 [bl[0], bl[1]],
-                                 [br[0], br[1]]])
-
-            cv2.line(draw_frame, tl, bl, (100,0,255), 8, 8)
-            cv2.line(draw_frame, bl, br, (100,0,255), 8, 8)
-            cv2.line(draw_frame, br, tr, (100,0,255), 8, 8)
-            cv2.line(draw_frame, tr, tl, (100,0,255), 8, 8)
-
-        return draw_frame
-
-    @lib.api_call
     def grab(self):
  
         self.servo_cape.transmit_block([5] + self.JUNK_BUFFER)
@@ -65,6 +48,16 @@ class RobotArm(object):
     def release(self):
         self.servo_cape.transmit_block([6] + self.JUNK_BUFFER)
         
+    @lib.api_call
+    def simple_center_on_qr(self, target_qr):
+        """Attempts to center arm on qr code using only arm itself.
+        Only the rotational joints, 
+        joint 0 corrects X 
+        joint 3 corrects Y
+        joint 5 corrects rotation
+        """
+
+
     @lib.api_call
     def set_angles(self):
         while(1):
@@ -112,8 +105,8 @@ class RobotArm(object):
             if (answer == 'n'):
                 return
             elif (answer == "y"):
-                array = [A1,A2,A3,A4,A5]
-                self.servo_cape.transmit_block([0] + array)
+                self.joints = [A1,A2,A3,A4,A5]
+                self.servo_cape.transmit_block([0] + self.joints)
                 return
             else:
                 print "Error: Invalid reply. Please answer in y/n format."

@@ -199,7 +199,7 @@ class RobotArm(object):
         
         while True:
             time.sleep(2.5)
-            ret = self.readQR()
+            ret = self.cam.readQR()
 
             #No QRs found
             if ret == None:
@@ -251,12 +251,12 @@ class RobotArm(object):
         self.demo(self.DEFAULT_LOOK)
         #Read from webcam
         time.sleep(2)
-        ret = self.readQR()
+        ret = self.cam.readQR()
         
         #No QRs found
         if ret == None:
             time.sleep(2)
-            ret = self.readQR()
+            ret = self.cam.readQR()
             if ret == None:
                 print "No QRCode Found"
                 return
@@ -278,7 +278,7 @@ class RobotArm(object):
         self.set_pos(look_pos)
         time.sleep(2)
         
-        ret = self.readQR()
+        ret = self.cam.readQR()
 
         #If not aligned adjust again with 7 DOF
         while(True):

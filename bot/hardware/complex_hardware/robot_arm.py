@@ -50,7 +50,7 @@ class RobotArm(object):
         self.cam_matrix  = np.float32(
                         self.bot_config[cam_model]["camera_matrix"])
         self.dist_coeffs = np.float32(
-                        self.bot_config[cam_model]["distance_coefficients"])
+                        self.bot_config[cam_model]["distortion_coefficients"])
         self.rail = Rail_Mover()  
         
         # initialize vertices of QR code

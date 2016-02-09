@@ -268,7 +268,7 @@ class RobotArm(object):
             if abs(x_disp) > .2:
                 self.rail.DisplacementConverter(x_disp)
             else:
-            break
+                break
         
         #extend arm towards block for 2nd check
         self.set_pos(look_pos)

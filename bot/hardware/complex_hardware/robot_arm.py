@@ -199,7 +199,7 @@ class RobotArm(object):
             #time.sleep(2)
             ret = self.cam.readQR()
             if ret != None:
-                disp_x = ret.tvec[0]
+                x_disp = ret.tvec[0]
                 print "Checking Alignment with x_disp = ", x_disp
                 if abs(x_disp) > .2:
                     self.rail.DisplacementConverter(x_disp)

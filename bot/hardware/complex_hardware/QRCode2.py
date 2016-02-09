@@ -63,6 +63,9 @@ class Camera:
             ret, frame = self.cam.read()        
             # Direct conversion cv -> zbar images did not work.
             # Buffer file used to have native data structures.
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            frame = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
+            frame = cv2.bilateralFilter(frame, 9, 75, 75) 
             cv2.imwrite('buffer.png', frame)
 
             # PIL -> zbar
@@ -85,16 +88,16 @@ class Camera:
                                           , self.cam_matrix
                                           , self.dist_coeffs)
 
-                cv2.line(frame, tl, bl, (100,0,255), 8, 8)
-                cv2.line(frame, bl, br, (100,0,255), 8, 8)
-                cv2.line(frame, br, tr, (100,0,255), 8, 8)
-                cv2.line(frame, tr, tl, (100,0,255), 8, 8)
+                #cv2.line(frame, tl, bl, (100,0,255), 8, 8)
+                #cv2.line(frame, bl, br, (100,0,255), 8, 8)
+                #cv2.line(frame, br, tr, (100,0,255), 8, 8)
+                #cv2.line(frame, tr, tl, (100,0,255), 8, 8)
 
                 QRList.append(QRCode(tvec, rvec, symbol.data, tr)) 
                 count += 1
             if count == 0:
                 #print "NO QR FOUND"
-                cv2.imshow('test', frame)
+                #cv2.imshow('test', frame)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
                 continue

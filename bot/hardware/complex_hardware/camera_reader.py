@@ -190,7 +190,8 @@ class Camera(object):
             #cv2.imshow('test', frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 return
-            continue
+            print "No QR Found"
+            return
         # find the best QRCode to grab (closest x then highest y)
         QRList.sort(key=lambda qr: qr.tvec[0], reverse=False)       # sort the list of qr codes by x, smallest to largest
         x_min = 100
@@ -222,8 +223,9 @@ class Camera(object):
         print "X:     ", targetQR.tvec[0]
         print "Y:     ", targetQR.tvec[1]
         print "====================================="
+        return targetQR
         #cv2.circle(frame,targetQR.tr, 10, (0,255,0), -1)
         #cv2.imshow('test', frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        #if cv2.waitKey(1) & 0xFF == ord('q'):
+        #    break
 

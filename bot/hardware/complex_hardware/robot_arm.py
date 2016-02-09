@@ -65,6 +65,8 @@ class RobotArm(object):
         # Angles of all of the joints. 
         # DO NOT SEND ANGLES ANY OTHER WAY
         self.angles = [90, 90, 90, 90, 90]
+        
+        self.hopper = [None, None, None, None]
 
     @lib.api_call
     def draw_qr_on_frame(self, zbar_dat, draw_frame):
@@ -204,19 +206,19 @@ class RobotArm(object):
             look_pos = self.BARGE_LOOK3
             
         if self.hopper[0] != None:
-            hopper_pos = self.HOPPER_POS0
+            hopper_pos = 1
         elif self.hopper[1] != None:
-            hopper_pos = self.HOPPER_POS1
+            hopper_pos = 2
         elif self.hopper[2] != None:
-            hopper_pos = self.HOPPER_POS2
+            hopper_pos = 3
         elif self.hopper[3] != None:
-            hopper_pos = self.HOPPER_POS3
+            hopper_pos = 4
         else:
             print "Error: Hopper is full."
             return
 
         #Set the Arm to its default looking position
-        self.set_pos(self.DEFAULT_LOOK)
+        self.demo(self.DEFAULT_LOOK)
         #Read from webcam
         time.sleep(2)
         ret = self.readQR()
@@ -235,10 +237,10 @@ class RobotArm(object):
 
         #adjust 7DOF to center on QR
         while(True):
-            disp_x = ret.getX
+            disp_x = ret.tvec[0]
             print "Checking Alignment with x_disp = ", x_disp
             if abs(x_disp) > .2:
-                self.dof(x_disp)
+                self.rail.DisplacementConverter(x_disp)
             else:
             break
         
@@ -246,19 +248,19 @@ class RobotArm(object):
         self.set_pos(look_pos)
         time.sleep(2)
         
-        self.readQR()
+        ret = self.readQR()
 
         #If not aligned adjust again with 7 DOF
         while(True):
-            x_disp, y_disp, z_disp = self.get_displacement()
+            x_disp = ret.tvec[0]
             print "Checking Alignment with x_disp = ", x_disp
             if abs(x_disp) > .2:
-                self.dof(x_disp)
+                self.rail.DisplacementConverter(x_disp)
             else:
             break
             
         #Once Aligned: extend arm fully to grab position
-        self.set_pos(grab_pos)
+        self.demo(grab_pos)
         time.sleep(2)
         
         #Check for QR again if possible (if even needed) then grab
@@ -266,18 +268,19 @@ class RobotArm(object):
         time.sleep(1)
 
         #Pick up and place in empty hopper bin
-        self.set_pos(self.DEFAULT_GRABBED)
+        self.demo(self.DEFAULT_GRABBED)
         time.sleep(2)
 
-        self.set_pos(hopper_pos)
+        self.rail.Orientor(hopper_pos)
         time.sleep(1.5)
         self.release()
         time.sleep(1)
-        self.update_hopper(hopper_pos)
+        self.hopper[hopper_pos] = ret
 
         #return to default looking position
-        self.set_pos(DEFAULT)
+        self.demo(DEFAULT)
         time.sleep(1)
+        return 1
 
     def calcFKposition(self, theta1, theta2, theta3, theta4, theta5, L1, L2, L3, L4, L5, L6):
         """ Finds the current xyz given the lengths and theta values

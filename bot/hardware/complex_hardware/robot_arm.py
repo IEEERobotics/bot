@@ -35,8 +35,6 @@ class RobotArm(object):
             = ServoCape(self.bot_config["dagu_arm"]["servo_cape"])     
         # Empty list of zeros representing each joint   
         self.joints = [0]*5
-)
-        
         
         
         # QR scanning tools.
@@ -45,7 +43,7 @@ class RobotArm(object):
 
         # Figure out what camera is being used
         cam_model = arm_config["camera"]
-        self.cam = Camera(bot_config[cam_model])
+        self.cam = Camera(self.bot_config[cam_model])
         
         self.rail = Rail_Mover()  
         

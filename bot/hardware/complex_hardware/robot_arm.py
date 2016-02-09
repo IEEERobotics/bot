@@ -217,94 +217,95 @@ class RobotArm(object):
                                          + [0]*5)        
     
     def basic_control(self, signal):
-    #Start signal recieved
-    barge_level = signal
-    grab_pos = 0;
-    if barge_height == 1:
-        grab_pos = self.BARGE_GRAB1
-        look_pos = self.BARGE_LOOK1
-    elif barge_height == 2:
-        grab_pos = self.BARGE_GRAB2
-        look_pos = self.BARGE_LOOK2
-    elif barge_height == 3:
-        grab_pos = self.BARGE_GRAB3
-        look_pos = self.BARGE_LOOK3
-        
-    if self.hopper[0] != None:
-        hopper_pos = self.HOPPER_POS0
-    elif self.hopper[1] != None:
-        hopper_pos = self.HOPPER_POS1
-    elif self.hopper[2] != None:
-        hopper_pos = self.HOPPER_POS2
-    elif self.hopper[3] != None:
-        hopper_pos = self.HOPPER_POS3
-    else:
-        print "Error: Hopper is full."
-        return
+        #Start signal recieved
+        barge_level = signal
+        grab_pos = 0;
 
-    #Set the Arm to its default looking position
-    self.set_pos(self.DEFAULT_LOOK)
-    #Read from webcam
-    time.sleep(2)
-    ret = self.readQR()
-    
-    #No QRs found
-    if ret == None:
-        time.sleep(2)
-        ret = self.readQR()
-        if ret == None:
-            print "No QRCode Found"
+        if barge_height == 1:
+            grab_pos = self.BARGE_GRAB1
+            look_pos = self.BARGE_LOOK1
+        elif barge_height == 2:
+            grab_pos = self.BARGE_GRAB2
+            look_pos = self.BARGE_LOOK2
+        elif barge_height == 3:
+            grab_pos = self.BARGE_GRAB3
+            look_pos = self.BARGE_LOOK3
+            
+        if self.hopper[0] != None:
+            hopper_pos = self.HOPPER_POS0
+        elif self.hopper[1] != None:
+            hopper_pos = self.HOPPER_POS1
+        elif self.hopper[2] != None:
+            hopper_pos = self.HOPPER_POS2
+        elif self.hopper[3] != None:
+            hopper_pos = self.HOPPER_POS3
+        else:
+            print "Error: Hopper is full."
             return
 
-    #Multiple QRs Found
-        # Choose one (closest X  then highest Y) -> 1 QR found
-        # built into readQR()
-
-    #adjust 7DOF to center on QR
-    while(True):
-        disp_x = ret.getX
-        print "Checking Alignment with x_disp = ", x_disp
-        if abs(x_disp) > .2:
-            self.dof(x_disp)
-        else:
-        break
-    
-    #extend arm towards block for 2nd check
-    self.set_pos(look_pos)
-    time.sleep(2)
-    
-    self.readQR()
-
-    #If not aligned adjust again with 7 DOF
-    while(True):
-        x_disp, y_disp, z_disp = self.get_displacement()
-        print "Checking Alignment with x_disp = ", x_disp
-        if abs(x_disp) > .2:
-            self.dof(x_disp)
-        else:
-        break
+        #Set the Arm to its default looking position
+        self.set_pos(self.DEFAULT_LOOK)
+        #Read from webcam
+        time.sleep(2)
+        ret = self.readQR()
         
-    #Once Aligned: extend arm fully to grab position
-    self.set_pos(grab_pos)
-    time.sleep(2)
-    
-    #Check for QR again if possible (if even needed) then grab
-    self.grab()
-    time.sleep(1)
+        #No QRs found
+        if ret == None:
+            time.sleep(2)
+            ret = self.readQR()
+            if ret == None:
+                print "No QRCode Found"
+                return
 
-    #Pick up and place in empty hopper bin
-    self.set_pos(self.DEFAULT_GRABBED)
-    time.sleep(2)
+        #Multiple QRs Found
+            # Choose one (closest X  then highest Y) -> 1 QR found
+            # built into readQR()
 
-    self.set_pos(hopper_pos)
-    time.sleep(1.5)
-    self.release()
-    time.sleep(1)
-    self.update_hopper(hopper_pos)
+        #adjust 7DOF to center on QR
+        while(True):
+            disp_x = ret.getX
+            print "Checking Alignment with x_disp = ", x_disp
+            if abs(x_disp) > .2:
+                self.dof(x_disp)
+            else:
+            break
+        
+        #extend arm towards block for 2nd check
+        self.set_pos(look_pos)
+        time.sleep(2)
+        
+        self.readQR()
 
-    #return to default looking position
-    self.set_pos(DEFAULT)
-    time.sleep(1)
+        #If not aligned adjust again with 7 DOF
+        while(True):
+            x_disp, y_disp, z_disp = self.get_displacement()
+            print "Checking Alignment with x_disp = ", x_disp
+            if abs(x_disp) > .2:
+                self.dof(x_disp)
+            else:
+            break
+            
+        #Once Aligned: extend arm fully to grab position
+        self.set_pos(grab_pos)
+        time.sleep(2)
+        
+        #Check for QR again if possible (if even needed) then grab
+        self.grab()
+        time.sleep(1)
+
+        #Pick up and place in empty hopper bin
+        self.set_pos(self.DEFAULT_GRABBED)
+        time.sleep(2)
+
+        self.set_pos(hopper_pos)
+        time.sleep(1.5)
+        self.release()
+        time.sleep(1)
+        self.update_hopper(hopper_pos)
+
+        #return to default looking position
+        self.set_pos(DEFAULT)
+        time.sleep(1)
     
     
     

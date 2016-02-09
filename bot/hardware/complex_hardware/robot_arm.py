@@ -13,8 +13,9 @@ import time
 
 import bot.lib.lib as lib
 from bot.hardware.servo_cape import ServoCape
-from bot.hardware.qr_code import QRCode
 
+from bot.hardware.qr_code import QRCode
+from SeventhDOF import Rail_Mover
 
 class RobotArm(object):
 
@@ -50,6 +51,7 @@ class RobotArm(object):
                         self.bot_config[cam_model]["camera_matrix"])
         self.dist_coeffs = np.float32(
                         self.bot_config[cam_model]["distance_coefficients"])
+        self.rail = Rail_Mover()  
         
         # initialize vertices of QR code
         l = 1.5

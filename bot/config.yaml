@@ -60,6 +60,13 @@ omni_drive_motors: {
 
 }
 
+rail_drive_motors: {
+
+    rail1: { board_num: 1, motor_num: 1 },
+    rail2: { board_num: 1, motor_num: 2 , invert: True},
+
+}
+
 logging: {log_file: bot/logs/bot.log, file_handler_level: DEBUG, stream_handler_level: INFO}  # Logging options
 test_pwm_base_dir: bot/simulator/pins/pwm/pwm
 test_gpio_base_dir: bot/simulator/pins/gpio/gpio

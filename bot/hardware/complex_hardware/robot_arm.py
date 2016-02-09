@@ -14,6 +14,8 @@ from bot.hardware.servo_cape import ServoCape
 
 from bot.hardware.qr_code import QRCode
 from SeventhDOF import Rail_Mover
+from QRCode2 import Camera
+from QRCode2 import QRCode
 
 
 class RobotArm(object):
@@ -33,12 +35,15 @@ class RobotArm(object):
         self.joints = [0]*5
 
         # Image processing 
-        self.cam = cv2.VideoCapture(0)
+        #self.cam = cv2.VideoCapture(0)
 
         # Camera dimensions had to be set manually
-        self.cam.set(3,1280)
-        self.cam.set(4,720)
-
+        #self.cam.set(3,1280)
+        #self.cam.set(4,720)
+        
+        self.cam = Camera()
+        
+        
         # QR scanning tools.
         self.scanner = zbar.ImageScanner()
         self.scanner.parse_config('enable')
@@ -47,10 +52,11 @@ class RobotArm(object):
         cam_model = arm_config["camera_model"]
 
         # Constants based on calibration for image processing
-        self.cam_matrix  = np.float32(
-                        self.bot_config[cam_model]["camera_matrix"])
-        self.dist_coeffs = np.float32(
-                        self.bot_config[cam_model]["distortion_coefficients"])
+        #self.cam_matrix  = np.float32(
+        #                self.bot_config[cam_model]["camera_matrix"])
+        #self.dist_coeffs = np.float32(
+        #                self.bot_config[cam_model]["distortion_coefficients"])
+        
         self.rail = Rail_Mover()  
         
         # initialize vertices of QR code
@@ -198,7 +204,7 @@ class RobotArm(object):
             #No QRs found
             if ret == None:
                 time.sleep(2)
-                ret = self.readQR()
+                ret = self.cam.readQR()
                 if ret == None:
                     print "No QRCode Found"
                     return

@@ -7,6 +7,7 @@ from PIL import Image
 import cv2
 import numpy as np
 import time
+import bot.lib.lib as lib
 
 class QRCode:
     def __init__(self,tvec,rvec,value, top_right):
@@ -18,30 +19,24 @@ class QRCode:
 class Camera:
     def  __init__(self):
         # Image processing 
-        self.cam = cv2.VideoCapture(0)
+        self.cam = cv2.VideoCapture(-1)
 
         # Camera dimensions had to be set manually
-        #self.cam.set(3,1280)
-        #self.cam.set(4,720)
+        self.cam.set(3,1280)
+        self.cam.set(4,720)
 
         # QR scanning tools.
         self.scanner = zbar.ImageScanner()
         self.scanner.parse_config('enable')
 
         # Figure out what camera is being used
-        #cam_model = arm_config["camera_model"]
+        cam_model = arm_config["camera_model"]
 
         # Constants based on calibration for image processing
         self.cam_matrix  = np.float32(
-                        [[8.0792012531407818e+02, 0.0, 3.1950000000000000e+02],
-                        [0.0, 8.0792012531407818e+02, 2.3950000000000000e+02],
-                        [0.0, 0.0,       1.0]])
-        self.dist_coeffs = np.float32([
-                        -2.5270839161968561e-01
-                        , 7.9500908841531919e+00
-                        , 0.0
-                        , 0.0
-                        , -5.7250126941290183e+01])
+                        self.bot_config[cam_model]["camera_matrix"])
+        self.dist_coeffs = np.float32(
+                        self.bot_config[cam_model]["distortion_coefficients"])
 
         # initialize vertices of QR code
         l = 1.5

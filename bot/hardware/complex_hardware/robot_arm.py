@@ -14,14 +14,16 @@ from bot.hardware.servo_cape import ServoCape
 
 from bot.hardware.qr_code import QRCode
 from SeventhDOF import Rail_Mover
-from QRCode2 import Camera
-from QRCode2 import QRCode
+from bot.hardware.complex_hardware.camera_reader import Camera
+
 
 
 class RobotArm(object):
 
     JUNK_BUFFER = [0]*5
-    HOME_ANGLE  = [90]*5
+    HOME = [90]*5
+    GRAB = 5
+
 
     """An object that resembles a robotic arm with n joints"""
     def __init__(self, arm_config):
@@ -33,15 +35,8 @@ class RobotArm(object):
             = ServoCape(self.bot_config["dagu_arm"]["servo_cape"])     
         # Empty list of zeros representing each joint   
         self.joints = [0]*5
-
-        # Image processing 
-        #self.cam = cv2.VideoCapture(0)
-
-        # Camera dimensions had to be set manually
-        #self.cam.set(3,1280)
-        #self.cam.set(4,720)
+)
         
-        self.cam = Camera()
         
         
         # QR scanning tools.
@@ -49,13 +44,8 @@ class RobotArm(object):
         self.scanner.parse_config('enable')
 
         # Figure out what camera is being used
-        cam_model = arm_config["camera_model"]
-
-        # Constants based on calibration for image processing
-        #self.cam_matrix  = np.float32(
-        #                self.bot_config[cam_model]["camera_matrix"])
-        #self.dist_coeffs = np.float32(
-        #                self.bot_config[cam_model]["distortion_coefficients"])
+        cam_model = arm_config["camera"]
+        self.cam = Camera(bot_config[cam_model])
         
         self.rail = Rail_Mover()  
         
@@ -68,7 +58,9 @@ class RobotArm(object):
 
         # Angles of all of the joints. 
         # DO NOT SEND ANGLES ANY OTHER WAY
-        self.angles = [90, 90, 90, 90, 90]
+        self.joints = self.HOME
+        self.camera = Camera(arm_config["camera"])
+        self.rail = Rail_Mover()  
         
         self.hopper = [None, None, None, None]
 
@@ -99,6 +91,16 @@ class RobotArm(object):
     def release(self):
         self.servo_cape.transmit_block([6] + self.JUNK_BUFFER)
         
+    @lib.api_call
+    def simple_center_on_qr(self, target_qr):
+        """Attempts to center arm on qr code using only arm itself.
+        Only the rotational joints, 
+        joint 0 corrects X 
+        joint 3 corrects Y
+        joint 5 corrects rotation
+        """
+
+
     @lib.api_call
     def set_angles(self):
         while(1):
@@ -157,7 +159,7 @@ class RobotArm(object):
     @lib.api_call
     def reset_home_position(self):
         """sets angles back to default position."""
-        self.servo_cape.transmit_block([0] + [90,90,90,90,90])
+        self.servo_cape.transmit_block([0] + HOME)
         
     @lib.api_call
     def fancy_demo(self):
@@ -192,7 +194,7 @@ class RobotArm(object):
     def demo(self, demo_number):
         """runs demos 1-7"""
         self.servo_cape.transmit_block([demo_number]
-                                         + [0]*5)        
+                                         + self.JUNK_BUFFER)        
     
     
     def rail_test(self):
@@ -251,12 +253,12 @@ class RobotArm(object):
         self.demo(self.DEFAULT_LOOK)
         #Read from webcam
         time.sleep(2)
-        ret = self.cam.readQR()
+        ret = self.camera.readQR()
         
         #No QRs found
         if ret == None:
             time.sleep(2)
-            ret = self.cam.readQR()
+            ret = self.readQR()
             if ret == None:
                 print "No QRCode Found"
                 return

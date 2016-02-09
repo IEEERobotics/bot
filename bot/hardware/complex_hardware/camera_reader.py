@@ -105,6 +105,12 @@ class Camera(object):
             if sorted_qr != None:
                 break
 
+    def draw_qr_on_frame(self, frame, qr):
+        cv2.line(frame, qr.topLeft, qr.topRight, (20, 20, 255), 8, 8)
+        cv2.line(frame, qr.topRight, qr.bottomRight, (20, 20, 255), 8, 8)
+        cv2.line(frame, qr.bottomRight, qr.bottomLeft, (20, 20, 255), 8, 8)
+        cv2.line(frame, qr.bottomLeft, qr.topLeft, (20, 20, 255), 8, 8)
+        return frame
 
     @lib.api_call 
     def infinite_demo(self):
@@ -112,9 +118,13 @@ class Camera(object):
             ret, frame = self.get_current_frame()
             cv2.imshow('frm', frame)
             clean_frame = self.apply_filters(frame)
-            cv2.imshow('cleaned frame', clean_frame)
+
             found_qrs = self.get_qr_list(clean_frame)
-   
+  
+            qr_frame = clean_frame
+            for qr in found_qrs:
+                qr_frame = self.draw_qr_on_frame(qr_frame, qr)
+            cv2.imshow('qrs',  qr_frame) 
             print "found_qrs", found_qrs           
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break

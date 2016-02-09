@@ -1,4 +1,4 @@
-from camera_reader import Camera
+from bot.hardware.complex_hardware.camera_reader import Camera
 
 import bot.lib.lib as lib
 

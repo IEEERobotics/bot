@@ -21,7 +21,7 @@ from SeventhDOF import Rail_Mover
 class RobotArm(object):
 
     JUNK_BUFFER = [0]*5
-    HOME_ANGLE  = [90]*5
+    HOME = [90]*5
 
     """An object that resembles a robotic arm with n joints"""
     def __init__(self, arm_config):
@@ -32,7 +32,7 @@ class RobotArm(object):
         self.servo_cape \
             = ServoCape(self.bot_config["dagu_arm"]["servo_cape"])     
         # Empty list of zeros representing each joint   
-        self.joints = [0]*5
+        self.joints = self.HOME
 
         # Image processing 
         self.cam = cv2.VideoCapture(0)
@@ -61,10 +61,6 @@ class RobotArm(object):
                             [-l/2,  l/2, 0],
                             [ l/2, -l/2, 0],
                             [ l/2,  l/2, 0]])
-
-        # Angles of all of the joints. 
-        # DO NOT SEND ANGLES ANY OTHER WAY
-        self.angles = [90, 90, 90, 90, 90]
 
     @lib.api_call
     def draw_qr_on_frame(self, zbar_dat, draw_frame):
@@ -151,7 +147,7 @@ class RobotArm(object):
     @lib.api_call
     def reset_home_position(self):
         """sets angles back to default position."""
-        self.servo_cape.transmit_block([0] + [90,90,90,90,90])
+        self.servo_cape.transmit_block([0] + HOME)
         
     @lib.api_call
     def fancy_demo(self):

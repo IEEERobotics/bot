@@ -6,7 +6,7 @@ import numpy as np
 import time
 import bot.lib.lib as lib
 
-class QRCode:
+class QRCode2:
     def __init__(self,tvec,rvec,value, top_right):
         self.tvec = tvec
         self.rvec = rvec

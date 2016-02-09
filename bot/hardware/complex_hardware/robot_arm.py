@@ -17,13 +17,15 @@ from bot.hardware.servo_cape import ServoCape
 from bot.hardware.qr_code import QRCode
 from SeventhDOF import Rail_Mover
 
+
 class RobotArm(object):
 
+    JUNK_BUFFER = [0]*5
+    HOME_ANGLE  = [90]*5
 
     """An object that resembles a robotic arm with n joints"""
     def __init__(self, arm_config):
         
-        self.default_angles = [90]*5
         self.logger = lib.get_logger()
         self.bot_config = lib.get_config()
         
@@ -59,39 +61,10 @@ class RobotArm(object):
                             [-l/2,  l/2, 0],
                             [ l/2, -l/2, 0],
                             [ l/2,  l/2, 0]])
-         
-    @lib.api_call
-    def follow_qr(self, frame):
 
-
-        self.codes = []
-        while True:
-            ret, frame = self.cam.read()        
-            # Direct conversion cv -> zbar images did not work.
-            # Buffer file used to have native data structures.
-            cv2.imwrite('buffer.png', frame)
-
-            # PIL -> zbar
-            pil_im = Image.open('buffer.png').convert('L')
-            width, height = pil_im.size
-            raw = pil_im.tobytes()
-            z_im = zbar.Image(width, height, 'Y800', raw)
-            
-            # Find codes in image
-            # Identify target QR
-
-            self.scanner.scan(z_im)
-            for symbol in z_im:
-                self.codes.append(QRCode(symbol))
-   
-            for c in self.codes: 
-                rvec, tvec = cv2.solvePnP(self.verts, c.points
-                                          , self.cam_matrix
-                                          , self.dist_coeffs)
-
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-
+        # Angles of all of the joints. 
+        # DO NOT SEND ANGLES ANY OTHER WAY
+        self.angles = [90, 90, 90, 90, 90]
 
     @lib.api_call
     def draw_qr_on_frame(self, zbar_dat, draw_frame):
@@ -104,21 +77,21 @@ class RobotArm(object):
                                  [bl[0], bl[1]],
                                  [br[0], br[1]]])
 
-            cv2.line(frame, tl, bl, (100,0,255), 8, 8)
-            cv2.line(frame, bl, br, (100,0,255), 8, 8)
-            cv2.line(frame, br, tr, (100,0,255), 8, 8)
-            cv2.line(frame, tr, tl, (100,0,255), 8, 8)
+            cv2.line(draw_frame, tl, bl, (100,0,255), 8, 8)
+            cv2.line(draw_frame, bl, br, (100,0,255), 8, 8)
+            cv2.line(draw_frame, br, tr, (100,0,255), 8, 8)
+            cv2.line(draw_frame, tr, tl, (100,0,255), 8, 8)
 
         return draw_frame
 
-
     @lib.api_call
     def grab(self):
-        self.servo_cape.transmit_block([5] + [0,0,0,0,0])
+ 
+        self.servo_cape.transmit_block([5] + self.JUNK_BUFFER)
         
     @lib.api_call   
     def release(self):
-        self.servo_cape.transmit_block([6] + [0,0,0,0,0])
+        self.servo_cape.transmit_block([6] + self.JUNK_BUFFER)
         
     @lib.api_call
     def set_angles(self):
@@ -181,7 +154,7 @@ class RobotArm(object):
         self.servo_cape.transmit_block([0] + [90,90,90,90,90])
         
     @lib.api_call
-    def Arm_Demo(self):
+    def fancy_demo(self):
         os.system('clear')
         print "Welcome to the Team 26: Robotic Arm Mainipulation and Vision demo function."
         print "Demo number      Function       "
@@ -208,9 +181,6 @@ class RobotArm(object):
                 self.set_angles()
             else:
                 self.demo(demo_number - 1)
-        
-        
-        
         
     @lib.api_call
     def demo(self, demo_number):
@@ -308,9 +278,6 @@ class RobotArm(object):
         #return to default looking position
         self.set_pos(DEFAULT)
         time.sleep(1)
-    
-    
-    
 
     def calcFKposition(self, theta1, theta2, theta3, theta4, theta5, L1, L2, L3, L4, L5, L6):
         """ Finds the current xyz given the lengths and theta values

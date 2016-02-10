@@ -1,13 +1,14 @@
 from bot.hardware.IR import IR
 from side import Side
-from bot.omni_driver import OmniDriver
+from bot.driver.omni_driver import OmniDriver
+import bot.lib.lib as lib
 from time import sleep
 
 class Navigation(object):
     def __init__(self):
-        self.device = IR() #INSTANCIATE ONLY ONCE
+        self.device = IR() # INSTANCIATE ONLY ONCE
         self.north = Side("North Left", "North Right", self.device.read_values)
-        self.sourth = Side("South Left", "South Right", self.device.read_values)
+        self.south = Side("South Left", "South Right", self.device.read_values)
         self.east = Side("East Top", "East Bottom", self.device.read_values)
         self.west = Side("West Top", "West Bottom", self.device.read_values)
         self.driver = OmniDriver()

@@ -23,6 +23,7 @@ class IR(object):
         data = [second[i] * 256 + first[i] for i in xrange(len(first))]
         return data
 
+    @lib.api_call
     def read_values(self):
         ms = range(20)
         for i in range(20):

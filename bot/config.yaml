@@ -39,8 +39,9 @@ omni_drive_motors: {
 
 }
 
-IR : { 
-    active : ["East Top", "East Bottom"]
+IR : {
+        "North Left": 2, "North Right": 3, "East Top": 4, "East Bottom": 5, "South Right": 6, "South Left": 7, "West Bottom": 8, "West Top": 9
+
 }
 
 logging: {log_file: bot/logs/bot.log, file_handler_level: DEBUG, stream_handler_level: INFO}  # Logging options

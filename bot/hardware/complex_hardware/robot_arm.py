@@ -59,7 +59,6 @@ class RobotArm(object):
         self.joints = self.HOME
 
         self.hopper = [None, None, None, None]
-
     @lib.api_call
     def draw_qr_on_frame(self, zbar_dat, draw_frame):
 
@@ -77,7 +76,6 @@ class RobotArm(object):
             cv2.line(draw_frame, tr, tl, (100,0,255), 8, 8)
 
         return draw_frame
-
     @lib.api_call
     def grab(self):
  
@@ -95,8 +93,6 @@ class RobotArm(object):
         joint 3 corrects Y
         joint 5 corrects rotation
         """
-
-
     @lib.api_call
     def set_angles(self):
         while(1):
@@ -197,7 +193,7 @@ class RobotArm(object):
         
         while True:
             #time.sleep(2)
-            ret = self.cam.readQR()
+            ret = self.cam.QRSweep()
             if ret != None:
                 x_disp = ret.tvec[0]
                 print "Checking Alignment with x_disp = ", x_disp

@@ -198,7 +198,7 @@ class RobotArm(object):
                 x_disp = ret.tvec[0]
                 print "Checking Alignment with x_disp = ", x_disp
                 if abs(x_disp) > .2:
-                    self.rail.DisplacementConverter(x_disp)
+                    self.rail.DisplacementConverter(-1 * x_disp)
             
             ret = None
                 

@@ -6,6 +6,7 @@ import zbar
 import cv2
 from PIL import Image
 import cv2
+import math
 
 
 import bot.lib.lib as lib
@@ -180,27 +181,31 @@ class Camera(object):
 
             tvec = self.solveQR(tl, tr, bl, br)
 
-            #cv2.line(frame, tl, bl, (100,0,255), 8, 8)
-            #cv2.line(frame, bl, br, (100,0,255), 8, 8)
-            #cv2.line(frame, br, tr, (100,0,255), 8, 8)
-            #cv2.line(frame, tr, tl, (100,0,255), 8, 8)
+            print symbol.data
+            print "X_Displacement = ", tvec[0]
+            print "Y_Displacement = ", tvec[1]
+            print "Z_Displacement = ", tvec[2]
+            print "========================================="
 
-            QRList.append(QRCode(tvec, symbol.data, tr)) 
+            QRList.append(QRCode2(tvec, symbol.data, tr)) 
             count += 1
 
         if count == 0:
+            print "No QRCode Found"
             return None
         
         targetQR = self.selectQR(QRList)
-        
-        print "value: ", targetQR.value
-        print "X:     ", targetQR.tvec[0]
-        print "Y:     ", targetQR.tvec[1]
-        print "X:     ", targetQR.tvec[2]
-        self.cam.release()
+        if targetQR == None:
+            print "No QRCode Found"
+        else: 
+            print "value: ", targetQR.value
+            print "X:     ", targetQR.tvec[0]
+            print "Y:     ", targetQR.tvec[1]
+            print "X:     ", targetQR.tvec[2]
+        #self.cam.release()
         return targetQR
     
-    def selectQR(QRList[]):
+    def selectQR(self, QRList):
         # find the best QRCode to grab (closest x then highest y)
         QRList.sort(key=lambda qr: qr.tvec[0], reverse=False)       # sort the list of qr codes by x, smallest to largest
         x_min = 100
@@ -228,6 +233,8 @@ class Camera(object):
                     targetQR = QRList[min_qr]
         if targetQR == None:
             targetQR = QRList[min_qr]
+            
+        return targetQR
     
     
     #new solvepnp
@@ -245,10 +252,10 @@ class Camera(object):
         pixel_displacement = [(QRCenter[0] - center[0]),(QRCenter[1] - center[1])]
 
         #find Z distance to QRCode
-        north = int(sqrt(pow(abs(tl[0] - tr[0]), 2) + pow(abs(tl[1] - tr[1]), 2)))
-        south = int(sqrt(pow(abs(bl[0] - br[0]), 2) + pow(abs(bl[1] - br[1]), 2)))
-        east = int(sqrt(pow(abs(tr[0] - br[0]), 2) + pow(abs(tr[1] - br[1]), 2)))
-        west = int(sqrt(pow(abs(tl[0] - bl[0]), 2) + pow(abs(tl[1] - bl[1]), 2)))
+        north = int(math.sqrt(pow(abs(tl[0] - tr[0]), 2) + pow(abs(tl[1] - tr[1]), 2)))
+        south = int(math.sqrt(pow(abs(bl[0] - br[0]), 2) + pow(abs(bl[1] - br[1]), 2)))
+        east = int(math.sqrt(pow(abs(tr[0] - br[0]), 2) + pow(abs(tr[1] - br[1]), 2)))
+        west = int(math.sqrt(pow(abs(tl[0] - bl[0]), 2) + pow(abs(tl[1] - bl[1]), 2)))
 
         if (north >= south and north >= east and north >= west):
             largest_edge = north

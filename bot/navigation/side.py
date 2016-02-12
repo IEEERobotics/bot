@@ -1,4 +1,5 @@
 from pid import PID
+import bot.lib.lib as lib
 
 
 class Side(object):
@@ -20,6 +21,7 @@ class Side(object):
         sens2 = vals[self.sensor2]
         return sens1 - sens2
 
+    @lib.api_call
     def get_correction(self, target, direction):
         """
         ::TODO:: Finish the actual processing

@@ -18,6 +18,7 @@ import bot.lib.messages as msgs
 from bot.hardware.switch import Switch
 from bot.driver.omni_driver import OmniDriver
 from bot.hardware.IR import IR
+from bot.navigation.side import Side
 
 from bot.navigation.nav import Navigation
 
@@ -134,14 +135,16 @@ class CtrlServer(object):
         self.switch = Switch()
         self.driver = OmniDriver()
         self.IR = IR()
-        self.nav = Navigation()
+        #self.nav = Navigation()
+        self.side = Side("East Top", "East Bottom", self.IR.read_values)
         
         systems = {}
         systems["ctrl"] = self
         systems["driver"] = self.driver
         systems["switch"] = self.switch
-        #systems["IR"] = self.IR
-        systems["nav"] = self.nav
+        systems["IR"] = self.IR
+        systems["side"] = self.side
+        #systems["nav"] = self.nav
 
         self.logger.debug("Systems: {}".format(systems))
         return systems

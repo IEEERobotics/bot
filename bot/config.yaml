@@ -4,7 +4,7 @@ testing : false
 test_mode: {
     slider_switch: true,
     ADC: true,
-    DMCC: true,
+    DMCC: false,
     stepper: true,
     motor: false,
     servo: true,

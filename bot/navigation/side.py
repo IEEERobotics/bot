@@ -11,6 +11,7 @@ class Side(object):
         self.sensor2 = sensor2
         self.get_values = ir_device_func
         self.pid = PID()
+        self.pid.set_k_values(0.3, 0, 0)
 
     def get_diff(self):
         """
@@ -28,7 +29,7 @@ class Side(object):
         get the motor correction values
         """
         diff = self.get_diff()
-        timestep = 10
+        timestep = 1
         error = self.pid.pid(target, diff + target, timestep)
 
         return error

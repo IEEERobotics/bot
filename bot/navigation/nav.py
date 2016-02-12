@@ -3,10 +3,11 @@ from side import Side
 from bot.driver.omni_driver import OmniDriver
 import bot.lib.lib as lib
 from time import sleep
+from time import time
 
 class Navigation(object):
     def __init__(self):
-        self.device = IR() # INSTANCIATE ONLY ONCE
+        self.device = IR() # INSTANTIATE ONLY ONCE
         self.north = Side("North Left", "North Right", self.device.read_values)
         self.south = Side("South Left", "South Right", self.device.read_values)
         self.east = Side("East Top", "East Bottom", self.device.read_values)
@@ -17,12 +18,16 @@ class Navigation(object):
                       "west": self.west,
                       "east": self.east}
         self.moving = False
+        self.logger = lib.get_logger()
 
     @lib.api_call
     def move_correct(self, direction, side, target, speed):
         # speed >= 0
         side = side.lower()
         err = self.sides[side].get_correction(target, direction)
+        
+        self.logger.info(
+            "Error from PID : %d", err)
 
         if side == "north":
             pass
@@ -65,6 +70,17 @@ class Navigation(object):
         self.stop()
 
     @lib.api_call
+    def drive_along_wall(self, direction, side, duration):
+        time_elapsed = time()
+        final_time = time_elapsed + duration
+        while time_elapsed < final_time:
+            self.move_correct(direction, side, 60, 60)
+            time_elapsed = time()
+            sleep(0.01)
+        self.stop()
+
+    #TODO(Vijay): This function is buggy. Needs to be fixed.
+    @lib.api_call
     def move_until_wall(self, direction, side, target):
         direction = direction.lower()
         mov_side = self.sides[direction]
@@ -85,3 +101,7 @@ class Navigation(object):
     def stop(self):
         self.driver.move(0)
         self.moving = False
+    
+    @lib.api_call
+    def read_IR_values(self):
+        return self.device.read_values       

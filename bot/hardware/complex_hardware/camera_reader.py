@@ -27,8 +27,11 @@ class Camera(object):
         self.logger = lib.get_logger()
         
         self.cam = cv2.VideoCapture(-1)
-        self.cam.set(3, 1280)
-        self.cam.set(4,720)
+        self.cam.set(3, 632)
+        self.cam.set(4, 474)
+        
+        self.resX = self.cam.get(3)
+        self.resY = self.cam.get(4)
 
         # QR scanning tools
         self.scanner = zbar.ImageScanner()
@@ -154,15 +157,18 @@ class Camera(object):
         self.cam.grab()
         self.cam.grab()
         self.cam.grab()
+        #cv2.waitKey(50)
         ret, frame = self.cam.read()   
+        
         # Direct conversion cv -> zbar images did not work.
         # Buffer file used to have native data structures.
 
         # PIL -> zbar
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        ret, frame = cv2.threshold(gray,95,255,cv2.THRESH_BINARY)
-        cv2.imwrite('buffer.png', frame)
+        #thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
+        ret, thresh = cv2.threshold(gray,85,255,cv2.THRESH_BINARY)
+        cv2.imwrite('buffer.png', thresh)
         pil_im = Image.open('buffer.png').convert('L')
 
         width, height = pil_im.size
@@ -240,10 +246,7 @@ class Camera(object):
     #new solvepnp
     def solveQR(self, tl, tr, bl, br):
         QRSize = 1.5                # units = inches
-
-        resX = 1280
-        resY = 720
-        center = [resX/2, resY/2]
+        center = [self.resX/2, self.resY/2]
 
         #find the center of the QRCode
         QRCenter = [int((tl[0] + tr[0] + bl[0] + br[0])/4), int((tl[1] + tr[1] + bl[1] + br[1])/4)]

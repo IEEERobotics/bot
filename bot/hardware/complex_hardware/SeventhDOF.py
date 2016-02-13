@@ -49,6 +49,7 @@ class Rail_Mover:
 
             while self.DMCC[1].motors[2].position > (StartPOS + Displacement):
                 print self.DMCC[1].motors[2].position
+                print "velocity: ", self.DMCC[1].motors[2].velocity
             
             self.DMCC[1].motors[2].power = 0
 
@@ -58,6 +59,7 @@ class Rail_Mover:
 
             while self.DMCC[1].motors[2].position < (StartPOS + Displacement):
                 print self.DMCC[1].motors[2].position
+                print "velocity: ", self.DMCC[1].motors[2].velocity
 
             self.DMCC[1].motors[2].power = 0
 
@@ -81,8 +83,26 @@ class Rail_Mover:
         self.DMCC[1].motors[2].power = power
         while self.DMCC[1].motors[2].position > 20:
             print self.DMCC[1].motors[2].position
+            print "velocity: ", self.DMCC[1].motors[2].velocity
         
         self.DMCC[1].motors[2].power = 0
         self.DMCC[1].motors[2].reset()
         return 1
+    
+    
+    def RunIntoWall(self):
+        print "I am trying to run into the wall."
+        power = 40
+        self.DMCC[1].motors[2].power = power
+        print "velocity: ", self.DMCC[1].motors[2].velocity
+        sleep(.5)
+        print "velocity: ", self.DMCC[1].motors[2].velocity
+        while self.DMCC[1].motors[2].velocity < 0:
+            print self.DMCC[1].motors[2].position
+            print "velocity: ", self.DMCC[1].motors[2].velocity
+    
+        self.DMCC[1].motors[2].power = 0
+        self.DMCC[1].motors[2].reset()
+        return 1
+    
 

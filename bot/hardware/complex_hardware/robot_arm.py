@@ -33,7 +33,9 @@ class RobotArm(object):
         self.bot_config = lib.get_config()
         
         self.servo_cape \
-            = ServoCape(self.bot_config["dagu_arm"]["servo_cape"])     
+            = ServoCape(self.bot_config["dagu_arm"]["servo_cape_arm"])     
+        self.servo_cape_grabber \
+            = ServoCape(self.bot_config["dagu_arm"]["servo_cape_grabber"])     
         # Empty list of zeros representing each joint   
         self.joints = [0]*5
         
@@ -79,11 +81,11 @@ class RobotArm(object):
     @lib.api_call
     def grab(self):
  
-        self.servo_cape.transmit_block([5] + self.JUNK_BUFFER)
+        self.servo_cape_grabber.transmit_block([5] + self.JUNK_BUFFER)
         
     @lib.api_call   
     def release(self):
-        self.servo_cape.transmit_block([6] + self.JUNK_BUFFER)
+        self.servo_cape_grabber.transmit_block([6] + self.JUNK_BUFFER)
         
     @lib.api_call
     def simple_center_on_qr(self, target_qr):

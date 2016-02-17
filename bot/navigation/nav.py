@@ -21,30 +21,37 @@ class Navigation(object):
         self.logger = lib.get_logger()
 
     @lib.api_call
-    def move_correct(self, direction, side, target, speed):
+    def move_correct(self, direction, side, target, speed, timestep):
         # speed >= 0
         side = side.lower()
-        err = self.sides[side].get_correction(target, direction)
-        
-        self.logger.info(
-            "Error from PID : %d", err)
-
         if side == "north":
             pass
         elif side == "south":
             pass
         elif side == "east":
-            err = self.east.get_correction(target, direction)
+            err = self.east.get_correction(target, direction, timestep)
+            #err = err*-1
+            sne = speed-err
+            spe = speed+err
+            # setting speed bounds
+            sne = -100 if sne < -100 else sne
+            sne = 100 if sne > 100 else sne
+            spe = -100 if spe < -100 else spe
+            spe = 100 if spe > 100 else spe
+            self.logger.info(
+                "Error from PID : %d", err)
             self.driver.set_motor("north", 0)
             self.driver.set_motor("south", 0)
             if direction == "north":
-                self.driver.set_motor("west", speed - err)
-                self.driver.set_motor("east", speed + err)
+                self.driver.set_motor("west", sne)
+                self.logger.info("west motor val: %d", sne)
+                self.logger.info("east motor val: %d", spe)
+                self.driver.set_motor("east", spe)
             elif direction == "south":
                 self.driver.set_motor("west", -speed + err)
                 self.driver.set_motor("east", -speed - err)
         elif side == "west":
-            err = self.west.get_correction(target, direction)
+            err = self.west.get_correction(target, direction, timestep)
             self.driver.set_motor("north", 0)
             self.driver.set_motor("south", 0)
             if direction == "north":
@@ -74,10 +81,15 @@ class Navigation(object):
         time_elapsed = time()
         final_time = time_elapsed + duration
         while time_elapsed < final_time:
-            self.move_correct(direction, side, 60, 60)
+            timestep = time()-time_elapsed
             time_elapsed = time()
+            self.move_correct(direction, side, 60, 60, timestep)
             sleep(0.01)
         self.stop()
+
+    @lib.api_call
+    def test(self):
+        self.drive_along_wall("north", "east", 5)
 
     #TODO(Vijay): This function is buggy. Needs to be fixed.
     @lib.api_call
@@ -104,4 +116,4 @@ class Navigation(object):
     
     @lib.api_call
     def read_IR_values(self):
-        return self.device.read_values       
+        return self.device.read_values()

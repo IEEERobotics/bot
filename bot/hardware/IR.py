@@ -29,6 +29,7 @@ class IR(object):
         for i in range(20):
             ms[i] = self.bus.read_byte(8)
         data = self.parse_packets(ms)
+        data[3] = data[3] - 40
         data = [((i ** -1.55) * 2000000 if i != 0 else 0) for i in data]
         return_dict = {}
         for j in self.hash_values:

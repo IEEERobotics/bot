@@ -10,6 +10,7 @@ class IR(object):
         self.config = lib.get_config()
         self.bus = smbus.SMBus(1)
         self.hash_values = self.config["IR"]
+        self.irDistancesFilt = [0] *10
 
     def parse_packets(self, msg):
         """ Return the 20 bytes of data from the IR Rangefinders.
@@ -35,3 +36,19 @@ class IR(object):
         for j in self.hash_values:
             return_dict[j] = int(data[self.hash_values[j] - 1])
         return return_dict
+        
+     
+    def moving_average_filter(self, ):
+        movingAVG_N = 4
+        irDistances = self.read_values()
+        i = 0
+        for side in irDistances:
+            self.irDistancesFilt[i] = self.irDistancesFilt[i] << movingAVG_N - self.irDistancesFilt[i]
+            self.irDistancesFilt[i] += irDistances[side]
+            self.irDistancesFilt[i] >>= movingAVG_N
+            irDistances[side] = self.irDistancesFilt[i]
+            i += 1
+            
+            
+            
+            

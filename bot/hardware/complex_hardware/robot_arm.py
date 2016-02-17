@@ -61,6 +61,21 @@ class RobotArm(object):
         self.joints = self.HOME
 
         self.hopper = [None, None, None, None]
+
+    @property
+    def joints(self):
+        return self.__joints
+
+    @joints.setter
+    def joints(self, vals):
+        # validate values
+        if len(vals) == 5:
+            self.__joints = vals
+        else:
+            self.__joints[:len(vals)] = vals
+        self.servo_cape_grabber.transmit_block([0] + self.joints)
+
+
     @lib.api_call
     def draw_qr_on_frame(self, zbar_dat, draw_frame):
 
@@ -95,8 +110,10 @@ class RobotArm(object):
         joint 3 corrects Y
         joint 5 corrects rotation
         """
+        return 0
+
     @lib.api_call
-    def set_angles(self):
+    def demo_set_angles(self):
         while(1):
             A1 = (input("What is Servo 1's angle?: "))
             if (A1 < 0 or A1> 180):

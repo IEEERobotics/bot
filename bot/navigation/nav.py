@@ -113,6 +113,11 @@ class Navigation(object):
     def stop(self):
         self.driver.move(0)
         self.moving = False
+        
+    @lib.api_call
+    def set_PID_values(self, side_to_set,kp, kd, ki):
+        set_side = self.sides[side_to_set]
+        set_side.pid.set_k_values(kp, kd, ki)
     
     @lib.api_call
     def read_IR_values(self):

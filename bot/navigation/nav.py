@@ -115,7 +115,7 @@ class Navigation(object):
         self.moving = False
         
     @lib.api_call
-    def set_PID_values(self, side_to_set,kp, kd, ki):
+    def set_PID_values(self, side_to_set="north",kp, kd, ki):
         set_side = self.sides[side_to_set]
         set_side.pid.set_k_values(kp, kd, ki)
     

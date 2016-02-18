@@ -64,7 +64,7 @@ class Rail_Mover:
             self.DMCC[1].motors[2].power = 0
 
 
-        return 0 
+        return 1 
 
 
     def DisplacementConverter(self,RawDisplacement):  

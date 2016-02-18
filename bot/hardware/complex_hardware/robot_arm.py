@@ -220,8 +220,57 @@ class RobotArm(object):
                     self.rail.DisplacementConverter(-1 * x_disp)
             
             ret = None
+            
+    def rail_feedback(self):
+        """
+        align the arm on the rail to a qrcode and return the code
+        """
+        
+        while(True):
+            ret = None
+            ret = self.cam.QRSweep()
+                if ret != None:
+                    x_disp = ret.tvec[0]
+                    if abs(x_disp) < .1:
+                        return ret
+                    else:
+                        print "Checking Alignment with x_disp = ", x_disp
+                        if abs(x_disp) > .1:
+                            rail_ret = self.rail.DisplacementConverter(-1 * x_disp)
+                            if rail_ret == 0:
+                                #out of range, reset to middle and try again
+                                disp = rail.DMCC[1].motors[2].position
+                                ticks = 3000 - disp
+                                self.rail.DisplacementMover(ticks)
                 
-    
+
+    def control_test(self):
+        qr = self.rail_feedback()
+        #assuming rail height of 5 inches for test
+        BLOCK_GRAB_5 = [90,90,90,90,90]
+        DEFAULT_HOLD = [90,90,90,90,90]
+        HOPPER_DEPOSIT = [90,90,90,90,90]
+        LOOK_5 = [90,90,90,90,90]
+        
+        
+        self.servo_cape.transmit_block([0] + LOOK_5)
+        self.rail.RunIntoWall()
+        self.rail.DisplacementConverter(3)  #get the rail to the middle
+        time.sleep(2)
+        self.servo_cape.transmit_block([0] + BLOCK_GRAB_5)
+        time.sleep(7)               #wait for arm to move to location
+        self.grab()
+        time.sleep(2)               #wait for arm to grab
+        self.servo_cape.transmit_block([0] + DEFAULT_HOLD)
+        time.sleep(7)               #wait for arm to move to location
+        self.rail.Orientor(1)
+        time.sleep(.5)              #wait for rail to move to bin location
+        self.servo_cape.transmit_block([0] + HOPPER_DEPOSIT)
+        time.sleep(4)
+        self.release()
+        time.sleep(2)
+        
+        
     
     def basic_control(self, signal):
         #Start signal recieved

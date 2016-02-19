@@ -13,8 +13,10 @@ class IR(object):
         self.hash_values = self.config["IR"]
         self.irDistancesFilt = [0] *10
         self.Last4IrDistances = {}
+        self.biases = {}
         for j in self.hash_values:
             self.Last4IrDistances[j] = [0] * 4 # each side ar
+            self.biases[j] = 0
 
     def parse_packets(self, msg):
         """ Return the 20 bytes of data from the IR Rangefinders.
@@ -34,7 +36,11 @@ class IR(object):
         for i in range(20):
             ms[i] = self.bus.read_byte(8)
         data = self.parse_packets(ms)
-        data[3] = data[3] - 40
+        #data[3] = data[3] - 40
+        for side in self.biases:
+            data_index = self.hash_values[side]
+            data[data_index] += self.biases
+        
         data = [((i ** -1.55) * 2000000 if i != 0 else 0) for i in data]
         return_dict = {}
         for j in self.hash_values:
@@ -45,7 +51,6 @@ class IR(object):
     def moving_average_filter(self):
         movingAVG_N = 4.0
         irDistances = self.read_values()
-    
         for side in irDistances:
             self.Last4IrDistances[side].popleft()
             self.Last4IrDistances[side].append(irDistances)
@@ -54,7 +59,8 @@ class IR(object):
             averages[side] = sum(self.Last4IrDistances[side])/movingAVG_N
         return averages
 
-            
+    def set_bias(self, side, bias):
+        self.biases[side] = bias
  
 #http://stackoverflow.com/questions/14313510/does-numpy-have-a-function-for-calculating-moving-average 
     def moving_average(a, n=4) :

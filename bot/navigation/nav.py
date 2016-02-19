@@ -130,3 +130,7 @@ class Navigation(object):
     
     #TODO: Make a getIrSensorValue function
     # find a value of a specific sensor
+        
+    @lib.api_call
+    def set_bias(self, side, bias):
+        self.device.set_bias(side,bias)

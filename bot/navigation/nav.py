@@ -20,46 +20,48 @@ class Navigation(object):
         self.moving = False
         self.logger = lib.get_logger()
 
+
+    def stop_unused_motors(self, direction):
+    	direction = direction.lower()
+    	if direction == "north" or direction == "south":
+    		self.set_motor("north", 0)
+    		self.set_motor("south", 0)
+    	elif direction == "east" or direction == "west":
+    		self.set_motor("east", 0)
+    		self.set_motor("west", 0)
+
     @lib.api_call
     def move_correct(self, direction, side, target, speed, timestep):
         # speed >= 0
         side = side.lower()
+        err = self.sides[side].get_correction()
+
+        # setting speed bounds
+        sne = speed-err
+        sne = -100 if sne < -100 else 100 if sne > 100 else sne
+        spe = speed+err
+        spe = -100 if spe < -100 else 100 if spe > 100 else spe
+        self.logger.info("Error from PID : %d", err)
+
+        self.stop_unused_motors(direction)
         if side == "north":
             pass
         elif side == "south":
             pass
         elif side == "east":
-            err = self.east.get_correction(target, direction, timestep)
-            #err = err*-1
-            sne = speed-err
-            spe = speed+err
-            # setting speed bounds
-            sne = -100 if sne < -100 else sne
-            sne = 100 if sne > 100 else sne
-            spe = -100 if spe < -100 else spe
-            spe = 100 if spe > 100 else spe
-            self.logger.info(
-                "Error from PID : %d", err)
-            self.driver.set_motor("north", 0)
-            self.driver.set_motor("south", 0)
             if direction == "north":
                 self.driver.set_motor("west", sne)
-                self.logger.info("west motor val: %d", sne)
-                self.logger.info("east motor val: %d", spe)
                 self.driver.set_motor("east", spe)
             elif direction == "south":
-                self.driver.set_motor("west", -speed + err)
-                self.driver.set_motor("east", -speed - err)
+                self.driver.set_motor("west", -sne)
+                self.driver.set_motor("east", -spe)
         elif side == "west":
-            err = self.west.get_correction(target, direction, timestep)
-            self.driver.set_motor("north", 0)
-            self.driver.set_motor("south", 0)
             if direction == "north":
-                self.driver.set_motor("west", speed + err)
-                self.driver.set_motor("east", speed - err)
+                self.driver.set_motor("west", spe)
+                self.driver.set_motor("east", sne)
             elif direction == "south":
-                self.driver.set_motor("west", -speed - err)
-                self.driver.set_motor("east", -speed + err)
+                self.driver.set_motor("west", -spe)
+                self.driver.set_motor("east", -sne)
         else:
             raise Exception()
 

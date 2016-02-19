@@ -24,17 +24,17 @@ class Navigation(object):
     def stop_unused_motors(self, direction):
     	direction = direction.lower()
     	if direction == "north" or direction == "south":
-    		self.set_motor("north", 0)
-    		self.set_motor("south", 0)
+    		self.driver.set_motor("north", 0)
+    		self.driver.set_motor("south", 0)
     	elif direction == "east" or direction == "west":
-    		self.set_motor("east", 0)
-    		self.set_motor("west", 0)
+    		self.driver.set_motor("east", 0)
+    		self.driver.set_motor("west", 0)
 
     @lib.api_call
     def move_correct(self, direction, side, target, speed, timestep):
         # speed >= 0
         side = side.lower()
-        err = self.sides[side].get_correction()
+        err = self.sides[side].get_correction(target, direction, timestep)
 
         # setting speed bounds
         sne = speed-err
@@ -117,10 +117,16 @@ class Navigation(object):
         self.moving = False
         
     @lib.api_call
-    def set_PID_values(self, side_to_set="north",kp, kd, ki):
+    def set_PID_values(self, side_to_set, kp, kd, ki):
         set_side = self.sides[side_to_set]
         set_side.pid.set_k_values(kp, kd, ki)
     
     @lib.api_call
     def read_IR_values(self):
         return self.device.read_values()
+
+    #TODO: Make a gotoBoat function
+    # go north towards block, then towards rail cars and straight down
+    
+    #TODO: Make a getIrSensorValue function
+    # find a value of a specific sensor

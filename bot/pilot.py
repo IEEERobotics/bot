@@ -86,6 +86,10 @@ class Pilot:
         time.sleep(10)
         self.wait_for_ready()
         self.drive(40, 0, 0.7)  # Leave starting block
+        # Move towards the blocks; stop when north sensors detect wall.
+        # Move towards the rail cars
+
+
 
 if __name__ == "__main__":
     Pilot().run()

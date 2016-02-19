@@ -133,4 +133,5 @@ class Navigation(object):
         
     @lib.api_call
     def set_bias(self, side, bias):
+        side = side.replace("_", " ")
         self.device.set_bias(side,bias)

@@ -38,8 +38,8 @@ class IR(object):
         data = self.parse_packets(ms)
         #data[3] = data[3] - 40
         for side in self.biases:
-            data_index = self.hash_values[side]
-            data[data_index] += self.biases
+            data_index = self.hash_values[side] - 1
+            data[data_index] += self.biases[side]
         
         data = [((i ** -1.55) * 2000000 if i != 0 else 0) for i in data]
         return_dict = {}

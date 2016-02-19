@@ -1,6 +1,7 @@
 import smbus
 from time import sleep
 import bot.lib.lib as lib
+import numpy as np
 
 
 class IR(object):
@@ -11,6 +12,9 @@ class IR(object):
         self.bus = smbus.SMBus(1)
         self.hash_values = self.config["IR"]
         self.irDistancesFilt = [0] *10
+        self.Last4IrDistances = {}
+        for j in self.hash_values:
+            self.Last4IrDistances[j] = [0] * 4 # each side ar
 
     def parse_packets(self, msg):
         """ Return the 20 bytes of data from the IR Rangefinders.
@@ -38,17 +42,24 @@ class IR(object):
         return return_dict
         
      
-    def moving_average_filter(self, ):
-        movingAVG_N = 4
+    def moving_average_filter(self):
+        movingAVG_N = 4.0
         irDistances = self.read_values()
-        i = 0
+    
         for side in irDistances:
-            self.irDistancesFilt[i] = self.irDistancesFilt[i] << movingAVG_N - self.irDistancesFilt[i]
-            self.irDistancesFilt[i] += irDistances[side]
-            self.irDistancesFilt[i] >>= movingAVG_N
-            irDistances[side] = self.irDistancesFilt[i]
-            i += 1
+            self.Last4IrDistances[side].popleft()
+            self.Last4IrDistances[side].append(irDistances)
+        averages = {}
+        for side in irDistances:
+            averages[side] = sum(self.Last4IrDistances[side])/movingAVG_N
+        return averages
+
             
-            
+ 
+#http://stackoverflow.com/questions/14313510/does-numpy-have-a-function-for-calculating-moving-average 
+    def moving_average(a, n=4) :
+        ret = np.cumsum(a, dtype=float)
+        ret[n:] = ret[n:] - ret[:-n]
+        return ret[n - 1:] / n
             
             

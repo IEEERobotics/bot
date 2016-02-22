@@ -229,19 +229,19 @@ class RobotArm(object):
         while(True):
             ret = None
             ret = self.cam.QRSweep()
-                if ret != None:
-                    x_disp = ret.tvec[0]
-                    if abs(x_disp) < .1:
-                        return ret
-                    else:
-                        print "Checking Alignment with x_disp = ", x_disp
-                        if abs(x_disp) > .1:
-                            rail_ret = self.rail.DisplacementConverter(-1 * x_disp)
-                            if rail_ret == 0:
-                                #out of range, reset to middle and try again
-                                disp = rail.DMCC[1].motors[2].position
-                                ticks = 3000 - disp
-                                self.rail.DisplacementMover(ticks)
+            if ret != None:
+                x_disp = ret.tvec[0]
+                if abs(x_disp) < .1:
+                    return ret
+                else:
+                    print "Checking Alignment with x_disp = ", x_disp
+                    if abs(x_disp) > .1:
+                        rail_ret = self.rail.DisplacementConverter(-1 * x_disp)
+                        if rail_ret == 0:
+                            #out of range, reset to middle and try again
+                            disp = rail.DMCC[1].motors[2].position
+                            ticks = 3000 - disp
+                            self.rail.DisplacementMover(ticks)
                 
 
     def control_test(self):

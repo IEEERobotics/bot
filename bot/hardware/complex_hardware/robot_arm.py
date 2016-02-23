@@ -261,7 +261,7 @@ class RobotArm(object):
                         rail_ret = self.rail.DisplacementConverter(-1 * x_disp)
                         if rail_ret == 0:
                             #out of range, reset to middle and try again
-                            disp = rail.DMCC[1].motors[2].position
+                            disp = self.rail.DMCC[1].motors[2].position
                             ticks = 3000 - disp
                             self.rail.DisplacementMover(ticks)
                 
@@ -269,8 +269,8 @@ class RobotArm(object):
     def control_test(self):
         
         #assuming rail height of 5 inches for test
-        BLOCK_MOVE_5 = [0, 145, 0, 160, 0]
-        BLOCK_GRAB_5 = [0, 145, 0, 160, 0]
+        BLOCK_MOVE_5 = [0, 60, 20, 40, 0]
+        BLOCK_GRAB_5 = [0, 0, 10, 40, 0]
         HOPPER1 = [0, 0, 10, 0, 0]
         HOPPER2 = [0, 0, 180, 0, 0]
         HOPPER3 = [0, 40, 180, 0, 0]
@@ -290,12 +290,15 @@ class RobotArm(object):
         hopper3: 0, 40, 180, 0, 0
         
         """
-        
+        time.sleep(3)
         self.servo_cape.transmit_block([0] + LOOK_5)
+        time.sleep(3)
         self.rail.DisplacementConverter(3)  #get the rail to the middle
         
         qr = self.rail_feedback()           #position infront of QRCode
-        time.sleep(2)
+        print "waiting after rail feedback"
+        time.sleep(3.5)
+        print "trying to move the arm"
         self.servo_cape.transmit_block([0] + BLOCK_MOVE_5)
         time.sleep(3.5)                     #wait for arm to move to location
         self.servo_cape.transmit_block([0] + BLOCK_GRAB_5)

@@ -276,7 +276,7 @@ class Camera(object):
         x_units = (QRSize)*(pixel_displacement[0]/float(largest_edge))
         y_units = -1 * (QRSize)*(pixel_displacement[1]/float(largest_edge))
         
-        z_units = sqrt(displacement**2 - x_units**2 - y_units**2)
+        z_units = math.sqrt(displacement**2 - x_units**2 - y_units**2)
 
         return [x_units, y_units, z_units, displacement]
 

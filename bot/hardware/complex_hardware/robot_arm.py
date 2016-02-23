@@ -103,7 +103,7 @@ class RobotArm(object):
         self.servo_cape_grabber.transmit_block([6] + self.JUNK_BUFFER)
         
     @lib.api_call
-    def joint_center_on_qr(self, target_qr):
+    def joint_center_on_qr(self):
         """Attempts to center arm on qr code using only arm itself.
         Only the rotational joints, 
         joint 0 corrects X 
@@ -130,8 +130,9 @@ class RobotArm(object):
                 if abs(dy) > 0.2:
                     self.joints[3] += p_y * dy
                 #TODO Find method for calculating rotational oreientation
+                break
 
-        return 0
+        return True
 
     @lib.api_call
     def demo_set_angles(self):

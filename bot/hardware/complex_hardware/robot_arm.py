@@ -103,13 +103,34 @@ class RobotArm(object):
         self.servo_cape_grabber.transmit_block([6] + self.JUNK_BUFFER)
         
     @lib.api_call
-    def simple_center_on_qr(self, target_qr):
+    def joint_center_on_qr(self, target_qr):
         """Attempts to center arm on qr code using only arm itself.
         Only the rotational joints, 
         joint 0 corrects X 
         joint 3 corrects Y
         joint 5 corrects rotation
         """
+        
+        # Correction constants for P(ID) controller.
+        # unlikely that we'll bother using I or D
+        p_x = 0.1
+        p_y = 0.1
+
+        while True:
+            ret = self.cam.QRSWEEP()
+            
+            # Calculate new vector for change
+            if ret != None:
+                
+                dx = ret.tvec[0]
+                dy = ret.tvec[1]
+                
+                if abs(dx) > 0.2:
+                    self.joints[0] += p_x * dx
+                if abs(dy) > 0.2:
+                    self.joints[3] += p_y * dy
+                #TODO Find method for calculating rotational oreientation
+
         return 0
 
     @lib.api_call

@@ -22,7 +22,7 @@ from bot.hardware.complex_hardware.camera_reader import Camera
 class RobotArm(object):
 
     JUNK_BUFFER = [0]*5
-    HOME = [90]*5
+    HOME = [0, 145, 0, 160, 0]
     GRAB = 5
 
 
@@ -68,12 +68,14 @@ class RobotArm(object):
 
     @joints.setter
     def joints(self, vals):
+        vals =  [int(x) for x in vals]
         # validate values
         if len(vals) == 5:
             self.__joints = vals
         else:
             self.__joints[:len(vals)] = vals
-        self.servo_cape_grabber.transmit_block([0] + self.joints)
+        print "Joints to be sent: ", vals
+        self.servo_cape.transmit_block([0] + self.__joints)
 
 
     @lib.api_call
@@ -113,11 +115,11 @@ class RobotArm(object):
         
         # Correction constants for P(ID) controller.
         # unlikely that we'll bother using I or D
-        p_x = 0.1
-        p_y = 0.1
+        p_x = 1
+        p_y = 1
 
         while True:
-            ret = self.cam.QRSWEEP()
+            ret = self.cam.QRSweep()
             
             # Calculate new vector for change
             if ret != None:
@@ -129,8 +131,9 @@ class RobotArm(object):
                     self.joints[0] += p_x * dx
                 if abs(dy) > 0.2:
                     self.joints[3] += p_y * dy
+                #print "Joints = ", self.joints
+                self.joints = self.joints
                 #TODO Find method for calculating rotational oreientation
-                break
 
         return True
 

@@ -166,8 +166,8 @@ class Camera(object):
         # PIL -> zbar
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        #thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
-        ret, thresh = cv2.threshold(gray,85,255,cv2.THRESH_BINARY)
+        thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
+        #ret, thresh = cv2.threshold(gray,85,255,cv2.THRESH_BINARY)
         cv2.imwrite('buffer.png', thresh)
         pil_im = Image.open('buffer.png').convert('L')
 

@@ -255,11 +255,12 @@ class Camera(object):
         pixel_displacement = [(QRCenter[0] - center[0]),(QRCenter[1] - center[1])]
 
         #find Z distance to QRCode
+
+        # Find longest edge
         north = int(math.sqrt(pow(abs(tl[0] - tr[0]), 2) + pow(abs(tl[1] - tr[1]), 2)))
         south = int(math.sqrt(pow(abs(bl[0] - br[0]), 2) + pow(abs(bl[1] - br[1]), 2)))
         east = int(math.sqrt(pow(abs(tr[0] - br[0]), 2) + pow(abs(tr[1] - br[1]), 2)))
         west = int(math.sqrt(pow(abs(tl[0] - bl[0]), 2) + pow(abs(tl[1] - bl[1]), 2)))
-
         if (north >= south and north >= east and north >= west):
             largest_edge = north
         elif (south >= east and south >= west):
@@ -269,13 +270,15 @@ class Camera(object):
         else:
             largest_edge = west
 
-        z_units = self.getDistance(largest_edge)
+        displacement = self.getDistance(largest_edge)
         
         #find x and y based on distance
         x_units = (QRSize)*(pixel_displacement[0]/float(largest_edge))
         y_units = -1 * (QRSize)*(pixel_displacement[1]/float(largest_edge))
         
-        return [x_units, y_units, z_units]
+        z_units = sqrt(displacement**2 - x_units**2 - y_units**2)
+
+        return [x_units, y_units, z_units, displacement]
 
 
     def getDistance(self, length):

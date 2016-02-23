@@ -274,6 +274,21 @@ class RobotArm(object):
         HOPPER_DEPOSIT = [90,90,90,90,90]
         LOOK_5 = [90,90,90,90,90]
         
+         """
+        initial: 0, 145, 0, 160, 0
+        4
+        move1: 0, 60, 20, 40, 0
+        3
+        low_grab: 0, 0, 10, 40, 0
+        3
+        hopper1: 0, 0, 10, 0, 0
+        2
+        hopper2: 0, 0, 180, 0, 0
+        3
+        hopper3: 0, 40, 180, 0, 0
+        
+        """
+        
         
         self.servo_cape.transmit_block([0] + LOOK_5)
         self.rail.RunIntoWall()

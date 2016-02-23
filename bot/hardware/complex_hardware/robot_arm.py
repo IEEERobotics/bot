@@ -267,14 +267,16 @@ class RobotArm(object):
                 
 
     def control_test(self):
-        qr = self.rail_feedback()
-        #assuming rail height of 5 inches for test
-        BLOCK_GRAB_5 = [90,90,90,90,90]
-        DEFAULT_HOLD = [90,90,90,90,90]
-        HOPPER_DEPOSIT = [90,90,90,90,90]
-        LOOK_5 = [90,90,90,90,90]
         
-         """
+        #assuming rail height of 5 inches for test
+        BLOCK_MOVE_5 = [0, 145, 0, 160, 0]
+        BLOCK_GRAB_5 = [0, 145, 0, 160, 0]
+        HOPPER1 = [0, 0, 10, 0, 0]
+        HOPPER2 = [0, 0, 180, 0, 0]
+        HOPPER3 = [0, 40, 180, 0, 0]
+        LOOK_5 = [0, 145, 0, 160, 0]
+        
+        """
         initial: 0, 145, 0, 160, 0
         4
         move1: 0, 60, 20, 40, 0
@@ -289,21 +291,25 @@ class RobotArm(object):
         
         """
         
-        
         self.servo_cape.transmit_block([0] + LOOK_5)
-        self.rail.RunIntoWall()
         self.rail.DisplacementConverter(3)  #get the rail to the middle
+        
+        qr = self.rail_feedback()           #position infront of QRCode
         time.sleep(2)
+        self.servo_cape.transmit_block([0] + BLOCK_MOVE_5)
+        time.sleep(3.5)                     #wait for arm to move to location
         self.servo_cape.transmit_block([0] + BLOCK_GRAB_5)
-        time.sleep(7)               #wait for arm to move to location
+        time.sleep(3.5)                     #wait for arm to move to location
         self.grab()
-        time.sleep(2)               #wait for arm to grab
-        self.servo_cape.transmit_block([0] + DEFAULT_HOLD)
-        time.sleep(7)               #wait for arm to move to location
+        time.sleep(2)                       #wait for arm to grab
+        self.servo_cape.transmit_block([0] + HOPPER1)
+        time.sleep(2)                       #wait for arm to move to location
+        self.servo_cape.transmit_block([0] + HOPPER2)
+        time.sleep(3.5)                     #wait for arm to move to location
+        self.servo_cape.transmit_block([0] + HOPPER3)
+        time.sleep(1.5)                     #wait for arm to move to location
         self.rail.Orientor(1)
-        time.sleep(.5)              #wait for rail to move to bin location
-        self.servo_cape.transmit_block([0] + HOPPER_DEPOSIT)
-        time.sleep(4)
+        time.sleep(.25)                     #wait for rail to move to bin location
         self.release()
         time.sleep(2)
         

@@ -98,7 +98,7 @@ class Navigation(object):
     def move_until_wall(self, direction, side, target):
         direction = direction.lower()
         mov_side = self.sides[direction]
-        mov_target = mov_side.get_distance()
+        mov_target = self.sides[side].get_distance()
         self.moving = True
         time_elapsed = time()
         while self.moving:

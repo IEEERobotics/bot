@@ -37,7 +37,7 @@ class RobotArm(object):
         self.servo_cape_grabber \
             = ServoCape(self.bot_config["dagu_arm"]["servo_cape_grabber"])     
         # Empty list of zeros representing each joint   
-        self.joints = [0]*5
+        #self.joints = [0]*5
         
         
         # QR scanning tools.
@@ -268,16 +268,19 @@ class RobotArm(object):
                             ticks = 3000 - disp
                             self.rail.DisplacementMover(ticks)
                 
-
+    
+    def test_look(self):
+        self.servo_cape.transmit_block([0] + [0, 125, 0, 170, 0])
+        
     def control_test(self):
         
         #assuming rail height of 5 inches for test
         BLOCK_MOVE_5 = [0, 60, 20, 40, 0]
-        BLOCK_GRAB_5 = [0, 0, 10, 40, 0]
-        HOPPER1 = [0, 0, 10, 0, 0]
-        HOPPER2 = [0, 0, 180, 0, 0]
-        HOPPER3 = [0, 40, 180, 0, 0]
-        LOOK_5 = [0, 145, 0, 160, 0]
+        BLOCK_GRAB_5 = [0, 0, 10, 50, 0]
+        HOPPER1 = [0, 0, 10, 0, 180]
+        HOPPER2 = [0, 0, 180, 0, 180]
+        HOPPER3 = [0, 40, 180, 0, 180]
+        LOOK_5 = [0, 115, 0, 160, 0]
         
         """
         initial: 0, 145, 0, 160, 0
@@ -296,7 +299,7 @@ class RobotArm(object):
         time.sleep(3)
         self.servo_cape.transmit_block([0] + LOOK_5)
         time.sleep(3)
-        self.rail.DisplacementConverter(3)  #get the rail to the middle
+        self.rail.DisplacementConverter(4.5)  #get the rail to the middle
         
         qr = self.rail_feedback()           #position infront of QRCode
         print "waiting after rail feedback"
@@ -312,10 +315,11 @@ class RobotArm(object):
         time.sleep(2)                       #wait for arm to move to location
         self.servo_cape.transmit_block([0] + HOPPER2)
         time.sleep(3.5)                     #wait for arm to move to location
-        self.servo_cape.transmit_block([0] + HOPPER3)
-        time.sleep(1.5)                     #wait for arm to move to location
         self.rail.Orientor(1)
         time.sleep(.25)                     #wait for rail to move to bin location
+        self.servo_cape.transmit_block([0] + HOPPER3)
+        time.sleep(1.5)                     #wait for arm to move to location
+        
         self.release()
         time.sleep(2)
         

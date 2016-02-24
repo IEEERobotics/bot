@@ -36,9 +36,6 @@ class RobotArm(object):
             = ServoCape(self.bot_config["dagu_arm"]["servo_cape_arm"])     
         self.servo_cape_grabber \
             = ServoCape(self.bot_config["dagu_arm"]["servo_cape_grabber"])     
-        # Empty list of zeros representing each joint   
-        self.joints = [0]*5
-        
         
         # QR scanning tools.
         self.scanner = zbar.ImageScanner()

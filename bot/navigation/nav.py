@@ -6,7 +6,7 @@ from time import sleep
 from time import time
 
 class Navigation(object):
-    def __init__(self):
+    def __init__(self, rail_cars="west"):
         self.device = IR() # INSTANTIATE ONLY ONCE
         self.north = Side("North Left", "North Right", self.device.read_values)
         self.south = Side("South Left", "South Right", self.device.read_values)
@@ -19,7 +19,7 @@ class Navigation(object):
                       "east": self.east}
         self.moving = False
         self.logger = lib.get_logger()
-
+        self.rail_cars_side = rail_cars
 
     def stop_unused_motors(self, direction):
     	direction = direction.lower()
@@ -100,8 +100,11 @@ class Navigation(object):
         mov_side = self.sides[direction]
         mov_target = mov_side.get_distance()
         self.moving = True
+        time_elapsed = time()
         while self.moving:
-            self.move_correct(direction, side, mov_target, 50)
+        	timestep = time() - time_elapsed
+        	time_elapsed = time()
+            self.move_correct(direction, side, mov_target, 60, timestep)
             if mov_side.get_distance() <= target:
                 self.stop()
 
@@ -125,8 +128,61 @@ class Navigation(object):
     def read_IR_values(self):
         return self.device.read_values()
 
+
+    def goto_top(self):
+    	if self.east.get_distance() < MAX_VALUE:
+    		self.move_until_wall("north", "east", 100)
+    	elif self.west.get_distance() < MAX_VALUE:
+    		self.move_until_wall("north", "west", 100)
+
+    @lib.api_call
+    def goto_railcar(self):
+    	self.goto_top()
+
+    	if self.rail_cars_side == "west":
+    		self.move_until_wall("west", "north", 100)
+    	elif self.rail_cars_side == "east":
+    		self.move_until_wall("east", "north", 100)
+
     #TODO: Make a gotoBoat function
     # go north towards block, then towards rail cars and straight down
+    @lib.api_call
+    def goto_boat(self):
+    	self.goto_railcar()
+
+    	if self.rail_cars_side == "west":
+    		self.move_until_wall("south", "west", 200)
+    	elif self.rail_cars_side == "east":
+    		self.move_until_wall("south", "east", 200)
+
+    @lib.api_call
+    def goto_truck(self):
+    	self.goto_top()
+
+    	if self.rail_cars_side == "west":
+    		self.move_until_wall("east", "north", 150)
+    	if self.rail_cars_side == "east":
+    		self.move_until_wall("west", "north", 150)
+
+    	self.move_until_side("south", "south", 150)
+
+
+    @lib.api_call
+    def goto_block_zone_A(self):
+    	self.goto_railcar()
+
+    def goto_block_zone_B(self):
+    	pass
+
+    @lib.api_call
+    def goto_block_zone_C(self):
+    	self.goto_top()
+
+		if self.rail_cars_side == "west":
+    		self.move_until_wall("east", "north", 100)
+    	if self.rail_cars_side == "east":
+    		self.move_until_wall("west", "north", 100)
+
     
     #TODO: Make a getIrSensorValue function
     # find a value of a specific sensor

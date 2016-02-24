@@ -22,13 +22,13 @@ class Navigation(object):
         self.rail_cars_side = rail_cars
 
     def stop_unused_motors(self, direction):
-    	direction = direction.lower()
-    	if direction == "north" or direction == "south":
-    		self.driver.set_motor("north", 0)
-    		self.driver.set_motor("south", 0)
-    	elif direction == "east" or direction == "west":
-    		self.driver.set_motor("east", 0)
-    		self.driver.set_motor("west", 0)
+        direction = direction.lower()
+        if direction == "north" or direction == "south":
+            self.driver.set_motor("north", 0)
+            self.driver.set_motor("south", 0)
+        elif direction == "east" or direction == "west":
+            self.driver.set_motor("east", 0)
+            self.driver.set_motor("west", 0)
 
     @lib.api_call
     def move_correct(self, direction, side, target, speed, timestep):
@@ -102,8 +102,8 @@ class Navigation(object):
         self.moving = True
         time_elapsed = time()
         while self.moving:
-        	timestep = time() - time_elapsed
-        	time_elapsed = time()
+            timestep = time() - time_elapsed
+            time_elapsed = time()
             self.move_correct(direction, side, mov_target, 60, timestep)
             if mov_side.get_distance() <= target:
                 self.stop()
@@ -130,58 +130,58 @@ class Navigation(object):
 
 
     def goto_top(self):
-    	if self.east.get_distance() < MAX_VALUE:
-    		self.move_until_wall("north", "east", 100)
-    	elif self.west.get_distance() < MAX_VALUE:
-    		self.move_until_wall("north", "west", 100)
+        if self.east.get_distance() < MAX_VALUE:
+            self.move_until_wall("north", "east", 100)
+        elif self.west.get_distance() < MAX_VALUE:
+            self.move_until_wall("north", "west", 100)
 
     @lib.api_call
     def goto_railcar(self):
-    	self.goto_top()
+        self.goto_top()
 
-    	if self.rail_cars_side == "west":
-    		self.move_until_wall("west", "north", 100)
-    	elif self.rail_cars_side == "east":
-    		self.move_until_wall("east", "north", 100)
+        if self.rail_cars_side == "west":
+            self.move_until_wall("west", "north", 100)
+        elif self.rail_cars_side == "east":
+            self.move_until_wall("east", "north", 100)
 
     #TODO: Make a gotoBoat function
     # go north towards block, then towards rail cars and straight down
     @lib.api_call
     def goto_boat(self):
-    	self.goto_railcar()
+        self.goto_railcar()
 
-    	if self.rail_cars_side == "west":
-    		self.move_until_wall("south", "west", 200)
-    	elif self.rail_cars_side == "east":
-    		self.move_until_wall("south", "east", 200)
+        if self.rail_cars_side == "west":
+            self.move_until_wall("south", "west", 200)
+        elif self.rail_cars_side == "east":
+            self.move_until_wall("south", "east", 200)
 
     @lib.api_call
     def goto_truck(self):
-    	self.goto_top()
+        self.goto_top()
 
-    	if self.rail_cars_side == "west":
-    		self.move_until_wall("east", "north", 150)
-    	if self.rail_cars_side == "east":
-    		self.move_until_wall("west", "north", 150)
+        if self.rail_cars_side == "west":
+            self.move_until_wall("east", "north", 150)
+        if self.rail_cars_side == "east":
+            self.move_until_wall("west", "north", 150)
 
-    	self.move_until_side("south", "south", 150)
+        self.move_until_side("south", "south", 150)
 
 
     @lib.api_call
     def goto_block_zone_A(self):
-    	self.goto_railcar()
+        self.goto_railcar()
 
     def goto_block_zone_B(self):
-    	pass
+        pass
 
     @lib.api_call
     def goto_block_zone_C(self):
-    	self.goto_top()
+        self.goto_top()
 
-		if self.rail_cars_side == "west":
-    		self.move_until_wall("east", "north", 100)
-    	if self.rail_cars_side == "east":
-    		self.move_until_wall("west", "north", 100)
+        if self.rail_cars_side == "west":
+            self.move_until_wall("east", "north", 100)
+        if self.rail_cars_side == "east":
+            self.move_until_wall("west", "north", 100)
 
     
     #TODO: Make a getIrSensorValue function

@@ -45,9 +45,19 @@ class Navigation(object):
 
         self.stop_unused_motors(direction)
         if side == "north":
-            pass
+            if direction == "west":
+                self.driver.set_motor("north", sne)
+                self.driver.set_motor("south", spe)
+            if direction == "east":
+                self.driver.set_motor("north", -sne)
+                self.driver.set_motor("south", -spe)
         elif side == "south":
-            pass
+            if direction == "west":
+                self.driver.set_motor("north", sne)
+                self.driver.set_motor("south", spe)
+            if direction == "east":
+                self.driver.set_motor("north", -sne)
+                self.driver.set_motor("south", -spe)
         elif side == "east":
             if direction == "north":
                 self.driver.set_motor("west", sne)
@@ -164,7 +174,7 @@ class Navigation(object):
         if self.rail_cars_side == "east":
             self.move_until_wall("west", "north", 150)
 
-        self.move_until_side("south", "south", 150)
+        self.move_until_wall("south", "south", 150)
 
 
     @lib.api_call

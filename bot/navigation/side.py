@@ -12,11 +12,11 @@ class Side(object):
         self.sensor2 = sensor2
         self.get_values = ir_device_func
         self.diff_pid = PID()
-        p1,i1,d1 = diff_k_values
+        p1,d1,i1 = diff_k_values
         # self.diff_pid.set_k_values(1.1, 0.04, 0.0)
         self.diff_pid.set_k_values(p1, d1, i1)
         self.dist_pid = PID()
-        p2,i2,d2 = dist_k_values
+        p2,d2,i2 = dist_k_values
         self.dist_pid.set_k_values(p2, d2, i2)
 
     def get_diff(self):

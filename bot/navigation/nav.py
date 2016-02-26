@@ -10,6 +10,9 @@ bound = lambda x, l, u: l if x < l else u if x > u else x
 
 class Navigation(object):
     def __init__(self, rail_cars="west"):
+        #TODO: Read the PID values from the config and pass in to side 
+        # Change parameters for Side()
+        # Change the read_values to average filter values
         self.device = IR() # INSTANTIATE ONLY ONCE
         self.north = Side("North Left", "North Right", self.device.read_values)
         self.south = Side("South Left", "South Right", self.device.read_values)

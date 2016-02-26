@@ -169,6 +169,8 @@ class Navigation(object):
     @lib.api_call
     def read_IR_values(self):
         return self.device.read_values()
+        
+
 
 
     def goto_top(self):

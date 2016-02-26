@@ -51,7 +51,8 @@ class IR(object):
         movingAVG_N = 4.0
         irDistances = self.read_values()
         for side in irDistances:
-            self.Last4IrDistances[side].popleft()
+            #pop left for the queue
+            self.Last4IrDistances[side] = self.Last4IrDistances[side][1:]
             self.Last4IrDistances[side].append(irDistances)
         averages = {}
         for side in irDistances:

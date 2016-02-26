@@ -13,11 +13,17 @@ class Navigation(object):
         #TODO: Read the PID values from the config and pass in to side 
         # Change parameters for Side()
         # Change the read_values to average filter values
+        
+        self.config = lib.get_config()
+        self.PID_values = self.config["IR_PID"]
+
+
         self.device = IR() # INSTANTIATE ONLY ONCE
-        self.north = Side("North Left", "North Right", self.device.read_values)
-        self.south = Side("South Left", "South Right", self.device.read_values)
-        self.east = Side("East Top", "East Bottom", self.device.read_values)
-        self.west = Side("West Top", "West Bottom", self.device.read_values)
+        self.north = Side("North Left", "North Right",  self.device.moving_average_filter(), self.PID_values["North"]["diff"], self.PID_values["North"]["dist"])
+        self.south = Side("South Left", "South Right",  self.device.moving_average_filter(), self.PID_values["South"]["diff"], self.PID_values["South"]["dist"])
+        self.east = Side("East Top", "East Bottom",  self.device.moving_average_filter(), self.PID_values["East"]["diff"], self.PID_values["East"]["dist"])
+        self.west = Side("West Top", "West Bottom",  self.device.moving_average_filter(), self.PID_values["West"]["diff"], self.PID_values["West"]["dist"])
+
         self.driver = OmniDriver()
         self.sides = {"north": self.north,
                       "south": self.south,
@@ -145,9 +151,13 @@ class Navigation(object):
         self.moving = False
         
     @lib.api_call
-    def set_PID_values(self, side_to_set, kp, kd, ki):
+    def set_PID_values(self, side_to_set, pid, kp, kd, ki):
         set_side = self.sides[side_to_set]
-        set_side.pid.set_k_values(kp, kd, ki)
+        if (pid == "diff"):
+            set_side.diff_pid_pid.set_k_values(kp, kd, ki)
+        elif(pid =="distd"):
+            set_side.dist_pid.set_k_values(kp, kd, ki)
+
     
     @lib.api_call
     def read_IR_values(self):

@@ -21,10 +21,10 @@ class Navigation(object):
 
 
         self.device = IR() # INSTANTIATE ONLY ONCE
-        self.north = Side("North Left", "North Right",  self.device.moving_average_filter(), self.PID_values["North"]["diff"], self.PID_values["North"]["dist"])
-        self.south = Side("South Left", "South Right",  self.device.moving_average_filter(), self.PID_values["South"]["diff"], self.PID_values["South"]["dist"])
-        self.east = Side("East Top", "East Bottom",  self.device.moving_average_filter(), self.PID_values["East"]["diff"], self.PID_values["East"]["dist"])
-        self.west = Side("West Top", "West Bottom",  self.device.moving_average_filter(), self.PID_values["West"]["diff"], self.PID_values["West"]["dist"])
+        self.north = Side("North Left", "North Right",  self.device.moving_average_filter, self.PID_values["North"]["diff"], self.PID_values["North"]["dist"])
+        self.south = Side("South Left", "South Right",  self.device.moving_average_filter, self.PID_values["South"]["diff"], self.PID_values["South"]["dist"])
+        self.east = Side("East Top", "East Bottom",  self.device.moving_average_filter, self.PID_values["East"]["diff"], self.PID_values["East"]["dist"])
+        self.west = Side("West Top", "West Bottom",  self.device.moving_average_filter, self.PID_values["West"]["diff"], self.PID_values["West"]["dist"])
 
         self.driver = OmniDriver()
         self.sides = {"north": self.north,
@@ -48,7 +48,7 @@ class Navigation(object):
     def move_correct(self, direction, side, target, speed, timestep):
         # speed >= 0
         side = side.lower()
-        diff_err = self.sides[side].get_diff_correction(target, direction, timestep)
+        diff_err = self.sides[side].get_diff_correction( timestep)
 
         # setting speed bounds
         sne = bound(speed-diff_err, -100, 100)
@@ -63,11 +63,11 @@ class Navigation(object):
             self.driver.set_motor("east", dist_err)
             self.driver.set_motor("west", dist_err)
             if direction == "west":
+                self.driver.set_motor("north", -spe)
+                self.driver.set_motor("south", -sne)
+            if direction == "east":
                 self.driver.set_motor("north", sne)
                 self.driver.set_motor("south", spe)
-            if direction == "east":
-                self.driver.set_motor("north", -sne)
-                self.driver.set_motor("south", -spe)
         elif side == "south":
             self.driver.set_motor("east", dist_err)
             self.driver.set_motor("west", dist_err)
@@ -78,14 +78,14 @@ class Navigation(object):
                 self.driver.set_motor("north", -sne)
                 self.driver.set_motor("south", -spe)
         elif side == "east":
-            self.driver.set_motor("north", dist_err)
-            self.driver.set_motor("south", dist_err)
+            self.driver.set_motor("north", -dist_err)
+            self.driver.set_motor("south", -dist_err)
             if direction == "north":
                 self.driver.set_motor("west", sne)
                 self.driver.set_motor("east", spe)
             elif direction == "south":
-                self.driver.set_motor("west", -sne)
-                self.driver.set_motor("east", -spe)
+                self.driver.set_motor("west", -spe)
+                self.driver.set_motor("east", -sne)
         elif side == "west":
             self.driver.set_motor("north", dist_err)
             self.driver.set_motor("south", dist_err)
@@ -93,8 +93,8 @@ class Navigation(object):
                 self.driver.set_motor("west", spe)
                 self.driver.set_motor("east", sne)
             elif direction == "south":
-                self.driver.set_motor("west", -spe)
-                self.driver.set_motor("east", -sne)
+                self.driver.set_motor("west", -sne)
+                self.driver.set_motor("east", -spe)
         else:
             raise Exception()
 
@@ -118,7 +118,7 @@ class Navigation(object):
         while time_elapsed < final_time:
             timestep = time()-time_elapsed
             time_elapsed = time()
-            self.move_correct(direction, side, 60, 60, timestep)
+            self.move_correct(direction, side, 300, 60, timestep)
             sleep(0.01)
         self.stop()
 

@@ -10,6 +10,8 @@ FOV=47
 
 BLOCK=1.5 
 
+
+#Finds the blocks
 def internal_find_blocks(img):
     hsv = cv2.cvtColor(img, cv2.cv.CV_BGR2HSV)
 
@@ -19,15 +21,10 @@ def internal_find_blocks(img):
     
     hsv=cv2.cvtColor(hsv, cv2.cv.CV_HSV2BGR)
     
-    #sat = np.copy(hsv)
-      
-    
 
     for i in range(5):
         hsv = cv2.GaussianBlur(hsv,(3,3),0)
 
-    #cv2.imshow('hsv',hsv)
-    #print 'blah'
     hsv = cv2.inRange(hsv, (220,0,0), (255,255,255))
     
     contours = cv2.findContours(hsv, cv2.cv.CV_RETR_LIST, cv2.cv.CV_CHAIN_APPROX_SIMPLE)
@@ -45,7 +42,7 @@ def internal_find_blocks(img):
             box = cv2.cv.BoxPoints(rect)
             box = np.int0(box)
             ratio=cv2.contourArea(approx)/cv2.contourArea(box)
-            if 1:#ratio>.75:    #THIS IS TO FILTER OUT BAD PARTICLES
+            if 1:#ratio>.75:    #THIS IS TO FILTER OUT BAD PARTICLES Not in use.
                 rect = cv2.minAreaRect(box)
             elif ratio>.25:
                 continue
@@ -55,6 +52,7 @@ def internal_find_blocks(img):
             result.append(rect)
     return result
 
+#Does math on the blocks
 def block_math(rect, img, actual_dist=0, centered=False):
     cx=rect[0][0]
     cy=rect[0][1]
@@ -62,7 +60,6 @@ def block_math(rect, img, actual_dist=0, centered=False):
     theta=thetad/360*2*pi
     w=rect[1][0]/2.0
     h=rect[1][1]/2.0
-##  if(h<w):
     if abs(thetad)>45:
         temp=h
         h=w
@@ -95,6 +92,11 @@ def block_math(rect, img, actual_dist=0, centered=False):
     
     return hoffset,-voffset,dist
 
+
+#Returns a list of the lateral offsets for each block found. (inches)
+#You probably want the one closest to 0.
+#Call this first and then compensate
+#Assume distance should be what is reported by the IR/distance sensors in inches
 def get_lateral_offset(img,assume_dist):
     blocks=internal_find_blocks(img)
     if len(blocks)==0:return -1
@@ -107,7 +109,11 @@ def get_lateral_offset(img,assume_dist):
     #return x offset of blocks
     results=sorted(results)
     return results
-            
+
+#Returns coordinates for each block found.
+#Again, probably want the one closest to 0.
+#Call get_lateral_offset first and center.
+# format (dx,dy,dz) in inches from where the arm is now.
 def get_front_center(img):
     blocks=internal_find_blocks(img)
     if len(blocks)==0:return -1

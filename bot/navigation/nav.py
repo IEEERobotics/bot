@@ -5,6 +5,9 @@ import bot.lib.lib as lib
 from time import sleep
 from time import time
 
+bound = lambda x, l, u: l if x < l else u if x > u else x
+
+
 class Navigation(object):
     def __init__(self, rail_cars="west"):
         self.device = IR() # INSTANTIATE ONLY ONCE
@@ -34,17 +37,20 @@ class Navigation(object):
     def move_correct(self, direction, side, target, speed, timestep):
         # speed >= 0
         side = side.lower()
-        err = self.sides[side].get_correction(target, direction, timestep)
+        diff_err = self.sides[side].get_diff_correction(target, direction, timestep)
 
         # setting speed bounds
-        sne = speed-err
-        sne = -100 if sne < -100 else 100 if sne > 100 else sne
-        spe = speed+err
-        spe = -100 if spe < -100 else 100 if spe > 100 else spe
-        self.logger.info("Error from PID : %d", err)
+        sne = bound(speed-diff_err, -100, 100)
+        # sne = -100 if sne < -100 else 100 if sne > 100 else sne
+        spe = bound(speed+diff_err, -100, 100)
+        #spe = -100 if spe < -100 else 100 if spe > 100 else spe
+        self.logger.info("Error from PID : %d", diff_err)
 
-        self.stop_unused_motors(direction)
+        dist_err = self.sides[side].get_dist_correction(target, timestep)
+        dist_err = bound(dist_err, -100, 100)
         if side == "north":
+            self.driver.set_motor("east", dist_err)
+            self.driver.set_motor("west", dist_err)
             if direction == "west":
                 self.driver.set_motor("north", sne)
                 self.driver.set_motor("south", spe)
@@ -52,6 +58,8 @@ class Navigation(object):
                 self.driver.set_motor("north", -sne)
                 self.driver.set_motor("south", -spe)
         elif side == "south":
+            self.driver.set_motor("east", dist_err)
+            self.driver.set_motor("west", dist_err)
             if direction == "west":
                 self.driver.set_motor("north", sne)
                 self.driver.set_motor("south", spe)
@@ -59,6 +67,8 @@ class Navigation(object):
                 self.driver.set_motor("north", -sne)
                 self.driver.set_motor("south", -spe)
         elif side == "east":
+            self.driver.set_motor("north", dist_err)
+            self.driver.set_motor("south", dist_err)
             if direction == "north":
                 self.driver.set_motor("west", sne)
                 self.driver.set_motor("east", spe)
@@ -66,6 +76,8 @@ class Navigation(object):
                 self.driver.set_motor("west", -sne)
                 self.driver.set_motor("east", -spe)
         elif side == "west":
+            self.driver.set_motor("north", dist_err)
+            self.driver.set_motor("south", dist_err)
             if direction == "north":
                 self.driver.set_motor("west", spe)
                 self.driver.set_motor("east", sne)

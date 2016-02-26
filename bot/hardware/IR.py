@@ -13,10 +13,9 @@ class IR(object):
         self.hash_values = self.config["IR"]
         self.irDistancesFilt = [0] *10
         self.Last4IrDistances = {}
-        self.biases = {}
+        self.biases = self.config["IR_Bias"]
         for j in self.hash_values:
             self.Last4IrDistances[j] = [0] * 4 # each side ar
-            self.biases[j] = 0
 
     def parse_packets(self, msg):
         """ Return the 20 bytes of data from the IR Rangefinders.

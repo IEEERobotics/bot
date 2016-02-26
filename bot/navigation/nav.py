@@ -4,6 +4,8 @@ from bot.driver.omni_driver import OmniDriver
 import bot.lib.lib as lib
 from time import sleep
 from time import time
+import os.path
+import yaml
 
 bound = lambda x, l, u: l if x < l else u if x > u else x
 
@@ -157,7 +159,12 @@ class Navigation(object):
             set_side.diff_pid_pid.set_k_values(kp, kd, ki)
         elif(pid =="distd"):
             set_side.dist_pid.set_k_values(kp, kd, ki)
-
+        # write updated PID values to the IR_config file
+        with open("IR_config.yaml") as f:
+            a = yaml.load(f)
+        a["IR_PID"][side_to_set][pid] = [kp, kd, ki]
+        with open("IR_config.yaml", "w") as f:
+            yaml.dump(a, f)
     
     @lib.api_call
     def read_IR_values(self):
@@ -226,3 +233,9 @@ class Navigation(object):
     def set_bias(self, side, bias):
         side = side.replace("_", " ")
         self.device.set_bias(side,bias)
+        # write updated bias value to IR_config file
+        with open("IR_config.yaml") as f:
+            a = yaml.load(f)
+        a["IR_Bias"][side] = bias
+        with open("IR_config.yaml", "w") as f:
+            yaml.dump(a, f)

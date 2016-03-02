@@ -66,6 +66,12 @@ class Pilot:
                          {'speed': speed, 'angle': angle,
                           'duration': duration})
 
+    def goto_block_zone_B(self):
+        return self.call('nav', 'goto_block_zone_B')
+
+    def goto_railcar(self):
+        return self.call('nav', 'goto_railcar')
+
     def wait_for_start(self):
         """Waits for color sensor to say it sees start signal.
         """
@@ -88,6 +94,13 @@ class Pilot:
         self.drive(40, 0, 0.7)  # Leave starting block
         # Move towards the blocks; stop when north sensors detect wall.
         # Move towards the rail cars
+
+        for i in xrange(3):
+            self.goto_railcar()
+            time.sleep(0.5)
+            self.goto_block_zone_B()
+            time.sleep(0.5)
+
 
 
 

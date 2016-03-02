@@ -39,6 +39,9 @@ class IR(object):
         for side in self.biases:
             data_index = self.hash_values[side] - 1
             data[data_index] += self.biases[side]
+            if data[data_index] < 0:
+                data[data_index] = 1
+
         
         data = [((i ** -1.55) * 2000000 if i != 0 else 0) for i in data]
         return_dict = {}
@@ -51,8 +54,9 @@ class IR(object):
         movingAVG_N = 4.0
         irDistances = self.read_values()
         for side in irDistances:
-            self.Last4IrDistances[side].popleft()
-            self.Last4IrDistances[side].append(irDistances)
+            #pop left for the queue
+            self.Last4IrDistances[side] = self.Last4IrDistances[side][1:]
+            self.Last4IrDistances[side].append(irDistances[side])
         averages = {}
         for side in irDistances:
             averages[side] = sum(self.Last4IrDistances[side])/movingAVG_N

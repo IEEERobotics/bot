@@ -274,7 +274,74 @@ class RobotArm(object):
     
     def test_look(self):
         self.servo_cape.transmit_block([0] + [0, 125, 0, 170, 0])
+     
+	def Tier_Grab(self, Tier):
+		if Tier == 'A':
+			print "Not coded yet" 
+			BLOCK_MOVE_5 = [0, 90, 90, 90, 0]
+			BLOCK_GRAB_5 = [0, 90, 90, 90, 0]
+			
+		elif Tier == 'B':
+			BLOCK_MOVE_5 = [0, 80, 10, 100, 0]
+			BLOCK_GRAB_5 = [0, 74, 10, 100, 0]
+			LOOK_5 = [0, 115, 0, 140, 0]
+			HOPPER1 = [0, 78, 10, 0, 180]
+			HOPPER2 = [0, 80, 180, 0, 180]
+			HOPPER3 = [0, 40, 180, 0, 180]
+			
+		elif Tier == 'C':
+			BLOCK_MOVE_5 = [0, 60, 20, 40, 0]
+			BLOCK_GRAB_5 = [0, 0, 10, 50, 0]
+			LOOK_5 = [0, 115, 0, 150, 0]
+		    HOPPER1 = [0, 0, 10, 0, 180]
+			HOPPER2 = [0, 0, 180, 0, 180]
+			HOPPER3 = [0, 40, 180, 0, 180]
         
+		
+		time.sleep(3)
+        self.servo_cape.transmit_block([0] + LOOK_5)
+        time.sleep(3)
+        self.rail.DisplacementConverter(4.5)  #get the rail to the middle
+		
+		if Tier == 'B' or Tier == 'C':
+			qr = self.rail_feedback()           #position infront of QRCode
+		else:
+			##Todo: Add in generic block code here 
+			print "Line up with generic blocks" 
+			
+		hopper_pos = 5
+		
+		if self.hopper[0] == None:
+            hopper_pos = 1
+        elif self.hopper[1] == None:
+            hopper_pos = 2
+        elif self.hopper[2] == None:
+            hopper_pos = 3
+        elif self.hopper[3] == None:
+            hopper_pos = 4	
+		else:
+			print "error~Hopper Full"
+			return 0 
+		
+		self.servo_cape.transmit_block([0] + BLOCK_MOVE_5)
+        time.sleep(3)                     #wait for arm to move to location
+        self.servo_cape.transmit_block([0] + BLOCK_GRAB_5)
+        time.sleep(3)                     #wait for arm to move to location
+        self.grab()
+        time.sleep(2)                       #wait for arm to grab
+        self.servo_cape.transmit_block([0] + HOPPER1)
+        time.sleep(2)                       #wait for arm to move to location
+        self.servo_cape.transmit_block([0] + HOPPER2)
+        time.sleep(3)                     #wait for arm to move to location
+        self.rail.Orientor(hopper_pos)
+        time.sleep(.25)                     #wait for rail to move to bin location
+        self.servo_cape.transmit_block([0] + HOPPER3)
+        time.sleep(1.5)                     #wait for arm to move to location
+		
+		
+		
+		self.hopper[hopper_pos] = qr
+		
     def control_test(self):
         
         #assuming rail height of 5 inches for test

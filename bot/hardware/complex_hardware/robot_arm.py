@@ -191,8 +191,11 @@ class RobotArm(object):
         
     @lib.api_call
     def reset_home_position(self):
-        """sets angles back to default position."""
+        """
+        sets angles back to default position. Also resets the position of the 7th DOF
+        """
         self.servo_cape.transmit_block([0] + HOME)
+        self.rail.RunIntoWall()
         
     @lib.api_call
     def fancy_demo(self):
@@ -315,9 +318,9 @@ class RobotArm(object):
             HOPPER3 = [0, 40, 180, 0, 180]
 
 
-        time.sleep(3)
+        time.sleep(1)
         self.servo_cape.transmit_block([0] + LOOK_5)
-        time.sleep(3)
+        time.sleep(2)
         self.rail.DisplacementConverter(3.5)  #get the rail to the middle
 
         if Tier == 'B' or Tier == 'C':
@@ -364,150 +367,39 @@ class RobotArm(object):
         print self.hopper
         
 
-    def control_test(self):
-        
-        #assuming rail height of 5 inches for test
-        BLOCK_MOVE_5 = [0, 60, 20, 40, 0]
-        BLOCK_GRAB_5 = [0, 0, 10, 50, 0]
-        HOPPER1 = [0, 0, 10, 0, 180]
-        HOPPER2 = [0, 0, 180, 0, 180]
-        HOPPER3 = [0, 40, 180, 0, 180]
-        LOOK_5 = [0, 115, 0, 160, 0]
-        
+    def FindAndGetBlock(self,color):
+        """ 
+        Function which takes a given color, and gets that block out of the hopper
         """
-        initial: 0, 145, 0, 160, 0
-        4
-        move1: 0, 60, 20, 40, 0
-        3
-        low_grab: 0, 0, 10, 40, 0
-        3
-        hopper1: 0, 0, 10, 0, 0
-        2
-        hopper2: 0, 0, 180, 0, 0
-        3
-        hopper3: 0, 40, 180, 0, 0
-        
-        """
-        time.sleep(3)
-        self.servo_cape.transmit_block([0] + LOOK_5)
-        time.sleep(3)
-        self.rail.DisplacementConverter(4.5)  #get the rail to the middle
-        
-        qr = self.rail_feedback()           #position infront of QRCode
-        print "waiting after rail feedback"
-        time.sleep(3.5)
-        print "trying to move the arm"
-        self.servo_cape.transmit_block([0] + BLOCK_MOVE_5)
-        time.sleep(3.5)                     #wait for arm to move to location
-        self.servo_cape.transmit_block([0] + BLOCK_GRAB_5)
-        time.sleep(3.5)                     #wait for arm to move to location
-        self.grab()
-        time.sleep(2)                       #wait for arm to grab
-        self.servo_cape.transmit_block([0] + HOPPER1)
-        time.sleep(2)                       #wait for arm to move to location
-        self.servo_cape.transmit_block([0] + HOPPER2)
-        time.sleep(3.5)                     #wait for arm to move to location
-        self.rail.Orientor(1)
-        time.sleep(.25)                     #wait for rail to move to bin location
-        self.servo_cape.transmit_block([0] + HOPPER3)
-        time.sleep(1.5)                     #wait for arm to move to location
-        
-        self.release()
-        time.sleep(2)
-        
-        
-    
-    def basic_control(self, signal):
-        #Start signal recieved
-        barge_level = signal
-        grab_pos = 0;
-
-        if barge_height == 1:
-            grab_pos = self.BARGE_GRAB1
-            look_pos = self.BARGE_LOOK1
-        elif barge_height == 2:
-            grab_pos = self.BARGE_GRAB2
-            look_pos = self.BARGE_LOOK2
-        elif barge_height == 3:
-            grab_pos = self.BARGE_GRAB3
-            look_pos = self.BARGE_LOOK3
-            
         if self.hopper[0] != None:
-            hopper_pos = 1
+            if self.hopper[0].value == color
+                self.EmptyHopper(1) 
+                self.reset_home_positon()
+                
         elif self.hopper[1] != None:
-            hopper_pos = 2
+            if self.hopper[1].value == color 
+                self.EmptyHopper(2)
+                self.reset_home_position()
+                
         elif self.hopper[2] != None:
-            hopper_pos = 3
-        elif self.hopper[3] != None:
-            hopper_pos = 4
-        else:
-            print "Error: Hopper is full."
-            return
-
-        #Set the Arm to its default looking position
-        self.demo(self.DEFAULT_LOOK)
-        #Read from webcam
-        time.sleep(2)
-        ret = self.camera.readQR()
-        
-        #No QRs found
-        if ret == None:
-            time.sleep(2)
-            ret = self.readQR()
-            if ret == None:
-                print "No QRCode Found"
-                return
-
-        #Multiple QRs Found
-            # Choose one (closest X  then highest Y) -> 1 QR found
-            # built into readQR()
-
-        #adjust 7DOF to center on QR
-        while(True):
-            disp_x = ret.tvec[0]
-            print "Checking Alignment with x_disp = ", x_disp
-            if abs(x_disp) > .2:
-                self.rail.DisplacementConverter(x_disp)
-            else:
-                break
-        
-        #extend arm towards block for 2nd check
-        self.set_pos(look_pos)
-        time.sleep(2)
-        
-        ret = self.cam.readQR()
-
-        #If not aligned adjust again with 7 DOF
-        while(True):
-            x_disp = ret.tvec[0]
-            print "Checking Alignment with x_disp = ", x_disp
-            if abs(x_disp) > .2:
-                self.rail.DisplacementConverter(x_disp)
-            else:
-                break
+            if self.hopper[2].value == color:
+                self.EmptyHopper(3)
+                self.reset_home_position()
             
-        #Once Aligned: extend arm fully to grab position
-        self.demo(grab_pos)
-        time.sleep(2)
+        elif self.hopper[3] != None:
+            if self.hopper[3].value == color:
+                self.EmptyHopper(4)
+                self.reset_home_position()
+            	
+        else:
+            print "No blocks in the hopper" 
+            return 0 
         
-        #Check for QR again if possible (if even needed) then grab
-        self.grab()
-        time.sleep(1)
-
-        #Pick up and place in empty hopper bin
-        self.demo(self.DEFAULT_GRABBED)
-        time.sleep(2)
-
-        self.rail.Orientor(hopper_pos)
-        time.sleep(1.5)
-        self.release()
-        time.sleep(1)
-        self.hopper[hopper_pos] = ret
-
-        #return to default looking position
-        self.demo(DEFAULT)
-        time.sleep(1)
-        return 1
-
-    
+        return 1 
+        
+    def EmptyHopper(self,Bin)
+        print "not done yet"
+        return 0 
+        
+        
     

@@ -247,7 +247,8 @@ class RobotArm(object):
         """
         align the arm on the rail to a qrcode and return the code
         """
-        
+        count = 0
+        direction = 1
         while(True):
             ret = None
             ret = self.cam.QRSweep()
@@ -264,6 +265,15 @@ class RobotArm(object):
                             disp = self.rail.DMCC[1].motors[2].position
                             ticks = 3000 - disp
                             self.rail.DisplacementMover(ticks)
+            else:                                   # if no qrcodes are found
+                if count >= 10:
+                    count = 0
+                    limit = self.rail.DisplacementConverter(.75*direction)
+                    if limit == 0:                  #out of range
+                        direction = -1*direction    #reverse direction
+                        ret = self.rail.DisplacementConverter(.75*direction)
+                        if ret == 0:
+                            print "Error: out of range on both ends, shouldn't be possible."
                 
     
     def test_look(self):
@@ -305,7 +315,7 @@ class RobotArm(object):
         time.sleep(3)
         self.servo_cape.transmit_block([0] + LOOK_5)
         time.sleep(3)
-        self.rail.DisplacementConverter(4.5)  #get the rail to the middle
+        self.rail.DisplacementConverter(3.5)  #get the rail to the middle
 
         if Tier == 'B' or Tier == 'C':
             qr = self.rail_feedback()           #position infront of QRCode

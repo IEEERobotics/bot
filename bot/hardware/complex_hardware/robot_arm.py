@@ -253,6 +253,7 @@ class RobotArm(object):
             ret = None
             ret = self.cam.QRSweep()
             if ret != None:
+                count = 0                           #reset the count.
                 x_disp = ret.tvec[0]
                 if abs(x_disp) < .1:
                     return ret
@@ -266,7 +267,7 @@ class RobotArm(object):
                             ticks = 3000 - disp
                             self.rail.DisplacementMover(ticks)
             else:                                   # if no qrcodes are found
-                if count >= 10:
+                if count >= 13:
                     count = 0
                     limit = self.rail.DisplacementConverter(.75*direction)
                     if limit == 0:                  #out of range
@@ -274,6 +275,8 @@ class RobotArm(object):
                         ret = self.rail.DisplacementConverter(.75*direction)
                         if ret == 0:
                             print "Error: out of range on both ends, shouldn't be possible."
+                            
+                count += 1
                 
     
     def test_look(self):

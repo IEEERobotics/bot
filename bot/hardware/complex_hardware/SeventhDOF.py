@@ -20,14 +20,14 @@ class Rail_Mover:
             return self.DisplacementMover(Displacement)
             
         elif Position == 2:
-            Displacement = 2200 - self.DMCC[1].motors[2].position
+            Displacement = 2300 - self.DMCC[1].motors[2].position
             return self.DisplacementMover(Displacement)
             
         elif Position == 3:
             Displacement = 4600 - self.DMCC[1].motors[2].position
             return self.DisplacementMover(Displacement)
         elif Position == 4:
-            Displacement = 7200 - self.DMCC[1].motors[2].position
+            Displacement = 7000 - self.DMCC[1].motors[2].position
             return self.DisplacementMover(Displacement)
 
     def DisplacementMover(self,Displacement):

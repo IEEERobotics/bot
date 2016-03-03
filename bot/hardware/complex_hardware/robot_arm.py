@@ -267,9 +267,9 @@ class RobotArm(object):
                             ticks = 3000 - disp
                             self.rail.DisplacementMover(ticks)
             else:                                   # if no qrcodes are found
-                if count >= 13:
+                if count >= 8:
                     count = 0
-                    limit = self.rail.DisplacementConverter(.75*direction)
+                    limit = self.rail.DisplacementConverter(1.5*direction)
                     if limit == 0:                  #out of range
                         direction = -1*direction    #reverse direction
                         ret = self.rail.DisplacementConverter(.75*direction)
@@ -283,7 +283,7 @@ class RobotArm(object):
         self.servo_cape.transmit_block([0] + [0, 125, 0, 170, 0])
     
     def basic_solver(self):
-        i = 2
+        i = 4
         while(i>0):
             self.joints = self.HOME
             self.rail.RunIntoWall()

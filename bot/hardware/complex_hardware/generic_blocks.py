@@ -25,22 +25,26 @@ def internal_find_blocks(img):
     for i in range(5):
         hsv = cv2.GaussianBlur(hsv,(3,3),0)
 
-    hsv = cv2.inRange(hsv, (220,0,0), (255,255,255))
+    valid = hsv[:,:,0] >= 220
+    hsv = np.zeros(np.shape(valid), dtype=np.uint8)
+    hsv[valid] = 255
+
+    #hsv = cv2.inRange(hsv, (220,0,0), (255,255,255))
     
     contours = cv2.findContours(hsv, cv2.cv.CV_RETR_LIST, cv2.cv.CV_CHAIN_APPROX_SIMPLE)
-
+    
     result=[]
 
     
 
     for c in contours[0]:
-
         if cv2.contourArea(c)>AREA_THRESHOLD:
             epsilon = 0.01*cv2.arcLength(c,True)
             approx = cv2.approxPolyDP(c,epsilon,True)
             rect = cv2.minAreaRect(c)
             box = cv2.cv.BoxPoints(rect)
             box = np.int0(box)
+            box = np.reshape(box, (4,1,2))
             ratio=cv2.contourArea(approx)/cv2.contourArea(box)
             if 1:#ratio>.75:    #THIS IS TO FILTER OUT BAD PARTICLES Not in use.
                 rect = cv2.minAreaRect(box)

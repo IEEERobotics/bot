@@ -140,6 +140,26 @@ class Navigation(object):
             self.move_correct(direction, side, mov_target, 60, timestep)
             if mov_side.get_distance() <= target:
                 self.stop()
+                
+    @lib.api_call
+    def move_until_color(self, direction, side, target, color):
+        direction = direction.lower()
+        mov_side = self.sides[direction]
+        mov_target = self.sides[side].get_distance()
+        self.moving = True
+        time_elapsed = time()
+        while self.moving:
+            timestep = time() - time_elapsed
+            time_elapsed = time()
+            self.move_correct(direction, side, mov_target, 60, timestep)
+            ir_values = mov_side.get_values()
+            ir_value = ir_values["South Right"]
+            if color == "white":
+                if ir_value >= 200:
+                    self.stop()
+            else:
+                if ir_value <= 200:
+                    self.stop()
 
     def move_to_position(self, x, y):
         self.move_until_wall(self, "west", "north", x)

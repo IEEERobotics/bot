@@ -6,7 +6,7 @@ from math import sin,cos,pi,copysign,tan,sqrt,hypot
 
 AREA_THRESHOLD=500
 
-FOV=47
+FOV=59
 
 BLOCK=1.5 
 

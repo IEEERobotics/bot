@@ -111,7 +111,7 @@ def get_lateral_offset(img,assume_dist):
         coords=block_math(rect,img,assume_dist)
         if coords is not None:results.append(coords[0])
     #return x offset of blocks
-    results=sorted(results)
+    results=sorted(results, key=lambda x: abs(x))
     return results
 
 #Returns coordinates for each block found.

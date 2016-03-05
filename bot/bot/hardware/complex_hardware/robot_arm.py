@@ -375,28 +375,22 @@ class RobotArm(object):
         if self.hopper[0] != None:
             if self.hopper[0].value == color:
                 self.EmptyHopper(1) 
-                self.reset_home_position()
-                time.sleep(4)
+                self.reset_home_positon()
                 
-                
-        if self.hopper[1] != None:
+        elif self.hopper[1] != None:
             if self.hopper[1].value == color: 
                 self.EmptyHopper(2)
                 self.reset_home_position()
-                time.sleep(4)
                 
-        if self.hopper[2] != None:
+        elif self.hopper[2] != None:
             if self.hopper[2].value == color:
                 self.EmptyHopper(3)
                 self.reset_home_position()
-                time.sleep(4)
-                
             
-        if self.hopper[3] != None:
+        elif self.hopper[3] != None:
             if self.hopper[3].value == color:
                 self.EmptyHopper(4)
                 self.reset_home_position()
-                time.sleep(4)
             	
         else:
             print "No blocks in the hopper" 
@@ -427,10 +421,6 @@ class RobotArm(object):
         self.release()
         time.sleep(2)
         self.reset_home_position() 
-        
-        self.hopper[Bin-1] = None 
-        
-        
         
         return 0 
         

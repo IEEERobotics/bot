@@ -194,7 +194,8 @@ class RobotArm(object):
         """
         sets angles back to default position. Also resets the position of the 7th DOF
         """
-        self.servo_cape.transmit_block([0] + HOME)
+        
+        self.servo_cape.transmit_block([0] + self.HOME)
         self.rail.RunIntoWall()
         
     @lib.api_call
@@ -372,12 +373,12 @@ class RobotArm(object):
         Function which takes a given color, and gets that block out of the hopper
         """
         if self.hopper[0] != None:
-            if self.hopper[0].value == color
+            if self.hopper[0].value == color:
                 self.EmptyHopper(1) 
                 self.reset_home_positon()
                 
         elif self.hopper[1] != None:
-            if self.hopper[1].value == color 
+            if self.hopper[1].value == color: 
                 self.EmptyHopper(2)
                 self.reset_home_position()
                 
@@ -397,8 +398,30 @@ class RobotArm(object):
         
         return 1 
         
-    def EmptyHopper(self,Bin)
-        print "not done yet"
+    def EmptyHopper(self,Bin):
+        
+        Hopper = [0,80,173,28,180]
+        PullBack = [0,30,170,30,180]
+        OffSide = [90,45,60,100,0]
+        
+        
+        self.rail.RunIntoWall()
+        time.sleep(1.5)
+        self.rail.Orientor(Bin)
+        time.sleep(1)
+        self.servo_cape.transmit_block([0] + Hopper)
+        time.sleep(5)
+        self.grab() 
+        time.sleep(3)
+        self.servo_cape.transmit_block([0] + PullBack) 
+        time.sleep(3)
+        self.rail.Orientor(4) 
+        self.servo_cape.transmit_block([0] + OffSide) 
+        time.sleep(6)
+        self.release()
+        time.sleep(2)
+        self.reset_home_position() 
+        
         return 0 
         
         

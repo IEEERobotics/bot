@@ -21,10 +21,10 @@ class Navigation(object):
 
 
         self.device = IR() # INSTANTIATE ONLY ONCE
-        self.north = Side("North Left", "North Right",  self.device.moving_average_filter, self.PID_values["North"]["diff"], self.PID_values["North"]["dist"])
-        self.south = Side("South Left", "South Right",  self.device.moving_average_filter, self.PID_values["South"]["diff"], self.PID_values["South"]["dist"])
-        self.east = Side("East Top", "East Bottom",  self.device.moving_average_filter, self.PID_values["East"]["diff"], self.PID_values["East"]["dist"])
-        self.west = Side("West Top", "West Bottom",  self.device.moving_average_filter, self.PID_values["West"]["diff"], self.PID_values["West"]["dist"])
+        self.north = Side("North Left", "North Right",  self.device.read_values, self.PID_values["North"]["diff"], self.PID_values["North"]["dist"])
+        self.south = Side("South Left", "South Right",  self.device.read_values, self.PID_values["South"]["diff"], self.PID_values["South"]["dist"])
+        self.east = Side("East Top", "East Bottom",  self.device.read_values, self.PID_values["East"]["diff"], self.PID_values["East"]["dist"])
+        self.west = Side("West Top", "West Bottom",  self.device.read_values, self.PID_values["West"]["diff"], self.PID_values["West"]["dist"])
 
         self.driver = OmniDriver()
         self.sides = {"north": self.north,
@@ -55,13 +55,14 @@ class Navigation(object):
         # sne = -100 if sne < -100 else 100 if sne > 100 else sne
         spe = bound(speed+diff_err, -100, 100)
         #spe = -100 if spe < -100 else 100 if spe > 100 else spe
-        self.logger.info("Error from PID : %d", diff_err)
+        #self.logger.info("Error from PID : %d", diff_err)
 
         dist_err = self.sides[side].get_dist_correction(target, timestep)
+        #self.logger.info("dist Error from PID : %d", dist_err)
         dist_err = bound(dist_err, -100, 100)
         if side == "north":
-            self.driver.set_motor("east", dist_err)
-            self.driver.set_motor("west", dist_err)
+            self.driver.set_motor("east", -dist_err)
+            self.driver.set_motor("west", -dist_err)
             if direction == "west":
                 self.driver.set_motor("north", -spe)
                 self.driver.set_motor("south", -sne)
@@ -124,7 +125,8 @@ class Navigation(object):
 
     @lib.api_call
     def test(self):
-        self.drive_along_wall("north", "east", 5)
+        #self.drive_along_wall("west", "north", 5)
+        self.move_until_wall("north","east", 300)
 
     #TODO(Vijay): This function is buggy. Needs to be fixed.
     @lib.api_call
@@ -140,26 +142,6 @@ class Navigation(object):
             self.move_correct(direction, side, mov_target, 60, timestep)
             if mov_side.get_distance() <= target:
                 self.stop()
-                
-    @lib.api_call
-    def move_until_color(self, direction, side, target, color):
-        direction = direction.lower()
-        mov_side = self.sides[direction]
-        mov_target = self.sides[side].get_distance()
-        self.moving = True
-        time_elapsed = time()
-        while self.moving:
-            timestep = time() - time_elapsed
-            time_elapsed = time()
-            self.move_correct(direction, side, mov_target, 60, timestep)
-            ir_values = mov_side.get_values()
-            ir_value = ir_values["South Right"]
-            if color == "white":
-                if ir_value >= 200:
-                    self.stop()
-            else:
-                if ir_value <= 200:
-                    self.stop()
 
     def move_to_position(self, x, y):
         self.move_until_wall(self, "west", "north", x)
@@ -189,9 +171,46 @@ class Navigation(object):
     @lib.api_call
     def read_IR_values(self):
         return self.device.read_values()
+    
+    
+    @lib.api_call
+    def move_until_color(self, direction, side, target, color):
+        direction = direction.lower()
+        mov_side = self.sides[direction]
+        mov_target = self.sides[side].get_distance()
+        self.moving = True
+        time_elapsed = time()
+        while self.moving:
+            timestep = time() - time_elapsed
+            time_elapsed = time()
+            self.move_correct(direction, side, mov_target, 60, timestep)
+            ir_values = mov_side.get_values()
+            ir_value = ir_values["South Right"]
+            if color == "white":
+                if ir_value >= 200:
+                    self.stop()
+            else:
+                if ir_value <= 200:
+                    self.stop()
+
+
+    @lib.api_call
+    def rotate_start(self):
+        ir_values = self.device.read_values()
+        ir_diff = abs(ir_values["East Bottom"] - ir_values["East Top"])
+        while ( ir_diff > 20):
+            if ir_values["East Bottom"] < ir_values["East Top"]:
+                if ir_values["West Bottom"] > ir_values["West Top"]:
+                #clockwise
+                    self.driver.rotate_t(-60,.25)
+            elif ir_values["East Bottom"] > ir_values["East Top"]:
+                if ir_values["West Bottom"] > ir_values["West Top"]:
+                # counter clockwise
+                    self.driver.rotate_t(60,.25)
+            else:
+                break
+            ir_diff = abs(ir_values["East Bottom"] - ir_values["East Top"])
         
-
-
 
     def goto_top(self):
         if self.east.get_distance() < MAX_VALUE:

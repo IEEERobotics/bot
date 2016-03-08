@@ -1,6 +1,6 @@
-
 import numpy as np
 import time
+import subprocess
 
 import zbar
 import cv2
@@ -22,11 +22,25 @@ class Camera(object):
                             [ L/2,  L/2, 0]])
 
     def __init__(self, cam_config):
-        # Recieves 
-
         self.logger = lib.get_logger()
+
+        # extract calib data from cam_config
+        self.a = cam_config["a"]
+        self.n = cam_config["n"]
+
+        udev_name = cam_config["udev_name"]
+
+        # find where symlink is pointing (/dev/vide0, video1, etc)
+        cmd = "readlink -f /dev/" + udev_name
+        process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+        out = process.communicate()[0]
+
+        #extract ints from name video0, etc
+        nums = [int(x) for x in out if x.isdigit()]
+        # There should nto be more than one digit
+        cam_num = nums[0]
         
-        self.cam = cv2.VideoCapture(-1)
+        self.cam = cv2.VideoCapture(cam_num)
         self.cam.set(3, 632)
         self.cam.set(4, 474)
         
@@ -37,16 +51,7 @@ class Camera(object):
         self.scanner = zbar.ImageScanner()
         self.scanner.parse_config('enable')
         
-        # Camera calibrations
-        self.cam_matrix = np.float32(cam_config["camera_matrix"])
-        self.dist_coeffs = np.float32(cam_config["distortion_coefficients"])
         
-        L = 1.5
-        self.qr_verts = np.float32([[-L/2, -L/2, 0],
-                            [-L/2,  L/2, 0],
-                            [ L/2, -L/2, 0],
-                            [ L/2,  L/2, 0]])
-
     def apply_filters(self, frame):
         """Attempts to improve viewing by applying filters """
         # grayscale

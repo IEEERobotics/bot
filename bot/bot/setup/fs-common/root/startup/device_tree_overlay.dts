@@ -1,0 +1,40 @@
+/dts-v1/;
+/plugin/;
+/ { compatible = "ti,beaglebone", "ti,beaglebone-black";
+
+part-number = "pinctrl-test-0";
+version = "00A0";
+fragment@0 {
+    target = <&am33xx_pinmux>;
+    __overlay__ {
+        pinctrl_test: pinctrl_test_0_pins {
+        pinctrl-single,pins= <;
+            0x080 0x07 /*P8_21 */
+            0x010 0x07 /*P8_23 */
+            0x000 0x07 /*P8_25 */
+            0x0E0 0x07 /*P8_27 */
+            0x0E4 0x07 /*P8_29 */
+            0x0D8 0x07 /*P8_31 */
+            0x0D4 0x07 /*P8_33 */
+            0x0D0 0x07 /*P8_35 */
+            0x018 0x07 /*P8_3 */
+            0x008 0x07 /*P8_5 */
+            >;
+        };
+    };
+};
+
+fragment@1 {
+    target = <&ocp>;
+    __overlay__ {
+        test_helper: helper {
+            compatible = "bone-pinmux-helper";
+            pinctrl-names = "default";
+            pinctrl-0 = <&pinctrl_test>;
+            status = "okay";
+        };
+    };
+};
+};
+
+// compile using dtc -O dtb -o pinctrl-test-0-00A0.dtbo -b 0 -@ device_tree_overlay.dts

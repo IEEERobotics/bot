@@ -372,48 +372,41 @@ class RobotArm(object):
         """ 
         Function which takes a given color, and gets that block out of the hopper
         """
-        self.reset_home_position() 
         if self.hopper[0] != None:
             if self.hopper[0].value == color:
                 self.EmptyHopper(1) 
+                self.reset_home_positon()
                 
-                time.sleep(4)
-                
-                
-        if self.hopper[1] != None:
+        elif self.hopper[1] != None:
             if self.hopper[1].value == color: 
                 self.EmptyHopper(2)
+                self.reset_home_position()
                 
-                time.sleep(4)
-                
-        if self.hopper[2] != None:
+        elif self.hopper[2] != None:
             if self.hopper[2].value == color:
                 self.EmptyHopper(3)
-                
-                time.sleep(4)
-                
+                self.reset_home_position()
             
-        if self.hopper[3] != None:
+        elif self.hopper[3] != None:
             if self.hopper[3].value == color:
                 self.EmptyHopper(4)
-                time.sleep(4)
+                self.reset_home_position()
             	
         else:
             print "No blocks in the hopper" 
             return 0 
-        self.reset_home_position()
+        
         return 1 
         
     def EmptyHopper(self,Bin):
         
-        InBetween = [0,20,173,28,180]
         Hopper = [0,80,173,28,180]
         PullBack = [0,30,170,30,180]
         OffSide = [90,45,60,100,0]
         
         
-        
-        self.servo_cape.transmit_block([0] + InBetween)
+        self.rail.RunIntoWall()
+        time.sleep(1.5)
         self.rail.Orientor(Bin)
         time.sleep(1)
         self.servo_cape.transmit_block([0] + Hopper)
@@ -421,20 +414,13 @@ class RobotArm(object):
         self.grab() 
         time.sleep(3)
         self.servo_cape.transmit_block([0] + PullBack) 
-        time.sleep(3) 
-        if Bin != 4:
-            
-            self.rail.Orientor(4) 
-        
+        time.sleep(3)
+        self.rail.Orientor(4) 
         self.servo_cape.transmit_block([0] + OffSide) 
         time.sleep(6)
         self.release()
         time.sleep(2)
-         
-        
-        self.hopper[Bin-1] = None 
-        
-        
+        self.reset_home_position() 
         
         return 0 
         

@@ -126,14 +126,14 @@ class Navigation(object):
     @lib.api_call
     def test(self):
         #self.drive_along_wall("west", "north", 5)
-        self.move_until_wall("north","east", 300)
+        self.move_until_wall("north","east", 400)
 
     #TODO(Vijay): This function is buggy. Needs to be fixed.
     @lib.api_call
     def move_until_wall(self, direction, side, target):
         direction = direction.lower()
         mov_side = self.sides[direction]
-        mov_target = self.sides[side].get_distance()
+        mov_target = 100
         self.moving = True
         time_elapsed = time()
         while self.moving:
@@ -202,13 +202,16 @@ class Navigation(object):
             if ir_values["East Bottom"] < ir_values["East Top"]:
                 if ir_values["West Bottom"] > ir_values["West Top"]:
                 #clockwise
-                    self.driver.rotate_t(-60,.25)
+                    self.driver.rotate_t(-60,.1)
+                    sleep(0.1)
             elif ir_values["East Bottom"] > ir_values["East Top"]:
-                if ir_values["West Bottom"] > ir_values["West Top"]:
+                if ir_values["West Bottom"] < ir_values["West Top"]:
                 # counter clockwise
-                    self.driver.rotate_t(60,.25)
+                    self.driver.rotate_t(60,.1)
+                    sleep(0.1)
             else:
                 break
+            ir_values = self.device.read_values()
             ir_diff = abs(ir_values["East Bottom"] - ir_values["East Top"])
         
 
@@ -280,3 +283,15 @@ class Navigation(object):
         #a["IR_Bias"][side] = bias
         #with open("IR_config.yaml", "w") as f:
         #    yaml.dump(a, f)
+
+    @lib.api_call
+    def test_nav(self):
+        self.driver.drive(70, 45, 0.5)
+        self.logger.info("Climbed the tunnel")
+        sleep(0.1)
+        self.rotate_start()
+        self.logger.info("Auto-corrected inside tunnel")
+        sleep(0.1)
+        self.move_until_wall("north","east", 500)
+        self.logger.info("Reached the barge")
+        sleep(0.1)

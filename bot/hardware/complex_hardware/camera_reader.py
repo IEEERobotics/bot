@@ -284,8 +284,8 @@ class Camera(object):
 
 
     def getDistance(self, length):
-        a = 1128.1
-        n = -1.1397
+        a = 512.05
+        n = -0.93835
         return a*math.pow(length, n)
 
 

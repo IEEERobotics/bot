@@ -3,6 +3,7 @@
 *.swo
 *.swn
 *.swm
+*.save
 *~
 *.png
 .DS_Store

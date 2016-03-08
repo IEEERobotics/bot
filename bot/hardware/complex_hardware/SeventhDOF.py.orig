@@ -1,6 +1,9 @@
 import os, sys
+
 from time import sleep
 import pyDMCC
+
+import bot.lib.lib as lib
 
 
 class Rail_Mover:
@@ -13,6 +16,7 @@ class Rail_Mover:
         board_num = rail_motor_conf["board_num"]
         motor_num = rail_motor_conf["motor_num"]
         
+        self.rail_motor = pyDMCC.DMCCMotor(board_num, motor_num, False)
 
     
     def Orientor(self,Position):
@@ -25,14 +29,14 @@ class Rail_Mover:
             return self.DisplacementMover(Displacement)
             
         elif Position == 2:
-            Displacement = 2200 - self.rail_motor.position
+            Displacement = 2300 - self.rail_motor.position
             return self.DisplacementMover(Displacement)
             
         elif Position == 3:
-            Displacement = 4600 - self.rail_motor.position
+            Displacement = 4500 - self.rail_motor.position
             return self.DisplacementMover(Displacement)
         elif Position == 4:
-            Displacement = 7200 - self.rail_motor.position
+            Displacement = 6800 - self.rail_motor.position
             return self.DisplacementMover(Displacement)
 
     def DisplacementMover(self,Displacement):
@@ -110,4 +114,3 @@ class Rail_Mover:
         self.rail_motor.reset()
         return 1
     
-

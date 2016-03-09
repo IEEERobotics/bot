@@ -296,4 +296,3 @@ class Navigation(object):
         self.move_until_wall("north","east", 500)
         self.logger.info("Reached the barge")
         sleep(0.1)
-        self.move_until_color

@@ -8,15 +8,11 @@ test_mode: {
     stepper: true,
     motor: false,
     servo: true,
-    servo_cape: true
 }
 
-dagu_arm: {
-    pwm_pins: [1, 2, 3, 4, 5, 6],
-    servo_cape: {
-        i2c_bus: 1,
-        i2c_addr: 0x10
-    }
+arm_configurations: {
+    pwm_pins: [1, 2, 3, 4, 5, 6]
+
 }
 
 # TODO: decide on gpio pin numbers
@@ -24,7 +20,6 @@ slider_switch: {
     left_gpio: 30,
     right_gpio: 60
 }
-
 
 dmcc_drive_motors: {
 
@@ -52,7 +47,7 @@ IR : {
 IR_PID : {
         "North": {
             "diff":[1.1, 0.06, 0.0],
-            "dist":[0, 0, 0]
+            "dist":[.5, 0, 0]
             },
         "East":  {
             "diff":[1.1, 0.06, 0.0],
@@ -60,17 +55,17 @@ IR_PID : {
             },
         "South": {
             "diff":[1.1, 0.06, 0.0],
-            "dist":[0, 0, 0]
+            "dist":[.5, 0, 0]
             },
         "West":  {
             "diff":[1.1, 0.06, 0.0],
-            "dist":[0, 0, 0]
+            "dist":[.5, 0, 0]
             }
 
 }
 
 IR_Bias : {
-        "North Left": 0, "North Right": 0, "East Top": -40, "East Bottom": 0, "South Right": 0, "South Left": 0, "West Bottom": 0, "West Top": 0
+        "North Left": -20, "North Right": 0, "East Top": -50, "East Bottom": 0, "South Right": 0, "South Left": 0, "West Bottom": -15, "West Top": 0
 
 }
 

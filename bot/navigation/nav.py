@@ -119,7 +119,7 @@ class Navigation(object):
         while time_elapsed < final_time:
             timestep = time()-time_elapsed
             time_elapsed = time()
-            self.move_correct(direction, side, 300, 60, timestep)
+            self.move_correct(direction, side, 300, 50, timestep)
             sleep(0.01)
         self.stop()
 
@@ -130,16 +130,16 @@ class Navigation(object):
 
     #TODO(Vijay): This function is buggy. Needs to be fixed.
     @lib.api_call
-    def move_until_wall(self, direction, side, target):
+    def move_until_wall(self, direction, side, target, dist=150):
         direction = direction.lower()
         mov_side = self.sides[direction]
-        mov_target = 100
+        mov_target = dist
         self.moving = True
         time_elapsed = time()
         while self.moving:
             timestep = time() - time_elapsed
             time_elapsed = time()
-            self.move_correct(direction, side, mov_target, 60, timestep)
+            self.move_correct(direction, side, mov_target, 70, timestep)
             if mov_side.get_distance() <= target:
                 self.stop()
 
@@ -177,20 +177,21 @@ class Navigation(object):
     def move_until_color(self, direction, side, target, color):
         direction = direction.lower()
         mov_side = self.sides[direction]
-        mov_target = self.sides[side].get_distance()
+        mov_target = 300
         self.moving = True
         time_elapsed = time()
         while self.moving:
             timestep = time() - time_elapsed
             time_elapsed = time()
-            self.move_correct(direction, side, mov_target, 60, timestep)
+            self.move_correct(direction, side, mov_target, 50, timestep)
             ir_values = mov_side.get_values()
-            ir_value = ir_values["South Right"]
+            # IR sensor for line detection is attached to South Left
+            ir_value = ir_values["South Left"]
             if color == "white":
-                if ir_value >= 200:
+                if ir_value >= 1000:
                     self.stop()
             else:
-                if ir_value <= 200:
+                if ir_value <= 1000:
                     self.stop()
 
 
@@ -286,7 +287,7 @@ class Navigation(object):
 
     @lib.api_call
     def test_nav(self):
-        self.driver.drive(70, 45, 0.5)
+        self.driver.drive(80, 45, 0.5)
         self.logger.info("Climbed the tunnel")
         sleep(0.1)
         self.rotate_start()
@@ -295,3 +296,4 @@ class Navigation(object):
         self.move_until_wall("north","east", 500)
         self.logger.info("Reached the barge")
         sleep(0.1)
+        self.move_until_color

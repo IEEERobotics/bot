@@ -10,13 +10,14 @@ import yaml
 
 bound = lambda x, l, u: l if x < l else u if x > u else x
 
+MAX_VALUE = 800
 
 class Navigation(object):
     def __init__(self, rail_cars="west"):
         #TODO: Read the PID values from the config and pass in to side 
         # Change parameters for Side()
         # Change the read_values to average filter values
-        
+
         self.config = lib.get_config()
         self.PID_values = self.config["IR_PID"]
 
@@ -103,7 +104,7 @@ class Navigation(object):
     @lib.api_call
     def move_dead(self, direction, speed):
         direction = direction.lower()
-        dirs = { "north": 0, "west": 90, "south": 180, "east": 270 }
+        dirs = {"north": 0, "west": 90, "south": 180, "east": 270}
         self.driver.move(speed, dirs[direction])
         self.moving = True
 
@@ -127,9 +128,9 @@ class Navigation(object):
     @lib.api_call
     def test(self):
         #self.drive_along_wall("west", "north", 5)
-        self.move_until_wall("north","east", 400)
+        self.move_until_wall("north", "east", 400)
 
-    #TODO(Vijay): This function is buggy. Needs to be fixed.
+    # TODO(Vijay): This function is buggy. Needs to be fixed.
     @lib.api_call
     def move_until_wall(self, direction, side, target, dist=150):
         direction = direction.lower()
@@ -157,7 +158,7 @@ class Navigation(object):
         while self.moving:
             timestep = time() - time_elapsed
             time_elapsed = time()
-            speed = speed_pid.pid(0, mov_side.get_distance() - target, timestep)
+            speed = speed_pid.pid(0, target - mov_side.get_distance(), timestep)
             speed = bound(speed, -100, 100)
             self.move_correct(direction, side, mov_target, speed, timestep)
             if mov_side.get_distance() <= target:
@@ -173,26 +174,25 @@ class Navigation(object):
     def stop(self):
         self.driver.move(0)
         self.moving = False
-        
+
     @lib.api_call
     def set_PID_values(self, side_to_set, pid, kp, kd, ki):
         set_side = self.sides[side_to_set]
         if (pid == "diff"):
             set_side.diff_pid.set_k_values(kp, kd, ki)
-        elif(pid =="dist"):
+        elif(pid == "dist"):
             set_side.dist_pid.set_k_values(kp, kd, ki)
         # write updated PID values to the IR_config file
-        #with open("IR_config.yaml") as f:
+        # with open("IR_config.yaml") as f:
         #    a = yaml.load(f)
-        #a["IR_PID"][side_to_set][pid] = [kp, kd, ki]
-        #with open("IR_config.yaml", "w") as f:
+        # a["IR_PID"][side_to_set][pid] = [kp, kd, ki]
+        # with open("IR_config.yaml", "w") as f:
         #    yaml.dump(a, f)
-    
+
     @lib.api_call
     def read_IR_values(self):
         return self.device.read_values()
-    
-    
+
     @lib.api_call
     def move_until_color(self, direction, side, target, color):
         direction = direction.lower()
@@ -214,44 +214,42 @@ class Navigation(object):
                 if ir_value <= 1000:
                     self.stop()
 
-
     @lib.api_call
     def rotate_start(self):
         ir_values = self.device.read_values()
         ir_diff = abs(ir_values["East Bottom"] - ir_values["East Top"])
-        while ( ir_diff > 20):
+        while (ir_diff > 20):
             if ir_values["East Bottom"] < ir_values["East Top"]:
                 if ir_values["West Bottom"] > ir_values["West Top"]:
-                #clockwise
-                    self.driver.rotate_t(-60,.1)
+                # clockwise
+                    self.driver.rotate_t(-60, .1)
                     sleep(0.1)
             elif ir_values["East Bottom"] > ir_values["East Top"]:
                 if ir_values["West Bottom"] < ir_values["West Top"]:
                 # counter clockwise
-                    self.driver.rotate_t(60,.1)
+                    self.driver.rotate_t(60, .1)
                     sleep(0.1)
             else:
                 break
             ir_values = self.device.read_values()
             ir_diff = abs(ir_values["East Bottom"] - ir_values["East Top"])
-        
 
     def goto_top(self):
         if self.east.get_distance() < MAX_VALUE:
-            self.move_until_wall("north", "east", 100)
+            self.move_until_wall("north", "east", 300)
         elif self.west.get_distance() < MAX_VALUE:
-            self.move_until_wall("north", "west", 100)
+            self.move_until_wall("north", "west", 300)
 
     @lib.api_call
     def goto_railcar(self):
         self.goto_top()
 
         if self.rail_cars_side == "west":
-            self.move_until_wall("west", "north", 100)
+            self.move_until_wall("west", "north", 300)
         elif self.rail_cars_side == "east":
-            self.move_until_wall("east", "north", 100)
+            self.move_until_wall("east", "north", 300)
 
-    #TODO: Make a gotoBoat function
+    # TODO: Make a gotoBoat function
     # go north towards block, then towards rail cars and straight down
     @lib.api_call
     def goto_boat(self):
@@ -273,7 +271,6 @@ class Navigation(object):
 
         self.move_until_wall("south", "south", 150)
 
-
     @lib.api_call
     def goto_block_zone_A(self):
         self.goto_railcar()
@@ -290,19 +287,19 @@ class Navigation(object):
         if self.rail_cars_side == "east":
             self.move_until_wall("west", "north", 100)
 
-    
-    #TODO: Make a getIrSensorValue function
+
+    # TODO: Make a getIrSensorValue function
     # find a value of a specific sensor
-        
+
     @lib.api_call
     def set_bias(self, side, bias):
         side = side.replace("_", " ")
         self.device.set_bias(side,bias)
         # write updated bias value to IR_config file
-        #with open("IR_config.yaml") as f:
+        # with open("IR_config.yaml") as f:
         #    a = yaml.load(f)
-        #a["IR_Bias"][side] = bias
-        #with open("IR_config.yaml", "w") as f:
+        # a["IR_Bias"][side] = bias
+        # with open("IR_config.yaml", "w") as f:
         #    yaml.dump(a, f)
 
     @lib.api_call
@@ -313,6 +310,6 @@ class Navigation(object):
         self.rotate_start()
         self.logger.info("Auto-corrected inside tunnel")
         sleep(0.1)
-        self.move_until_wall("north","east", 500)
+        self.move_until_wall("north", "east", 500)
         self.logger.info("Reached the barge")
         sleep(0.1)

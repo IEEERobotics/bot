@@ -4,6 +4,7 @@ from bot.driver.omni_driver import OmniDriver
 import bot.lib.lib as lib
 from time import sleep
 from time import time
+from pid import PID
 import os.path
 import yaml
 
@@ -140,6 +141,25 @@ class Navigation(object):
             timestep = time() - time_elapsed
             time_elapsed = time()
             self.move_correct(direction, side, mov_target, 70, timestep)
+            if mov_side.get_distance() <= target:
+                self.stop()
+
+    @lib.api_call
+    def move_smooth_until_wall(self, direction, side, target, dist=150):
+        direction = direction.lower()
+        mov_side = self.sides[direction]
+        mov_target = dist
+        self.moving = True
+        time_elapsed = time()
+        speed = 0
+        speed_pid = PID()
+        speed_pid.set_k_values(1, 0, 0)
+        while self.moving:
+            timestep = time() - time_elapsed
+            time_elapsed = time()
+            speed = speed_pid.pid(0, mov_side.get_distance() - target, timestep)
+            speed = bound(speed, -100, 100)
+            self.move_correct(direction, side, mov_target, speed, timestep)
             if mov_side.get_distance() <= target:
                 self.stop()
 

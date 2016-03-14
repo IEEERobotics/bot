@@ -29,13 +29,10 @@ class RobotArm(object):
     """An object that resembles a robotic arm with n joints"""
     def __init__(self, arm_config):
         
-        self.logger = lib.get_logger()
-        self.bot_config = lib.get_config()
-        
         self.servo_cape \
-            = ServoCape(self.bot_config["dagu_arm"]["servo_cape_arm"])     
+            = ServoCape(self.arm_config["servo_cape_arm"])     
         self.servo_cape_grabber \
-            = ServoCape(self.bot_config["dagu_arm"]["servo_cape_grabber"])     
+            = ServoCape(self.arm_config["servo_cape_grabber"])     
         
         # QR scanning tools.
         self.scanner = zbar.ImageScanner()
@@ -43,7 +40,7 @@ class RobotArm(object):
 
         # Figure out what camera is being used
         cam_model = arm_config["camera"]
-        self.cam = Camera(self.bot_config[cam_model])
+        self.cam = Camera(self.arm_config[cam_model])
         self.rail = Rail_Mover()  
         
         # initialize vertices of QR code

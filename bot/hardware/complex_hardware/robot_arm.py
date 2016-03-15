@@ -22,17 +22,20 @@ from bot.hardware.complex_hardware.camera_reader import Camera
 class RobotArm(object):
 
     JUNK_BUFFER = [0]*5
-    HOME = [0, 145, 0, 160, 0]
+    HOME = [0, 25, 170, 10, 180]
     GRAB = 5
 
 
     """An object that resembles a robotic arm with n joints"""
     def __init__(self, arm_config):
         
+        self.logger = lib.get_logger()
+        self.bot_config = lib.get_config()
+        
         self.servo_cape \
-            = ServoCape(self.arm_config["servo_cape_arm"])     
+            = ServoCape(self.bot_config["dagu_arm"]["servo_cape_arm"])     
         self.servo_cape_grabber \
-            = ServoCape(self.arm_config["servo_cape_grabber"])     
+            = ServoCape(self.bot_config["dagu_arm"]["servo_cape_grabber"])     
         
         # QR scanning tools.
         self.scanner = zbar.ImageScanner()
@@ -40,7 +43,7 @@ class RobotArm(object):
 
         # Figure out what camera is being used
         cam_model = arm_config["camera"]
-        self.cam = Camera(self.arm_config[cam_model])
+        self.cam = Camera(self.bot_config[cam_model])
         self.rail = Rail_Mover()  
         
         # initialize vertices of QR code
@@ -291,38 +294,51 @@ class RobotArm(object):
             time.sleep(4)
             self.Tier_Grab('B')
             i= i-1
+            
+    def MoveToQR(self):
+        time.sleep(1)
+        self.servo_cape.transmit_block([0] + LOOK_5)
+        time.sleep(2)
+        self.rail.DisplacementConverter(3.5)  #get the rail to the middle
+        qr = self.rail_feedback()           #position infront of QRCode
+        return qr
         
     
-    def Tier_Grab(self, Tier):
+    def Tier_Grab(self, Tier, Case):
+           ### Tier is the level of the barge the block is being grabbed from
+           ### Case is whether or not a block is on top of another
+           
         if Tier == 'A':
+            ## Generic Blocks 
             print "Not coded yet" 
             BLOCK_MOVE_5 = [0, 90, 90, 90, 0]
             BLOCK_GRAB_5 = [0, 90, 90, 90, 0]
 
         elif Tier == 'B':
-            BLOCK_MOVE_5 = [0, 80, 10, 100, 0]
-            BLOCK_GRAB_5 = [0, 74, 10, 100, 0]
-            LOOK_5 = [0, 135, 0, 160, 0]
-            HOPPER1 = [0, 78, 10, 0, 180]
+            ## Mixed QR Blocks 
+            if Case == 1:  ## Block on top
+                BLOCK_GRAB_5 = [0, 120, 110, 75, 180]
+            elif Case == 2: ## Block on bottom
+                BLOCK_GRAB_5 = [0, 120, 110, 55, 180]
+                
+            LOOK_5 = [0, 25, 170, 10, 180]
+            HOPPER1 = [0, 25, 170, 10, 180]
             HOPPER2 = [0, 0, 180, 0, 180]
             HOPPER3 = [0, 40, 180, 0, 180]
 
         elif Tier == 'C':
             BLOCK_MOVE_5 = [0, 60, 20, 40, 0]
             BLOCK_GRAB_5 = [0, 0, 10, 50, 0]
-            LOOK_5 = [0, 115, 0, 150, 0]
+            LOOK_5 = [0, 25, 170, 10, 180]
             HOPPER1 = [0, 0, 10, 0, 180]
             HOPPER2 = [0, 0, 180, 0, 180]
             HOPPER3 = [0, 40, 180, 0, 180]
 
 
-        time.sleep(1)
-        self.servo_cape.transmit_block([0] + LOOK_5)
-        time.sleep(2)
-        self.rail.DisplacementConverter(3.5)  #get the rail to the middle
+
 
         if Tier == 'B' or Tier == 'C':
-            qr = self.rail_feedback()           #position infront of QRCode
+            qr = self.MoveToQR()
         else:
             ##Todo: Add in generic block code here 
             print "Line up with generic blocks" 
@@ -341,8 +357,7 @@ class RobotArm(object):
             print "error~Hopper Full"
             return 0 
 
-        self.servo_cape.transmit_block([0] + BLOCK_MOVE_5)
-        time.sleep(2.25)                     #wait for arm to move to location
+        
         self.servo_cape.transmit_block([0] + BLOCK_GRAB_5)
         time.sleep(2.25)                     #wait for arm to move to location
         self.grab()
@@ -361,9 +376,7 @@ class RobotArm(object):
 
         self.hopper[hopper_pos-1] = qr
         
-        print self.hopper[hopper_pos-1].value
-        print self.hopper
-        
+      
 
     def FindAndGetBlock(self,color):
         """ 

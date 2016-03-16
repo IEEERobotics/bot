@@ -72,16 +72,6 @@ class Pilot:
     def goto_railcar(self):
         return self.call('nav', 'goto_railcar')
 
-    def wait_for_start(self):
-        """Waits for color sensor to say it sees start signal.
-        """
-
-        return self.call('color_sensor', 'watch_for_not_color',
-                         {'color': 'red', "timeout": 180})
-
-    def wait_for_ready(self):
-        return self.call('color_sensor', 'wait_for_ready')
-
     def run(self):
         """Main pilot interface with outside world.
         start script will call, and pilot will handle all other logic.
@@ -90,7 +80,6 @@ class Pilot:
         # wait for Start signal to indicate time to run.
         # self.wait_for_start()
         time.sleep(10)
-        self.wait_for_ready()
         self.drive(40, 0, 0.7)  # Leave starting block
         # Move towards the blocks; stop when north sensors detect wall.
         # Move towards the rail cars

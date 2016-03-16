@@ -149,7 +149,7 @@ def get_logger():
 
     # Build logger
     logger = logging.getLogger(__name__)
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
 
     # Check if log exists and should therefore be rolled
     needRoll = False

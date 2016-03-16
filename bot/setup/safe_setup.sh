@@ -6,6 +6,8 @@ base="git python-yaml libzmq-dev python-zmq python-simplejson python-smbus pytho
 
 extra="vim-nox ipython tmux screen nmap tree i2c-tools wireless-tools grc"
 
+# Revert setup script after competition
+
 while getopts aubh opt; do
     case $opt in
         a)
@@ -31,19 +33,6 @@ while getopts aubh opt; do
             ;;
   esac
 done
-
-if [ "$usb_install" = true ]; then
-    bb=192.168.7.2
-    ssh-keygen -R $bb >/dev/null 2>&1
-    echo "=============================="
-    echo "Copying install files over USB"
-    echo "=============================="
-    dir=$(dirname $0)
-    rsync -e "ssh -o StrictHostKeyChecking=no" -vr $dir root@${bb}:
-    ssh -o StrictHostKeyChecking=no root@${bb} ./setup_bone.sh $usb_opts
-    echo "Done with USB install"
-    exit
-fi
 
 # Verify we're on an actual BeagleBone
 if grep -q AM33XX /proc/cpuinfo; then
@@ -72,45 +61,12 @@ if [ "$bot_specific" = true ]; then
     echo "============================"
     echo "Enabling bot wireless uplink"
     echo "============================"
-    echo Enabling uplink...
-    ifup wlan1
 fi
-
-echo "=================="
-echo "Testing network..."
-echo "=================="
-if  /bin/ping -c1 -w1 google.com; then
-    echo "Network is live"
-else
-    echo "No network connection detected, attempting to route via USB..."
-    route add default gw 192.168.7.1
-    echo "nameserver 8.8.8.8" > /etc/resolv.conf
-    if  /bin/ping -c1 -w1 google.com; then
-        echo "Network is temporarily live for install"
-    else
-        echo "Aborting setup due to lack of connectivty!"
-        exit 1
-    fi
-fi
-echo
 
 echo "========================="
 echo "Updating package listings"
 echo "========================="
 apt-get update
-
-if [ "$bot_specific" = true ]; then
-    echo "=============================="
-    echo "Configuring wireless AP on bot"
-    echo "=============================="
-    update-rc.d masquerade defaults
-    export DEBIAN_FRONTEND=noninteractive
-    DPKG_OPTS=Dpkg::Options::="--force-confold"
-    #apt-get -y purge udhcpd breaks usb connection
-    apt-get -y -o ${DPKG_OPTS} install hostapd dnsmasq
-    hostname -F /etc/hostname
-fi
-
 update-rc.d bbb defaults
 cp /usr/share/zoneinfo/America/New_York /etc/localtime
 
@@ -162,30 +118,6 @@ fetch_git_repo beagleboard/am335x_pru_package
 echo "======================================"
 echo "Building and installing PRU library..."
 echo "======================================"
-cd $BASE_DIR/am335x_pru_package
-make
-make install
-
-if [ -d $BASE_DIR/bot/pru ];then
-    echo "Assembling PRU code..."
-    cd $BASE_DIR/bot/pru
-    make
-fi
-
-# Virtualenv
-echo "==================================="
-echo "Creating Python virtual environment"
-echo "==================================="
-VENV_DIR=venv
-VENV_PATH=$BASE_DIR/$VENV_DIR
-virtualenv --clear --system-site-packages $VENV_PATH
-source $VENV_PATH/bin/activate
-echo $VENV_PATH > /root/bot2014/.venv
-
-echo "==============================="
-echo "Installing modules into venv..."
-echo "==============================="
-echo "Using $(which python)..."
 
 python_module() {
     MODULE=$1

@@ -3,7 +3,9 @@
 *.swo
 *.swn
 *.swm
+*.save
 *~
+*.png
 .DS_Store
 *.egg-info
 *.log

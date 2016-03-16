@@ -1,0 +1,14 @@
+#logitech
+KERNEL=="video*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="0825", ATTRS{serial}=="081C01D0", SYMLINK+="CAMC"
+
+# Playstation camera
+KERNEL=="video*", ATTRS{idVendor}=="1d6b", ATTRS{idProduct}=="0002", ATTRS{serial}=="0000:00:1d.0", SYMLINK+="PSCAM"
+
+#generic cam
+KERNEL=="video*", ATTRS{idVendor}=="0c45", ATTRS{idProduct}=="62f1", SYMLINK+="generic_cam"
+
+#HP camera
+KERNEL=="video*", ATTRS{idVendor}=="04f2", ATTRS{idProduct}=="a149", SYMLINK+="hp_cam"
+
+
+

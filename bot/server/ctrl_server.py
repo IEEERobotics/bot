@@ -135,7 +135,6 @@ class CtrlServer(object):
         self.switch = Switch()
         self.driver = OmniDriver()
         self.nav = Navigation()
-        
 #        self.arm = RobotArm(self.config["dagu_arm"])
 
         systems = {}

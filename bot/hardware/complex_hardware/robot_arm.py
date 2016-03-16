@@ -2,37 +2,142 @@
 
 """Encapsulates functionality of moving around robot arm"""
 import os
-import sympy
-from sympy import *
+
+import zbar
+from PIL import Image
+import cv2
+import numpy as np
+import time
+
 import bot.lib.lib as lib
 from bot.hardware.servo_cape import ServoCape
 
+from bot.hardware.qr_code import QRCode
+from bot.hardware.complex_hardware.QRCode2 import QRCode2
+from SeventhDOF import Rail_Mover
+from bot.hardware.complex_hardware.camera_reader import Camera
+
+import generic_blocks
+
+
 
 class RobotArm(object):
+
+    JUNK_BUFFER = [0]*5
+    HOME = [0, 25, 170, 10, 180]
+    GRAB = 5
 
 
     """An object that resembles a robotic arm with n joints"""
     def __init__(self, arm_config):
         
-        self.default_angles = [90]*5
         self.logger = lib.get_logger()
         self.bot_config = lib.get_config()
         
         self.servo_cape \
-            = ServoCape(self.bot_config["dagu_arm"]["servo_cape"])     
-        # Empty list of zeros representing each joint   
-        self.joints = [0]*5
+            = ServoCape(self.bot_config["dagu_arm"]["servo_cape_arm"])     
+        self.servo_cape_grabber \
+            = ServoCape(self.bot_config["dagu_arm"]["servo_cape_grabber"])     
         
+        # QR scanning tools.
+        self.scanner = zbar.ImageScanner()
+        self.scanner.parse_config('enable')
+
+        # Figure out what camera is being used
+        cam_model = arm_config["camera"]
+        self.cam = Camera(self.bot_config[cam_model])
+        self.rail = Rail_Mover()  
+        
+        # initialize vertices of QR code
+        l = 1.5
+        self.qr_verts = np.float32([[-l/2, -l/2, 0],
+                            [-l/2,  l/2, 0],
+                            [ l/2, -l/2, 0],
+                            [ l/2,  l/2, 0]])
+
+        # Angles of all of the joints. 
+        # DO NOT SEND ANGLES ANY OTHER WAY
+        self.joints = self.HOME
+
+        self.hopper = [None, None, None, None]
+
+    @property
+    def joints(self):
+        return self.__joints
+
+    @joints.setter
+    def joints(self, vals):
+        vals =  [int(x) for x in vals]
+        # validate values
+        if len(vals) == 5:
+            self.__joints = vals
+        else:
+            self.__joints[:len(vals)] = vals
+        print "Joints to be sent: ", vals
+        self.servo_cape.transmit_block([0] + self.__joints)
+
+
+    @lib.api_call
+    def draw_qr_on_frame(self, zbar_dat, draw_frame):
+
+        self.scanner.scan(zbar_dat)
+        for symbol in zbar_dat:
+            tl, bl, br, tr = [item for item in symbol.location]
+            points = np.float32([[tl[0], tl[1]],
+                                 [tr[0], tr[1]],
+                                 [bl[0], bl[1]],
+                                 [br[0], br[1]]])
+
+            cv2.line(draw_frame, tl, bl, (100,0,255), 8, 8)
+            cv2.line(draw_frame, bl, br, (100,0,255), 8, 8)
+            cv2.line(draw_frame, br, tr, (100,0,255), 8, 8)
+            cv2.line(draw_frame, tr, tl, (100,0,255), 8, 8)
+
+        return draw_frame
     @lib.api_call
     def grab(self):
-        self.servo_cape.transmit_block([5] + [0,0,0,0,0])
+ 
+        self.servo_cape_grabber.transmit_block([5] + self.JUNK_BUFFER)
         
     @lib.api_call   
     def release(self):
-        self.servo_cape.transmit_block([6] + [0,0,0,0,0])
+        self.servo_cape_grabber.transmit_block([6] + self.JUNK_BUFFER)
         
     @lib.api_call
-    def set_angles(self):
+    def joint_center_on_qr(self):
+        """Attempts to center arm on qr code using only arm itself.
+        Only the rotational joints, 
+        joint 0 corrects X 
+        joint 3 corrects Y
+        joint 5 corrects rotation
+        """
+        
+        # Correction constants for P(ID) controller.
+        # unlikely that we'll bother using I or D
+        p_x = 1
+        p_y = 1
+
+        while True:
+            ret = self.cam.QRSweep()
+            
+            # Calculate new vector for change
+            if ret != None:
+                
+                dx = ret.tvec[0]
+                dy = ret.tvec[1]
+                
+                if abs(dx) > 0.2:
+                    self.joints[0] += p_x * dx
+                if abs(dy) > 0.2:
+                    self.joints[3] += p_y * dy
+                #print "Joints = ", self.joints
+                self.joints = self.joints
+                #TODO Find method for calculating rotational oreientation
+
+        return True
+
+    @lib.api_call
+    def demo_set_angles(self):
         while(1):
             A1 = (input("What is Servo 1's angle?: "))
             if (A1 < 0 or A1> 180):
@@ -88,11 +193,15 @@ class RobotArm(object):
         
     @lib.api_call
     def reset_home_position(self):
-        """sets angles back to default position."""
-        self.servo_cape.transmit_block([0] + [90,90,90,90,90])
+        """
+        sets angles back to default position. Also resets the position of the 7th DOF
+        """
+        
+        self.servo_cape.transmit_block([0] + self.HOME)
+        self.rail.RunIntoWall()
         
     @lib.api_call
-    def Arm_Demo(self):
+    def fancy_demo(self):
         os.system('clear')
         print "Welcome to the Team 26: Robotic Arm Mainipulation and Vision demo function."
         print "Demo number      Function       "
@@ -120,234 +229,235 @@ class RobotArm(object):
             else:
                 self.demo(demo_number - 1)
         
-        
-        
-        
     @lib.api_call
     def demo(self, demo_number):
         """runs demos 1-7"""
         self.servo_cape.transmit_block([demo_number]
-                                         + [0]*5)        
+                                         + self.JUNK_BUFFER)        
     
-
-    def calcFKposition(self, theta1, theta2, theta3, theta4, theta5, L1, L2, L3, L4, L5, L6):
-        """ Finds the current xyz given the lengths and theta values
-
-        :param thetaX:  angle of joint x
-        :type thetaX:   double
-        :param LX:      length of arm x
-        :type LX:       double
-
-        :returns: 3x1 matrix of xyz location
-
+    
+    def rail_test(self):
+        
+        while True:
+            #time.sleep(2)
+            ret = self.cam.QRSweep()
+            if ret != None:
+                x_disp = ret.tvec[0]
+                print "Checking Alignment with x_disp = ", x_disp
+                if abs(x_disp) > .2:
+                    self.rail.DisplacementConverter(-1 * x_disp)
+            
+            ret = None
+            
+    def rail_feedback(self):
         """
-
-        Px = ((1 / 2.) * L2 * cos(theta1 - theta2) +
-            (1 / 2.) * L2 * cos(theta1 + theta2) +
-            -(1 / 2.) * L6 * sin(theta1 + theta5) +
-            -(1 / 2.) * L6 * sin(theta1 - theta5) +
-            (1 / 2.) * L3 * cos(-theta3 + theta1 - theta2) +
-            (1 / 2.) * L3 * cos(theta3 + theta1 + theta2) +
-            (1 / 2.) * L5 * cos(-theta4 - theta3 + theta1 - theta2) +
-            (1 / 2.) * L5 * cos(theta4 + theta3 + theta1 + theta2) +
-            (1 / 2.) * L4 * cos(theta4 + theta3 + theta1 + theta2) +
-            (1 / 2.) * L4 * cos(-theta4 - theta3 + theta1 - theta2) +
-            (1 / 4.) * L6 * cos(theta1 + theta2 + theta3 + theta5 + theta4) +
-            (1 / 4.) * L6 * cos(theta1 - theta2 - theta3 - theta5 - theta4) +
-            -(1 / 4.) * L6 * cos(theta1 + theta2 + theta3 - theta5 + theta4) +
-            -(1 / 4.) * L6 * cos(theta1 - theta2 - theta3 + theta5 - theta4))
-
-        Py = ((1 / 2.) * L6 * cos(theta1 - theta5) +
-            (1 / 2.) * L6 * cos(theta1 + theta5) +
-            (1 / 2.) * L2 * sin(theta1 + theta2) +
-            (1 / 2.) * L2 * sin(theta1 - theta2) +
-            (1 / 2.) * L3 * sin(theta3 + theta1 + theta2) +
-            (1 / 2.) * L3 * sin(-theta3 + theta1 - theta2) +
-            (1 / 2.) * L5 * sin(theta4 + theta3 + theta1 + theta2) +
-            (1 / 2.) * L5 * sin(-theta4 - theta3 + theta1 - theta2) +
-            (1 / 2.) * L4 * sin(theta4 + theta3 + theta1 + theta2) +
-            (1 / 2.) * L4 * sin(-theta4 - theta3 + theta1 - theta2) +
-            (1 / 4.) * L6 * sin(theta1 - theta2 - theta3 - theta5 - theta4) +
-            (1 / 4.) * L6 * sin(theta1 + theta2 + theta3 + theta5 + theta4) +
-            -(1 / 4.) * L6 * sin(theta1 - theta2 - theta3 + theta5 - theta4) +
-            -(1 / 4.) * L6 * sin(theta1 + theta2 + theta3 - theta5 + theta4))
-
-        Pz = (L3 * sin(theta2 + theta3) +
-            L5 * sin(theta2 + theta4 + theta3) +
-            L4 * sin(theta2 + theta4 + theta3) +
-            (1 / 2.) * L6 * sin(theta5 + theta4 + theta2 + theta3) +
-            -(1 / 2.) * L6 * sin(-theta5 + theta4 + theta2 + theta3) +
-            L2 * sin(theta2) +
-            L1)
-
-        P = Matrix([Px, Py, Pz])
-        return P
-
-    @lib.api_call
-    def InverseKinematics(self, X_goal,Y_goal, Z_goal):
-
-    	""" This function takes the current position of the arm (assumed at 180*)
-	        and a desired coordinate for the arm and outputs the angles of the serv$
-	        :param targetX: target x value for the arm
-	        :type targetX: double
-	        :param targetY: target y value for the arm
-	        :type targetY: double
-	        :param targetZ: target z value for the arm
-	        :type targetZ: double
-	    
-	        Returns array of joint angles
-    	"""
-
-        #print("Inverse Kinematic Start")
-        # Symbolic Setup
-        the, a, d, al, b, l1, l2, l3, l4, l5 = symbols(
-            "the a d al b l1 l2 l3 l4 l5")
-        the1, the2, the3, the4, the5 = symbols("the1 the2 the3 the4 the5")
+        align the arm on the rail to a qrcode and return the code
+        """
+        count = 0
+        direction = 1
+        while(True):
+            ret = None
+            ret = self.cam.QRSweep()
+            if ret != None:
+                count = 0                           #reset the count.
+                x_disp = ret.tvec[0]
+                if abs(x_disp) < .1:
+                    return ret
+                else:
+                    print "Checking Alignment with x_disp = ", x_disp
+                    if abs(x_disp) > .1:
+                        rail_ret = self.rail.DisplacementConverter(-1 * x_disp)
+                        if rail_ret == 0:
+                            #out of range, reset to middle and try again
+                            disp = self.rail.DMCC[1].motors[2].position
+                            ticks = 3000 - disp
+                            self.rail.DisplacementMover(ticks)
+            else:                                   # if no qrcodes are found
+                if count >= 8:
+                    count = 0
+                    limit = self.rail.DisplacementConverter(1.5*direction)
+                    if limit == 0:                  #out of range
+                        direction = -1*direction    #reverse direction
+                        ret = self.rail.DisplacementConverter(.75*direction)
+                        if ret == 0:
+                            print "Error: out of range on both ends, shouldn't be possible."
+                            
+                count += 1
+                
     
-        # Kinematic Constants and Symbols
-        pi = sympy.pi
-        b = 5.5
-        l1 = 9
-        l2 = 8
-        l3 = 8.1
-        l4 = 4.8
-        l5 = 5.7
-        l6 = 9
-        s1 = sin(the)
-        c1 = cos(the)
-        s2 = sin(al)
-        c2 = cos(al)
-        
-        theA = 45 * (pi / 180)
-        theB = 45 * (pi / 180)
-        theC = (90-45) * (pi / 180)
-        theD = (45-90) * (pi / 180)
-        theE = 90 * (pi / 180)
-        
-        Theta_cur = Matrix([[theA], [theB], [theC], [theD], [theE]])
-        
-        [x_cur, y_cur, z_cur] = self.calcFKposition(
-            theA, theB, theC, theD, theE, l1, l2, l3, l4, l5, l6)
-        
-        x_cur = x_cur.evalf(5)
-        y_cur = y_cur.evalf(5)
-        z_cur = z_cur.evalf(5)
-        
-        #print "Forward Kinematics Position"
-        #print x_cur
-        #print y_cur
-        #print z_cur
+    def test_look(self):
+        self.servo_cape.transmit_block([0] + [0, 125, 0, 170, 0])
     
-        # Coordinate Transforms
-        A = Matrix(
-            [[c1, -s1 * c2, s1 * s2, a * c1], [s1, c1 * c2, -c1 * s2, a * s1], [0, s2, c2, d], [0, 0, 0, 1]])
-    
-        a1 = A.subs(the, the1)
-        a1 = a1.subs(d, b + l1)
-        a1 = a1.subs(a, 0)
-        a1 = a1.subs(al, pi / 2)
-    
-        a2 = A.subs(the, the2)
-        a2 = a2.subs(d, 0)
-        a2 = a2.subs(a, l2)
-        a2 = a2.subs(al, 0)
-    
-        a3 = A.subs(the, the3)
-        a3 = a3.subs(d, 0)
-        a3 = a3.subs(a, l3)
-        a3 = a3.subs(al, 0)
-    
-        a4 = A.subs(the, the4)
-        a4 = a4.subs(d, 0)
-        a4 = a4.subs(a, l4)
-        a4 = a4.subs(al, pi / 2)
-    
-        a5 = A.subs(the, -pi / 2)
-        a5 = a5.subs(d, 0)
-        a5 = a5.subs(a, 0)
-        a5 = a5.subs(al, -pi / 2)
-    
-        a6 = A.subs(the, the5)
-        a6 = a6.subs(d, l5)
-        a6 = a6.subs(a, l6)
-        a6 = a6.subs(al, -pi / 2)
-    
-        T = a1 * a2 * a3 * a4 * a5 * a6
-        
-        Px = T[0, 3]
-        Py = T[1, 3]
-        Pz = T[2, 3]   
-        
-        goal = Matrix([X_goal, Y_goal, Z_goal])
-        cur = Matrix([x_cur, y_cur, z_cur])
-        displacement = (goal - cur)
-        
-        dist = displacement.norm().evalf(5)
-        #print dist
-        
-        Pxyz = Matrix([Px, Py, Pz])
-        the12345 = Matrix([the1, the2, the3, the4, the5])
-        J = Pxyz.jacobian(the12345)
-        
-        J_cur = J.subs(the1, theA)
-        J_cur = J_cur.subs(the2, theB)
-        J_cur = J_cur.subs(the3, theC)
-        J_cur = J_cur.subs(the4, theD)
-        J_cur = J_cur.subs(the5, theE)
-        
-        J_cur = J_cur.evalf(5)
-        
-        J_inv = J_cur.pinv()
-        
-        Theta_next = (Theta_cur + J_inv * displacement).evalf(5)
-        #print 'Next Joint Angles'
-        #print Theta_next
-        
-        while (dist > 1):
-            #print '=============================================================='
-    
-            theA = Theta_next[0]
-            theB = Theta_next[1]
-            theC = Theta_next[2]
-            theD = Theta_next[3]
-            theE = pi / 2
-            Theta_cur1 = Matrix([theA, theB, theC, theD, theE])
-    
-            [x_cur, y_cur, z_cur] = self.calcFKposition(
-                theA, theB, theC, theD, theE, l1, l2, l3, l4, l5, l6)
-    		
-            #print "Forward Kinematics Position"
-            #print x_cur.evalf(5)
-            #print y_cur.evalf(5)
-            #print z_cur.evalf(5)
+    def basic_solver(self):
+        i = 4
+        while(i>0):
+            self.joints = self.HOME
+            self.rail.RunIntoWall()
+            time.sleep(4)
+            self.Tier_Grab('B')
+            i= i-1
             
-            cur = Matrix([x_cur, y_cur, z_cur])
-            displacement = (goal - cur)
-            #print 'Displacement Distance'
-            dist = displacement.norm().evalf(5)
-            #print dist
+    def MoveToQR(self):
+        time.sleep(1)
+        self.servo_cape.transmit_block([0] + LOOK_5)
+        time.sleep(2)
+        self.rail.DisplacementConverter(3.5)  #get the rail to the middle
+        qr = self.rail_feedback()           #position infront of QRCode
+        return qr
+
+    def MoveToGenericBlock(self):
+        block_dist = 12.5 #adjust to correct block distance from camera
+        self.rail.DisplacementMover(3600 - self.rail.rail_motor.position) #goto middle
+        for i in xrange(1): #potentially move multiple times to get it right
+            img = self.cam.get_current_frame() #needs to be bottom camera
+            offsets = generic_blocks.get_lateral_offset(img, block_dist)
+            if len(offsets) == 0: return 0
+            self.rail.DisplacementConverter(-offsets[0])
+        return 1
     
-            J_cur = J.subs(the1, theA)
-            J_cur = J_cur.subs(the2, theB)
-            J_cur = J_cur.subs(the3, theC)
-            J_cur = J_cur.subs(the4, theD)
-            J_cur = J_cur.subs(the5, theE)
-            
-            J_cur = J_cur.evalf(5)
-            J_inv = J_cur.pinv().evalf(5)
-    
-            Theta_next = (Theta_cur1 + J_inv * displacement).evalf(5)
-            #print 'Next Joint Angles'
-            #print Theta_next
-            #print '=============================================================='
-            #print "X = " + x_cur
-            #print "X = " + y_cur
-            #print "X = " + z_cur
-            
-            
-    
-        #print "DONE"
-        ThetaArray = [int((Theta_next[0]*180/pi).evalf()), int((Theta_next[1]*180/pi).evalf()), int((Theta_next[2]*180/pi).evalf()), int((Theta_next[3]*180/pi).evalf()), int((Theta_next[4]*180/pi).evalf())]
-        self.servo_cape.write_angles(ThetaArray)
+    def Tier_Grab(self, Tier, Case):
+           ### Tier is the level of the barge the block is being grabbed from
+           ### Case is whether or not a block is on top of another
+           
+        if Tier == 'A':
+            ## Generic Blocks 
+            print "Not coded yet" 
+            BLOCK_MOVE_5 = [0, 90, 90, 90, 0]
+            BLOCK_GRAB_5 = [0, 90, 90, 90, 0]
+
+        elif Tier == 'B':
+            ## Mixed QR Blocks 
+            if Case == 1:  ## Block on top
+                BLOCK_GRAB_5 = [0, 120, 110, 75, 180]
+            elif Case == 2: ## Block on bottom
+                BLOCK_GRAB_5 = [0, 120, 110, 55, 180]
+                
+            LOOK_5 = [0, 25, 170, 10, 180]
+            HOPPER1 = [0, 25, 170, 10, 180]
+            HOPPER2 = [0, 0, 180, 0, 180]
+            HOPPER3 = [0, 40, 180, 0, 180]
+
+        elif Tier == 'C':
+            BLOCK_MOVE_5 = [0, 60, 20, 40, 0]
+            BLOCK_GRAB_5 = [0, 0, 10, 50, 0]
+            LOOK_5 = [0, 25, 170, 10, 180]
+            HOPPER1 = [0, 0, 10, 0, 180]
+            HOPPER2 = [0, 0, 180, 0, 180]
+            HOPPER3 = [0, 40, 180, 0, 180]
 
 
+
+
+        if Tier == 'B' or Tier == 'C':
+            qr = self.MoveToQR()
+        else:
+            ##Todo: Add in generic block code here
+            print "Line up with generic blocks" 
+
+        hopper_pos = 5
+
+        if self.hopper[0] == None:
+            hopper_pos = 1
+        elif self.hopper[1] == None:
+            hopper_pos = 2
+        elif self.hopper[2] == None:
+            hopper_pos = 3
+        elif self.hopper[3] == None:
+            hopper_pos = 4	
+        else:
+            print "error~Hopper Full"
+            return 0 
+
+        
+        self.servo_cape.transmit_block([0] + BLOCK_GRAB_5)
+        time.sleep(2.25)                     #wait for arm to move to location
+        self.grab()
+        time.sleep(1.25)                       #wait for arm to grab
+        self.servo_cape.transmit_block([0] + HOPPER1)
+        time.sleep(1.5)                       #wait for arm to move to location
+        self.servo_cape.transmit_block([0] + HOPPER2)
+        time.sleep(3)                     #wait for arm to move to location
+        self.rail.Orientor(hopper_pos)
+        time.sleep(.25)                     #wait for rail to move to bin location
+        self.servo_cape.transmit_block([0] + HOPPER3)
+        time.sleep(1.5)                     #wait for arm to move to location
+
+        self.release()
+        time.sleep(1) 
+
+        self.hopper[hopper_pos-1] = qr
+        
+      
+
+    def FindAndGetBlock(self,color):
+        """ 
+        Function which takes a given color, and gets that block out of the hopper
+        """
+        self.reset_home_position() 
+        if self.hopper[0] != None:
+            if self.hopper[0].value == color:
+                self.EmptyHopper(1) 
+                
+                time.sleep(4)
+                
+                
+        if self.hopper[1] != None:
+            if self.hopper[1].value == color: 
+                self.EmptyHopper(2)
+                
+                time.sleep(4)
+                
+        if self.hopper[2] != None:
+            if self.hopper[2].value == color:
+                self.EmptyHopper(3)
+                
+                time.sleep(4)
+                
+            
+        if self.hopper[3] != None:
+            if self.hopper[3].value == color:
+                self.EmptyHopper(4)
+                time.sleep(4)
+            	
+        else:
+            print "No blocks in the hopper" 
+            return 0 
+        self.reset_home_position()
+        return 1 
+        
+    def EmptyHopper(self,Bin):
+        
+        InBetween = [0,20,173,28,180]
+        Hopper = [0,80,173,28,180]
+        PullBack = [0,30,170,30,180]
+        OffSide = [90,45,60,100,0]
+        
+        
+        
+        self.servo_cape.transmit_block([0] + InBetween)
+        self.rail.Orientor(Bin)
+        time.sleep(1)
+        self.servo_cape.transmit_block([0] + Hopper)
+        time.sleep(5)
+        self.grab() 
+        time.sleep(3)
+        self.servo_cape.transmit_block([0] + PullBack) 
+        time.sleep(3) 
+        if Bin != 4:
+            
+            self.rail.Orientor(4) 
+        
+        self.servo_cape.transmit_block([0] + OffSide) 
+        time.sleep(6)
+        self.release()
+        time.sleep(2)
+         
+        
+        self.hopper[Bin-1] = None 
+        
+        
+        
+        return 0 
+        
+        
+    

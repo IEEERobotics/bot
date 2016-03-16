@@ -1,0 +1,113 @@
+import os, sys
+from time import sleep
+import pyDMCC
+
+
+class Rail_Mover:
+
+    def __init__(self):
+
+        self.bot_config = lib.get_config()
+
+        rail_motor_conf = self.bot_config["dagu_arm"]["rail_cape"]["rail_cape"]
+        board_num = rail_motor_conf["board_num"]
+        motor_num = rail_motor_conf["motor_num"]
+        
+
+    
+    def Orientor(self,Position):
+        
+          
+        self.rail_motor.power = 0
+
+        if Position == 1:
+            Displacement = 200 - self.rail_motor.position 
+            return self.DisplacementMover(Displacement)
+            
+        elif Position == 2:
+            Displacement = 2200 - self.rail_motor.position
+            return self.DisplacementMover(Displacement)
+            
+        elif Position == 3:
+            Displacement = 4600 - self.rail_motor.position
+            return self.DisplacementMover(Displacement)
+        elif Position == 4:
+            Displacement = 7200 - self.rail_motor.position
+            return self.DisplacementMover(Displacement)
+
+    def DisplacementMover(self,Displacement):
+
+        if (self.rail_motor.position + Displacement) > 7200:
+            print "Cannot move beyond range"
+            return 0 
+        elif (self.rail_motor.position + Displacement) < 0:
+            print "Cannot move beyond range"
+            return 0
+
+        StartPOS = self.rail_motor.position
+        
+        if Displacement == 0:
+            return 1
+        elif Displacement < 0:   #Negative movement 
+            power = 40
+            self.rail_motor.power = power
+
+            while self.rail_motor.position > (StartPOS + Displacement):
+                print self.rail_motor.position
+                print "velocity: ", self.rail_motor.velocity
+            
+            self.rail_motor.power = 0
+
+        elif Displacement > 0:    #Positive movement
+            power = -40
+            self.rail_motor.power = power
+
+            while self.rail_motor.position < (StartPOS + Displacement):
+                print self.rail_motor.position
+                print "velocity: ", self.rail_motor.velocity
+
+            self.rail_motor.power = 0
+
+
+        return 1 
+
+
+    def DisplacementConverter(self,RawDisplacement):  
+        
+        ConversionRatio = 1020
+        Displacement = RawDisplacement*ConversionRatio
+        return self.DisplacementMover(Displacement)
+
+    def ResetToHome(self):
+
+        if self.rail_motor.position < 0:
+            self.rail_motor.reset()
+            return 0
+
+        power = 40
+        self.rail_motor.power = power
+        while self.rail_motor.position > 20:
+            print self.rail_motor.position
+            print "velocity: ", self.rail_motor.velocity
+        
+        self.rail_motor.power = 0
+        self.rail_motor.reset()
+        return 1
+    
+    
+    def RunIntoWall(self):
+        print "I am trying to run into the wall."
+        power = 40
+        self.rail_motor.power = power
+        print "velocity: ", self.rail_motor.velocity
+        sleep(.5)
+        print "velocity: ", self.rail_motor.velocity
+        while self.rail_motor.velocity < 0:
+            print self.rail_motor.position
+            print "velocity: ", self.rail_motor.velocity
+    
+        self.rail_motor.power = 0
+        self.rail_motor.reset()
+        return 1
+    
+

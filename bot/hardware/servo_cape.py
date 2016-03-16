@@ -21,8 +21,8 @@ class ServoCape(object):
         self.logger = lib.get_logger()
         self.bot_config = lib.get_config()
 
-        self.bus  = smbus.SMBus(self.bot_config["dagu_arm"]["servo_cape"]["i2c_bus"])
-        self.addr = self.bot_config["dagu_arm"]["servo_cape"]["i2c_addr"]
+        self.bus  = smbus.SMBus(cape_config["i2c_bus"])
+        self.addr = cape_config["i2c_addr"]
         #TODO(Ahmed): Figure out how to use regs
         self.reg = 0xFF
 

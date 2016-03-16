@@ -33,7 +33,7 @@ load_gpio 30
 load_gpio 60
 
 # remove after competition
-python /root/bot/bot/start.py
+python /root/bot/bot/start.py -p
 
 ## ADC example
 # enable_adcs

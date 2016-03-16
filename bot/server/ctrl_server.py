@@ -16,7 +16,8 @@ import pub_server as pub_server_mod
 import bot.lib.messages as msgs
 
 from bot.hardware.switch import Switch
-from bot.driver.rail_driver import RailDriver
+from bot.driver.omni_driver import OmniDriver
+from bot.navigation.nav import Navigation
 
 from bot.hardware.complex_hardware.robot_arm import RobotArm
 from bot.hardware.servo_cape import ServoCape
@@ -132,13 +133,15 @@ class CtrlServer(object):
         """
 
         self.switch = Switch()
-        self.driver = RailDriver()
+        self.driver = OmniDriver()
         self.arm = RobotArm(self.config["dagu_arm"])
 
         systems = {}
         systems["ctrl"] = self
+        systems["driver"] = self.driver
         systems["switch"] = self.switch
-        systems["arm"] = self.arm
+        systems["nav"] = self.nav
+#        systems["arm"] = self.arm
 
 
         self.logger.debug("Systems: {}".format(systems))

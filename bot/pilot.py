@@ -1,9 +1,4 @@
-"""Autonomous control client that solves IEEE Hardware Competition 2014.
-
-UPDATE (Vijay - 9/27/15): Pilot does not work since the last year's
-code has been erased. This file is here for reference and is expected to
-be modified for IEEE Hardware Competition 2016.
-Please do not instantiate Pilot before it is fixed.
+"""Autonomous control client that solves IEEE Hardware Competition 2016.
 """
 
 import sys
@@ -42,11 +37,6 @@ class Pilot:
                               " error: {}".format(sub_addr, e))
             sys.exit(-1)
 
-        # Initialize other members
-        self.ITEM_BACKUP_TIME = 0.2
-        # Order in which activities are solved.
-        self.acts = ["simon", "etch", "rubiks", "card"]
-
     def call(self, obj_name, method_name, param_dict=dict()):
         """Light wrapper around ctrl_client to handle result unpacking."""
         result = self.ctrl_client.call(obj_name, method_name, param_dict)
@@ -76,50 +66,18 @@ class Pilot:
                          {'speed': speed, 'angle': angle,
                           'duration': duration})
 
+    def goto_block_zone_B(self):
+        return self.call('nav', 'goto_block_zone_B')
+
+    def goto_railcar(self):
+        return self.call('nav', 'goto_railcar')
+
     def wait_for_start(self):
         """Waits for color sensor to say it sees start signal.
         """
 
         return self.call('color_sensor', 'watch_for_not_color',
                          {'color': 'red', "timeout": 180})
-
-    def follow(self):
-        """Helper function for calling line_follower.
-        Will kick out at intersection.
-        """
-        dir_of_intersection = \
-            self.call('follower', 'analog_state')
-
-        return dir_of_intersection
-
-    def rotate_90(self, direction):
-        """call on driver api with whatever args are needed
-        Pass either "cc" or "c".
-        """
-
-        return self.call('driver', 'rough_rotate_90',
-                         {'direction': direction})
-
-    def solve_activity(self, activity):
-        """pass name of activity to solve, will fix as needed.
-        Choices are:
-            etch, rubiks, simon, card
-        """
-
-        return self.call(activity, 'solve')
-
-    def follow_ignoring_turns(self):
-        return self.call('follower', 'follow_ignoring_turns')
-
-    def find_dir_of_turn(self):
-        return self.call('follower', 'find_dir_of_turn')
-
-    def find_dir_of_int(self):
-        return self.call('follower', 'find_dir_of_int')
-
-    def rotate_to_line(self, direction):
-        return self.call('follower', 'rotate_to_line',
-                         {'direction': direction})
 
     def wait_for_ready(self):
         return self.call('color_sensor', 'wait_for_ready')
@@ -134,54 +92,17 @@ class Pilot:
         time.sleep(10)
         self.wait_for_ready()
         self.drive(40, 0, 0.7)  # Leave starting block
+        # Move towards the blocks; stop when north sensors detect wall.
+        # Move towards the rail cars
 
-        for activity in self.acts:
-
-            # Follow to intersection.
-            self.follow_ignoring_turns()
-
-            # keep track of direction of branch for returning to main path.
-            act_dir = self.find_dir_of_int()
-
-            self.rotate_to_line(act_dir)
-
-            # go to act.
-            self.follow_ignoring_turns()
-
-            # Activities we aren't solving.
-            if activity == 'card':
-                self.drive(40, 0, 0.2)
-                time.sleep(1)
-                self.drive(40, 180, 0.2)
-            elif activity == 'simon':
-                self.logger.debug("Not doing simon")
-            else:
-                self.solve_activity(activity)
-
-            # Leave box and return to path.
-            self.move(40, 180)
-            time.sleep(self.ITEM_BACKUP_TIME)
-            self.move(0, 0)
-
-            self.rotate_90('right')
+        for i in xrange(3):
+            self.goto_railcar()
             time.sleep(0.5)
-            self.rotate_to_line('right')
+            self.goto_block_zone_B()
+            time.sleep(0.5)
 
-            # line follow back to path
-            self.follow_ignoring_turns()
 
-            # turn back to path
-            if act_dir == 'left':
-                self.rotate_to_line('right')
-            elif act_dir == 'right':
-                self.rotate_to_line('left')
-            else:
-                # error case but somehow possible.
-                # Guess turn direction.
-                self.rotate_to_line('right')
 
-        self.follow_ignoring_turns()
-        self.drive(40, 0, 0.5)
 
 if __name__ == "__main__":
     Pilot().run()

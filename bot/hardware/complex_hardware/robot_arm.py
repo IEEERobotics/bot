@@ -283,28 +283,36 @@ class RobotArm(object):
                 count += 1
                 
     
-    def test_look(self):
-        self.servo_cape.transmit_block([0] + [0, 125, 0, 170, 0])
     
-    def basic_solver(self):
-        i = 4
-        while(i>0):
-            self.joints = self.HOME
-            self.rail.RunIntoWall()
-            time.sleep(4)
-            self.Tier_Grab('B')
-            i= i-1
-            
+
     def MoveToQR(self):
         time.sleep(1)
         self.servo_cape.transmit_block([0] + LOOK_5)
         time.sleep(2)
         self.rail.DisplacementConverter(3.5)  #get the rail to the middle
         qr = self.rail_feedback()           #position infront of QRCode
-        return qr
         
+        return qr
     
-    def Tier_Grab(self, Tier, Case):
+    def UpdateHopper(self,QR):
+        hopper_pos = 5
+
+        if self.hopper[0] == None:
+            hopper_pos = 1
+        elif self.hopper[1] == None:
+            hopper_pos = 2
+        elif self.hopper[2] == None:
+            hopper_pos = 3
+        elif self.hopper[3] == None:
+            hopper_pos = 4	
+        else:
+            print "error~Hopper Full"
+            return 0 
+            
+        self.hopper[hopper_pos-1] = qr 
+        return hopper_pos
+    
+    def Tier_Grab(self, Tier, Case, Bin):
            ### Tier is the level of the barge the block is being grabbed from
            ### Case is whether or not a block is on top of another
            
@@ -334,28 +342,8 @@ class RobotArm(object):
             HOPPER2 = [0, 0, 180, 0, 180]
             HOPPER3 = [0, 40, 180, 0, 180]
 
+      
 
-
-
-        if Tier == 'B' or Tier == 'C':
-            qr = self.MoveToQR()
-        else:
-            ##Todo: Add in generic block code here 
-            print "Line up with generic blocks" 
-
-        hopper_pos = 5
-
-        if self.hopper[0] == None:
-            hopper_pos = 1
-        elif self.hopper[1] == None:
-            hopper_pos = 2
-        elif self.hopper[2] == None:
-            hopper_pos = 3
-        elif self.hopper[3] == None:
-            hopper_pos = 4	
-        else:
-            print "error~Hopper Full"
-            return 0 
 
         
         self.servo_cape.transmit_block([0] + BLOCK_GRAB_5)
@@ -366,15 +354,16 @@ class RobotArm(object):
         time.sleep(1.5)                       #wait for arm to move to location
         self.servo_cape.transmit_block([0] + HOPPER2)
         time.sleep(3)                     #wait for arm to move to location
-        self.rail.Orientor(hopper_pos)
+        self.rail.Orientor(Bin)
         time.sleep(.25)                     #wait for rail to move to bin location
         self.servo_cape.transmit_block([0] + HOPPER3)
         time.sleep(1.5)                     #wait for arm to move to location
 
         self.release()
         time.sleep(1) 
+        return 1
 
-        self.hopper[hopper_pos-1] = qr
+        
         
       
 
@@ -416,14 +405,12 @@ class RobotArm(object):
         
     def EmptyHopper(self,Bin):
         
-        InBetween = [0,20,173,28,180]
+       
         Hopper = [0,80,173,28,180]
         PullBack = [0,30,170,30,180]
-        OffSide = [90,45,60,100,0]
+        OffSide = [90, 45, 135, 10, 180] 
+          
         
-        
-        
-        self.servo_cape.transmit_block([0] + InBetween)
         self.rail.Orientor(Bin)
         time.sleep(1)
         self.servo_cape.transmit_block([0] + Hopper)
@@ -447,6 +434,28 @@ class RobotArm(object):
         
         
         return 0 
+        
+    def CompetitionSolver_Barge(self,Tier): 
+        ###This Function that is called by pilot, which will grab blocks 
+        
+        if Tier == 'A':
+            print "Do nothing currently" 
+        elif Tier == 'B': 
+            while True: 
+                qr = self.MoveToQR()
+                Case = self.CVFunction()
+                Bin = self.UpdateHopper(qr)
+                if Bin == 0:
+                    return 1 
+                self.Tier_Grab(Tier,Case,Bin) 
+        elif Tier == 'C': 
+            while True:
+                qr = self.MoveToQR()
+                Bin = self.UpdateHopper(qr) 
+                if Bin == 0:
+                    return 1
+                self.Tier_Grab(Tier,Case,Bin)
+            
         
         
     

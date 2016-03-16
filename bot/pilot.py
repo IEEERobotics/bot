@@ -83,15 +83,7 @@ class Pilot:
         self.drive(40, 0, 0.7)  # Leave starting block
         # Move towards the blocks; stop when north sensors detect wall.
         # Move towards the rail cars
-
-        for i in xrange(3):
-            self.goto_railcar()
-            time.sleep(0.5)
-            self.goto_block_zone_B()
-            time.sleep(0.5)
-
-
-
+        self.ctrl_client.exit_server()
 
 if __name__ == "__main__":
     Pilot().run()

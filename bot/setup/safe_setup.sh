@@ -63,24 +63,6 @@ if [ "$bot_specific" = true ]; then
     echo "============================"
 fi
 
-echo "=================="
-echo "Testing network..."
-echo "=================="
-if  /bin/ping -c1 -w1 google.com; then
-    echo "Network is live"
-else
-    echo "No network connection detected, attempting to route via USB..."
-    route add default gw 192.168.7.1
-    echo "nameserver 8.8.8.8" > /etc/resolv.conf
-    if  /bin/ping -c1 -w1 google.com; then
-        echo "Network is temporarily live for install"
-    else
-        echo "Aborting setup due to lack of connectivty!"
-        exit 1
-    fi
-fi
-echo
-
 echo "========================="
 echo "Updating package listings"
 echo "========================="

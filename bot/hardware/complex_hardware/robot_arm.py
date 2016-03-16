@@ -17,6 +17,8 @@ from bot.hardware.complex_hardware.QRCode2 import QRCode2
 from SeventhDOF import Rail_Mover
 from bot.hardware.complex_hardware.camera_reader import Camera
 
+import generic_blocks
+
 
 
 class RobotArm(object):
@@ -291,8 +293,22 @@ class RobotArm(object):
         time.sleep(2)
         self.rail.DisplacementConverter(3.5)  #get the rail to the middle
         qr = self.rail_feedback()           #position infront of QRCode
+<<<<<<< HEAD
         
         return qr
+=======
+        return qr
+
+    def MoveToGenericBlock(self):
+        block_dist = 12.5 #adjust to correct block distance from camera
+        self.rail.DisplacementMover(3600 - self.rail.rail_motor.position) #goto middle
+        for i in xrange(1): #potentially move multiple times to get it right
+            img = self.cam.get_current_frame() #needs to be bottom camera
+            offsets = generic_blocks.get_lateral_offset(img, block_dist)
+            if len(offsets) == 0: return 0
+            self.rail.DisplacementConverter(-offsets[0])
+        return 1
+>>>>>>> f9ed3196fd29e56127de2dbd7956fca90b27fc41
     
     def UpdateHopper(self,QR):
         hopper_pos = 5
@@ -345,6 +361,30 @@ class RobotArm(object):
       
 
 
+<<<<<<< HEAD
+=======
+
+        if Tier == 'B' or Tier == 'C':
+            qr = self.MoveToQR()
+        else:
+            ##Todo: Add in generic block code here
+            print "Line up with generic blocks" 
+
+        hopper_pos = 5
+
+        if self.hopper[0] == None:
+            hopper_pos = 1
+        elif self.hopper[1] == None:
+            hopper_pos = 2
+        elif self.hopper[2] == None:
+            hopper_pos = 3
+        elif self.hopper[3] == None:
+            hopper_pos = 4	
+        else:
+            print "error~Hopper Full"
+            return 0 
+
+>>>>>>> f9ed3196fd29e56127de2dbd7956fca90b27fc41
         
         self.servo_cape.transmit_block([0] + BLOCK_GRAB_5)
         time.sleep(2.25)                     #wait for arm to move to location

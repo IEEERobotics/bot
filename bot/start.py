@@ -45,7 +45,7 @@ if len(sys.argv) == 1:
 args = parser.parse_args()
 
 # Run on simulated hardware, or not
-lib.set_testing(args.test_mode, "config.yaml")
+lib.set_testing(args.test_mode)
 if args.test_mode:
     print "Using simulated hardware"
 

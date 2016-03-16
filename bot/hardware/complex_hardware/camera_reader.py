@@ -246,6 +246,7 @@ class Camera(object):
                     targetQR = QRList[min_qr]
         if targetQR == None:
             targetQR = QRList[min_qr]
+            targetQR.case = 'bottom'
             
         return targetQR
     

@@ -13,4 +13,6 @@ class QRCode2:
         self.tvec = tvec
         self.value = value
         self.tr = top_right
-
+        
+        #either top or bottom
+        self.case = 'unknown'

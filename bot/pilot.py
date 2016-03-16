@@ -57,6 +57,9 @@ class Pilot:
         self.call('ctrl', 'stop_full')
         sys.exit(1)
 
+    def find_start_condition(self):
+        self.call('switch', 'detect_switch_orientation')
+
     def move(self, speed, angle):
         self.call('driver', 'move',
                   {'speed': speed, 'angle': angle})
@@ -77,14 +80,16 @@ class Pilot:
         start script will call, and pilot will handle all other logic.
         """
 
-        # wait for Start signal to indicate time to run.
-        # self.wait_for_start()
-        #time.sleep(10)
-        #self.drive(40, 0, 0.7)  # Leave starting block
-        # Move towards the blocks; stop when north sensors detect wall.
-        # Move towards the rail cars
-        self.call('switch', 'test')
-        self.ctrl_client.exit_server()
+        #self.call('switch', 'test')
+        val = self.find_start_condition()
+        # Only on of these values will occur. Find which
+        if val is 0 or 3:
+            self.ctrl_client.exit_server()
+            return
+        # Left or Right?
+        if val is 1:
+        # Left or Right?
+        if val is 2:
 
 if __name__ == "__main__":
     Pilot().run()

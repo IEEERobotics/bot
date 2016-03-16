@@ -293,10 +293,6 @@ class RobotArm(object):
         time.sleep(2)
         self.rail.DisplacementConverter(3.5)  #get the rail to the middle
         qr = self.rail_feedback()           #position infront of QRCode
-<<<<<<< HEAD
-        
-        return qr
-=======
         return qr
 
     def MoveToGenericBlock(self):
@@ -308,7 +304,6 @@ class RobotArm(object):
             if len(offsets) == 0: return 0
             self.rail.DisplacementConverter(-offsets[0])
         return 1
->>>>>>> f9ed3196fd29e56127de2dbd7956fca90b27fc41
     
     def UpdateHopper(self,QR):
         hopper_pos = 5
@@ -358,12 +353,6 @@ class RobotArm(object):
             HOPPER2 = [0, 0, 180, 0, 180]
             HOPPER3 = [0, 40, 180, 0, 180]
 
-      
-
-
-<<<<<<< HEAD
-=======
-
         if Tier == 'B' or Tier == 'C':
             qr = self.MoveToQR()
         else:
@@ -384,7 +373,6 @@ class RobotArm(object):
             print "error~Hopper Full"
             return 0 
 
->>>>>>> f9ed3196fd29e56127de2dbd7956fca90b27fc41
         
         self.servo_cape.transmit_block([0] + BLOCK_GRAB_5)
         time.sleep(2.25)                     #wait for arm to move to location
@@ -402,10 +390,6 @@ class RobotArm(object):
         self.release()
         time.sleep(1) 
         return 1
-
-        
-        
-      
 
     def FindAndGetBlock(self,color):
         """ 
@@ -495,7 +479,4 @@ class RobotArm(object):
                 if Bin == 0:
                     return 1
                 self.Tier_Grab(Tier,Case,Bin)
-            
-        
-        
-    
+

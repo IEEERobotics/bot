@@ -79,10 +79,11 @@ class Pilot:
 
         # wait for Start signal to indicate time to run.
         # self.wait_for_start()
-        time.sleep(10)
-        self.drive(40, 0, 0.7)  # Leave starting block
+        #time.sleep(10)
+        #self.drive(40, 0, 0.7)  # Leave starting block
         # Move towards the blocks; stop when north sensors detect wall.
         # Move towards the rail cars
+        self.call('switch', 'test')
         self.ctrl_client.exit_server()
 
 if __name__ == "__main__":

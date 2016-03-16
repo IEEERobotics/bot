@@ -45,3 +45,7 @@ class Switch():
             return 3
         else:
             return 0
+
+    @lib.api_call
+    def test(self):
+        self.left_course_gpio.output()

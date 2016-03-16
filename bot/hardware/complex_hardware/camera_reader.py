@@ -236,14 +236,19 @@ class Camera(object):
             if (abs(QRList[min_qr -1].tvec[0] - x_min) < .1):
                 if QRList[min_qr -1].tvec[1] < QRList[min_qr].tvec[1]:
                     targetQR = QRList[min_qr-1]
+                    targetQR.case = 'top'
                 else:
                     targetQR = QRList[min_qr]
+                    targetQR.case = 'top'
         if ((min_qr < (len(QRList) - 1)) and (targetQR == None)):
             if (abs(QRList[min_qr +1].tvec[0] - x_min) < .1):
                 if QRList[min_qr +1].tvec[1] < QRList[min_qr].tvec[1]:
                     targetQR = QRList[min_qr+1]
+                    targetQR.case = 'top'
                 else:
                     targetQR = QRList[min_qr]
+                    targetQR.case = 'top'
+                    
         if targetQR == None:
             targetQR = QRList[min_qr]
             targetQR.case = 'bottom'

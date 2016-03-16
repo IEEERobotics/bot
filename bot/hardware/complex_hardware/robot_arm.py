@@ -17,6 +17,8 @@ from bot.hardware.complex_hardware.QRCode2 import QRCode2
 from SeventhDOF import Rail_Mover
 from bot.hardware.complex_hardware.camera_reader import Camera
 
+import generic_blocks
+
 
 
 class RobotArm(object):
@@ -302,7 +304,16 @@ class RobotArm(object):
         self.rail.DisplacementConverter(3.5)  #get the rail to the middle
         qr = self.rail_feedback()           #position infront of QRCode
         return qr
-        
+
+    def MoveToGenericBlock(self):
+        block_dist = 12.5 #adjust to correct block distance from camera
+        self.rail.DisplacementMover(3600 - self.rail.rail_motor.position) #goto middle
+        for i in xrange(1): #potentially move multiple times to get it right
+            img = self.cam.get_current_frame() #needs to be bottom camera
+            offsets = generic_blocks.get_lateral_offset(img, block_dist)
+            if len(offsets) == 0: return 0
+            self.rail.DisplacementConverter(-offsets[0])
+        return 1
     
     def Tier_Grab(self, Tier, Case):
            ### Tier is the level of the barge the block is being grabbed from
@@ -340,7 +351,7 @@ class RobotArm(object):
         if Tier == 'B' or Tier == 'C':
             qr = self.MoveToQR()
         else:
-            ##Todo: Add in generic block code here 
+            ##Todo: Add in generic block code here
             print "Line up with generic blocks" 
 
         hopper_pos = 5

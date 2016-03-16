@@ -32,6 +32,9 @@ done
 load_gpio 30
 load_gpio 60
 
+# remove after competition
+python /root/bot/bot/start.py
+
 ## ADC example
 # enable_adcs
 # load_slot BB-BONE-PRU-01

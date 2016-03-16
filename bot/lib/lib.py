@@ -15,7 +15,7 @@ except ImportError, err:
 _config = None
 _loaded_config_file = None
 _logger = None
-default_config = "bot/config.yaml"
+default_config = "../config.yaml"
 
 
 # Types

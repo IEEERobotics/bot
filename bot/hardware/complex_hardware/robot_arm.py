@@ -310,8 +310,10 @@ class RobotArm(object):
         self.rail.DisplacementMover(3600 - self.rail.rail_motor.position) #goto middle
         for i in xrange(1): #potentially move multiple times to get it right
             img = self.cam.get_current_frame() #needs to be bottom camera
-            offset = generic_blocks.get_lateral_offset(img, block_dist)[0]
-            self.rail.DisplacementConverter(-offset)
+            offsets = generic_blocks.get_lateral_offset(img, block_dist)
+            if len(offsets) == 0: return 0
+            self.rail.DisplacementConverter(-offsets[0])
+        return 1
     
     def Tier_Grab(self, Tier, Case):
            ### Tier is the level of the barge the block is being grabbed from

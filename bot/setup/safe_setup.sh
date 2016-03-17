@@ -128,6 +128,7 @@ python_module() {
     python setup.py install
 }
 
+python_module i2c_device
 python_module DMCC_Library
 pip install pypruss
 pip install  sympy

@@ -13,7 +13,7 @@ bound = lambda x, l, u: l if x < l else u if x > u else x
 MAX_VALUE = 800
 
 class Navigation(object):
-    def __init__(self, rail_cars="west"):
+    def __init__(self, rail_cars=0):
         #TODO: Read the PID values from the config and pass in to side 
         # Change parameters for Side()
         # Change the read_values to average filter values
@@ -35,7 +35,8 @@ class Navigation(object):
                       "east": self.east}
         self.moving = False
         self.logger = lib.get_logger()
-        self.rail_cars_side = rail_cars
+        mapping = ["EXIT", "west", "east"]
+        self.rail_cars_side = mapping[rail_cars]
 
     def stop_unused_motors(self, direction):
         direction = direction.lower()

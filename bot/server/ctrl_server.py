@@ -134,7 +134,8 @@ class CtrlServer(object):
 
         self.switch = Switch()
         self.driver = OmniDriver()
-        self.nav = Navigation()
+        orientation = self.switch.detect_switch_orientation()
+        self.nav = Navigation(orientation)
 #        self.arm = RobotArm(self.config["dagu_arm"])
 
         systems = {}

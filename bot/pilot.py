@@ -99,10 +99,6 @@ class Pilot:
         if val is 0 or 3:
             self.ctrl_client.exit_server()
             return
-        # Left or Right?
-        if val is 1:
-        # Left or Right?
-        if val is 2:
-
+        
 if __name__ == "__main__":
     Pilot().run()

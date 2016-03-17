@@ -128,11 +128,10 @@ python_module() {
     python setup.py install
 }
 
-python_module i2c_device
 python_module DMCC_Library
-python_module pypruss
-python_module sympy
-python_module Pillow
+pip install pypruss
+pip install  sympy
+pip install Pillow
 
 # Zbar doesn't work when installed from pip/apt-get, no idea why
 echo "Install zbar"

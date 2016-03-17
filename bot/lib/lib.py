@@ -15,7 +15,7 @@ except ImportError, err:
 _config = None
 _loaded_config_file = None
 _logger = None
-default_config = "bot/config.yaml"
+default_config = "/root/bot/bot/config.yaml"
 
 
 # Types
@@ -149,7 +149,7 @@ def get_logger():
 
     # Build logger
     logger = logging.getLogger(__name__)
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
 
     # Check if log exists and should therefore be rolled
     needRoll = False

@@ -7,16 +7,8 @@ import signal
 import os
 import sys
 from time import sleep
-from bot.hardware.switch import Switch
 
 # Always called on startup, make sure it's actually ready
-sw = Switch()
-orientation = sw.detect_switch_orientation
-
-# Both zero only when no left/right
-if orientation == 3:
-    quit()
-
 new_path = [os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")]
 sys.path = new_path + sys.path
 
@@ -53,7 +45,7 @@ if len(sys.argv) == 1:
 args = parser.parse_args()
 
 # Run on simulated hardware, or not
-lib.set_testing(args.test_mode, "config.yaml")
+lib.set_testing(args.test_mode)
 if args.test_mode:
     print "Using simulated hardware"
 

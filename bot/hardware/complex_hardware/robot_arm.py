@@ -356,8 +356,8 @@ class RobotArm(object):
         if Tier == 'B' or Tier == 'C':
             qr = self.MoveToQR()
         else:
-            ##Todo: Add in generic block code here
-            print "Line up with generic blocks" 
+            self.MoveToGenericBlock()
+            qr = QRCode2(None, 'generic', None)
 
         hopper_pos = 5
 

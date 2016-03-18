@@ -75,6 +75,19 @@ class Pilot:
     def goto_railcar(self):
         return self.call('nav', 'goto_railcar')
 
+    def do_Zone_B(self):
+        running = True
+        while running:
+            self.goto_block_zone_B()
+            # Do Arm Stuff
+            self.goto_railcar()
+            # Do Arm Stuff
+            self.goto_block_zone_B()
+            # Check if blocks left?
+            blocks_left = False
+            if not blocks_left:
+                running = False
+
     def run(self):
         """Main pilot interface with outside world.
         start script will call, and pilot will handle all other logic.
@@ -86,10 +99,6 @@ class Pilot:
         if val is 0 or 3:
             self.ctrl_client.exit_server()
             return
-        # Left or Right?
-        if val is 1:
-        # Left or Right?
-        if val is 2:
-
+        
 if __name__ == "__main__":
     Pilot().run()

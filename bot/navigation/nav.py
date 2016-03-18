@@ -13,7 +13,7 @@ bound = lambda x, l, u: l if x < l else u if x > u else x
 MAX_VALUE = 800
 
 class Navigation(object):
-    def __init__(self, rail_cars="west"):
+    def __init__(self, rail_cars=0):
         #TODO: Read the PID values from the config and pass in to side 
         # Change parameters for Side()
         # Change the read_values to average filter values
@@ -35,7 +35,8 @@ class Navigation(object):
                       "east": self.east}
         self.moving = False
         self.logger = lib.get_logger()
-        self.rail_cars_side = rail_cars
+        mapping = ["EXIT", "west", "east"]
+        self.rail_cars_side = mapping[rail_cars]
 
     def stop_unused_motors(self, direction):
         direction = direction.lower()
@@ -313,3 +314,33 @@ class Navigation(object):
         self.move_until_wall("north", "east", 500)
         self.logger.info("Reached the barge")
         sleep(0.1)
+
+    @lib.api_call
+    def get_sensor_value(self, value):
+        try:
+            return self.read_IR_values()[value]
+        except KeyError:
+            self.logger.warning("Invalid Key for IR Values %s"%value)
+
+    @lib.api_call
+    def goto_next_railcar(self):
+        def avg(vals):
+            return sum(vals)/float(len(vals))
+        self.moving = True
+        last_value = self.get_sensor_value("West Top")
+        last_set = [last_value for i in xrange(10)]
+        time_elapsed = time()
+        while self.moving:
+            timestep = time() - time_elapsed
+            time_elapsed = time()
+            curr_value = self,get_sensor_value("West Top")
+            diff = curr_value - avg(last_set)
+            if abs(diff) > 100 and diff > 0:
+                self.moving = False
+                break
+            self.move_correct("south", self.rail_cars_side, 300, 55, timestep)
+            last_value = self.get_sensor_value("West Top")
+            last_set.pop_left()
+            last_set.append(last_value)
+        self.moving = False
+        self.stop()

@@ -140,12 +140,4 @@ wget https://github.com/npinchot/zbar/archive/master.zip
 unzip master.zip 
 cd zbar-master
 python setup.py install
-
-
-echo "==============="
-echo "Cleaining up..."
-echo "==============="
-cd $BASE_DIR
-rm -rf fs-bot fs-common setup_bone.sh
-
 echo "Done with local install"

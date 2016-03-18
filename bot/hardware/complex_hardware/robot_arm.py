@@ -235,7 +235,7 @@ class RobotArm(object):
         self.servo_cape.transmit_block([demo_number]
                                          + self.JUNK_BUFFER)        
     
-    
+    @lib.api_call    
     def rail_test(self):
         
         while True:
@@ -296,7 +296,8 @@ class RobotArm(object):
             time.sleep(4)
             self.Tier_Grab('B')
             i= i-1
-            
+           
+    @lib.api_call 
     def MoveToQR(self):
         time.sleep(1)
         self.servo_cape.transmit_block([0] + LOOK_5)
@@ -315,6 +316,7 @@ class RobotArm(object):
             self.rail.DisplacementConverter(-offsets[0])
         return 1
     
+    @lib.api_call
     def Tier_Grab(self, Tier, Case):
            ### Tier is the level of the barge the block is being grabbed from
            ### Case is whether or not a block is on top of another
@@ -389,6 +391,7 @@ class RobotArm(object):
         
       
 
+    @lib.api_call
     def FindAndGetBlock(self,color):
         """ 
         Function which takes a given color, and gets that block out of the hopper
@@ -425,6 +428,7 @@ class RobotArm(object):
         self.reset_home_position()
         return 1 
         
+    @lib.api_call
     def EmptyHopper(self,Bin):
         
         InBetween = [0,20,173,28,180]
@@ -451,13 +455,9 @@ class RobotArm(object):
         time.sleep(6)
         self.release()
         time.sleep(2)
-         
         
         self.hopper[Bin-1] = None 
-        
-        
         
         return 0 
         
         
-    

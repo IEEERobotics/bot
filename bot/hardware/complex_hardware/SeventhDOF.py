@@ -14,8 +14,9 @@ class Rail_Mover:
         board_num = rail_motor_conf["board_num"]
         motor_num = rail_motor_conf["motor_num"]
         
-        self.rail_motor = pyDMCC.DMCCMotor(board_num, motor_num, False)
-    
+        self.rail_DMCC = pyDMCC.DMCC(board_num, motor_num, False)    
+        self.rail_motor = self.rail_DMCC[0]
+
     def Orientor(self,Position):
         
           

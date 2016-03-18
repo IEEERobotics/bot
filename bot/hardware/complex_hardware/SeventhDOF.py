@@ -2,6 +2,7 @@ import os, sys
 from time import sleep
 import pyDMCC
 
+import bot.lib.lib as lib
 
 class Rail_Mover:
 

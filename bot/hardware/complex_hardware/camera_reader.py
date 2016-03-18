@@ -15,7 +15,7 @@ from bot.hardware.complex_hardware.QRCode2 import QRCode2
 
 def find_name(symlink):
     # find where symlink is pointing (/dev/vide0, video1, etc)
-    cmd = "readlink -f /dev/" + udev_name
+    cmd = "readlink -f /dev/" + symlink 
     process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
     out = process.communicate()[0]
 

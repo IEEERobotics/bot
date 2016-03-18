@@ -13,6 +13,18 @@ import bot.lib.lib as lib
 from bot.hardware.qr_code import QRCode
 from bot.hardware.complex_hardware.QRCode2 import QRCode2
 
+def find_name(symlink):
+    # find where symlink is pointing (/dev/vide0, video1, etc)
+    cmd = "readlink -f /dev/" + udev_name
+    process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    out = process.communicate()[0]
+
+    #extract ints from name video0, etc
+    nums = [int(x) for x in out if x.isdigit()]
+    # There should nto be more than one digit
+    interface_num = nums[0]    
+    return interface_num
+
 class Camera(object):
 
     L = 1.5
@@ -30,15 +42,7 @@ class Camera(object):
 
         udev_name = cam_config["udev_name"]
 
-        # find where symlink is pointing (/dev/vide0, video1, etc)
-        cmd = "readlink -f /dev/" + udev_name
-        process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
-        out = process.communicate()[0]
-
-        #extract ints from name video0, etc
-        nums = [int(x) for x in out if x.isdigit()]
-        # There should nto be more than one digit
-        cam_num = nums[0]
+        cam_num = find_name(udev_name)
         
         self.cam = cv2.VideoCapture(cam_num)
         self.cam.set(3, 632)
@@ -289,8 +293,6 @@ class Camera(object):
 
 
     def getDistance(self, length):
-        a = 512.05
-        n = -0.93835
         return a*math.pow(length, n)
 
 

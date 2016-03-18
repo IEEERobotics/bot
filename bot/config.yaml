@@ -29,6 +29,7 @@ dagu_arm: {
         }
 }
 
+
 # TODO: decide on gpio pin numbers
 slider_switch: {
     left_gpio: 30,
@@ -82,6 +83,21 @@ IR_PID : {
 IR_Bias : {
         "North Left": -20, "North Right": 0, "East Top": -50, "East Bottom": 0, "South Right": 0, "South Left": 0, "West Bottom": -15, "West Top": 0
 
+}
+
+
+
+# Cameras
+hp_cam: {
+    a: 1128.1,
+    n: -1.1397,
+    udev_name: hp_cam
+}
+
+generic_cam: {
+    a: 0,
+    n: 0,
+    udev_name: generic_cam
 }
 
 

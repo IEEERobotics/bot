@@ -434,11 +434,11 @@ class RobotArm(object):
         InBetween = [0,20,173,28,180]
         Hopper = [0,80,173,28,180]
         PullBack = [0,30,170,30,180]
-        OffSide = [90,45,60,100,0]
+        OffSide = [90,45,135,10,180]
         
         
         
-        self.servo_cape.transmit_block([0] + InBetween)
+        self.reset_home_postion()
         self.rail.Orientor(Bin)
         time.sleep(1)
         self.servo_cape.transmit_block([0] + Hopper)
@@ -447,9 +447,9 @@ class RobotArm(object):
         time.sleep(3)
         self.servo_cape.transmit_block([0] + PullBack) 
         time.sleep(3) 
-        if Bin != 4:
+        if Bin != 1:
             
-            self.rail.Orientor(4) 
+            self.rail.Orientor(1) 
         
         self.servo_cape.transmit_block([0] + OffSide) 
         time.sleep(6)

@@ -10,7 +10,7 @@ class Rail_Mover:
 
         self.bot_config = lib.get_config()
 
-        rail_motor_conf = self.bot_config["dagu_arm"]["rail_cape"]["rail_cape"]
+        rail_motor_conf = self.bot_config["dagu_arm"]["rail_cape"]["rail_motor"]
         board_num = rail_motor_conf["board_num"]
         motor_num = rail_motor_conf["motor_num"]
         

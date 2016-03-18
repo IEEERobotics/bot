@@ -89,14 +89,14 @@ IR_Bias : {
 
 # Cameras
 hp_cam: {
-    a: 1128.1,
-    n: -1.1397,
+    a: 512.05,
+    n: -0.93835,
     udev_name: hp_cam
 }
 
 generic_cam: {
-    a: 0,
-    n: 0,
+    a: 936.8,
+    n: -0.98655,
     udev_name: generic_cam
 }
 

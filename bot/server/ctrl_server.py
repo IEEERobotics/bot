@@ -19,8 +19,8 @@ from bot.hardware.switch import Switch
 from bot.driver.omni_driver import OmniDriver
 from bot.navigation.nav import Navigation
 
-#from bot.hardware.complex_hardware.robot_arm import RobotArm
-#from bot.hardware.servo_cape import ServoCape
+from bot.hardware.complex_hardware.robot_arm import RobotArm
+from bot.hardware.servo_cape import ServoCape
 
 def is_api_method(obj, name):
     """Tests whether named method exists in obj and is flagged for API export.
@@ -136,14 +136,14 @@ class CtrlServer(object):
         self.driver = OmniDriver()
         orientation = self.switch.detect_switch_orientation()
         self.nav = Navigation(orientation)
-#        self.arm = RobotArm(self.config["dagu_arm"])
+        self.arm = RobotArm(self.config["dagu_arm"])
 
         systems = {}
         systems["ctrl"] = self
         systems["driver"] = self.driver
         systems["switch"] = self.switch
         systems["nav"] = self.nav
-#        systems["arm"] = self.arm
+        systems["arm"] = self.arm
 
 
         self.logger.debug("Systems: {}".format(systems))

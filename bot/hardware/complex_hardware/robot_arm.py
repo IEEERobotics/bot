@@ -431,9 +431,9 @@ class RobotArm(object):
         InBetween = [0,20,173,28,180]
         Hopper = [0,80,173,28,180]
         PullBack = [0,30,170,30,180]
-        OffSide = [90,45,135,10,180]
+        OffSide = [90,60,110,10,180]
         
-        
+      
         
         self.reset_home_position()
         self.rail.Orientor(Bin)

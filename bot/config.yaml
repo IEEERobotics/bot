@@ -3,10 +3,8 @@ testing : false
 # Used for testing individual pices of hardware.
 test_mode: {
     slider_switch: false,
-    ADC: true,
-    DMCC: true,
-    stepper: true,
-    motor: true,
+    DMCC: false,
+    motor: false,
     servo: true,
     servo_cape: true
 }

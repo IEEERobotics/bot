@@ -332,9 +332,9 @@ class RobotArm(object):
 
         elif Tier == 'B':
             ## Mixed QR Blocks 
-            if qr.case = "high":  ## Block on top
+            if qr.case == "high":  ## Block on top
                 BLOCK_GRAB_5 = [0, 120, 110, 75, 180]
-            elif qr.case = "low": ## Block on bottom
+            elif qr.case == "low": ## Block on bottom
                 BLOCK_GRAB_5 = [0, 120, 110, 55, 180]
                 
             LOOK_5 = [0, 25, 170, 10, 180]
@@ -468,7 +468,7 @@ class RobotArm(object):
         HOPPER_LOOK = [90,90,90,90,90]
         #check hopper in array
         if (self.hopper[hopper_pos] != None):
-            if (self.hopper[hopper_pos].data != None:)
+            if (self.hopper[hopper_pos].data != None):
                 print "Color already known."
                 return 1
         #look at the hopper physical

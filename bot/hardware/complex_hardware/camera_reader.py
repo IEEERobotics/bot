@@ -13,6 +13,7 @@ import math
 import bot.lib.lib as lib
 from bot.hardware.qr_code import QRCode
 from bot.hardware.complex_hardware.QRCode2 import QRCode2
+from bot.hardware.complex_hardware.QRCode2 import Block
 
 def find_name(symlink):
     # find where symlink is pointing (/dev/vide0, video1, etc)

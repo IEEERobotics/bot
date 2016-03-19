@@ -321,7 +321,9 @@ class RobotArm(object):
     def Tier_Grab(self, Tier, Case):
            ### Tier is the level of the barge the block is being grabbed from
            ### Case is whether or not a block is on top of another
-           
+        if Tier == 'B' or Tier == 'C':
+            qr = self.MoveToQR()
+         
         if Tier == 'A':
             ## Generic Blocks 
             print "Not coded yet" 
@@ -330,32 +332,28 @@ class RobotArm(object):
 
         elif Tier == 'B':
             ## Mixed QR Blocks 
-            if Case == 1:  ## Block on top
+            if qr.case = "high":  ## Block on top
                 BLOCK_GRAB_5 = [0, 120, 110, 75, 180]
-            elif Case == 2: ## Block on bottom
+            elif qr.case = "low": ## Block on bottom
                 BLOCK_GRAB_5 = [0, 120, 110, 55, 180]
                 
             LOOK_5 = [0, 25, 170, 10, 180]
-            HOPPER1 = [0, 25, 170, 10, 180]
-            HOPPER2 = [0, 0, 180, 0, 180]
-            HOPPER3 = [0, 40, 180, 0, 180]
+            HOPPER1 = [0, 90, 100, 55, 180]
+            HOPPER2 = [0, 40, 180, 0, 180]
+            
 
         elif Tier == 'C':
             BLOCK_MOVE_5 = [0, 60, 20, 40, 0]
             BLOCK_GRAB_5 = [0, 0, 10, 50, 0]
             LOOK_5 = [0, 25, 170, 10, 180]
-            HOPPER1 = [0, 0, 10, 0, 180]
-            HOPPER2 = [0, 0, 180, 0, 180]
+            HOPPER1 = [0, 90, 100, 35, 180]
             HOPPER3 = [0, 40, 180, 0, 180]
 
 
 
 
-        if Tier == 'B' or Tier == 'C':
-            qr = self.MoveToQR()
-        else:
-            ##Todo: Add in generic block code here
-            print "Line up with generic blocks" 
+
+
 
         hopper_pos = 5
 
@@ -373,7 +371,7 @@ class RobotArm(object):
 
         
         self.servo_cape.transmit_block([0] + BLOCK_GRAB_5)
-        time.sleep(2.25)                     #wait for arm to move to location
+        time.sleep(3)                     #wait for arm to move to location
         self.grab()
         time.sleep(1.25)                       #wait for arm to grab
         self.servo_cape.transmit_block([0] + HOPPER1)
@@ -381,9 +379,8 @@ class RobotArm(object):
         self.servo_cape.transmit_block([0] + HOPPER2)
         time.sleep(3)                     #wait for arm to move to location
         self.rail.Orientor(hopper_pos)
-        time.sleep(.25)                     #wait for rail to move to bin location
-        self.servo_cape.transmit_block([0] + HOPPER3)
-        time.sleep(1.5)                     #wait for arm to move to location
+        time.sleep(1)                     #wait for rail to move to bin location
+
 
         self.release()
         time.sleep(1) 
@@ -435,11 +432,11 @@ class RobotArm(object):
         InBetween = [0,20,173,28,180]
         Hopper = [0,80,173,28,180]
         PullBack = [0,30,170,30,180]
-        OffSide = [90,45,135,10,180]
+        OffSide = [90,60,110,10,180]
         
+      
         
-        
-        self.reset_home_postion()
+        self.reset_home_position()
         self.rail.Orientor(Bin)
         time.sleep(1)
         self.servo_cape.transmit_block([0] + Hopper)

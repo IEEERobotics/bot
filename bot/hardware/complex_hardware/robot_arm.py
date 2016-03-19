@@ -13,8 +13,8 @@ import bot.lib.lib as lib
 from bot.hardware.servo_cape import ServoCape
 
 from bot.hardware.qr_code import QRCode
-from bot.hardware.complex_hardware.QRCode2 import QRCode2
-from bot.hardware.complex_hardware.QRCode2 import Block
+from bot.hardware.complex_hardware.QRCode2 import QRCode2, Block 
+
 from SeventhDOF import Rail_Mover
 from bot.hardware.complex_hardware.camera_reader import Camera
 

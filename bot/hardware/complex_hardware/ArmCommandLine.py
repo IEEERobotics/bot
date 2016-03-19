@@ -20,6 +20,7 @@ while True:
     print "6:  Pinch         "
     print "7:  Let go        "
     print "8:  Reset the arm and rail"
+    print "9:  Check color in bin" 
 
     Command = input("Command:  ")
     
@@ -59,3 +60,8 @@ while True:
      
     if Command == 8:
         arm.reset_home_position()
+        
+    if Command == 9: 
+        bin = input("which bin to check:  ") 
+        arm.check_block_color(bin) 
+    

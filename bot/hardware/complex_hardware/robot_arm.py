@@ -429,9 +429,9 @@ class RobotArm(object):
     @lib.api_call
     def EmptyHopper(self,Bin):
         
-        InBetween = [0,20,173,28,180]
+        
         Hopper = [0,80,173,28,180]
-        PullBack = [0,30,170,30,180]
+        PullBack = [0,15,170,30,180]
         OffSide = [90,60,110,10,180]
         
       
@@ -465,21 +465,22 @@ class RobotArm(object):
         Takes the hopper posisiton 0-3 as input and will look at the hopper posistion
         to see what clor it is then update the hopper array with the new data.
         """
-        HOPPER_LOOK = [90,90,90,90,90]
+        HOPPER_LOOK = [0,85,170,30,180]
         #check hopper in array
         if (self.hopper[hopper_pos] != None):
             if (self.hopper[hopper_pos].data != None:)
                 print "Color already known."
                 return 1
-        #look at the hopper physical
+        #look at the hopper physically
         self.rail.Orientor(hopper_pos + 1)
-        self.joints = [HOPPER_LOOK]
+        self.joints = HOPPER_LOOK
         time.sleep(3)
         #look for a color
         largest = self.cam.check_color()
         #udate with color found
         if largest != None:
             self.hopper[hopper_pos].value = largest.color
+            print largest.color 
         else: 
             print "Error: No color Found."
     

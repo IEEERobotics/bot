@@ -484,4 +484,14 @@ class RobotArm(object):
         else: 
             print "Error: No color Found."
     
+    @lib.api_call 
+    def check_box_color(self):
+        Look = [90, 45, 170, 10, 180]
+        
+        self.reset_home_position()
+        self.joints = Look
+        largest = self.cam.check_color() 
+        
+        return largest.color 
+        
     

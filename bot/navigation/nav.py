@@ -35,7 +35,7 @@ class Navigation(object):
                       "east": self.east}
         self.moving = False
         self.logger = lib.get_logger()
-        mapping = ["EXIT", "west", "east"]
+        mapping = ["EXIT", "west", "east", "EXIT"]
         self.rail_cars_side = mapping[rail_cars]
 
     def stop_unused_motors(self, direction):

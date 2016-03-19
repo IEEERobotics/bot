@@ -17,11 +17,15 @@ while True:
     print "3:  Set Hopper" 
     print "4:  Empty hopper"  
     print "5:  Grab the block" 
+    print "7:  Test function" 
 
     Command = input("Command:  ")
     
     if Command == -1: 
         break
+    if Command == 2:
+        Pos = input("Which bin:  ")
+        arm.rail.Orientor(Pos) 
     if Command == 1:
         arm.demo_set_angles()
     if Command == 4:
@@ -37,3 +41,5 @@ while True:
             qr = QRCode2(0,Color,0)
             arm.hopper[i]=qr 
             i=i+1
+    if Command == 7:
+        arm.TestFunction() 

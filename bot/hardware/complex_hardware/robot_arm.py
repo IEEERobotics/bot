@@ -460,4 +460,35 @@ class RobotArm(object):
         
         return 0 
         
-        
+    def TestFunction(self):
+        GrabHigh = [0,120,110,75,180] 
+        GrabLow = [0,120,110,55,180] 
+        Hopper1 = [0,90,100,55,180] 
+        Hopper2 = [0,40,180,0,180] 
+        self.reset_home_position()
+        self.joints = GrabHigh
+        time.sleep(3)
+        self.grab()
+        time.sleep(1)
+        self.joints= Hopper1
+        time.sleep(2)
+        self.rail.Orientor(1)
+        self.joints = Hopper2
+        time.sleep(2)
+        self.release() 
+        time.sleep(2)
+        self.reset_home_position()
+        self.joints = GrabLow 
+        time.sleep(3)
+        self.grab()
+        time.sleep(1)
+        self.joints = Hopper1
+        time.sleep(2)
+        self.rail.Orientor(2)
+        time.sleep(1)
+        self.joints = Hopper2 
+        time.sleep(2)
+        self.release()
+        time.sleep(2)
+        self.reset_home_position()
+

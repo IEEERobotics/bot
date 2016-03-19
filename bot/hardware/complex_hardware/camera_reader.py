@@ -5,6 +5,7 @@ import subprocess
 import zbar
 import cv2
 from PIL import Image
+from PIL import ImageEnhance
 import cv2
 import math
 
@@ -253,7 +254,6 @@ class Camera(object):
             
         return targetQR
     
-    
     #new solvepnp
     def solveQR(self, tl, tr, bl, br):
         QRSize = 1.5                # units = inches
@@ -291,8 +291,93 @@ class Camera(object):
 
         return [x_units, y_units, z_units, displacement]
 
-
     def getDistance(self, length):
         return a*math.pow(length, n)
+    
+    #color library
+    def check_color(hopper_pos):
+    
+        largest = None
+
+        """
+        #make sure it lack a color field
+        if (self.hopper[hopper_pos] != None):
+            if (self.hopper[hopper_pos].data != None:)
+                print "Color already known."
+                return 1
+        #look at the hopper
+        arm.Orientor(hopper_pos + 1)
+        self.joints = [HOPPER_LOOK]
+        time.sleep(3)
+        """
+
+        #get the image
+        cap.grab()
+        cap.grab()
+        cap.grab()
+        cap.grab()
+        ret, bgr = cap.read()
+
+        #crop the image
+        for x_val in range(0,x_third):
+            for y_val in range(0,y):
+                bgr[y_val, x_val] = [0,0,0]
+
+        for x_val in range(x - x_third,x):
+            for y_val in range(0,y):
+                bgr[y_val, x_val] = [0,0,0]
+
+        #enhance and show the image with gaussian and color
+        bgr_enhanced = enhance_color(bgr)
+        cv2.imshow("enhanced",bgr_enhanced)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            return None
+
+        # define the list of boundaries
+        boundaries = [
+            ([0,0,120], [230,50,255]),                          #red bgr  GOOD
+            ([220,0,0], [255,150,150]),                         #blue bgr GOOD
+            ([0,125,125], [100,255,255]),                       #yellow bgr GOOD
+            ([75,120,0], [185,255,75])                           #green: bad
+        ]
+
+        # loop over the boundaries
+        count = 0
+        for (lower, upper) in boundaries:
+            # create NumPy arrays from the boundaries
+            lower = np.array(lower)
+            upper = np.array(upper)
+
+            # find the colors within the specified boundaries and apply the mask
+            mask = cv2.inRange(bgr_enhanced, lower, upper)
+            mask = cv2.erode(mask, None, iterations=15)
+            output = cv2.dilate(mask, None, iterations=5)
+
+            #find contours of the masked output
+            (cnts,_) = cv2.findContours(output.copy(),cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
+
+            cnt = 0
+            for contour in cnts:
+                size = cv2.contourArea(contour)
+                if largest != None:
+                    if (size > largest.size):
+                        largest = block(size, num_to_color(count))
+                else:
+                    largest = block(size, num_to_color(count))
+
+                center = find_center(contour)
+                cv2.circle(output, center, 5, (0,0,255), -1) 
+                cnt += 1
+
+            #if count == 3:
+            #    cv2.imshow("green",output)
+            #    if cv2.waitKey(1) & 0xFF == ord('q'):
+            #        return None
+
+            count += 1
+
+        #arm.hopper[hopper_pos].data = largest.color
+
+        return largest
 
 

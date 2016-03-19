@@ -464,15 +464,23 @@ class RobotArm(object):
         
         
     def check_block_color(self, hopper_pos):
+        """
+        Takes the hopper posisiton 0-3 as input and will look at the hopper posistion
+        to see what clor it is then update the hopper array with the new data.
+        """
+        HOPPER_LOOK = [90,90,90,90,90]
+        #check hopper in array
         if (self.hopper[hopper_pos] != None):
             if (self.hopper[hopper_pos].data != None:)
                 print "Color already known."
                 return 1
-        #look at the hopper
+        #look at the hopper physical
         self.rail.Orientor(hopper_pos + 1)
         self.joints = [HOPPER_LOOK]
         time.sleep(3)
+        #look for a color
         largest = self.cam.check_color()
+        #udate with color found
         if largest != None:
             self.hopper[hopper_pos].data = largest.color
         else: 

@@ -296,6 +296,11 @@ class Camera(object):
     
     #color library
     def check_color(self):
+        """
+        Looks through the camera and detects blocks size and color.
+        returns a Block object of with the size and color data fields.
+        """
+        
         x_third = int(resX/3)
         largest = None
 

@@ -14,6 +14,11 @@ class QRCode2:
         self.value = value
         self.tr = top_right
         
+class block:
+    def __init__(self, size, color):
+        self.size = size
+        self.color = color
+        
 class Camera:
     def  __init__(self):
         # Image processing 

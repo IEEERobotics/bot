@@ -5,6 +5,7 @@ import subprocess
 import zbar
 import cv2
 from PIL import Image
+from PIL import ImageEnhance
 import cv2
 import math
 
@@ -253,7 +254,6 @@ class Camera(object):
             
         return targetQR
     
-    
     #new solvepnp
     def solveQR(self, tl, tr, bl, br):
         QRSize = 1.5                # units = inches
@@ -291,8 +291,10 @@ class Camera(object):
 
         return [x_units, y_units, z_units, displacement]
 
-
     def getDistance(self, length):
         return a*math.pow(length, n)
+    
+    #color library
+    
 
 

@@ -14,7 +14,7 @@ class QRCode2:
         self.value = value
         self.tr = top_right
         
-class block:
+class Block:
     def __init__(self, size, color):
         self.size = size
         self.color = color

@@ -14,6 +14,7 @@ from bot.hardware.servo_cape import ServoCape
 
 from bot.hardware.qr_code import QRCode
 from bot.hardware.complex_hardware.QRCode2 import QRCode2
+from bot.hardware.complex_hardware.QRCode2 import Block
 from SeventhDOF import Rail_Mover
 from bot.hardware.complex_hardware.camera_reader import Camera
 
@@ -461,3 +462,20 @@ class RobotArm(object):
         return 0 
         
         
+        
+    def check_block_color(self, hopper_pos):
+        if (self.hopper[hopper_pos] != None):
+            if (self.hopper[hopper_pos].data != None:)
+                print "Color already known."
+                return 1
+        #look at the hopper
+        self.rail.Orientor(hopper_pos + 1)
+        self.joints = [HOPPER_LOOK]
+        time.sleep(3)
+        largest = self.cam.check_color()
+        if largest != None:
+            self.hopper[hopper_pos].data = largest.color
+        else: 
+            print "Error: No color Found."
+    
+    

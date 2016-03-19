@@ -295,50 +295,35 @@ class Camera(object):
         return a*math.pow(length, n)
     
     #color library
-    def check_color(hopper_pos):
-    
+    def check_color(self):
+        x_third = int(resX/3)
         largest = None
 
-        """
-        #make sure it lack a color field
-        if (self.hopper[hopper_pos] != None):
-            if (self.hopper[hopper_pos].data != None:)
-                print "Color already known."
-                return 1
-        #look at the hopper
-        arm.Orientor(hopper_pos + 1)
-        self.joints = [HOPPER_LOOK]
-        time.sleep(3)
-        """
-
         #get the image
-        cap.grab()
-        cap.grab()
-        cap.grab()
-        cap.grab()
-        ret, bgr = cap.read()
+        self.cam.grab()
+        self.cam.grab()
+        self.cam.grab()
+        self.cam.grab()
+        ret, bgr = self.cam.read()
 
         #crop the image
         for x_val in range(0,x_third):
-            for y_val in range(0,y):
+            for y_val in range(0,resY):
                 bgr[y_val, x_val] = [0,0,0]
 
-        for x_val in range(x - x_third,x):
-            for y_val in range(0,y):
+        for x_val in range(resX - x_third,resX):
+            for y_val in range(0,resY):
                 bgr[y_val, x_val] = [0,0,0]
 
-        #enhance and show the image with gaussian and color
-        bgr_enhanced = enhance_color(bgr)
-        cv2.imshow("enhanced",bgr_enhanced)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            return None
+        #enhance and show the image with gaussian and colorenhance
+        bgr_enhanced = self.enhance_color(bgr)
 
         # define the list of boundaries
         boundaries = [
             ([0,0,120], [230,50,255]),                          #red bgr  GOOD
             ([220,0,0], [255,150,150]),                         #blue bgr GOOD
             ([0,125,125], [100,255,255]),                       #yellow bgr GOOD
-            ([75,120,0], [185,255,75])                           #green: bad
+            ([75,120,0], [185,255,75])                          #green: bad
         ]
 
         # loop over the boundaries
@@ -361,23 +346,47 @@ class Camera(object):
                 size = cv2.contourArea(contour)
                 if largest != None:
                     if (size > largest.size):
-                        largest = block(size, num_to_color(count))
+                        largest = Block(size, self.num_to_color(count))
                 else:
-                    largest = block(size, num_to_color(count))
+                    largest = Block(size, self.num_to_color(count))
 
-                center = find_center(contour)
+                center = self.find_center(contour)
                 cv2.circle(output, center, 5, (0,0,255), -1) 
                 cnt += 1
 
-            #if count == 3:
-            #    cv2.imshow("green",output)
-            #    if cv2.waitKey(1) & 0xFF == ord('q'):
-            #        return None
-
             count += 1
-
-        #arm.hopper[hopper_pos].data = largest.color
 
         return largest
 
+    def enhance_color(self, bgr):
+        #enhance the image with gaussian and color
+        bgr2 = cv2.GaussianBlur(bgr,(9,9),0)
+        rgb = cv2.cvtColor(bgr2,cv2.COLOR_BGR2RGB)
+        pil_im = Image.fromarray(rgb)
+        converter = ImageEnhance.Color(pil_im)
+        enhanced = converter.enhance(3.0)
+        pil_image = enhanced.convert('RGB') 
+        open_cv_image = np.array(pil_image)
+
+        # Convert RGB to BGR 
+        rgb_enhanced = open_cv_image[:, :, ::-1].copy()
+        bgr_enhanced = cv2.GaussianBlur(rgb_enhanced,(9,9),0)
+        return bgr_enhanced
+
+    def num_to_color(self, number):
+        if number == 0:
+            return "red"
+        if number == 1:
+            return "blue"
+        if number == 2:
+            return "yellow"
+        if number == 3:
+            return "green"
+        else:
+            return None
+
+    def find_center(self, cnt):
+        (x,y), r = cv2.minEnclosingCircle(cnt)
+        center = (int(x), int(y))
+        return center
 

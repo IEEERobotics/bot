@@ -479,7 +479,7 @@ class RobotArm(object):
         largest = self.cam.check_color()
         #udate with color found
         if largest != None:
-            self.hopper[hopper_pos].data = largest.color
+            self.hopper[hopper_pos].value = largest.color
         else: 
             print "Error: No color Found."
     

@@ -16,25 +16,46 @@ while True:
     print "2:  Move to hopper pos"
     print "3:  Set Hopper" 
     print "4:  Empty hopper"  
-    print "5:  Grab the block" 
+    print "5:  Grab the block"
+    print "6:  Pinch         "
+    print "7:  Let go        "
+    print "8:  Reset the arm and rail"
 
     Command = input("Command:  ")
     
     if Command == -1: 
+        print "Good Bye!"
         break
+        
     if Command == 1:
         arm.demo_set_angles()
-    if Command == 4:
-        Color = raw_input("Which color:  ")
-        arm.reset_home_position() 
-        arm.FindAndGetBlock(Color)
-    if Command == 5:
-        Tier = raw_input("Which Tier")
-        arm.Tier_Grab(Tier)
+        
+    if Command == 2:
+        Pos = input("which bin to go to:  ")
+        arm.rail.Orientor(Pos)
+        
     if Command == 3:
         i = 0
         while i < 4:
             Color = raw_input("Block color:   ") 
             qr = QRCode2(0,Color,0)
             arm.hopper[i]=qr 
-            i=i+1
+            i=i+1   
+            
+    if Command == 4:
+        Color = raw_input("Which color:  ")
+        arm.reset_home_position() 
+        arm.FindAndGetBlock(Color)
+        
+    if Command == 5:
+        Tier = raw_input("Which Tier")
+        arm.Tier_Grab(Tier)
+        
+    if Command == 6: 
+        arm.grab()
+        
+    if Command == 7:
+        arm.release()
+     
+    if Command == 8:
+        arm.reset_home_position()

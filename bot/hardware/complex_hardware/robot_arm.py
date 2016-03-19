@@ -465,7 +465,7 @@ class RobotArm(object):
         Takes the hopper posisiton 0-3 as input and will look at the hopper posistion
         to see what clor it is then update the hopper array with the new data.
         """
-        HOPPER_LOOK = [0,85,170,30,180]
+        HOPPER_LOOK = [0,65,170,20,180]
         #check hopper in array
         if (self.hopper[hopper_pos] != None):
             if (self.hopper[hopper_pos].data != None):

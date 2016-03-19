@@ -26,6 +26,7 @@ while True:
         arm.demo_set_angles()
     if Command == 4:
         Color = raw_input("Which color:  ")
+        arm.reset_home_position() 
         arm.FindAndGetBlock(Color)
     if Command == 5:
         Tier = raw_input("Which Tier")

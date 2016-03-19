@@ -24,8 +24,8 @@ dagu_arm: {
     camera: hp_cam,
 
     rail_cape:{
-         rail_motor: { board_num: 3, motor_num: 2 },
-         unused: {board_num: 3, motor_num: 1}
+         rail_motor: { board_num: 1, motor_num: 2 },
+         unused: {board_num: 1, motor_num: 1}
         }
 }
 

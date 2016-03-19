@@ -438,7 +438,7 @@ class RobotArm(object):
         
         
         
-        self.reset_home_postion()
+        self.reset_home_position()
         self.rail.Orientor(Bin)
         time.sleep(1)
         self.servo_cape.transmit_block([0] + Hopper)

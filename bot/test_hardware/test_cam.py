@@ -4,8 +4,8 @@ cam = cv2.VideoCapture(0)
 
 
 
-cam.set(3,300)
-cam.set(4,400)
+cam.set(3,640)
+cam.set(4,480)
 
 ret, frame = cam.read()
 
@@ -15,4 +15,4 @@ print "Y: ", cam.get(4)
 print ret
 print frame
 
-cv2.imwrite('hd_cam.png', frame)
+cv2.imwrite('arm_cam.png', frame)

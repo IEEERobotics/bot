@@ -47,8 +47,8 @@ class Camera(object):
         cam_num = find_name(udev_name)
         
         self.cam = cv2.VideoCapture(cam_num)
-        self.cam.set(3, 640)
-        self.cam.set(4, 480)
+        self.cam.set(3, 632)
+        self.cam.set(4, 474)
         
         self.resX = self.cam.get(3)
         self.resY = self.cam.get(4)

@@ -321,27 +321,29 @@ class Navigation(object):
         def avg(vals):
             return sum(vals)/float(len(vals))
         self.moving = True
+        speed = 50
         sensor = "West Bottom"
         last_value = self.get_sensor_value(sensor)
         self.logger.info("sensor value: %d", last_value)
         last_set = [last_value for i in xrange(10)]
         time_elapsed = time()
-        self.move_dead("south", 50)
+        self.move_dead("south", speed)
         while self.moving:
             timestep = time() - time_elapsed
             time_elapsed = time()
             curr_value = self.get_sensor_value(sensor)
             self.logger.info("sensor value: %d", curr_value)
             diff = curr_value - avg(last_set)
+            if abs(self.sides[self.rail_cars_side].get_diff_correction(timestep)) > 20:
+                self.move_correct("south", self.rail_cars_side, 100, speed, timestep)
             if diff > 100:
                 if sensor == "West Bottom":
                     sensor = "West Top"
-                    self.move_dead("south", 35)
+                    speed = 35
                     last_set = [curr_value for i in xrange(10)]
                 else:
                     self.moving = False
                     break
-            #self.move_correct("south", "west", 100, 50, timestep)
             last_set.pop(0)
             last_set.append(curr_value)
             sleep(0.01)

@@ -508,7 +508,8 @@ class RobotArm(object):
                 self.Tier_Grab(Tier,2) 
                 i = i + 1
             return 1 
-    
+            
+    @lib.api_call 
     def check_hopper(self):
         i = 0
         while i < 4:

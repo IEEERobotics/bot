@@ -508,5 +508,11 @@ class RobotArm(object):
                 self.Tier_Grab(Tier,2) 
                 i = i + 1
             return 1 
+    
+    def check_hopper(self):
+        i = 0
+        while i < 4:
+            self.check_block_colot(i) 
+            i = i + 1
         
     

@@ -366,3 +366,17 @@ class Navigation(object):
             self.move_until_wall("north", "west", 500)
         self.logger.info("Reached the barge")
         sleep(0.1)
+        
+    @lib.api_call
+    def move_s(self, north=-100, south=-100, west=80, east=80):
+        self.driver.set_motor("north", north)
+        self.driver.set_motor("south", south)
+        self.driver.set_motor("west", west)
+        self.driver.set_motor("east", east)
+        
+        
+    @lib.api_call
+    def move_through_tunnel(self, north=-100, south=-100, west=80, east=80, duration=.75):
+        self.move_s(north,south,west,east)
+        sleep(duration)
+        

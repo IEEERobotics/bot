@@ -67,7 +67,6 @@ while True:
         arm.reset_home_position()
         
     if Command == 9: 
-        
-        arm.check_hopper() 
-        print arm.hopper
+        bin = input("which bin to check:  ") 
+        arm.check_block_color(bin) 
     

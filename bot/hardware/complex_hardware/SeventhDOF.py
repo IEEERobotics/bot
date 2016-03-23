@@ -54,8 +54,9 @@ class Rail_Mover:
             power = 40
             self.rail_motor.power = power
             print self.rail_motor.position
+            i = 0 
             while self.rail_motor.position > (StartPOS + Displacement):
-                
+                i = i +1 
             print self.rail_motor.position
             
             self.rail_motor.power = 0
@@ -64,9 +65,9 @@ class Rail_Mover:
             power = -40
             self.rail_motor.power = power
             print self.rail_motor.position
-            
+            i = 0
             while self.rail_motor.position < (StartPOS + Displacement):
-                       
+                i = i +1     
                
             print self.rail_motor.position
             self.rail_motor.power = 0

@@ -271,10 +271,8 @@ class RobotArm(object):
                         rail_ret = self.rail.DisplacementConverter(x_disp)
                         if rail_ret == 0:
                             #out of range, reset to middle and try again
-                            disp = self.rail.DMCC[1].motors[2].position
-                            ticks = 3000 - disp
-                            self.rail.DisplacementMover(ticks)
-            else:                                   # if no qrcodes are found
+                            self.rail.MoveToPosition(3500)
+            else:       # if no qrcodes are found
                 if count >= 3:
                     count = 0
                     limit = self.rail.DisplacementConverter(1.5*direction)

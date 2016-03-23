@@ -304,13 +304,15 @@ class Camera(object):
         
         x_third = int(self.resX/3)
         largest = None
-
+        print "Getting the frame"
         #get the image
         self.cam.grab()
         self.cam.grab()
         self.cam.grab()
         self.cam.grab()
         ret, bgr = self.cam.read()
+        
+        print "got the Frame, cropping the image"
 
         #crop the image
         for x_val in range(0,x_third):
@@ -320,7 +322,8 @@ class Camera(object):
         for x_val in range(self.resX - x_third,self.resX):
             for y_val in range(0,self.resY):
                 bgr[y_val, x_val] = [0,0,0]
-
+        
+        print "cropped, enhancing color"
         #enhance and show the image with gaussian and colorenhance
         bgr_enhanced = self.enhance_color(bgr)
 
@@ -333,6 +336,7 @@ class Camera(object):
         ]
 
         # loop over the boundaries
+        print "looking for colors"
         count = 0
         for (lower, upper) in boundaries:
             # create NumPy arrays from the boundaries
@@ -361,7 +365,11 @@ class Camera(object):
                 cnt += 1
 
             count += 1
-
+        
+        if  largest == None:
+            print  "no color found"
+        else:
+            print "Color found: ", largest.color
         return largest
 
     def enhance_color(self, bgr):

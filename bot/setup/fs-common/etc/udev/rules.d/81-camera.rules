@@ -1,5 +1,5 @@
 #logitech
-KERNEL=="video*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="0825", ATTRS{serial}=="081C01D0", SYMLINK+="CAMC"
+KERNEL=="video*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="0825", ATTRS{serial}=="081C01D0", SYMLINK+="logitech_cam"
 
 # Playstation camera
 KERNEL=="video*", ATTRS{idVendor}=="1d6b", ATTRS{idProduct}=="0002", ATTRS{serial}=="0000:00:1d.0", SYMLINK+="PSCAM"

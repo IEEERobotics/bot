@@ -19,7 +19,7 @@ dagu_arm: {
         i2c_bus: 1,
         i2c_addr: 0x10
     },
-    camera: hp_cam,
+    camera: logitech_cam,
 
     rail_cape:{
          rail_motor: { board_num: 1, motor_num: 2 },
@@ -98,6 +98,11 @@ generic_cam: {
     udev_name: generic_cam
 }
 
+logitech_cam: {
+    a: 936.8,
+    n: -0.98655,
+    udev_name: logitech_cam
+}
 
 logging: {log_file: bot/logs/bot.log, file_handler_level: DEBUG, stream_handler_level: INFO}  # Logging options
 test_pwm_base_dir: bot/simulator/pins/pwm/pwm

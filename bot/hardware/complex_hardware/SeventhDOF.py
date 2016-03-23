@@ -116,29 +116,16 @@ class Rail_Mover:
     
     @lib.api_call 
     def MoveToPosition(self,Position):
-        power = 60 
+        
         current_position = self.rail_motor.position
         
         if Position < 0 or Position > 7150:
             print "Invalid Position"
             return 0
             
-        if Position == current_position:
-            return 1
+        Displacement = Position - current_position
         
-        if Position < current_position:
-            self.rail_motor.power = power
-            
-            while self.rail_motor.position > (Position - 20): 
-                print self.rail_motor.position
-            
-        if Position > current_position: 
-            self.rail_motor.power = -power 
-            
-            while self.rail_motor.position < (Position + 20): 
-                print self.rail_motor.position
-        
-        self.rail_motor.power = 0 
+        self.DisplacementMover(Displacement) 
          
         
 

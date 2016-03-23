@@ -17,6 +17,7 @@ from QRCode2 import QRCode2, Block
 
 from SeventhDOF import Rail_Mover
 from bot.hardware.complex_hardware.camera_reader import Camera
+import pyDMCC 
 
 import generic_blocks
 

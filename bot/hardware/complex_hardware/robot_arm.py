@@ -509,10 +509,13 @@ class RobotArm(object):
                 Position = self.rail.rail_motor.position 
                 time.sleep(3)
                 self.Tier_Grab(Tier,1) 
+                self.reset_home_position() 
                 time.sleep(2)
                 self.rail.MoveToPosition(Position) 
                 time.sleep(2) 
                 self.Tier_Grab(Tier,2) 
+                self.rail.reset_home_position()
+                
                 i = i + 1
             self.reset_home_position() 
             return 1 

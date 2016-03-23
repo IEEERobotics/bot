@@ -267,7 +267,7 @@ class RobotArm(object):
                 else:
                     print "Checking Alignment with x_disp = ", x_disp
                     if abs(x_disp) > .1:
-                        rail_ret = self.rail.DisplacementConverter(-1 * x_disp)
+                        rail_ret = self.rail.DisplacementConverter(x_disp)
                         if rail_ret == 0:
                             #out of range, reset to middle and try again
                             disp = self.rail.DMCC[1].motors[2].position

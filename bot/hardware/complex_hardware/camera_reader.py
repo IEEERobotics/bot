@@ -50,8 +50,8 @@ class Camera(object):
         self.cam.set(3, 1280)
         self.cam.set(4, 720)
         
-        self.resX = self.cam.get(3)
-        self.resY = self.cam.get(4)
+        self.resX = int(elf.cam.get(3))
+        self.resY = int(self.cam.get(4))
 
         # QR scanning tools
         self.scanner = zbar.ImageScanner()
@@ -293,7 +293,7 @@ class Camera(object):
         return [x_units, y_units, z_units, displacement]
 
     def getDistance(self, length):
-        return self.a*math.pow(length, self.n)
+        return a*math.pow(length, n)
     
     #color library
     def check_color(self):

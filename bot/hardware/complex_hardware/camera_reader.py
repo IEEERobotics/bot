@@ -209,7 +209,9 @@ class Camera(object):
 
             QRList.append(QRCode2(tvec, symbol.data, tr)) 
             count += 1
-
+        
+        #cleanup
+        del(z_im)
         if count == 0:
             print "No QRCode Found"
             return None

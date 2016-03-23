@@ -274,7 +274,7 @@ class RobotArm(object):
                             ticks = 3000 - disp
                             self.rail.DisplacementMover(ticks)
             else:                                   # if no qrcodes are found
-                if count >= 8:
+                if count >= 3:
                     count = 0
                     limit = self.rail.DisplacementConverter(1.5*direction)
                     if limit == 0:                  #out of range

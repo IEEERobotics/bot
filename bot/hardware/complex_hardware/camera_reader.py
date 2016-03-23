@@ -39,6 +39,7 @@ class Camera(object):
         self.logger = lib.get_logger()
 
         udev_name = cam_config["udev_name"]
+        print udev_name
 
         cam_num = find_name(udev_name)
         

@@ -373,16 +373,16 @@ class RobotArm(object):
         self.servo_cape.transmit_block([0] + BLOCK_GRAB_5)
         time.sleep(3)                     #wait for arm to move to location
         self.grab()
-        time.sleep(1.25)                       #wait for arm to grab
+        time.sleep(3)                       #wait for arm to grab
         self.servo_cape.transmit_block([0] + HOPPER1)
 
-        time.sleep(3)                     #wait for arm to move to location
+        time.sleep(5)                     #wait for arm to move to location
         self.rail.Orientor(hopper_pos)
-        time.sleep(1)                     #wait for rail to move to bin location
+        time.sleep(5)                     #wait for rail to move to bin location
         self.joints = self.HOME
-        time.sleep(1.5)                       #wait for arm to move to location
+        time.sleep(3)                       #wait for arm to move to location
         self.servo_cape.transmit_block([0] + HOPPER2)
-
+        time.sleep(3) 
 
         self.release()
         time.sleep(1) 
@@ -507,10 +507,14 @@ class RobotArm(object):
                 self.MoveToQR()
                 
                 Position = self.rail.rail_motor.position 
+                time.sleep(3)
                 self.Tier_Grab(Tier,1) 
+                time.sleep(2)
                 self.rail.MoveToPosition(Position) 
+                time.sleep(2) 
                 self.Tier_Grab(Tier,2) 
                 i = i + 1
+            self.reset_home_position() 
             return 1 
             
     @lib.api_call 

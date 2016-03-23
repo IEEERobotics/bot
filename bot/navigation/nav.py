@@ -348,3 +348,21 @@ class Navigation(object):
             last_set.append(curr_value)
             sleep(0.01)
         self.stop()
+
+    @lib.api_call
+    def drive_through_tunnel(self):
+        self.driver.move(80, 45)
+        self.driver.set_motor("north", 90)
+        sleep(0.5)
+        self.stop()
+        self.logger.info("Climbed the tunnel")
+        sleep(0.1)
+        self.rotate_start()
+        self.logger.info("Auto-corrected inside tunnel")
+        sleep(0.1)
+        if self.rail_cars_side == "west":
+            self.move_until_wall("north", "east", 500)
+        else:
+            self.move_until_wall("north", "west", 500)
+        self.logger.info("Reached the barge")
+        sleep(0.1)

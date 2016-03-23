@@ -20,9 +20,14 @@ while True:
     print "6:  Pinch         "
     print "7:  Let go        "
     print "8:  Reset the arm and rail"
-    print "9:  Check color in bin" 
+    print "9:  Check color in bin"
+    print "-2: Tier Grab         "
+    
 
     Command = input("Command:  ")
+    
+    if Command == -2:
+        arm.competition_solver_barge('B') 
     
     if Command == -1: 
         print "Good Bye!"

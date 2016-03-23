@@ -346,7 +346,7 @@ class RobotArm(object):
             BLOCK_MOVE_5 = [0, 60, 20, 40, 0]
             BLOCK_GRAB_5 = [0, 0, 10, 50, 0]
             LOOK_5 = [0, 25, 170, 10, 180]
-            HOPPER1 = [0, 90, 100, 35, 180]
+            HOPPER1 = [0, 90, 100, 45, 180]
             HOPPER3 = [0, 40, 180, 0, 180]
 
 
@@ -376,9 +376,9 @@ class RobotArm(object):
         time.sleep(3)                       #wait for arm to grab
         self.servo_cape.transmit_block([0] + HOPPER1)
 
-        time.sleep(5)                     #wait for arm to move to location
+        time.sleep(3)                     #wait for arm to move to location
         self.rail.Orientor(hopper_pos)
-        time.sleep(5)                     #wait for rail to move to bin location
+        time.sleep(3)                     #wait for rail to move to bin location
         self.joints = self.HOME
         time.sleep(3)                       #wait for arm to move to location
         self.servo_cape.transmit_block([0] + HOPPER2)
@@ -442,9 +442,9 @@ class RobotArm(object):
         self.rail.Orientor(Bin)
         time.sleep(1)
         self.servo_cape.transmit_block([0] + Hopper)
-        time.sleep(5)
-        self.grab() 
         time.sleep(3)
+        self.grab() 
+        time.sleep(2)
         self.servo_cape.transmit_block([0] + PullBack) 
         time.sleep(3) 
         if Bin != 1:

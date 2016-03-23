@@ -50,7 +50,7 @@ class Camera(object):
         self.cam.set(3, 1280)
         self.cam.set(4, 720)
         
-        self.resX = int(elf.cam.get(3))
+        self.resX = int(self.cam.get(3))
         self.resY = int(self.cam.get(4))
 
         # QR scanning tools

@@ -379,4 +379,4 @@ class Navigation(object):
     def move_through_tunnel(self, north=-100, south=-100, west=80, east=80, duration=.75):
         self.move_s(north,south,west,east)
         sleep(duration)
-        
+        self.stop()

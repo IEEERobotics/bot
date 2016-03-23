@@ -375,11 +375,13 @@ class RobotArm(object):
         self.grab()
         time.sleep(1.25)                       #wait for arm to grab
         self.servo_cape.transmit_block([0] + HOPPER1)
-        time.sleep(1.5)                       #wait for arm to move to location
-        self.servo_cape.transmit_block([0] + HOPPER2)
+
         time.sleep(3)                     #wait for arm to move to location
         self.rail.Orientor(hopper_pos)
         time.sleep(1)                     #wait for rail to move to bin location
+        self.joints = self.HOME
+        time.sleep(1.5)                       #wait for arm to move to location
+        self.servo_cape.transmit_block([0] + HOPPER2)
 
 
         self.release()
@@ -500,7 +502,9 @@ class RobotArm(object):
         if Tier == 'B' or Tier == 'C': 
             i = 0
             while i < 2: 
+                
                 self.MoveToQR()
+                
                 Position = self.rail.rail_motor.position 
                 self.Tier_Grab(Tier,1) 
                 self.rail.MoveToPosition(Position) 

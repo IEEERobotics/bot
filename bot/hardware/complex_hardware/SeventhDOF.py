@@ -127,13 +127,13 @@ class Rail_Mover:
         if Position < current_position:
             self.rail_motor.power = -power
             
-            while self.rail_motor.position < (Position - 20): 
+            while self.rail_motor.position > (Position - 20): 
                 print self.rail_motor.position
             
         if Position > current_position: 
             self.rail_motor.power = power 
             
-            while self.rail_motor.position > (Position + 20): 
+            while self.rail_motor.position < (Position + 20): 
                 print self.rail_motor.position
         
         self.rail_motor.power = 0 

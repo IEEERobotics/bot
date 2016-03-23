@@ -481,11 +481,13 @@ class RobotArm(object):
         largest = self.cam.check_color()
         #udate with color found
         if largest != None:
-            self.hopper[hopper_pos].value = largest.color
-            print largest.color 
+            if self.hopper[hopper_pos] != None:
+                self.hopper[hopper_pos] = QRCode2(0,largest.color,0) 
+            else:
+                self.hopper[hopper_pos].value = largest.color 
         else: 
             print "Error: No color Found."
-    
+            
     @lib.api_call 
     def check_box_color(self):
         Look = [90, 45, 170, 10, 180]

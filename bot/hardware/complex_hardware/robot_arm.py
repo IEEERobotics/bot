@@ -497,7 +497,7 @@ class RobotArm(object):
     @lib.api_call 
     def competition_solver_barge(self,Tier):
         if Tier == 'A':
-        
+            a=0 
         elif Tier == 'B' or Tier == 'C': 
             i = 0
             while i < 2: 

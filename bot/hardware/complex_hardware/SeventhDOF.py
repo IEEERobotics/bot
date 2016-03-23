@@ -34,7 +34,7 @@ class Rail_Mover:
             Displacement = 4600 - self.rail_motor.position
             return self.DisplacementMover(Displacement)
         elif Position == 4:
-            Displacement = 7100 - self.rail_motor.position
+            Displacement = 7000 - self.rail_motor.position
             return self.DisplacementMover(Displacement)
 
     def DisplacementMover(self,Displacement):

@@ -10,3 +10,5 @@ arm_config = bot_config["dagu_arm"]
 arm = RA.RobotArm(arm_config) 
 
 
+
+arm.competition_solver_barge('B')

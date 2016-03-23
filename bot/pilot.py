@@ -100,6 +100,7 @@ class Pilot:
         val = self.find_start_condition()
         # Only on of these values will occur. Find which
         if val is 0 or 3:
+            self.call("switch", "test")
             self.ctrl_client.exit_server()
             return
         

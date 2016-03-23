@@ -163,7 +163,7 @@ class Navigation(object):
             if direction == "east" or direction == "west":
                 speed = bound(speed, -65, 65)
             else:
-                speed = bound(speed, -50, 50)
+                speed = bound(speed, -65, 65)
             self.move_correct(direction, side, mov_target, speed, timestep)
             if mov_side.get_distance() <= target:
                 self.stop()
@@ -218,6 +218,7 @@ class Navigation(object):
                 if ir_value <= 1000:
                     self.stop()
 
+    @lib.api_call
     def rotate_start(self):
         ir_values = self.device.read_values()
         ir_diff = abs(ir_values["East Bottom"] - ir_values["East Top"])
@@ -369,10 +370,10 @@ class Navigation(object):
         
     @lib.api_call
     def move_s(self, north=-100, south=-100, west=80, east=80):
+        self.driver.set_motor("east", east)
         self.driver.set_motor("north", north)
         self.driver.set_motor("south", south)
         self.driver.set_motor("west", west)
-        self.driver.set_motor("east", east)
         
         
     @lib.api_call
@@ -380,3 +381,13 @@ class Navigation(object):
         self.move_s(north,south,west,east)
         sleep(duration)
         self.stop()
+            
+
+    @lib.api_call
+    def test_tun(self):
+        self.move_through_tunnel(-90 ,-80 ,80,90 ,.8)
+        sleep(.5)
+        self.rotate_start()
+        sleep(.5)
+        self.move_smooth_until_wall("north", "east",400)
+

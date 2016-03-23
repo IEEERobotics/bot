@@ -38,20 +38,20 @@ class Camera(object):
     def __init__(self, cam_config):
         self.logger = lib.get_logger()
 
-        # extract calib data from cam_config
-        self.a = cam_config["a"]
-        self.n = cam_config["n"]
-
         udev_name = cam_config["udev_name"]
 
         cam_num = find_name(udev_name)
+        
+        # extract calib data from cam_config
+        self.a = cam_config["a"]
+        self.n = cam_config["n"]
         
         self.cam = cv2.VideoCapture(cam_num)
         self.cam.set(3, 1280)
         self.cam.set(4, 720)
         
-        self.resX = self.cam.get(3)
-        self.resY = self.cam.get(4)
+        self.resX = int(elf.cam.get(3))
+        self.resY = int(self.cam.get(4))
 
         # QR scanning tools
         self.scanner = zbar.ImageScanner()
@@ -293,7 +293,7 @@ class Camera(object):
         return [x_units, y_units, z_units, displacement]
 
     def getDistance(self, length):
-        return self.a*math.pow(length, self.n)
+        return a*math.pow(length, n)
     
     #color library
     def check_color(self):

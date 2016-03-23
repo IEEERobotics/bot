@@ -333,7 +333,7 @@ class RobotArm(object):
         elif Tier == 'B':
             ## Mixed QR Blocks 
             if Case == 1:  ## Block on top
-                BLOCK_GRAB_5 = [0, 120, 110, 75, 180]
+                BLOCK_GRAB_5 = [0, 120, 80, 35, 180]
             elif Case == 2: ## Block on bottom
                 BLOCK_GRAB_5 = [0, 120, 110, 55, 180]
                 

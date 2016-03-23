@@ -301,7 +301,7 @@ class RobotArm(object):
     @lib.api_call 
     def MoveToQR(self):
         time.sleep(1)
-        self.servo_cape.transmit_block([0] + LOOK_5)
+        self.servo_cape.transmit_block([0] + self.HOME)
         time.sleep(2)
         self.rail.DisplacementConverter(3.5)  #get the rail to the middle
         qr = self.rail_feedback()           #position infront of QRCode

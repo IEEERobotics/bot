@@ -4,7 +4,7 @@ import pyDMCC
 
 import bot.lib.lib as lib
 
-class Rail_Mover:
+class Rail_Mover(object):
 
     def __init__(self):
 
@@ -16,7 +16,7 @@ class Rail_Mover:
         
         self.rail_DMCC = pyDMCC.DMCC(1)    
         self.rail_motor = self.rail_DMCC.motors[motor_num]
-
+    @lib.api_call 
     def Orientor(self,Position):
         
           

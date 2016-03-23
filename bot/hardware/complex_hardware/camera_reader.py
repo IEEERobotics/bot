@@ -38,13 +38,13 @@ class Camera(object):
     def __init__(self, cam_config):
         self.logger = lib.get_logger()
 
-        # extract calib data from cam_config
-        self.a = cam_config["a"]
-        self.n = cam_config["n"]
-
         udev_name = cam_config["udev_name"]
 
         cam_num = find_name(udev_name)
+        
+        # extract calib data from cam_config
+        self.a = cam_config["a"]
+        self.n = cam_config["n"]
         
         self.cam = cv2.VideoCapture(cam_num)
         self.cam.set(3, 1280)

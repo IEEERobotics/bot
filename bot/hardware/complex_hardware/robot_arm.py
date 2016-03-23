@@ -524,7 +524,7 @@ class RobotArm(object):
     def check_hopper(self):
         i = 0
         while i < 4:
-            self.check_block_colot(i) 
+            self.check_block_color(i) 
             i = i + 1
         
     

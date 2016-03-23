@@ -53,21 +53,22 @@ class Rail_Mover:
         elif Displacement < 0:   #Negative movement 
             power = 40
             self.rail_motor.power = power
-
+            print self.rail_motor.position
             while self.rail_motor.position > (StartPOS + Displacement):
-                print self.rail_motor.position
-                print "velocity: ", self.rail_motor.velocity
+                
+            print self.rail_motor.position
             
             self.rail_motor.power = 0
 
         elif Displacement > 0:    #Positive movement
             power = -40
             self.rail_motor.power = power
-
+            print self.rail_motor.position
+            
             while self.rail_motor.position < (StartPOS + Displacement):
-                print self.rail_motor.position
-                print "velocity: ", self.rail_motor.velocity
-
+                       
+               
+            print self.rail_motor.position
             self.rail_motor.power = 0
 
 

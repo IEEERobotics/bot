@@ -88,6 +88,9 @@ class Pilot:
             if not blocks_left:
                 running = False
 
+    def go_through_tunnel(self):
+        return self.call('nav', 'drive_through_tunnel')
+
     def run(self):
         """Main pilot interface with outside world.
         start script will call, and pilot will handle all other logic.

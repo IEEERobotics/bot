@@ -125,7 +125,7 @@ class Rail_Mover:
             
         Displacement = Position - current_position
         
-        DisplacementMover(Displacement) 
+        self.DisplacementMover(Displacement) 
          
         
 

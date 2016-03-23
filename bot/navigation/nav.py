@@ -79,7 +79,7 @@ class Navigation(object):
                 self.driver.set_motor("north", sne)
                 self.driver.set_motor("south", spe)
             if direction == "east":
-                self.driver.set_motor("north", -sne)
+                self.driver.set_motor("north", sne)
                 self.driver.set_motor("south", -spe)
         elif side == "east":
             self.driver.set_motor("north", -dist_err)
@@ -102,14 +102,11 @@ class Navigation(object):
         else:
             raise Exception()
 
-    @lib.api_call
     def move_dead(self, direction, speed):
         direction = direction.lower()
         dirs = {"north": 0, "west": 90, "south": 180, "east": 270}
         self.driver.move(speed, dirs[direction])
-        self.moving = True
 
-    @lib.api_call
     def drive_dead(self, direction, speed, duration):
         self.move_dead(direction, speed)
         sleep(duration)
@@ -122,7 +119,10 @@ class Navigation(object):
         while time_elapsed < final_time:
             timestep = time()-time_elapsed
             time_elapsed = time()
-            self.move_correct(direction, side, 300, 50, timestep)
+            if direction == "west" or direction == "east": 
+                self.move_correct(direction, side, 300, 65, timestep)
+            else:
+                self.move_correct(direction, side, 300, 50, timestep)
             sleep(0.01)
         self.stop()
 
@@ -131,7 +131,6 @@ class Navigation(object):
         #self.drive_along_wall("west", "north", 5)
         self.move_until_wall("north", "east", 400)
 
-    # TODO(Vijay): This function is buggy. Needs to be fixed.
     @lib.api_call
     def move_until_wall(self, direction, side, target, dist=150):
         direction = direction.lower()
@@ -142,10 +141,11 @@ class Navigation(object):
         while self.moving:
             timestep = time() - time_elapsed
             time_elapsed = time()
-            self.move_correct(direction, side, mov_target, 70, timestep)
+            self.move_correct(direction, side, mov_target, 60, timestep)
             if mov_side.get_distance() <= target:
                 self.stop()
 
+    #TODO: to be tested
     @lib.api_call
     def move_smooth_until_wall(self, direction, side, target, dist=150):
         direction = direction.lower()
@@ -155,12 +155,15 @@ class Navigation(object):
         time_elapsed = time()
         speed = 0
         speed_pid = PID()
-        speed_pid.set_k_values(1, 0, 0)
+        speed_pid.set_k_values(4, 0.01, 0)
         while self.moving:
             timestep = time() - time_elapsed
             time_elapsed = time()
             speed = speed_pid.pid(0, target - mov_side.get_distance(), timestep)
-            speed = bound(speed, -100, 100)
+            if direction == "east" or direction == "west":
+                speed = bound(speed, -65, 65)
+            else:
+                speed = bound(speed, -50, 50)
             self.move_correct(direction, side, mov_target, speed, timestep)
             if mov_side.get_distance() <= target:
                 self.stop()
@@ -215,7 +218,6 @@ class Navigation(object):
                 if ir_value <= 1000:
                     self.stop()
 
-    @lib.api_call
     def rotate_start(self):
         ir_values = self.device.read_values()
         ir_diff = abs(ir_values["East Bottom"] - ir_values["East Top"])
@@ -252,7 +254,6 @@ class Navigation(object):
 
     # TODO: Make a gotoBoat function
     # go north towards block, then towards rail cars and straight down
-    @lib.api_call
     def goto_boat(self):
         self.goto_railcar()
 
@@ -261,7 +262,6 @@ class Navigation(object):
         elif self.rail_cars_side == "east":
             self.move_until_wall("south", "east", 200)
 
-    @lib.api_call
     def goto_truck(self):
         self.goto_top()
 
@@ -272,14 +272,12 @@ class Navigation(object):
 
         self.move_until_wall("south", "south", 150)
 
-    @lib.api_call
     def goto_block_zone_A(self):
         self.goto_railcar()
 
     def goto_block_zone_B(self):
         pass
 
-    @lib.api_call
     def goto_block_zone_C(self):
         self.goto_top()
 
@@ -296,12 +294,6 @@ class Navigation(object):
     def set_bias(self, side, bias):
         side = side.replace("_", " ")
         self.device.set_bias(side,bias)
-        # write updated bias value to IR_config file
-        # with open("IR_config.yaml") as f:
-        #    a = yaml.load(f)
-        # a["IR_Bias"][side] = bias
-        # with open("IR_config.yaml", "w") as f:
-        #    yaml.dump(a, f)
 
     @lib.api_call
     def test_nav(self):
@@ -317,6 +309,8 @@ class Navigation(object):
 
     @lib.api_call
     def get_sensor_value(self, value):
+        if "_" in value:
+            value = value.replace("_", " ")
         try:
             return self.read_IR_values()[value]
         except KeyError:
@@ -327,20 +321,48 @@ class Navigation(object):
         def avg(vals):
             return sum(vals)/float(len(vals))
         self.moving = True
-        last_value = self.get_sensor_value("West Top")
+        speed = 50
+        sensor = "West Bottom"
+        last_value = self.get_sensor_value(sensor)
+        self.logger.info("sensor value: %d", last_value)
         last_set = [last_value for i in xrange(10)]
         time_elapsed = time()
+        self.move_dead("south", speed)
         while self.moving:
             timestep = time() - time_elapsed
             time_elapsed = time()
-            curr_value = self,get_sensor_value("West Top")
+            curr_value = self.get_sensor_value(sensor)
+            self.logger.info("sensor value: %d", curr_value)
             diff = curr_value - avg(last_set)
-            if abs(diff) > 100 and diff > 0:
-                self.moving = False
-                break
-            self.move_correct("south", self.rail_cars_side, 300, 55, timestep)
-            last_value = self.get_sensor_value("West Top")
-            last_set.pop_left()
-            last_set.append(last_value)
-        self.moving = False
+            if abs(self.sides[self.rail_cars_side].get_diff_correction(timestep)) > 20:
+                self.move_correct("south", self.rail_cars_side, 100, speed, timestep)
+            if diff > 100:
+                if sensor == "West Bottom":
+                    sensor = "West Top"
+                    speed = 35
+                    last_set = [curr_value for i in xrange(10)]
+                else:
+                    self.moving = False
+                    break
+            last_set.pop(0)
+            last_set.append(curr_value)
+            sleep(0.01)
         self.stop()
+
+    @lib.api_call
+    def drive_through_tunnel(self):
+        self.driver.move(80, 45)
+        self.driver.set_motor("north", 90)
+        sleep(0.5)
+        self.stop()
+        self.logger.info("Climbed the tunnel")
+        sleep(0.1)
+        self.rotate_start()
+        self.logger.info("Auto-corrected inside tunnel")
+        sleep(0.1)
+        if self.rail_cars_side == "west":
+            self.move_until_wall("north", "east", 500)
+        else:
+            self.move_until_wall("north", "west", 500)
+        self.logger.info("Reached the barge")
+        sleep(0.1)

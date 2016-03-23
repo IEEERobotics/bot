@@ -321,8 +321,8 @@ class RobotArm(object):
     def Tier_Grab(self, Tier, Case):
            ### Tier is the level of the barge the block is being grabbed from
            ### Case is whether or not a block is on top of another
-        if Tier == 'B' or Tier == 'C':
-            qr = self.MoveToQR()
+        #if Tier == 'B' or Tier == 'C':
+        #    qr = self.MoveToQR()
          
         if Tier == 'A':
             ## Generic Blocks 
@@ -332,9 +332,9 @@ class RobotArm(object):
 
         elif Tier == 'B':
             ## Mixed QR Blocks 
-            if qr.case == "high":  ## Block on top
+            if Case == 1:  ## Block on top
                 BLOCK_GRAB_5 = [0, 120, 110, 75, 180]
-            elif qr.case == "low": ## Block on bottom
+            elif Case == 2: ## Block on bottom
                 BLOCK_GRAB_5 = [0, 120, 110, 55, 180]
                 
             LOOK_5 = [0, 25, 170, 10, 180]
@@ -385,7 +385,7 @@ class RobotArm(object):
         self.release()
         time.sleep(1) 
 
-        self.hopper[hopper_pos-1] = qr
+        self.hopper[hopper_pos-1] = 1 
         
       
 
@@ -493,5 +493,27 @@ class RobotArm(object):
         largest = self.cam.check_color() 
         
         return largest.color 
+    
+    @lib.api_call 
+    def competition_solver_barge(self,Tier):
+        if Tier == 'A':
+        
+        elif Tier == 'B' or Tier == 'C': 
+            i = 0
+            while i < 2: 
+                self.MoveToQR()
+                Position = self.rail.rail_motor.position 
+                self.Tier_Grab(Tier,1) 
+                self.rail.MoveToPosition(Position) 
+                self.Tier_Grab(Tier,2) 
+                i = i + 1
+            return 1 
+            
+    @lib.api_call 
+    def check_hopper(self):
+        i = 0
+        while i < 4:
+            self.check_block_colot(i) 
+            i = i + 1
         
     

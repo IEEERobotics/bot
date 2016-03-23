@@ -513,10 +513,10 @@ class RobotArm(object):
                 self.Tier_Grab(Tier,1) 
                  
                 time.sleep(2)
-                self.rail.MoveToPosition(Position) 
+                self.MoveToPosition(Position) 
                 time.sleep(2) 
                 self.Tier_Grab(Tier,2) 
-                self.rail.reset_home_position()
+                self.reset_home_position()
                 
                 i = i + 1
             self.reset_home_position() 

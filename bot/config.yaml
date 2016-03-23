@@ -99,8 +99,8 @@ generic_cam: {
 }
 
 logitech_cam: {
-    a: 936.8,
-    n: -0.98655,
+    a: 2453.3,
+    n: -1.0235,
     udev_name: logitech_cam
 }
 

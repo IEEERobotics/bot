@@ -293,7 +293,7 @@ class Camera(object):
         return [x_units, y_units, z_units, displacement]
 
     def getDistance(self, length):
-        return a*math.pow(length, n)
+        return self.a*math.pow(length, self.n)
     
     #color library
     def check_color(self):

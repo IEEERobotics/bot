@@ -26,6 +26,10 @@ while True:
 
     Command = input("Command:  ")
     
+    if Command == -3:
+        Pos = input("where to?  :   ") 
+        arm.rail.MoveToPosition(Pos)
+    
     if Command == -2:
         arm.competition_solver_barge('B') 
     

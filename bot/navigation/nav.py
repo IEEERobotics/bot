@@ -14,10 +14,6 @@ MAX_VALUE = 800
 
 class Navigation(object):
     def __init__(self, rail_cars=0):
-        #TODO: Read the PID values from the config and pass in to side 
-        # Change parameters for Side()
-        # Change the read_values to average filter values
-
         self.config = lib.get_config()
         self.PID_values = self.config["IR_PID"]
 
@@ -145,7 +141,7 @@ class Navigation(object):
             if mov_side.get_distance() <= target:
                 self.stop()
 
-    #TODO: to be tested
+    #TODO: Update the controller in this function
     @lib.api_call
     def move_smooth_until_wall(self, direction, side, target, dist=150):
         direction = direction.lower()
@@ -198,7 +194,7 @@ class Navigation(object):
         return self.device.read_values()
 
     @lib.api_call
-    def move_until_color(self, direction, side, target, color):
+    def move_until_color(self, direction, side, color):
         direction = direction.lower()
         mov_side = self.sides[direction]
         mov_target = 300
@@ -221,18 +217,26 @@ class Navigation(object):
     @lib.api_call
     def rotate_start(self):
         ir_values = self.device.read_values()
+        # If North side is facing inner wall of tunnel rotate until East top can see inner wall.
+        while ir_values["East Bottom"] > 200 and ir_values["East Top"] > 200:
+            # counter clockwise
+            self.driver.rotate_t(60, .1)
+            sleep(.1)
+            ir_values = self.device.read_values()
+        self.logger.info("Now straightening out")
+
+        # Straighten out inside the tunnel
+        ir_values = self.device.read_values()
         ir_diff = abs(ir_values["East Bottom"] - ir_values["East Top"])
         while (ir_diff > 20):
             if ir_values["East Bottom"] < ir_values["East Top"]:
-                if ir_values["West Bottom"] > ir_values["West Top"]:
                 # clockwise
-                    self.driver.rotate_t(-60, .1)
-                    sleep(0.1)
+                self.driver.rotate_t(-60, .1)
+                sleep(0.1)
             elif ir_values["East Bottom"] > ir_values["East Top"]:
-                if ir_values["West Bottom"] < ir_values["West Top"]:
                 # counter clockwise
-                    self.driver.rotate_t(60, .1)
-                    sleep(0.1)
+                self.driver.rotate_t(60, .1)
+                sleep(0.1)
             else:
                 break
             ir_values = self.device.read_values()
@@ -287,26 +291,10 @@ class Navigation(object):
         if self.rail_cars_side == "east":
             self.move_until_wall("west", "north", 100)
 
-
-    # TODO: Make a getIrSensorValue function
-    # find a value of a specific sensor
-
     @lib.api_call
     def set_bias(self, side, bias):
         side = side.replace("_", " ")
         self.device.set_bias(side,bias)
-
-    @lib.api_call
-    def test_nav(self):
-        self.driver.drive(80, 45, 0.5)
-        self.logger.info("Climbed the tunnel")
-        sleep(0.1)
-        self.rotate_start()
-        self.logger.info("Auto-corrected inside tunnel")
-        sleep(0.1)
-        self.move_until_wall("north", "east", 500)
-        self.logger.info("Reached the barge")
-        sleep(0.1)
 
     @lib.api_call
     def get_sensor_value(self, value):
@@ -317,6 +305,7 @@ class Navigation(object):
         except KeyError:
             self.logger.warning("Invalid Key for IR Values %s"%value)
 
+    #TODO: to be tested
     @lib.api_call
     def goto_next_railcar(self):
         def avg(vals):
@@ -349,7 +338,8 @@ class Navigation(object):
             last_set.append(curr_value)
             sleep(0.01)
         self.stop()
-
+        
+    #TODO: Update this function
     @lib.api_call
     def drive_through_tunnel(self):
         self.driver.move(80, 45)
@@ -375,19 +365,16 @@ class Navigation(object):
         self.driver.set_motor("south", south)
         self.driver.set_motor("west", west)
         
-        
     @lib.api_call
     def move_through_tunnel(self, north=-100, south=-100, west=80, east=80, duration=.75):
         self.move_s(north,south,west,east)
         sleep(duration)
         self.stop()
-            
 
     @lib.api_call
     def test_tun(self):
-        self.move_through_tunnel(-90 ,-80 ,80,90 ,.8)
+        self.move_through_tunnel(-90 ,-75 ,75 ,90 ,.8)
         sleep(.5)
         self.rotate_start()
         sleep(.5)
-        self.move_smooth_until_wall("north", "east",400)
-
+        oelf.move_smooth_until_wall("north", "east",400)

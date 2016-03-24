@@ -529,5 +529,7 @@ class RobotArm(object):
         while i < 4:
             self.check_block_color(i) 
             i = i + 1
-        
-    
+
+    @lib.api_call
+    def orient(self, pos):
+        self.rail.Orientor(pos)

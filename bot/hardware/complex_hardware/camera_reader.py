@@ -463,7 +463,7 @@ class Camera(object):
             elif len(matches) == 0:
                 n=0
 
-        return qr_list[]
+        return qr_list
     
     def partial_qr_select(self, qr_list):
         """

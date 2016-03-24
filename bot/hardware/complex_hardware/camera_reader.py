@@ -304,8 +304,6 @@ class Camera(object):
         Looks through the camera and detects blocks size and color.
         returns a Block object of with the size and color data fields.
         """
-        
-        x_third = int(self.resX/3)
         largest = None
         print "Getting the frame"
         #get the image
@@ -317,16 +315,6 @@ class Camera(object):
         
         print "got the Frame, cropping the image"
 
-        #crop the image
-        for x_val in range(0,x_third):
-            for y_val in range(0,self.resY):
-                bgr[y_val, x_val] = [0,0,0]
-
-        for x_val in range(self.resX - x_third,self.resX):
-            for y_val in range(0,self.resY):
-                bgr[y_val, x_val] = [0,0,0]
-        
-        print "cropped, enhancing color"
         #enhance and show the image with gaussian and colorenhance
         bgr_enhanced = self.enhance_color(bgr)
 
@@ -348,7 +336,7 @@ class Camera(object):
 
             # find the colors within the specified boundaries and apply the mask
             mask = cv2.inRange(bgr_enhanced, lower, upper)
-            mask = cv2.erode(mask, None, iterations=15)
+            mask = cv2.erode(mask, None, iterations=10)
             output = cv2.dilate(mask, None, iterations=5)
 
             #find contours of the masked output
@@ -376,11 +364,23 @@ class Camera(object):
         return largest
 
     def enhance_color(self, bgr):
-        #enhance the image with gaussian and color
-        bgr2 = cv2.GaussianBlur(bgr,(9,9),0)
-        rgb = cv2.cvtColor(bgr2,cv2.COLOR_BGR2RGB)
+        """
+        resizes the opencv image and enhances it for color
+        """
+        size = 640,480
+        #crop and enhance the image for color
+        rgb = cv2.cvtColor(bgr,cv2.COLOR_BGR2RGB)
+
         pil_im = Image.fromarray(rgb)
-        converter = ImageEnhance.Color(pil_im)
+
+        pil_im.thumbnail(size, Image.ANTIALIAS)
+
+        w, h = pil_im.size
+        w_3 = int(w/3)
+        h_6 = int(w/6)
+
+        pil_cropped = pil_im.crop((w_3,h_6,w-w_3, h- h_6))
+        converter = ImageEnhance.Color(pil_cropped)
         enhanced = converter.enhance(3.0)
         pil_image = enhanced.convert('RGB') 
         open_cv_image = np.array(pil_image)
@@ -403,6 +403,9 @@ class Camera(object):
             return None
 
     def find_center(self, cnt):
+        """
+        finds the center of a contour using a bounding circle.
+        """
         (x,y), r = cv2.minEnclosingCircle(cnt)
         center = (int(x), int(y))
         return center

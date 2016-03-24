@@ -380,5 +380,5 @@ class Navigation(object):
         self.rotate_start()
         sleep(.5)
         self.logger.info("driving to wall")
-        oelf.move_smooth_until_wall("north", "east",400)
+        self.move_smooth_until_wall("north", "east",400)
         self.logger.info("At barge")

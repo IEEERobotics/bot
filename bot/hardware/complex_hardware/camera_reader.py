@@ -14,6 +14,7 @@ import bot.lib.lib as lib
 from bot.hardware.qr_code import QRCode
 from bot.hardware.complex_hardware.QRCode2 import QRCode2
 from bot.hardware.complex_hardware.QRCode2 import Block
+from bot.hardware.complex_hardware.partial_qr import *
 
 def find_name(symlink):
     # find where symlink is pointing (/dev/vide0, video1, etc)
@@ -351,7 +352,7 @@ class Camera(object):
                 else:
                     largest = Block(size, self.num_to_color(count))
 
-                center = self.find_center(contour)
+                center = self.find_contour_center(contour)
                 cv2.circle(output, center, 5, (0,0,255), -1) 
                 cnt += 1
 
@@ -402,11 +403,105 @@ class Camera(object):
         else:
             return None
 
-    def find_center(self, cnt):
+    def find_contour_center(self, cnt):
         """
         finds the center of a contour using a bounding circle.
         """
         (x,y), r = cv2.minEnclosingCircle(cnt)
         center = (int(x), int(y))
         return center
+    
+    def partial_qr_scan(self):
+        #Capture frame-by-frame
+        self.cam.grab()
+        self.cam.grab()
+        self.cam.grab()
+        self.cam.grab()
+        ret, frame = self.cam.read() 
+
+        frame_orig = frame
+
+        # gray and blur
+        frame = cv2.GaussianBlur(frame,(0,0),3)
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        frame = cv2.adaptiveThreshold(frame, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 9, 2)
+        
+        #edge detect and find contours
+        frame = cv2.Canny(frame, 50, 150)
+        (cnts, hierarchy) = cv2.findContours(frame.copy()
+                                            , cv2.RETR_TREE
+                                            , cv2.CHAIN_APPROX_SIMPLE)
+
+        markers = find_markers(cnts, hierarchy)
+
+        # Sort Markers by largest edge
+        markers.sort(key=lambda x: largest_edge(x), reverse = True)
+        
+        #iterate through the markers and find the qr_codes
+        qr_list = []
+        for mrk in markers:
+            markers.remove(mrk)
+            matches = [m for m in markers if same_qr(mrk, m)]
+            for mtch in matches:
+                markers.remove(mtch)
+
+            if len(matches) > 2:
+                n = 0
+            elif len(matches) == 2:
+                qr_list.append(PartialQR(mrk, matches[0], matches[1]))
+            elif len(matches) == 1:
+                print "Only one match"
+                # Find the next marker based on new marker
+                found=0
+                for m in markers:
+                    if same_qr(matches[0], m):
+                        matches.append(m)
+                        markers.remove(m)
+                        found=1
+                if found==0:
+                    print "error, no matches"
+            elif len(matches) == 0:
+                n=0
+
+        return qr_list[]
+    
+    def partial_qr_select(self, qr_list):
+        """
+        Takes in an array of partial QRcode objects and looks for the most centered QRCode. 
+        Returns a QRcode2 object of the chosen partial qr.
+        """
+        if len(qr_list) <= 0 or qr_list == None:
+            return None
+        
+        center_x = int(self.resX/2)
+        best_x = -10000
+        best_y = -10000
+        count = 0
+        
+        else:
+            for qr in qr_list:
+                x,y = partial_center(qr)
+                if best_x < 0:
+                    best_x = x
+                    best_y = y
+                    best = count
+                elif abs(center_x - x) < abs(center_x - best_x):
+                    best_x = x
+                    best_y = y
+                    best = count
+                count += 1
+        
+        if best_x < 0:
+            return None
+        else:
+            pqr = qr_list[best]
+            avg_length = int((pqr.marker1.length + pqr.marker2.length + pqr.marker3.length)/3)
+            x_disp = 0.354331 * float(best_x/float(avg_length))
+            y_disp = 0.354331 * float(best_y/float(avg_length))
+            target_qr = QRCode2([x_disp,y_disp,0], None, 0)
+            return target_qr
+        
+        
+        
+
 

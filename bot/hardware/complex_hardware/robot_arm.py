@@ -259,7 +259,8 @@ class RobotArm(object):
         direction = 1
         while(True):
             ret = None
-            ret = self.cam.QRSweep()
+            partial_list = self.cam.partial_qr_scan()
+            ret = self.cam.partial_qr_select(partial_list)
             if ret != None:
                 count = 0                           #reset the count.
                 x_disp = ret.tvec[0]

@@ -264,7 +264,7 @@ class RobotArm(object):
             if ret != None:
                 count = 0                           #reset the count.
                 x_disp = ret.tvec[0]
-                if abs(x_disp) < .2:
+                if abs(x_disp) < .1:
                     return ret
                 else:
                     print "Checking Alignment with x_disp = ", x_disp

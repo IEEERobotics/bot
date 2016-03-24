@@ -470,14 +470,15 @@ class Camera(object):
         Takes in an array of partial QRcode objects and looks for the most centered QRCode. 
         Returns a QRcode2 object of the chosen partial qr.
         """
-        if len(qr_list) <= 0 or qr_list == None:
-            return None
         
         center_x = int(self.resX/2)
         best_x = -10000
         best_y = -10000
         count = 0
         
+        if len(qr_list) <= 0 or qr_list == None:
+            return None
+
         else:
             for qr in qr_list:
                 x,y = partial_center(qr)

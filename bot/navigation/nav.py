@@ -44,10 +44,10 @@ class Navigation(object):
             self.driver.set_motor("west", 0)
 
     @lib.api_call
-    def move_correct(self, direction, side, target, speed, timestep):
+    def move_correct(self, direction, side, target, speed, timestep, threshold=1000000):
         # speed >= 0
         side = side.lower()
-        diff_err = self.sides[side].get_diff_correction( timestep)
+        diff_err = self.sides[side].get_diff_correction( timestep, threshold)
 
         # setting speed bounds
         sne = bound(speed-diff_err, -100, 100)
@@ -347,7 +347,7 @@ class Navigation(object):
             self.logger.info("sensor value: %d", curr_value)
             diff = curr_value - avg(last_set)
             if abs(self.sides[self.rail_cars_side].get_diff_correction(timestep)) > 20:
-                self.move_correct("south", self.rail_cars_side, 100, speed, timestep)
+                self.move_correct("south", self.rail_cars_side, 100, speed, timestep, threshold=1000)
             if diff > 100:
                 if sensor == "West Bottom":
                     sensor = "West Top"

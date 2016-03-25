@@ -113,7 +113,7 @@ class Pilot:
             return
         elif (val == 1 or val==2):
             self.go_through_tunnel()
-            self.do_zone_B()
+            self.do_Zone_B()
             self.ctrl_client.exit_server()
             return
 

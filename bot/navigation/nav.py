@@ -122,6 +122,7 @@ class Navigation(object):
             sleep(0.01)
         self.stop()
 
+
     @lib.api_call
     def test(self):
         #self.drive_along_wall("west", "north", 5)
@@ -160,6 +161,7 @@ class Navigation(object):
                 speed = bound(speed, -65, 65)
             else:
                 speed = bound(speed, -65, 65)
+
             self.move_correct(direction, side, mov_target, speed, timestep)
             if mov_side.get_distance() <= target:
                 self.stop()
@@ -242,20 +244,21 @@ class Navigation(object):
             ir_values = self.device.read_values()
             ir_diff = abs(ir_values["East Bottom"] - ir_values["East Top"])
 
+    @lib.api_call
     def goto_top(self):
         if self.east.get_distance() < MAX_VALUE:
-            self.move_until_wall("north", "east", 300)
+            self.move_smooth_until_wall("north", "east", 300)
         elif self.west.get_distance() < MAX_VALUE:
-            self.move_until_wall("north", "west", 300)
+            self.move_smooth_until_wall("north", "west", 300)
 
     @lib.api_call
     def goto_railcar(self):
         self.goto_top()
 
         if self.rail_cars_side == "west":
-            self.move_until_wall("west", "north", 300)
+            self.move_smooth_until_wall("west", "north", 300)
         elif self.rail_cars_side == "east":
-            self.move_until_wall("east", "north", 300)
+            self.move_smooth_until_wall("east", "north", 300)
 
     # TODO: Make a gotoBoat function
     # go north towards block, then towards rail cars and straight down
@@ -280,8 +283,28 @@ class Navigation(object):
     def goto_block_zone_A(self):
         self.goto_railcar()
 
+    @lib.api_call
     def goto_block_zone_B(self):
-        pass
+        self.goto_top()
+        if self.east.get_distance() < MAX_VALUE:
+            self.move_until_color("west", "north", "white")
+        elif self.west.get_distance() < MAX_VALUE:
+            self.move_until_color("east", "north", "white")
+        self.drive_dead("north", 60, 0.5)
+        self.bang()
+
+    @lib.api_call
+    def bang(self):
+        self.drive_dead("north", 60, 0.5)
+
+    @lib.api_call
+    def get_off_wall(self):
+        self.drive_dead("south", 60, 0.333)
+
+    @lib.api_call
+    def correct_bang(self):
+        self.get_off_wall()
+        self.drive_dead("north", 60, 0.7)
 
     def goto_block_zone_C(self):
         self.goto_top()
@@ -342,19 +365,16 @@ class Navigation(object):
     #TODO: Update this function
     @lib.api_call
     def drive_through_tunnel(self):
-        self.driver.move(80, 45)
-        self.driver.set_motor("north", 90)
-        sleep(0.5)
-        self.stop()
+        self.move_through_tunnel(-90 ,-75 ,75 ,90 ,.8)
+        sleep(.5)
         self.logger.info("Climbed the tunnel")
-        sleep(0.1)
         self.rotate_start()
         self.logger.info("Auto-corrected inside tunnel")
-        sleep(0.1)
+        sleep(0.5)
         if self.rail_cars_side == "west":
-            self.move_until_wall("north", "east", 500)
+            self.move_smooth_until_wall("north", "east", 500)
         else:
-            self.move_until_wall("north", "west", 500)
+            self.move_smooth_until_wall("north", "west", 500)
         self.logger.info("Reached the barge")
         sleep(0.1)
         

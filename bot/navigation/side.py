@@ -49,4 +49,4 @@ class Side(object):
         vals = self.get_values()
         sens1 = vals[self.sensor1]
         sens2 = vals[self.sensor2]
-        return (sens1 + sens2 / 2)
+        return sens1 if sens1 < sens2 else sens2

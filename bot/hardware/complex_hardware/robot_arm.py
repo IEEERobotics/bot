@@ -492,7 +492,7 @@ class RobotArm(object):
             
     @lib.api_call 
     def check_box_color(self):
-        Look = [90, 65, 170, 10, 180]
+        Look = [90, 50, 170, 10, 180]
         
         self.reset_home_position()
         self.joints = Look

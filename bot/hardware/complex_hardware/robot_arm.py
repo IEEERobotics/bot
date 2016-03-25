@@ -497,7 +497,10 @@ class RobotArm(object):
         self.reset_home_position()
         self.joints = Look
         time.sleep(5)
-        largest = self.cam.check_color() 
+        largest = self.cam.check_color()
+        if largest == None:
+            qr = self.cam.QRSweep()
+            return qr.value 
         
         return largest.color 
     

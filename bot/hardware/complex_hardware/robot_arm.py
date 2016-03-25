@@ -496,7 +496,7 @@ class RobotArm(object):
         
         self.reset_home_position()
         self.joints = Look
-        time.sleep(3)
+        time.sleep(5)
         largest = self.cam.check_color() 
         
         return largest.color 

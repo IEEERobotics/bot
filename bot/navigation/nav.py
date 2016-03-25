@@ -393,8 +393,12 @@ class Navigation(object):
 
     @lib.api_call
     def test_tun(self):
+        self.logger.info("dead driving through")
         self.move_through_tunnel(-90 ,-75 ,75 ,90 ,.8)
         sleep(.5)
+        self.logger.info("Auto correcting")
         self.rotate_start()
         sleep(.5)
-        oelf.move_smooth_until_wall("north", "east",400)
+        self.logger.info("driving to wall")
+        self.move_smooth_until_wall("north", "east",400)
+        self.logger.info("At barge")

@@ -77,20 +77,24 @@ class Pilot:
 
     def align_on_wall(self):
         self.call("nav", "bang")
+        time.sleep(.5)
         self.call("nav", "correct_bang")
 
     def do_Zone_B(self):
         running = True
         while running:
             self.goto_block_zone_B()
+            
             self.align_on_wall()
             time.sleep(0.5)
             # Do Arm Stuff
             self.goto_railcar()
+            time.sleep(.5)
             self.align_on_wall()
             time.sleep(0.5)
             # Do Arm Stuff
             self.goto_block_zone_B()
+            time.sleep(.5)
             self.align_on_wall()
             # Check if blocks left?
             blocks_left = False

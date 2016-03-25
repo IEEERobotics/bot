@@ -36,9 +36,11 @@ class Side(object):
         """
         diff = self.get_diff()
         error = self.diff_pid.pid(0, diff, timestep)
+        print threshold, error
         if abs(error) < threshold:
             return error
         else:
+            print "OUT OF THRESHOLD"
             return 0
 
     def get_dist_correction(self, target, timestep):

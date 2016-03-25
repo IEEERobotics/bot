@@ -75,18 +75,26 @@ class Pilot:
     def goto_railcar(self):
         return self.call('nav', 'goto_railcar')
 
+    def align_on_wall(self):
+        self.call("nav", "bang")
+        self.call("nav", "correct_bang")
+
     def do_Zone_B(self):
         running = True
         while running:
             self.goto_block_zone_B()
+            self.align_on_wall()
             # Do Arm Stuff
             self.goto_railcar()
+            self.align_on_wall()
             # Do Arm Stuff
             self.goto_block_zone_B()
+            self.align_on_wall()
             # Check if blocks left?
             blocks_left = False
             if not blocks_left:
                 running = False
+            break
 
     def go_through_tunnel(self):
         return self.call('nav', 'drive_through_tunnel')
@@ -104,7 +112,8 @@ class Pilot:
             self.ctrl_client.exit_server()
             return
         elif (val == 1 or val==2):
-            self.call('nav', 'test_tun')
+            self.go_through_tunnel()
+            self.do_zone_B()
             self.ctrl_client.exit_server()
             return
 

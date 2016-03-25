@@ -346,7 +346,7 @@ class Navigation(object):
             curr_value = self.get_sensor_value(sensor)
             self.logger.info("sensor value: %d", curr_value)
             diff = curr_value - avg(last_set)
-            self.move_correct("south", self.rail_cars_side, 100, speed, timestep, threshold=100)
+            self.move_correct("south", self.rail_cars_side, 200, speed, timestep, threshold=100)
             if diff > 100:
                 if sensor == "West Bottom":
                     sensor = "West Top"

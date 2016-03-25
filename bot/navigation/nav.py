@@ -144,7 +144,7 @@ class Navigation(object):
 
     #TODO: Update the controller in this function
     @lib.api_call
-    def move_smooth_until_wall(self, direction, side, target, dist=150):
+    def move_smooth_until_wall(self, direction, side, target, dist=150, t_type="avg"):
         direction = direction.lower()
         mov_side = self.sides[direction]
         mov_target = dist
@@ -163,7 +163,7 @@ class Navigation(object):
                 speed = bound(speed, -65, 65)
 
             self.move_correct(direction, side, mov_target, speed, timestep)
-            if mov_side.get_distance() <= target:
+            if mov_side.get_distance(t_type) <= target:
                 self.stop()
 
     def move_to_position(self, x, y):
@@ -199,7 +199,7 @@ class Navigation(object):
     def move_until_color(self, direction, side, color):
         direction = direction.lower()
         mov_side = self.sides[direction]
-        mov_target = 300
+        mov_target = self.sides[side].get_distance()
         self.moving = True
         time_elapsed = time()
         while self.moving:
@@ -256,9 +256,9 @@ class Navigation(object):
         self.goto_top()
 
         if self.rail_cars_side == "west":
-            self.move_smooth_until_wall("west", "north", 300)
+            self.move_smooth_until_wall("west", "north", 200, t_type="min")
         elif self.rail_cars_side == "east":
-            self.move_smooth_until_wall("east", "north", 300)
+            self.move_smooth_until_wall("east", "north", 200, t_type="min")
 
     # TODO: Make a gotoBoat function
     # go north towards block, then towards rail cars and straight down
@@ -290,7 +290,6 @@ class Navigation(object):
             self.move_until_color("west", "north", "white")
         elif self.west.get_distance() < MAX_VALUE:
             self.move_until_color("east", "north", "white")
-        self.drive_dead("north", 60, 0.5)
         self.bang()
 
     @lib.api_call

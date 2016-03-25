@@ -45,10 +45,13 @@ class Side(object):
 
         return error
 
-    def get_distance(self, avg=True):
+    def get_distance(self, style="avg"):
         vals = self.get_values()
         sens1 = vals[self.sensor1]
         sens2 = vals[self.sensor2]
-        if avg:
+        if style=="avg":
             return (sens1+sens2)/2
-        return sens1 if sens1 < sens2 else sens2
+        elif style == "max":
+            return max(sens1, sens2)
+        elif style == "min":
+            return min(sens1, sens2)

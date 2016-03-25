@@ -365,7 +365,7 @@ class Navigation(object):
     #TODO: Update this function
     @lib.api_call
     def drive_through_tunnel(self):
-        self.move_through_tunnel(-70 ,-75 ,75 ,90 ,.8)
+        self.move_through_tunnel(-75 ,-75 ,75 ,90 ,.8)
         sleep(.5)
         self.logger.info("Climbed the tunnel")
         self.rotate_start()

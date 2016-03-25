@@ -84,9 +84,11 @@ class Pilot:
         while running:
             self.goto_block_zone_B()
             self.align_on_wall()
+            time.sleep(0.5)
             # Do Arm Stuff
             self.goto_railcar()
             self.align_on_wall()
+            time.sleep(0.5)
             # Do Arm Stuff
             self.goto_block_zone_B()
             self.align_on_wall()

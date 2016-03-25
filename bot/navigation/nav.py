@@ -286,6 +286,8 @@ class Navigation(object):
     @lib.api_call
     def goto_block_zone_B(self):
         self.goto_top()
+        self.logger.info("sensor value: %d",self.east.get_distance())
+        self.logger.info("sensor value: %d", self.west.get_distance())
         if self.east.get_distance() < MAX_VALUE:
             self.move_until_color("west", "north", "white")
         elif self.west.get_distance() < MAX_VALUE:

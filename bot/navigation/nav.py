@@ -295,16 +295,16 @@ class Navigation(object):
 
     @lib.api_call
     def bang(self):
-        self.drive_dead("north", 60, 0.5)
+        self.drive_dead("north", 50, 0.5)
 
     @lib.api_call
     def get_off_wall(self):
-        self.drive_dead("south", 60, 0.333)
+        self.drive_dead("south", 50, 0.333)
 
     @lib.api_call
     def correct_bang(self):
         self.get_off_wall()
-        self.drive_dead("north", 60, 0.7)
+        self.drive_dead("north", 50, 0.7)
 
     def goto_block_zone_C(self):
         self.goto_top()

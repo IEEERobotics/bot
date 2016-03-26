@@ -254,10 +254,14 @@ class Navigation(object):
     @lib.api_call
     def goto_railcar(self):
         self.goto_top()
+        self.logger.info("Currently near barge")
+
 
         if self.rail_cars_side == "west":
+            self.logger.info("Going west towards railcars")
             self.move_smooth_until_wall("west", "north", 200, t_type="min")
         elif self.rail_cars_side == "east":
+            self.logger.info("Going east towards railcars")
             self.move_smooth_until_wall("east", "north", 200, t_type="min")
 
     # TODO: Make a gotoBoat function
@@ -289,10 +293,13 @@ class Navigation(object):
         self.logger.info("sensor value: %d",self.east.get_distance())
         self.logger.info("sensor value: %d", self.west.get_distance())
         if self.east.get_distance() < MAX_VALUE:
+            self.logger.info("I'm on right side of course. Going to white line on my left")
             self.move_until_color("west", "north", "white")
         elif self.west.get_distance() < MAX_VALUE:
+            self.logger.info("I'm on left side of course. Going to white line on my right")
             self.move_until_color("east", "north", "white")
         self.bang()
+        self.logger.info("Reached Zone B")
 
     @lib.api_call
     def bang(self):
@@ -306,6 +313,7 @@ class Navigation(object):
     def correct_bang(self):
         self.get_off_wall()
         self.drive_dead("north", 50, 0.7)
+        self.logger.info("Aligned with barge")
 
     def goto_block_zone_C(self):
         self.goto_top()
@@ -362,21 +370,20 @@ class Navigation(object):
             sleep(0.01)
         self.stop()
         
-    #TODO: Update this function
     @lib.api_call
     def drive_through_tunnel(self):
         self.move_through_tunnel(-75 ,-75 ,75 ,90 ,.8)
-        sleep(.5)
+        sleep(.8)
         self.logger.info("Climbed the tunnel")
         self.rotate_start()
         self.logger.info("Auto-corrected inside tunnel")
-        sleep(0.5)
+        sleep(0.8)
         if self.rail_cars_side == "west":
             self.move_smooth_until_wall("north", "east", 500)
         else:
             self.move_smooth_until_wall("north", "west", 500)
         self.logger.info("Reached the barge")
-        sleep(0.1)
+        sleep(0.8)
         
     @lib.api_call
     def move_s(self, north=-100, south=-100, west=80, east=80):
@@ -390,15 +397,3 @@ class Navigation(object):
         self.move_s(north,south,west,east)
         sleep(duration)
         self.stop()
-
-    @lib.api_call
-    def test_tun(self):
-        self.logger.info("dead driving through")
-        self.move_through_tunnel(-90 ,-75 ,75 ,90 ,.8)
-        sleep(.5)
-        self.logger.info("Auto correcting")
-        self.rotate_start()
-        sleep(.5)
-        self.logger.info("driving to wall")
-        self.move_smooth_until_wall("north", "east",400)
-        self.logger.info("At barge")

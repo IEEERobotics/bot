@@ -543,3 +543,36 @@ class RobotArm(object):
     @lib.api_call
     def GrabQR(self):
         self.cam.QRSweep()
+        
+    @lib.api_call
+    def color_test_loop(self, hopper_pos):
+        """
+        Takes the hopper posisiton 0-3 as input and will look at the hopper posistion
+        to see what clor it is then update the hopper array with the new data.
+        
+        this function loops to test how color detection works with different lighting conditions
+        """
+        HOPPER_LOOK = [0,65,170,20,180]
+        #check hopper in array
+        if (self.hopper[hopper_pos] != None):
+            if (self.hopper[hopper_pos].data != None):
+                print "Color already known."
+                return 1
+        #look at the hopper physically
+        self.rail.Orientor(hopper_pos + 1)
+        self.joints = HOPPER_LOOK
+        time.sleep(3)
+        while True:
+            #look for a color
+            largest = self.cam.check_color()
+            #udate with color found
+            if largest != None:
+                print "Color Found: ", largest.color
+                if self.hopper[hopper_pos] != None:
+                    self.hopper[hopper_pos] = QRCode2(0,largest.color,0)
+                else:
+                    self.hopper[hopper_pos].value = largest.color
+            else: 
+                print "Error: No color Found."
+
+    

@@ -475,7 +475,7 @@ class RobotArm(object):
         return 0 
         
         
-        
+    @lib.api_call   
     def check_block_color(self, hopper_pos):
         """
         Takes the hopper posisiton 0-3 as input and will look at the hopper posistion

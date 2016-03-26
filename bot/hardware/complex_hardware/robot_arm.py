@@ -313,9 +313,9 @@ class RobotArm(object):
     @lib.api_call 
     def MoveToQR(self):
     
-        LOOK = [0, 0, 170, 10, 180]
+        LOOK = [0, 15, 170, 10, 180]
         time.sleep(1)
-        self.servo_cape.transmit_block([0] + self.HOME)
+        self.servo_cape.transmit_block([0] + LOOK)
         time.sleep(2)
         self.rail.DisplacementConverter(3.5)  #get the rail to the middle
         qr = self.rail_feedback()           #position infront of QRCode
@@ -475,13 +475,13 @@ class RobotArm(object):
         return 0 
         
         
-        
+    @lib.api_call   
     def check_block_color(self, hopper_pos):
         """
         Takes the hopper posisiton 0-3 as input and will look at the hopper posistion
         to see what clor it is then update the hopper array with the new data.
         """
-        HOPPER_LOOK = [0,65,170,20,180]
+        HOPPER_LOOK = [0,75,170,10,180]
         #check hopper in array
         if (self.hopper[hopper_pos] != None):
             if (self.hopper[hopper_pos].data != None):

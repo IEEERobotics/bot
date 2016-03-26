@@ -534,7 +534,12 @@ class RobotArm(object):
         while i < 4:
             self.check_block_color(i) 
             i = i + 1
-
+        return 1 
+        
     @lib.api_call
     def orient(self, pos):
         self.rail.Orientor(pos)
+    
+    @lib.api_call
+    def GrabQR(self):
+        self.cam.QRSweep()

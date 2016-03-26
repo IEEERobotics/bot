@@ -571,7 +571,8 @@ class RobotArm(object):
                 if self.hopper[hopper_pos] != None:
                     self.hopper[hopper_pos] = QRCode2(0,largest.color,0)
                 else:
-                    self.hopper[hopper_pos].value = largest.color
+                    #self.hopper[hopper_pos].value = largest.color
+                    continue
             else: 
                 print "Error: No color Found."
 

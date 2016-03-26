@@ -360,6 +360,7 @@ class Navigation(object):
             if diff > 100:
                 if sensor == "West Bottom":
                     sensor = "West Top"
+                    break
                     speed = 35
                     last_set = [curr_value for i in xrange(10)]
                 else:

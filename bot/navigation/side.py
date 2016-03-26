@@ -29,15 +29,19 @@ class Side(object):
         return sens1 - sens2
 
     @lib.api_call
-    def get_diff_correction(self, timestep):
+    def get_diff_correction(self, timestep, threshold=1000000):
         """
         ::TODO:: Finish the actual processing
         get the motor correction values
         """
         diff = self.get_diff()
         error = self.diff_pid.pid(0, diff, timestep)
-
-        return error
+        print threshold, error
+        if abs(error) < threshold:
+            return error
+        else:
+            print "OUT OF THRESHOLD"
+            return 0
 
     def get_dist_correction(self, target, timestep):
         dist = self.get_distance()
@@ -45,8 +49,13 @@ class Side(object):
 
         return error
 
-    def get_distance(self):
+    def get_distance(self, style="avg"):
         vals = self.get_values()
         sens1 = vals[self.sensor1]
         sens2 = vals[self.sensor2]
-        return sens1 if sens1 < sens2 else sens2
+        if style=="avg":
+            return (sens1+sens2)/2
+        elif style == "max":
+            return max(sens1, sens2)
+        elif style == "min":
+            return min(sens1, sens2)

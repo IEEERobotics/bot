@@ -104,7 +104,7 @@ logitech_cam: {
     udev_name: logitech_cam
 }
 
-logging: {log_file: bot/logs/bot.log, file_handler_level: DEBUG, stream_handler_level: INFO}  # Logging options
+logging: {log_file: bot/logs/bot.log, file_handler_level: INFO, stream_handler_level: INFO}  # Logging options
 test_pwm_base_dir: bot/simulator/pins/pwm/pwm
 test_gpio_base_dir: bot/simulator/pins/gpio/gpio
 test_adc_base_dir: bot/simulator/pins/adc

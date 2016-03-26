@@ -115,12 +115,16 @@ class Pilot:
         print val
         # Only on of these values will occur. Find which
         if ((val == 0) or (val==3)):
+            # kill server
             self.ctrl_client.exit_server()
+            # kill client
+            self.ctrl_client.clean_up()
             return
         elif (val == 1 or val==2):
             self.go_through_tunnel()
             self.do_Zone_B()
             self.ctrl_client.exit_server()
+            self.ctrl_client.clean_up()
             return
 
 if __name__ == "__main__":

@@ -178,12 +178,14 @@ class Camera(object):
 
         # PIL -> zbar
         #frame = cv2.bilateralFilter(frame, 9, 75, 75) 
-        frame2 = cv2.GaussianBlur(frame,(5,5),0)
-        gray = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
-        thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 9, 2)
+        frame = cv2.GaussianBlur(frame,(5,5),0)
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        frame = cv2.adaptiveThreshold(frame, 255
+                                      , cv2.ADAPTIVE_THRESH_MEAN_C
+                                      , cv2.THRESH_BINARY, 9, 2)
         
         #ret, thresh = cv2.threshold(gray,50,255,cv2.THRESH_BINARY)
-        cv2.imwrite('buffer.png', thresh)
+        cv2.imwrite('buffer.png', frame)
         pil_im = Image.open('buffer.png').convert('L')
 
         width, height = pil_im.size
@@ -213,6 +215,10 @@ class Camera(object):
         
         #cleanup
         del(z_im)
+        del(pil_im)
+        del(raw)
+        del(frame)
+
         if count == 0:
             print "No QRCode Found"
             return None

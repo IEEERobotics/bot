@@ -313,7 +313,7 @@ class RobotArm(object):
     @lib.api_call 
     def MoveToQR(self):
     
-        LOOK = [0, 0, 170, 10, 180]
+        LOOK = [0, 15, 170, 10, 180]
         time.sleep(1)
         self.servo_cape.transmit_block([0] + LOOK)
         time.sleep(2)

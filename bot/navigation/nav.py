@@ -354,11 +354,10 @@ class Navigation(object):
             timestep = time() - time_elapsed
             time_elapsed = time()
             curr_value = self.get_sensor_value(sensor)
-            self.logger.info("sensor Type: %s, sensor value: %d, avg: %d", sensor, curr_value, avg(last_set))
+            self.logger.info("sensor Type: %s, sensor value: %d, avg: %d", sensor, curr_value, avg(last_set)
             diff = curr_value - avg(last_set)
             self.move_correct("south", self.rail_cars_side, 200, speed, timestep, threshold=100)
             if diff > 100:
-                break
                 if sensor == "West Bottom":
                     sensor = "West Top"
                     speed = 35

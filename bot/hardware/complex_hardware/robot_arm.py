@@ -23,12 +23,12 @@ import generic_blocks
 
 
 
+JUNK_BUFFER = [0]*5
+HOME = [0, 25, 170, 10, 180]
+GRAB = 5
+
+
 class RobotArm(object):
-
-    JUNK_BUFFER = [0]*5
-    HOME = [0, 25, 170, 10, 180]
-    GRAB = 5
-
 
     """An object that resembles a robotic arm with n joints"""
     def __init__(self, arm_config):
@@ -59,7 +59,7 @@ class RobotArm(object):
 
         # Angles of all of the joints. 
         # DO NOT SEND ANGLES ANY OTHER WAY
-        self.joints = self.HOME
+        self.joints = HOME
 
         self.hopper = [None, None, None, None]
 
@@ -99,11 +99,23 @@ class RobotArm(object):
     @lib.api_call
     def grab(self):
  
-        self.servo_cape_grabber.transmit_block([5] + self.JUNK_BUFFER)
+        self.servo_cape_grabber.transmit_block([5] + JUNK_BUFFER)
         
     @lib.api_call   
     def release(self):
-        self.servo_cape_grabber.transmit_block([6] + self.JUNK_BUFFER)
+        self.servo_cape_grabber.transmit_block([6] + JUNK_BUFFER)
+
+    @lib.api_call
+    def set_joints(self, a0=None
+                    , a1=None
+                    , a2=None
+                    , a3=None
+                    , a4=None):
+        set_vals = [a0, a1, a2, a3, a4]
+        for i in range(len(set_vals)):
+            if set_vals[i] != None:
+                self.joints[i] = set_vals[i]
+        self.joints = self.joints
         
     @lib.api_call
     def joint_center_on_qr(self):
@@ -116,8 +128,8 @@ class RobotArm(object):
         
         # Correction constants for P(ID) controller.
         # unlikely that we'll bother using I or D
-        p_x = 1
-        p_y = 1
+        p_x = 10
+        p_y = 10
 
         while True:
             ret = self.cam.QRSweep()
@@ -128,9 +140,9 @@ class RobotArm(object):
                 dx = ret.tvec[0]
                 dy = ret.tvec[1]
                 
-                if abs(dx) > 0.2:
+                if abs(dx) > 0.1:
                     self.joints[0] += p_x * dx
-                if abs(dy) > 0.2:
+                if abs(dy) > 0.1:
                     self.joints[3] += p_y * dy
                 #print "Joints = ", self.joints
                 self.joints = self.joints
@@ -199,7 +211,7 @@ class RobotArm(object):
         sets angles back to default position. Also resets the position of the 7th DOF
         """
         
-        self.servo_cape.transmit_block([0] + self.HOME)
+        self.servo_cape.transmit_block([0] + HOME)
         self.rail.RunIntoWall()
         
     @lib.api_call
@@ -235,7 +247,7 @@ class RobotArm(object):
     def demo(self, demo_number):
         """runs demos 1-7"""
         self.servo_cape.transmit_block([demo_number]
-                                         + self.JUNK_BUFFER)        
+                                         + JUNK_BUFFER)        
     
     @lib.api_call    
     def rail_test(self):
@@ -292,7 +304,7 @@ class RobotArm(object):
     def basic_solver(self):
         i = 4
         while(i>0):
-            self.joints = self.HOME
+            self.joints = HOME
             self.rail.RunIntoWall()
             time.sleep(4)
             self.Tier_Grab('B')
@@ -381,7 +393,7 @@ class RobotArm(object):
         time.sleep(3)                     #wait for arm to move to location
         self.rail.Orientor(hopper_pos)
         time.sleep(3)                     #wait for rail to move to bin location
-        self.joints = self.HOME
+        self.joints = HOME
         time.sleep(3)                       #wait for arm to move to location
         self.servo_cape.transmit_block([0] + HOPPER2)
         time.sleep(3) 

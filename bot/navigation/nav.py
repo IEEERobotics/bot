@@ -358,9 +358,9 @@ class Navigation(object):
             diff = curr_value - avg(last_set)
             self.move_correct("south", self.rail_cars_side, 200, speed, timestep, threshold=100)
             if diff > 100:
+                break
                 if sensor == "West Bottom":
                     sensor = "West Top"
-                    break
                     speed = 35
                     last_set = [curr_value for i in xrange(10)]
                 else:

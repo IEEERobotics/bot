@@ -315,7 +315,7 @@ class RobotArm(object):
     
         LOOK = [0, 15, 170, 10, 180]
         time.sleep(1)
-        self.servo_cape.transmit_block([0] + self.HOME)
+        self.servo_cape.transmit_block([0] + HOME)
         time.sleep(2)
         self.rail.DisplacementConverter(3.5)  #get the rail to the middle
         qr = self.rail_feedback()           #position infront of QRCode

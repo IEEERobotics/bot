@@ -504,7 +504,7 @@ class RobotArm(object):
             
     @lib.api_call 
     def check_box_color(self):
-        Look = [90, 50, 170, 10, 180]
+        Look = [90, 85, 170, 0, 180]
         
         self.reset_home_position()
         self.joints = Look
@@ -512,7 +512,9 @@ class RobotArm(object):
         largest = self.cam.check_color()
         if largest == None:
             qr = self.cam.QRSweep()
-            return qr.value 
+            if qr != None:
+                return qr.value
+            return 0
         
         return largest.color 
     
@@ -568,7 +570,8 @@ class RobotArm(object):
         #check hopper in array
         if (self.hopper[hopper_pos] != None):
             if (self.hopper[hopper_pos].data != None):
-                print "Color already known."
+                print "Color already known."  
+                 
                 return 1
         #look at the hopper physically
         self.rail.Orientor(hopper_pos + 1)
@@ -587,5 +590,7 @@ class RobotArm(object):
                     continue
             else: 
                 print "Error: No color Found."
+    
+    
 
     

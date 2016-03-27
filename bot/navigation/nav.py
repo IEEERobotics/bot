@@ -8,6 +8,8 @@ from pid import PID
 import os.path
 import yaml
 
+from bot.hardware.complex_hardware import Camera
+
 bound = lambda x, l, u: l if x < l else u if x > u else x
 
 MAX_VALUE = 800
@@ -33,6 +35,10 @@ class Navigation(object):
         self.logger = lib.get_logger()
         mapping = ["EXIT", "west", "east", "EXIT"]
         self.rail_cars_side = mapping[rail_cars]
+
+        # camera for checking
+        c_config = self.config["generic_cam"]
+        self.cam = Camera(c_config)
 
     def stop_unused_motors(self, direction):
         direction = direction.lower()

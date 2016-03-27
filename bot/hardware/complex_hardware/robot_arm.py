@@ -559,7 +559,7 @@ class RobotArm(object):
         self.cam.QRSweep()
         
     @lib.api_call
-    def GrabColor(self)
+    def GrabColor(self):
         self.cam.check_color()
         
     @lib.api_call

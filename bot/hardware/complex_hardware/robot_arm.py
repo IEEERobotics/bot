@@ -504,11 +504,11 @@ class RobotArm(object):
             
     @lib.api_call 
     def check_box_color(self):
-        Look = [90, 85, 170, 15, 180]
+        Look = [90, 80, 170, 15, 180]
         
         self.reset_home_position()
         self.joints = Look
-        time.sleep(5)
+        time.sleep(8)
         largest = self.cam.check_color()
         if largest == None:
             qr = self.cam.QRSweep()
@@ -557,6 +557,10 @@ class RobotArm(object):
     @lib.api_call
     def GrabQR(self):
         self.cam.QRSweep()
+        
+    @lib.api_call
+    def GrabColor(self)
+        self.cam.check_color()
         
     @lib.api_call
     def color_test_loop(self, hopper_pos):

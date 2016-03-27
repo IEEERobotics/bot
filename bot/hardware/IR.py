@@ -32,7 +32,7 @@ class IR(object):
     @lib.api_call
     def read_values(self):
         ms = range(20)
-        self.bus.write_byte(8,0xA5)
+        #self.bus.write_byte(8,0xA5)
         #sleep(.1)
         for i in range(20):
             ms[i] = self.bus.read_byte(8)

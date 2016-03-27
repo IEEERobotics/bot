@@ -36,7 +36,7 @@ class Side(object):
         """
         diff = self.get_diff()
         error = self.diff_pid.pid(0, diff, timestep)
-        print threshold, error
+        #print threshold, error
         if abs(error) < threshold:
             return error
         else:

@@ -495,7 +495,7 @@ class RobotArm(object):
         largest = self.cam.check_color()
         #udate with color found
         if largest != None:
-            if self.hopper[hopper_pos] != None:
+            if self.hopper[hopper_pos] == None:
                 self.hopper[hopper_pos] = QRCode2(0,largest.color,0) 
             else:
                 self.hopper[hopper_pos].value = largest.color 
@@ -570,7 +570,7 @@ class RobotArm(object):
         
         this function loops to test how color detection works with different lighting conditions
         """
-        HOPPER_LOOK = [0,65,170,20,180]
+        HOPPER_LOOK = [0,75,170,10,180]
         #check hopper in array
         if (self.hopper[hopper_pos] != None):
             if (self.hopper[hopper_pos].data != None):

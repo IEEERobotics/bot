@@ -481,7 +481,7 @@ class RobotArm(object):
         Takes the hopper posisiton 0-3 as input and will look at the hopper posistion
         to see what clor it is then update the hopper array with the new data.
         """
-        HOPPER_LOOK = [0,75,170,10,180]
+        HOPPER_LOOK = [0,75,170,20,180]
         #check hopper in array
         if (self.hopper[hopper_pos] != None):
             if (self.hopper[hopper_pos].data != None):
@@ -570,7 +570,7 @@ class RobotArm(object):
         
         this function loops to test how color detection works with different lighting conditions
         """
-        HOPPER_LOOK = [0,75,170,10,180]
+        HOPPER_LOOK = [0,75,170,20,180]
         #check hopper in array
         if (self.hopper[hopper_pos] != None):
             if (self.hopper[hopper_pos].data != None):

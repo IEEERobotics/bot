@@ -401,7 +401,7 @@ class RobotArm(object):
         self.release()
         time.sleep(1) 
 
-        self.hopper[hopper_pos-1] = 1 
+        self.hopper[hopper_pos-1].value = None
         
       
 
@@ -536,7 +536,7 @@ class RobotArm(object):
                 self.rail.MoveToPosition(Position) 
                 time.sleep(2) 
                 self.Tier_Grab(Tier,2) 
-                self.reset_home_position()
+                #self.reset_home_position()
                 
                 i = i + 1
             self.reset_home_position() 

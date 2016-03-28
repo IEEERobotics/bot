@@ -285,6 +285,7 @@ class RobotArm(object):
                         QRList.append(ret)
                         print "Checking Alignment with x_disp = ", x_disp
                 else:       # if no qrcodes are found
+
                     limit = self.rail.DisplacementConverter(1.5*direction)
                     if limit == 0:                  #out of range
                         direction = -1*direction    #reverse direction
@@ -355,13 +356,13 @@ class RobotArm(object):
         elif Tier == 'B':
             ## Mixed QR Blocks 
             if Case == 1:  ## Block on top
-                BLOCK_GRAB_5 = [0, 120, 80, 35, 180]
+                BLOCK_GRAB_5 = [0, 120, 115, 55, 180]
             elif Case == 2: ## Block on bottom
-                BLOCK_GRAB_5 = [0, 120, 110, 55, 180]
+                BLOCK_GRAB_5 = [0, 120, 115, 35, 180]
                 
             LOOK_5 = [0, 25, 170, 10, 180]
-            HOPPER1 = [0, 90, 100, 55, 180]
-            HOPPER2 = [0, 40, 180, 0, 180]
+            HOPPER1 = [0, 45, 145, 55, 180]
+            HOPPER2 = [0, 55, 180, 0, 180]
             
 
         elif Tier == 'C':
@@ -369,7 +370,7 @@ class RobotArm(object):
             BLOCK_GRAB_5 = [0, 0, 10, 50, 0]
             LOOK_5 = [0, 25, 170, 10, 180]
             HOPPER1 = [0, 90, 100, 45, 180]
-            HOPPER2 = [0, 40, 180, 0, 180]
+            HOPPER3 = [0, 40, 180, 0, 180]
 
 
 
@@ -409,7 +410,7 @@ class RobotArm(object):
         self.release()
         time.sleep(1) 
 
-        self.hopper[hopper_pos-1] = QRCode2(0,None,0)
+        self.hopper[hopper_pos-1] = 1 
         
       
 
@@ -454,9 +455,9 @@ class RobotArm(object):
     def EmptyHopper(self,Bin):
         
         
-        Hopper = [0,80,173,28,180]
-        PullBack = [0,15,170,30,180]
-        OffSide = [90,60,110,10,180]
+        Hopper = [0,88,170,20,180]
+        PullBack = [0,35,170,30,180]
+        OffSide = [85,75,110,10,180]
         
       
         
@@ -489,7 +490,7 @@ class RobotArm(object):
         Takes the hopper posisiton 0-3 as input and will look at the hopper posistion
         to see what clor it is then update the hopper array with the new data.
         """
-        HOPPER_LOOK = [0,75,170,20,180]
+        HOPPER_LOOK = [0,75,170,10,180]
         #check hopper in array
         if (self.hopper[hopper_pos] != None):
             if (self.hopper[hopper_pos].data != None):
@@ -508,11 +509,13 @@ class RobotArm(object):
             else:
                 self.hopper[hopper_pos].value = largest.color 
         else: 
-            print "Error: No color Found."
+            self.hopper[hopper_pos] = None
+            print "no color found"
+            return 0
             
     @lib.api_call 
     def check_box_color(self):
-        Look = [90, 80, 170, 15, 180]
+        Look = [85, 80, 170, 15, 180]
         
         self.reset_home_position()
         self.joints = Look
@@ -522,7 +525,7 @@ class RobotArm(object):
             qr = self.cam.QRSweep()
             if qr != None:
                 return qr.value
-            return 0
+            return None
         
         return largest.color 
     
@@ -544,7 +547,7 @@ class RobotArm(object):
                 self.rail.MoveToPosition(Position) 
                 time.sleep(2) 
                 self.Tier_Grab(Tier,2) 
-                #self.reset_home_position()
+                self.reset_home_position()
                 
                 i = i + 1
             self.reset_home_position() 
@@ -554,6 +557,7 @@ class RobotArm(object):
     def check_hopper(self):
         i = 0
         while i < 4:
+            print i 
             self.check_block_color(i) 
             i = i + 1
         return 1 
@@ -578,10 +582,10 @@ class RobotArm(object):
         
         this function loops to test how color detection works with different lighting conditions
         """
-        HOPPER_LOOK = [0,75,170,20,180]
+        HOPPER_LOOK = [0,75,170,10,180]
         #check hopper in array
         if (self.hopper[hopper_pos] != None):
-            if (self.hopper[hopper_pos].value != None):
+            if (self.hopper[hopper_pos].data != None):
                 print "Color already known."  
                  
                 return 1

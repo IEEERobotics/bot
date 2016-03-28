@@ -276,7 +276,8 @@ class RobotArm(object):
             if ret != None:
                 count = 0                           #reset the count.
                 x_disp = ret.tvec[0]
-                if abs(x_disp) < .1:
+                if abs(x_disp) < .125:
+                    print "QRCode found at x_disp: ", x_disp
                     return ret
                 else:
                     print "Checking Alignment with x_disp = ", x_disp
@@ -401,7 +402,7 @@ class RobotArm(object):
         self.release()
         time.sleep(1) 
 
-        self.hopper[hopper_pos-1].value = None
+        self.hopper[hopper_pos-1] = QRCode2(0,None,0)
         
       
 

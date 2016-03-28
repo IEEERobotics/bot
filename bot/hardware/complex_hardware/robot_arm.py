@@ -347,13 +347,13 @@ class RobotArm(object):
         elif Tier == 'B':
             ## Mixed QR Blocks 
             if Case == 1:  ## Block on top
-                BLOCK_GRAB_5 = [0, 120, 80, 35, 180]
+                BLOCK_GRAB_5 = [0, 120, 115, 55, 180]
             elif Case == 2: ## Block on bottom
-                BLOCK_GRAB_5 = [0, 120, 110, 55, 180]
+                BLOCK_GRAB_5 = [0, 120, 115, 35, 180]
                 
             LOOK_5 = [0, 25, 170, 10, 180]
-            HOPPER1 = [0, 90, 100, 55, 180]
-            HOPPER2 = [0, 40, 180, 0, 180]
+            HOPPER1 = [0, 45, 145, 35, 180]
+            HOPPER2 = [0, 55, 180, 0, 180]
             
 
         elif Tier == 'C':
@@ -446,9 +446,9 @@ class RobotArm(object):
     def EmptyHopper(self,Bin):
         
         
-        Hopper = [0,80,173,28,180]
-        PullBack = [0,15,170,30,180]
-        OffSide = [90,60,110,10,180]
+        Hopper = [0,88,170,20,180]
+        PullBack = [0,35,170,30,180]
+        OffSide = [85,75,110,10,180]
         
       
         
@@ -500,11 +500,13 @@ class RobotArm(object):
             else:
                 self.hopper[hopper_pos].value = largest.color 
         else: 
-            print "Error: No color Found."
+            self.hopper[hopper_pos] = None
+            print "no color found"
+            return 0
             
     @lib.api_call 
     def check_box_color(self):
-        Look = [90, 80, 170, 15, 180]
+        Look = [85, 80, 170, 15, 180]
         
         self.reset_home_position()
         self.joints = Look
@@ -514,7 +516,7 @@ class RobotArm(object):
             qr = self.cam.QRSweep()
             if qr != None:
                 return qr.value
-            return 0
+            return None
         
         return largest.color 
     

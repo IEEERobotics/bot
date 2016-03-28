@@ -302,8 +302,8 @@ class Navigation(object):
         self.logger.info("Reached Zone B")
 
     @lib.api_call
-    def bang(self):
-        self.drive_dead("north", 50, 0.5)
+    def bang(self, side="north"):
+        self.drive_dead(side, 50, 0.5)
 
     @lib.api_call
     def get_off_wall(self):
@@ -354,10 +354,11 @@ class Navigation(object):
             timestep = time() - time_elapsed
             time_elapsed = time()
             curr_value = self.get_sensor_value(sensor)
-            self.logger.info("sensor Type: %s, sensor value: %d, avg: %d", sensor, curr_value, avg(last_set)
+            self.logger.info("sensor Type: %s, sensor value: %d, avg: %d", sensor, curr_value, avg(last_set))
             diff = curr_value - avg(last_set)
-            self.move_correct("south", self.rail_cars_side, 200, speed, timestep, threshold=100)
-            if diff > 100:
+            self.move_correct("south", self.rail_cars_side, 150, speed, timestep, threshold=100)
+            if diff > 50:
+                break
                 if sensor == "West Bottom":
                     sensor = "West Top"
                     speed = 35

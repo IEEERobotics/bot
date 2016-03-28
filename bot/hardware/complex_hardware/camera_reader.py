@@ -180,9 +180,11 @@ class Camera(object):
         #frame = cv2.bilateralFilter(frame, 9, 75, 75) 
         frame = cv2.GaussianBlur(frame,(5,5),0)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # Other possible constants 
+        # 19, 0
         frame = cv2.adaptiveThreshold(frame, 255
                                       , cv2.ADAPTIVE_THRESH_MEAN_C
-                                      , cv2.THRESH_BINARY, 9, 2)
+                                      , cv2.THRESH_BINARY, 19, 0)
         
         #ret, thresh = cv2.threshold(gray,50,255,cv2.THRESH_BINARY)
         cv2.imwrite('buffer.png', frame)

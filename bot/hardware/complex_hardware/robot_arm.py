@@ -361,7 +361,7 @@ class RobotArm(object):
             BLOCK_GRAB_5 = [0, 0, 10, 50, 0]
             LOOK_5 = [0, 25, 170, 10, 180]
             HOPPER1 = [0, 90, 100, 45, 180]
-            HOPPER3 = [0, 40, 180, 0, 180]
+            HOPPER2 = [0, 40, 180, 0, 180]
 
 
 
@@ -573,7 +573,7 @@ class RobotArm(object):
         HOPPER_LOOK = [0,75,170,20,180]
         #check hopper in array
         if (self.hopper[hopper_pos] != None):
-            if (self.hopper[hopper_pos].data != None):
+            if (self.hopper[hopper_pos].value != None):
                 print "Color already known."  
                  
                 return 1

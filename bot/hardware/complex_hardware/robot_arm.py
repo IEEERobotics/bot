@@ -297,8 +297,8 @@ class RobotArm(object):
             if targetQR != None:
                 rail_ret = self.rail.DisplacementConverter(targetQR.tvec[0])
                 if rail_ret == 0:
-                #out of range, reset to middle and try again
-                self.rail.MoveToPosition(3500)
+                    #out of range, reset to middle and try again
+                    self.rail.MoveToPosition(3500)
             else:       # if no qrcodes are found
                 limit = self.rail.DisplacementConverter(1.5*direction)
                 if limit == 0:                  #out of range

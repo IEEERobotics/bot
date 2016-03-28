@@ -270,25 +270,21 @@ class RobotArm(object):
         count = 0
         direction = 1
         while(True):
-            ret = None
-            partial_list = self.cam.partial_qr_scan()
-            ret = self.cam.partial_qr_select(partial_list)
-            if ret != None:
-                count = 0                           #reset the count.
-                x_disp = ret.tvec[0]
-                if abs(x_disp) < .125:
-                    print "QRCode found at x_disp: ", x_disp
-                    return ret
-                else:
-                    print "Checking Alignment with x_disp = ", x_disp
-                    if abs(x_disp) > .1:
-                        rail_ret = self.rail.DisplacementConverter(x_disp)
-                        if rail_ret == 0:
-                            #out of range, reset to middle and try again
-                            self.rail.MoveToPosition(3500)
-            else:       # if no qrcodes are found
-                if count >= 3:
-                    count = 0
+            x = 0
+            QRList = []
+            while (x < 3):
+                ret = None
+                partial_list = self.cam.partial_qr_scan()
+                ret = self.cam.partial_qr_select(partial_list)
+                if ret != None:
+                    x_disp = ret.tvec[0]
+                    if abs(x_disp) < .125:
+                        print "QRCode found at x_disp: ", x_disp
+                        return ret
+                    else:
+                        QRList.append(ret)
+                        print "Checking Alignment with x_disp = ", x_disp
+                else:       # if no qrcodes are found
                     limit = self.rail.DisplacementConverter(1.5*direction)
                     if limit == 0:                  #out of range
                         direction = -1*direction    #reverse direction
@@ -296,8 +292,19 @@ class RobotArm(object):
                         if ret == 0:
                             print "Error: out of range on both ends, shouldn't be possible."
                             
-                count += 1
-                
+            targetQR = self.cam.selectQR(QRList)
+            if targetQR != None:
+                rail_ret = self.rail.DisplacementConverter(targetQR.tvec[0])
+                if rail_ret == 0:
+                #out of range, reset to middle and try again
+                self.rail.MoveToPosition(3500)
+            else:       # if no qrcodes are found
+                limit = self.rail.DisplacementConverter(1.5*direction)
+                if limit == 0:                  #out of range
+                    direction = -1*direction    #reverse direction
+                    ret = self.rail.DisplacementConverter(.75*direction)
+                    if ret == 0:
+                        print "Error: out of range on both ends, shouldn't be possible."   
     
     def test_look(self):
         self.servo_cape.transmit_block([0] + [0, 125, 0, 170, 0])

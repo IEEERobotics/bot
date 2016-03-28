@@ -504,7 +504,7 @@ class Camera(object):
             return None
         else:
             pqr = qr_list[best]
-            avg_length = float((pqr.marker1.length + pqr.marker2.length + pqr.marker3.length)/3.0)
+            avg_length = max([pqr.marker1.length, pqr.marker2.length, pqr.marker3.length]
             x_disp = 0.354331 * float(best_x - center_x)/float(avg_length)
             y_disp = 0.354331 * float(best_y/float(avg_length))
             target_qr = QRCode2([x_disp,y_disp,0], None, 0)

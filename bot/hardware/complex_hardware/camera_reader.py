@@ -9,6 +9,8 @@ from PIL import ImageEnhance
 import cv2
 import math
 
+from threading import Thread
+
 
 import bot.lib.lib as lib
 from bot.hardware.qr_code import QRCode
@@ -58,6 +60,36 @@ class Camera(object):
         # QR scanning tools
         self.scanner = zbar.ImageScanner()
         self.scanner.parse_config('enable')
+        
+        (self.grabbed, self.frame) = self.cam.read()
+        self.stopped = False
+        
+        self.vs = self.start()
+        
+        
+        
+    def start(self):
+		# start the thread to read frames from the video stream
+		Thread(target=self.update, args=()).start()
+		return self
+ 
+	def update(self):
+		# keep looping infinitely until the thread is stopped
+		while True:
+			# if the thread indicator variable is set, stop the thread
+			if self.stopped:
+				return
+ 
+			# otherwise, read the next frame from the stream
+			(self.grabbed, self.frame) = self.cam.read()
+ 
+	def read(self):
+		# return the frame most recently read
+		return self.frame
+ 
+	def stop(self):
+		# indicate that the thread should be stopped
+		self.stopped = True
         
         
     def apply_filters(self, frame):
@@ -166,12 +198,7 @@ class Camera(object):
     def QRSweep(self):
         
         QRList = []
-        self.cam.grab()
-        self.cam.grab()
-        self.cam.grab()
-        self.cam.grab()
-        #cv2.waitKey(50)
-        ret, frame = self.cam.read()   
+        ret, frame = self.read()   
         
         # Direct conversion cv -> zbar images did not work.
         # Buffer file used to have native data structures.
@@ -316,7 +343,7 @@ class Camera(object):
         largest = None
         print "Getting the frame"
         #get the image
-        ret, bgr = self.cam.read()
+        bgr = self.read()
         
         print "got the Frame, cropping the image"
 
@@ -435,11 +462,7 @@ class Camera(object):
     
     def partial_qr_scan(self):
         #Capture frame-by-frame
-        self.cam.grab()
-        self.cam.grab()
-        self.cam.grab()
-        self.cam.grab()
-        ret, frame = self.cam.read() 
+        frame = self.read()
 
         frame_orig = frame
 

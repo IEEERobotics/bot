@@ -168,6 +168,7 @@ class CtrlServer(object):
                 sys.exit(0)
             except:
                 e = sys.exc_info()[0]
+                print "error: ", e
                 self.logger.info("massive server error")
                 self.logger.info(e)
 

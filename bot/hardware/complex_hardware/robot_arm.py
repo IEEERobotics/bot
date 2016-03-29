@@ -326,8 +326,10 @@ class RobotArm(object):
         time.sleep(1)
         self.servo_cape.transmit_block([0] + HOME)
         time.sleep(2)
-        self.rail.DisplacementConverter(3.5)  #get the rail to the middle
-        qr = self.rail_feedback()           #position infront of QRCode
+        #get the rail to the middl
+        self.rail.DisplacementConverter(3.5)
+        # In front of QR  
+        qr = self.rail_feedback()           
         return qr
 
     def MoveToGenericBlock(self):

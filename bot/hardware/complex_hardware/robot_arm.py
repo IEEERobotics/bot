@@ -273,6 +273,7 @@ class RobotArm(object):
             x = 0
             QRList = []
             while (x < 3):
+                x = x + 1
                 ret = None
                 partial_list = self.cam.partial_qr_scan()
                 ret = self.cam.partial_qr_select(partial_list)

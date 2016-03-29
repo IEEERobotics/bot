@@ -315,6 +315,23 @@ class Navigation(object):
         self.drive_dead("north", 50, 0.7)
         self.logger.info("Aligned with barge")
 
+    @lib.api_call
+    def bang_railcar(self):
+        self.drive_dead(self.rail_cars_side, 50, 0.5)
+
+    @lib.api_call
+    def get_off_railcar(self):
+        if self.rail_cars_side == "east":
+            self.drive_dead("west", 50, 0.333)
+        else:
+            self.drive_dead("east", 50, 0.333)
+
+    @lib.api_call
+    def correct_bang_railcar(self):
+        self.get_off_railcar()
+        self.drive_dead(self.rail_cars_side, 50, 0.7)
+        self.logger.info("Aligned with railcars")
+    
     def goto_block_zone_C(self):
         self.goto_top()
 

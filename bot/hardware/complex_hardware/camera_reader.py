@@ -409,7 +409,6 @@ class Camera(object):
         # cleanup
         del(rgb)
         del(rgb_enhanced)
-        del(bgr_enhanced)
         del(pil_cropped)
         del(enhanced)
         del(pil_im)

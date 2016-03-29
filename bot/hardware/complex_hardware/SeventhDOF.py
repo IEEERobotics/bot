@@ -7,7 +7,13 @@ import bot.lib.lib as lib
 class Rail_Mover(object):
 
     def __init__(self):
-
+    
+        self.bin_1 = 200
+        self.bin_2 = 2250
+        self.bin_3 = 4600
+        self.bin_4 = 7000 
+        self.left_extreme = 7200
+        
         self.bot_config = lib.get_config()
 
         rail_motor_conf = self.bot_config["dagu_arm"]["rail_cape"]["rail_motor"]
@@ -90,6 +96,7 @@ class Rail_Mover(object):
 
         power = 40
         self.rail_motor.power = power
+        i = 0
         while self.rail_motor.position > 20:
             print self.rail_motor.position
             print "velocity: ", self.rail_motor.velocity
@@ -106,9 +113,10 @@ class Rail_Mover(object):
         print "velocity: ", self.rail_motor.velocity
         sleep(.5)
         print "velocity: ", self.rail_motor.velocity
+        i = 0
         while self.rail_motor.velocity < 0:
-            print self.rail_motor.position
-            print "velocity: ", self.rail_motor.velocity
+            i = i+1
+            
     
         self.rail_motor.power = 0
         self.rail_motor.reset()
@@ -126,6 +134,24 @@ class Rail_Mover(object):
         Displacement = Position - current_position
         
         self.DisplacementMover(Displacement) 
+    
+    def CalibrateRail(self):
+        Delta = 100
+        while True:
+            command = raw_input("A:Right F:Left") 
+            if command == 'A':
+                self.DisplacementMover(-Delta)
+            if command == 'F':
+                self.DisplacementMover(Delta)
+            if command == 'C':
+                self.bin_1 = input("bin 1 value:  ")
+                self.bin_2 = input("bin 2 value:  ") 
+                self.bin_3 = input("bin 3 value:  ")
+                self.bin_4 = input("bin 4 value:  ") 
+                self.left_extreme = input("left extreme value:  ") 
+            if command == 'Q':
+                break 
+        
          
         
 

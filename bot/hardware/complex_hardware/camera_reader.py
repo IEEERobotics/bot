@@ -316,10 +316,6 @@ class Camera(object):
         largest = None
         print "Getting the frame"
         #get the image
-        self.cam.grab()
-        self.cam.grab()
-        self.cam.grab()
-        self.cam.grab()
         ret, bgr = self.cam.read()
         
         print "got the Frame, cropping the image"

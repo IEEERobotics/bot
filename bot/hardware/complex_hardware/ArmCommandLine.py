@@ -16,7 +16,7 @@ while True:
     print "2:  Move to hopper pos"
     print "3:  Set Hopper" 
     print "4:  Empty hopper"  
-    print "5:  Grab the block"
+    print "5:  Calibrate rail"
     print "6:  Pinch         "
     print "7:  Let go        "
     print "8:  Reset the arm and rail"
@@ -58,8 +58,7 @@ while True:
         arm.FindAndGetBlock(Color)
         
     if Command == 5:
-        Tier = raw_input("Which Tier")
-        arm.Tier_Grab(Tier)
+        arm.rail.CalibrateRail() 
         
     if Command == 6: 
         arm.grab()

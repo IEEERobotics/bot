@@ -70,8 +70,8 @@ class Camera(object):
         
     def start(self):
         # start the thread to read frames from the video stream
-        Thread(target=self.update, args=()).start()
-		return self
+        thread = Thread(target=self.update, args=()).start()
+        return thread
 
     def update(self):
         # keep looping infinitely until the thread is stopped

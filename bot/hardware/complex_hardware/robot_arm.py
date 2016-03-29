@@ -457,7 +457,7 @@ class RobotArm(object):
     def EmptyHopper(self,Bin):
         
         
-        Hopper = [0,88,170,20,180]
+        Hopper = [0,85,170,20,180]
         PullBack = [0,35,170,30,180]
         OffSide = [85,75,110,10,180]
         

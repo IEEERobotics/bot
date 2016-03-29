@@ -505,7 +505,7 @@ class RobotArm(object):
         self.joints = HOPPER_LOOK
         time.sleep(3)
         #look for a color
-        largest = self.cam.check_color()
+        largest = self.GrabColor()
         #udate with color found
         if largest != None:
             if self.hopper[hopper_pos] == None:
@@ -524,7 +524,7 @@ class RobotArm(object):
         self.reset_home_position()
         self.joints = Look
         time.sleep(8)
-        largest = self.cam.check_color()
+        largest = self.GrabColor()
         if largest == None:
             qr = self.cam.QRSweep()
             if qr != None:
@@ -576,7 +576,9 @@ class RobotArm(object):
         
     @lib.api_call
     def GrabColor(self):
+        self.TurnOnLight()
         self.cam.check_color()
+        self.TurnOffLight()
         
     @lib.api_call
     def color_test_loop(self, hopper_pos):
@@ -599,7 +601,7 @@ class RobotArm(object):
         time.sleep(3)
         while True:
             #look for a color
-            largest = self.cam.check_color()
+            largest = self.GrabColor()
             #udate with color found
             if largest != None:
                 print "Color Found: ", largest.color

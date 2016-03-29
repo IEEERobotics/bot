@@ -21,16 +21,21 @@ while True:
     print "7:  Let go        "
     print "8:  Reset the arm and rail"
     print "9:  Check color in bin"
-    print "-2: Tier Grab         "
+    print "10: Tier Grab         "
+    print "11: Turn Light On     "
+    print "12: Turn Light Off    "
     
 
     Command = input("Command:  ")
     
-    if Command == -3:
-        Pos = input("where to?  :   ") 
-        arm.rail.MoveToPosition(Pos)
+    if Command == 12:
+        arm.TurnOffLight()
     
-    if Command == -2:
+    if Command == 11:
+        
+        arm.TurnOnLight()
+    
+    if Command == 10:
         arm.competition_solver_barge('B') 
     
     if Command == -1: 

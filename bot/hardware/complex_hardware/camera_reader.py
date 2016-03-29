@@ -18,6 +18,7 @@ from bot.hardware.complex_hardware.QRCode2 import QRCode2
 from bot.hardware.complex_hardware.QRCode2 import Block
 from bot.hardware.complex_hardware.partial_qr import *
 
+"""
 def find_name(symlink):
     # find where symlink is pointing (/dev/vide0, video1, etc)
     cmd = "readlink -f /dev/" + symlink 
@@ -29,6 +30,8 @@ def find_name(symlink):
     # There should nto be more than one digit
     interface_num = nums[0]    
     return interface_num
+    
+"""
 
 class Camera(object):
 

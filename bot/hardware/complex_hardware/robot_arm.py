@@ -273,7 +273,6 @@ class RobotArm(object):
             x = 0
             QRList = []
             while (x < 3):
-                x += 1
                 ret = None
                 partial_list = self.cam.partial_qr_scan()
                 ret = self.cam.partial_qr_select(partial_list)
@@ -282,9 +281,6 @@ class RobotArm(object):
                     if abs(x_disp) < .125:
                         print "QRCode found at x_disp: ", x_disp
                         return ret
-                    elif abs(x_disp) < .75:
-                        QRList.append(ret)
-                        break
                     else:
                         QRList.append(ret)
                         print "Checking Alignment with x_disp = ", x_disp
@@ -331,8 +327,10 @@ class RobotArm(object):
         time.sleep(1)
         self.servo_cape.transmit_block([0] + HOME)
         time.sleep(2)
-        self.rail.DisplacementConverter(3.5)  #get the rail to the middle
-        qr = self.rail_feedback()           #position infront of QRCode
+        #get the rail to the middl
+        self.rail.DisplacementConverter(3.5)
+        # In front of QR  
+        qr = self.rail_feedback()           
         return qr
 
     def MoveToGenericBlock(self):
@@ -495,7 +493,7 @@ class RobotArm(object):
         Takes the hopper posisiton 0-3 as input and will look at the hopper posistion
         to see what clor it is then update the hopper array with the new data.
         """
-        HOPPER_LOOK = [0,100,125,10,180]
+        HOPPER_LOOK = [0,75,170,10,180]
         #check hopper in array
         if (self.hopper[hopper_pos] != None):
             if (self.hopper[hopper_pos].data != None):
@@ -506,7 +504,7 @@ class RobotArm(object):
         self.joints = HOPPER_LOOK
         time.sleep(3)
         #look for a color
-        largest = self.GrabColor()
+        largest = self.cam.check_color()
         #udate with color found
         if largest != None:
             if self.hopper[hopper_pos] == None:
@@ -525,7 +523,7 @@ class RobotArm(object):
         self.reset_home_position()
         self.joints = Look
         time.sleep(8)
-        largest = self.GrabColor()
+        largest = self.cam.check_color()
         if largest == None:
             qr = self.cam.QRSweep()
             if qr != None:

@@ -273,6 +273,7 @@ class RobotArm(object):
             x = 0
             QRList = []
             while (x < 3):
+                x += 1
                 ret = None
                 partial_list = self.cam.partial_qr_scan()
                 ret = self.cam.partial_qr_select(partial_list)
@@ -281,6 +282,9 @@ class RobotArm(object):
                     if abs(x_disp) < .125:
                         print "QRCode found at x_disp: ", x_disp
                         return ret
+                    elif abs(x_disp) < .75:
+                        QRList.append(ret)
+                        break
                     else:
                         QRList.append(ret)
                         print "Checking Alignment with x_disp = ", x_disp

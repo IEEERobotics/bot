@@ -607,6 +607,11 @@ class RobotArm(object):
             else: 
                 print "Error: No color Found."
     
-    
-
+    @lib.api_call
+    def TurnOnLight(self):
+        self.servo_cape_grabber.transmit_block([3] + JUNK_BUFFER)
+        
+    @lib.api_call 
+    def TurnOffLight(self):
+        self.servo_cape_grabber.transmit_block([4] + JUNK_BUFFER) 
     

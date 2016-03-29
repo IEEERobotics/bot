@@ -273,6 +273,7 @@ class RobotArm(object):
             x = 0
             QRList = []
             while (x < 3):
+                x += 1
                 ret = None
                 partial_list = self.cam.partial_qr_scan()
                 ret = self.cam.partial_qr_select(partial_list)
@@ -281,6 +282,9 @@ class RobotArm(object):
                     if abs(x_disp) < .125:
                         print "QRCode found at x_disp: ", x_disp
                         return ret
+                    elif abs(x_disp) < .75:
+                        QRList.append(ret)
+                        break
                     else:
                         QRList.append(ret)
                         print "Checking Alignment with x_disp = ", x_disp
@@ -501,7 +505,7 @@ class RobotArm(object):
         self.joints = HOPPER_LOOK
         time.sleep(3)
         #look for a color
-        largest = self.cam.check_color()
+        largest = self.GrabColor()
         #udate with color found
         if largest != None:
             if self.hopper[hopper_pos] == None:
@@ -520,7 +524,7 @@ class RobotArm(object):
         self.reset_home_position()
         self.joints = Look
         time.sleep(8)
-        largest = self.cam.check_color()
+        largest = self.GrabColor()
         if largest == None:
             qr = self.cam.QRSweep()
             if qr != None:
@@ -572,7 +576,13 @@ class RobotArm(object):
         
     @lib.api_call
     def GrabColor(self):
-        self.cam.check_color()
+        self.TurnOnLight()
+        ret = self.cam.check_color()
+        if ret == None:         #try again
+            print "Trying again"
+            ret = self.cam.check_color()
+        self.TurnOffLight()
+        return ret
         
     @lib.api_call
     def color_test_loop(self, hopper_pos):
@@ -595,7 +605,7 @@ class RobotArm(object):
         time.sleep(3)
         while True:
             #look for a color
-            largest = self.cam.check_color()
+            largest = self.GrabColor()
             #udate with color found
             if largest != None:
                 print "Color Found: ", largest.color

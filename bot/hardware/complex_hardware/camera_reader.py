@@ -75,14 +75,12 @@ class Camera(object):
 
     def update(self):
         # keep looping infinitely until the thread is stopped
-        while True:
+        while not self.stopped:
             print "In the update camera thread"
-            # if the thread indicator variable is set, stop the thread
-            if self.stopped:
-                return
- 
             # otherwise, read the next frame from the stream
             (self.grabbed, self.frame) = self.cam.read()
+            cv2.waitKey(30)
+        return
 
     def read(self):
         # return the frame most recently read

@@ -9,10 +9,10 @@ class Rail_Mover(object):
     def __init__(self):
     
         self.bin_1 = 200
-        self.bin_2 = 2250
-        self.bin_3 = 4600
-        self.bin_4 = 7000 
-        self.left_extreme = 7200
+        self.bin_2 = 2600
+        self.bin_3 = 4570
+        self.bin_4 = 6870 
+        self.left_extreme = 7100
         
         self.bot_config = lib.get_config()
 
@@ -29,23 +29,23 @@ class Rail_Mover(object):
         self.rail_motor.power = 0
 
         if Position == 1:
-            Displacement = 200 - self.rail_motor.position 
+            Displacement = self.bin_1 - self.rail_motor.position 
             return self.DisplacementMover(Displacement)
             
         elif Position == 2:
-            Displacement = 2250 - self.rail_motor.position
+            Displacement = self.bin_2 - self.rail_motor.position
             return self.DisplacementMover(Displacement)
             
         elif Position == 3:
-            Displacement = 4600 - self.rail_motor.position
+            Displacement = self.bin_3 - self.rail_motor.position
             return self.DisplacementMover(Displacement)
         elif Position == 4:
-            Displacement = 7000 - self.rail_motor.position
+            Displacement = self.bin4 - self.rail_motor.position
             return self.DisplacementMover(Displacement)
 
     def DisplacementMover(self,Displacement):
 
-        if (self.rail_motor.position + Displacement) > 7200:
+        if (self.rail_motor.position + Displacement) > self.left_extreme:
             print "Cannot move beyond range"
             return 0 
         elif (self.rail_motor.position + Displacement) < 0:
@@ -127,14 +127,14 @@ class Rail_Mover(object):
         
         current_position = self.rail_motor.position
         
-        if Position < 0 or Position > 7150:
+        if Position < 0 or Position > self.left_extreme:
             print "Invalid Position"
             return 0
             
         Displacement = Position - current_position
         
         self.DisplacementMover(Displacement) 
-    
+    @lib.api_call
     def CalibrateRail(self):
         Delta = 100
         while True:

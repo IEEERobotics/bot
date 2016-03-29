@@ -370,6 +370,14 @@ class Camera(object):
             print  "no color found"
         else:
             print "Color found: ", largest.color
+
+        # cleanup
+        del(bgr)
+        del(bgr_enhanced)
+        del(mask)
+        del(output)
+        del(cnts)
+
         return largest
 
     def enhance_color(self, bgr):
@@ -397,6 +405,17 @@ class Camera(object):
         # Convert RGB to BGR 
         rgb_enhanced = open_cv_image[:, :, ::-1].copy()
         bgr_enhanced = cv2.GaussianBlur(rgb_enhanced,(9,9),0)
+    
+        # cleanup
+        del(rgb)
+        del(rgb_enhanced)
+        del(bgr_enhanced)
+        del(pil_cropped)
+        del(enhanced)
+        del(pil_im)
+        del(pil_image)
+        del(open_cv_image)
+
         return bgr_enhanced
 
     def num_to_color(self, number):

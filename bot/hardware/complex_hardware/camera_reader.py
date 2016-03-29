@@ -76,6 +76,7 @@ class Camera(object):
     def update(self):
         # keep looping infinitely until the thread is stopped
         while True:
+            print "In the update camera thread"
             # if the thread indicator variable is set, stop the thread
             if self.stopped:
                 return

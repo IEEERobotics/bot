@@ -69,28 +69,27 @@ class Camera(object):
         
         
     def start(self):
-		# start the thread to read frames from the video stream
-		Thread(target=self.update, args=()).start()
+        # start the thread to read frames from the video stream
+        Thread(target=self.update, args=()).start()
 		return self
+
+    def update(self):
+        # keep looping infinitely until the thread is stopped
+        while True:
+            # if the thread indicator variable is set, stop the thread
+            if self.stopped:
+                return
  
-	def update(self):
-		# keep looping infinitely until the thread is stopped
-		while True:
-			# if the thread indicator variable is set, stop the thread
-			if self.stopped:
-				return
- 
-			# otherwise, read the next frame from the stream
-			(self.grabbed, self.frame) = self.cam.read()
- 
-	def read(self):
-		# return the frame most recently read
-		return self.frame
- 
-	def stop(self):
-		# indicate that the thread should be stopped
-		self.stopped = True
-        
+            # otherwise, read the next frame from the stream
+            (self.grabbed, self.frame) = self.cam.read()
+
+    def read(self):
+        # return the frame most recently read
+        return self.frame
+
+    def stop(self):
+        # indicate that the thread should be stopped
+        self.stopped = True
         
     def apply_filters(self, frame):
         """Attempts to improve viewing by applying filters """

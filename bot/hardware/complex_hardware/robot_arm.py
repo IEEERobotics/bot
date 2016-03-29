@@ -577,8 +577,12 @@ class RobotArm(object):
     @lib.api_call
     def GrabColor(self):
         self.TurnOnLight()
-        self.cam.check_color()
+        ret = self.cam.check_color()
+        if ret == None:         #try again
+            print "Trying again"
+            ret = self.cam.check_color()
         self.TurnOffLight()
+        return ret
         
     @lib.api_call
     def color_test_loop(self, hopper_pos):

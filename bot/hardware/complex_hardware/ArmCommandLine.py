@@ -24,10 +24,18 @@ while True:
     print "10: Tier Grab         "
     print "11: Turn Light On     "
     print "12: Turn Light Off    "
+    print "13: Grab QR           "
+    print "14: Grab Color        " 
     
 
     Command = input("Command:  ")
     
+    if Command == 13: 
+        arm.GrabQR()
+        
+    if Command == 14:
+        arm.GrabColor() 
+        
     if Command == 12:
         arm.TurnOffLight()
     

@@ -288,6 +288,7 @@ class RobotArm(object):
                     else:
                         QRList.append(ret)
                         print "Checking Alignment with x_disp = ", x_disp
+                        print "countx = ", x
                 else:       # if no qrcodes are found
 
                     limit = self.rail.DisplacementConverter(1.5*direction)

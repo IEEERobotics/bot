@@ -647,14 +647,14 @@ class RobotArm(object):
             
             print "IR value: "+ str(Value["Arm"])
             Value = self.IR.read_values()
-            time.sleep(.5)
+            time.sleep(1)
             self.rail.DisplacementMover(Displacement)
             NewValue = self.IR.read_values()
             NetDiff = NewValue["Arm"] - Value["Arm"] 
             print "NetDiff:  " +str(NetDiff)
             
             
-        self.rail.DisplacementMover(-Displacement)   
+          
         print Value["Arm"]
         
         

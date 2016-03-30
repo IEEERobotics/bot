@@ -632,12 +632,12 @@ class RobotArm(object):
     def TurnOffLight(self):
         self.servo_cape_grabber.transmit_block([4] + JUNK_BUFFER) 
         
-    
+    @lib.api_call
     def FindBlockWithIR(self):
         Look = [0,90,125,20,180] 
         HandSensor = 2 
         Displacement = 150
-        Threshold =  150
+        Threshold =  120
         self.joints = Look 
         Value = self.IR.read_values()
         print Value

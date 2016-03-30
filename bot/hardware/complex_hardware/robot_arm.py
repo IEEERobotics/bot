@@ -642,7 +642,7 @@ class RobotArm(object):
         
         self.joints = Look 
         time.sleep(3)
-        Threshold = 130
+        Threshold = 140
         
         self.rail.SetMotorPower()
         

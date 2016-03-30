@@ -79,6 +79,12 @@ class Pilot:
         self.call("nav", "bang")
         time.sleep(.5)
         self.call("nav", "correct_bang")
+        
+        
+    def align_on_railcar(self):
+        self.call("nav", "bang_railcar")
+        time.sleep(.5)
+        self.call("nav", "correct_bang_railcar")
 
     def do_Zone_B(self):
         running = True
@@ -88,11 +94,37 @@ class Pilot:
             self.align_on_wall()
             time.sleep(0.5)
             # Do Arm Stuff
+            #grab blocks
             self.goto_railcar()
             time.sleep(.5)
             self.align_on_wall()
             time.sleep(0.5)
             # Do Arm Stuff
+            #find positions for railcar and deposit blocks
+            
+            self.call("nav", "get_off_wall")
+            self.align_on_railcar()
+            #Deposit blocks
+            time.sleep(0.5)
+            
+            self.call('nav', 'goto_next_railcar')
+            time.sleep(0.5)
+            elf.align_on_railcar()
+            #Deposit blocks
+            time.sleep(0.5)
+ 
+            self.call('nav', 'goto_next_railcar')
+            time.sleep(0.5)
+            elf.align_on_railcar()
+            #Deposit blocks
+            time.sleep(0.5)
+            
+            self.call('nav', 'goto_next_railcar')
+            time.sleep(0.5)
+            elf.align_on_railcar()
+            #Deposit blocks
+            time.sleep(0.5)
+            
             self.goto_block_zone_B()
             time.sleep(.5)
             self.align_on_wall()

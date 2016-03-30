@@ -8,7 +8,7 @@ import bot.lib.lib as lib
 import math
 
 
-class QRCode2:
+class QRCode2(object):
     def __init__(self, tvec, value, top_right):
         self.tvec = tvec
         self.value = value
@@ -18,4 +18,3 @@ class Block(object):
     def __init__(self, size, color):
         self.size = size
         self.color = color
-        

@@ -42,7 +42,9 @@ class IR(object):
         for side in self.biases:
             data_index = self.hash_values[side] - 1
             data[data_index] += self.biases[side]
-            if data[data_index] < 0:
+            if data[data_index] <= 0:
+                self.bus.write_byte(8,0xA5)
+                sleep(.2)
                 data[data_index] = 1
 
         

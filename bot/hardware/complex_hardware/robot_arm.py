@@ -621,6 +621,7 @@ class RobotArm(object):
         
         this function loops to test how color detection works with different lighting conditions
         """
+        self.cam.start()
         HOPPER_LOOK = [0,75,170,10,180]
         #check hopper in array
         if (self.hopper[hopper_pos] != None):
@@ -645,6 +646,8 @@ class RobotArm(object):
                     continue
             else: 
                 print "Error: No color Found."
+                
+        self.cam.stop()
     
     @lib.api_call
     def TurnOnLight(self):

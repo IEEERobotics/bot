@@ -54,8 +54,8 @@ omni_drive_motors: {
 }
 
 IR : {
-        "North Left": 10, "North Right": 3, "East Top": 4, "East Bottom": 5, "South Right": 6, "South Left": 7, "West Bottom": 8, "West Top": 9
-
+        "North Left": 10, "North Right": 3, "East Top": 4, "East Bottom": 5, "South Right": 6, "South Left": 7, "West Bottom": 8, "West Top": 9,
+        "Arm": 2
 }
 
 IR_PID : {

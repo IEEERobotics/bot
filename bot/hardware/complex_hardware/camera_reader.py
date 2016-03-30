@@ -18,7 +18,7 @@ from bot.hardware.complex_hardware.QRCode2 import QRCode2
 from bot.hardware.complex_hardware.QRCode2 import Block
 from bot.hardware.complex_hardware.partial_qr import *
 
-"""
+
 def find_name(symlink):
     # find where symlink is pointing (/dev/vide0, video1, etc)
     cmd = "readlink -f /dev/" + symlink 
@@ -30,8 +30,6 @@ def find_name(symlink):
     # There should nto be more than one digit
     interface_num = nums[0]    
     return interface_num
-    
-"""
 
 class Camera(object):
 
@@ -44,18 +42,18 @@ class Camera(object):
     def __init__(self, cam_config):
         self.logger = lib.get_logger()
 
-        #udev_name = cam_config["udev_name"]
-        #print udev_name
+        udev_name = cam_config["udev_name"]
+        print udev_name
 
-        #cam_num = find_name(udev_name)
+        cam_num = find_name(udev_name)
         
-        # extract calib data from cam_config
-        self.a = 1
-        self.n = 1
+        #extract calib data from cam_config
+        self.a = cam_config["a"]
+        self.n = cam_config["n"]
         
-        self.cam = cv2.VideoCapture(-1)
-        self.cam.set(3, 1920)
-        self.cam.set(4, 1080)
+        self.cam = cv2.VideoCapture(cam_num)
+        self.cam.set(3, 1280)
+        self.cam.set(4, 720)
         
         self.resX = int(self.cam.get(3))
         self.resY = int(self.cam.get(4))

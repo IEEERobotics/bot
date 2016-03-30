@@ -584,13 +584,11 @@ class RobotArm(object):
             
     @lib.api_call 
     def check_hopper(self):
-        self.cam.start()
         i = 0
         while i < 4:
             print i 
             self.check_block_color(i) 
             i = i + 1
-        self.cam.stop()
         return 1 
         
     @lib.api_call
@@ -603,12 +601,15 @@ class RobotArm(object):
         
     @lib.api_call
     def GrabColor(self):
+        self.cam.start()
+        time.sleep(1)
         self.TurnOnLight()
         ret = self.cam.check_color()
         if ret == None:         #try again
             print "Trying again"
             ret = self.cam.check_color()
         self.TurnOffLight()
+        self.cam.stop()
         return ret
         
     @lib.api_call
@@ -619,7 +620,6 @@ class RobotArm(object):
         
         this function loops to test how color detection works with different lighting conditions
         """
-        self.cam.start()
         HOPPER_LOOK = [0,65,170,10,180]
         #check hopper in array
         if (self.hopper[hopper_pos] != None):
@@ -644,8 +644,6 @@ class RobotArm(object):
                     continue
             else: 
                 print "Error: No color Found."
-                
-        self.cam.stop()
     
     @lib.api_call
     def TurnOnLight(self):

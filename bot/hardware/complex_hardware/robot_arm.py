@@ -639,9 +639,10 @@ class RobotArm(object):
         Displacement = 50
         Threshold = 70 
         self.joints = Look 
-        
-        while Threshold < self.IR.read_values()[HandSensor]:
-            print self.IR.read_values()[HandSensor]
+        Value = self.IR.read_values()[HandSensor]
+        while Threshold < Value:
+            print Value
+            Value = self.IR.read_values()[HandSensor]
             self.rail.DisplacementMover(Displacement)
             
         

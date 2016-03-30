@@ -194,6 +194,8 @@ class Navigation(object):
     @lib.api_call
     def read_IR_values(self):
         return self.device.read_values()
+        
+
 
     @lib.api_call
     def move_until_color(self, direction, side, color):

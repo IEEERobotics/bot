@@ -637,8 +637,8 @@ class RobotArm(object):
         Look = [0,85,125,20,180]
         NetDiff = 0
         HandSensor = 2 
-        Displacement = 200
-        Threshold =  120
+        Displacement = 250
+        
         self.joints = Look 
         time.sleep(3)
         Value = self.IR.read_values()
@@ -649,6 +649,7 @@ class RobotArm(object):
             Value = self.IR.read_values()
             time.sleep(1)
             self.rail.DisplacementMover(Displacement)
+            time.sleep(1)
             NewValue = self.IR.read_values()
             NetDiff = NewValue["Arm"] - Value["Arm"] 
             print "NetDiff:  " +str(NetDiff)

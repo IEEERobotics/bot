@@ -636,7 +636,7 @@ class RobotArm(object):
     def FindBlockWithIR(self):
         Look = [0,85,125,20,180]
         NetDiff = 0
-        HandSensor = 2 
+        
         Displacement = 250
         
         self.joints = Look 
@@ -655,7 +655,7 @@ class RobotArm(object):
             print "NetDiff:  " +str(NetDiff)
             
             
-          
+        self.rail.DisplacmentMover(Displacement)  
         print Value["Arm"]
         
         

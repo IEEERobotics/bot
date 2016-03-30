@@ -152,6 +152,11 @@ class Rail_Mover(object):
             if command == 'Q':
                 break 
         
-         
+    def SetMotorPower(self):
+        
+        self.rail_motor.power = -50 
+     
+    def StopMotor(self):
+        self.rail_motor.power = 0 
         
 

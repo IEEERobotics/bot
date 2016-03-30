@@ -634,27 +634,26 @@ class RobotArm(object):
         
     @lib.api_call
     def FindBlockWithIR(self):
-        Look = [0,85,125,10,180]
+        Look = [0,85,125,15,180]
         NetDiff = 0
         
         Displacement = 250
         
+        
         self.joints = Look 
         time.sleep(3)
-        Value = self.IR.read_values()
-        print Value
-        while NetDiff > -70:
+        Threshold = 130
+        
+        self.rail.SetMotorPower()
+        
+        while Value["Arm"]>Threshold:
             
-            print "IR value: "+ str(Value["Arm"])
+            
             Value = self.IR.read_values()
-            time.sleep(1)
-            self.rail.DisplacementMover(Displacement)
-            time.sleep(1)
-            NewValue = self.IR.read_values()
-            NetDiff = NewValue["Arm"] - Value["Arm"] 
-            print "NetDiff:  " +str(NetDiff)
             
             
+        
+        self.rail.StopMotor()
        
         print Value["Arm"]
         

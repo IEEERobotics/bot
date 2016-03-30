@@ -26,10 +26,13 @@ while True:
     print "12: Turn Light Off    "
     print "13: Grab QR           "
     print "14: Grab Color        " 
+    print "15: Find block with IR"
     
 
     Command = input("Command:  ")
-    
+    if Command == 15:
+        arm.FindBlockWithIR() 
+        
     if Command == 13: 
         arm.GrabQR()
         

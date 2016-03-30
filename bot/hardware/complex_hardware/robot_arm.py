@@ -649,6 +649,7 @@ class RobotArm(object):
             time.sleep(.5)
             self.rail.DisplacementMover(Displacement)
             NewValue = self.IR.read_values()
+            NetDiff = NewValue["Arm"] - Value["Arm"] 
             
             
         self.rail.DisplacementMover(-Displacement)   

@@ -513,9 +513,7 @@ class RobotArm(object):
         self.joints = HOPPER_LOOK
         time.sleep(3)
         #look for a color
-        self.TurnOnLight()
-        largest = self.cam.check_color()
-        self.TurnOffLight()
+        largest = self.GrabColor()
         #udate with color found
         if largest != None:
             if self.hopper[hopper_pos] == None:
@@ -622,7 +620,7 @@ class RobotArm(object):
         this function loops to test how color detection works with different lighting conditions
         """
         self.cam.start()
-        HOPPER_LOOK = [0,75,170,10,180]
+        HOPPER_LOOK = [0,65,170,10,180]
         #check hopper in array
         if (self.hopper[hopper_pos] != None):
             if (self.hopper[hopper_pos].value != None):

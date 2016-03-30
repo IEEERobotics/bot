@@ -362,7 +362,7 @@ class RobotArm(object):
             if Case == 1:
                 BLOCK_MOVE_5 = [0, 110, 135, 50, 180]
             if Case == 2: 
-                BLOCK_GRAB_5 = [0, 130, 90, 90, 0]
+                BLOCK_GRAB_5 = [0, 130, 110, 35, 180]
 
         elif Tier == 'B':
             ## Mixed QR Blocks 
@@ -545,7 +545,22 @@ class RobotArm(object):
     @lib.api_call 
     def competition_solver_barge(self,Tier):
         if Tier == 'A':
-            a=0 
+            while i< 2:
+                self.FindBlockWithIR()
+                self.FindBlockWithIR()
+                Position = self.rail.rail_motor.position 
+                time.sleep(3)
+                self.Tier_Grab(Tier,1) 
+                 
+                time.sleep(2)
+                self.rail.MoveToPosition(Position) 
+                time.sleep(2) 
+                self.Tier_Grab(Tier,2) 
+                self.reset_home_position()
+                
+                i = i + 1
+                self.reset_home_position() 
+            return 1
         elif Tier == 'B' or Tier == 'C': 
             i = 0
             while i < 2: 

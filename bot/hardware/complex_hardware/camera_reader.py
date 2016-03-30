@@ -63,7 +63,7 @@ class Camera(object):
         self.scanner.parse_config('enable')
         
         (self.grabbed, self.frame) = self.cam.read()
-        self.stopped = False
+        self.stopped = True
         
         
         
@@ -71,6 +71,7 @@ class Camera(object):
         # start the thread to read frames from the video stream
         thread = Thread(target=self.update, args=())
         thread.setDaemon(True)
+        self.stopped = False
         thread.start()
         return thread
 

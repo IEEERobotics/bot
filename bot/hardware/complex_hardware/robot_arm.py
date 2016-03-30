@@ -67,7 +67,7 @@ class RobotArm(object):
         self.hopper = [None, None, None, None]
         
         self.IR = IR()
-        self.cam.start()
+        #self.cam.start()
 
     @property
     def joints(self):
@@ -584,11 +584,13 @@ class RobotArm(object):
             
     @lib.api_call 
     def check_hopper(self):
+        self.cam.start()
         i = 0
         while i < 4:
             print i 
             self.check_block_color(i) 
             i = i + 1
+        self.cam.stop()
         return 1 
         
     @lib.api_call

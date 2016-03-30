@@ -547,20 +547,22 @@ class RobotArm(object):
     def competition_solver_barge(self,Tier):
         if Tier == 'A':
             while i< 2:
-                self.FindBlockWithIR()
-                self.FindBlockWithIR()
-                Position = self.rail.rail_motor.position 
-                time.sleep(3)
-                self.Tier_Grab(Tier,1) 
+                Success = self.FindBlockWithIR()
+                if Success:
+                    
+                    Position = self.rail.rail_motor.position 
+                    time.sleep(3)
+                    self.Tier_Grab(Tier,1) 
                  
-                time.sleep(2)
-                self.rail.MoveToPosition(Position) 
-                time.sleep(2) 
-                self.Tier_Grab(Tier,2) 
-                self.reset_home_position()
+                    time.sleep(2)
+                    self.rail.MoveToPosition(Position) 
+                    time.sleep(2) 
+                    self.Tier_Grab(Tier,2) 
+                    self.reset_home_position()
                 
-                i = i + 1
-                self.reset_home_position() 
+                    i = i + 1
+                    self.reset_home_position() 
+                
             return 1
         elif Tier == 'B' or Tier == 'C': 
             i = 0
@@ -667,17 +669,19 @@ class RobotArm(object):
         Value = self.IR.read_values() 
         while Value["Arm"]>Threshold:
             
-            if(self.rail.rail_motor.position > 6800): 
-                break
+            if(self.rail.rail_motor.position > 6700): 
+                self.arm.orient(1)
+                return 0
+                
                 
             Value = self.IR.read_values()
             print Value["Arm"] 
             
             
-        
+        time.sleep(.25)
         self.rail.StopMotor()
        
         print Value["Arm"]
-        
+        return 1
         
     

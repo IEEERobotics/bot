@@ -655,7 +655,7 @@ class RobotArm(object):
             print "NetDiff:  " +str(NetDiff)
             
             
-        self.rail.DisplacementMover(Displacement)  
+       
         print Value["Arm"]
         
         

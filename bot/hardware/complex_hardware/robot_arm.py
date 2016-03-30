@@ -643,7 +643,7 @@ class RobotArm(object):
         time.sleep(3)
         Value = self.IR.read_values()
         print Value
-        while NetDiff > -50:
+        while NetDiff > -70:
             
             print "IR value: "+ str(Value["Arm"])
             Value = self.IR.read_values()
@@ -655,7 +655,7 @@ class RobotArm(object):
             print "NetDiff:  " +str(NetDiff)
             
             
-        self.rail.DisplacmentMover(Displacement)  
+        self.rail.DisplacementMover(Displacement)  
         print Value["Arm"]
         
         

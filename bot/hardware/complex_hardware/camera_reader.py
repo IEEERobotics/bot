@@ -9,12 +9,15 @@ from PIL import ImageEnhance
 import cv2
 import math
 
+from threading import Thread
+
 
 import bot.lib.lib as lib
 from bot.hardware.qr_code import QRCode
 from bot.hardware.complex_hardware.QRCode2 import QRCode2
 from bot.hardware.complex_hardware.QRCode2 import Block
 from bot.hardware.complex_hardware.partial_qr import *
+
 
 def find_name(symlink):
     # find where symlink is pointing (/dev/vide0, video1, etc)
@@ -44,7 +47,7 @@ class Camera(object):
 
         cam_num = find_name(udev_name)
         
-        # extract calib data from cam_config
+        #extract calib data from cam_config
         self.a = cam_config["a"]
         self.n = cam_config["n"]
         
@@ -59,6 +62,34 @@ class Camera(object):
         self.scanner = zbar.ImageScanner()
         self.scanner.parse_config('enable')
         
+        (self.grabbed, self.frame) = self.cam.read()
+        self.stopped = False
+        
+        
+        
+    def start(self):
+        # start the thread to read frames from the video stream
+        thread = Thread(target=self.update, args=())
+        thread.setDaemon(True)
+        thread.start()
+        return thread
+
+    def update(self):
+        # keep looping infinitely until the thread is stopped
+        while not self.stopped:
+            #print "In the update camera thread"
+            # otherwise, read the next frame from the stream
+            (self.grabbed, self.frame) = self.cam.read()
+            time.sleep(.1)
+        return
+
+    def read(self):
+        # return the frame most recently read
+        return self.frame
+
+    def stop(self):
+        # indicate that the thread should be stopped
+        self.stopped = True
         
     def apply_filters(self, frame):
         """Attempts to improve viewing by applying filters """
@@ -166,12 +197,7 @@ class Camera(object):
     def QRSweep(self):
         
         QRList = []
-        self.cam.grab()
-        self.cam.grab()
-        self.cam.grab()
-        self.cam.grab()
-        #cv2.waitKey(50)
-        ret, frame = self.cam.read()   
+        ret, frame = self.read()   
         
         # Direct conversion cv -> zbar images did not work.
         # Buffer file used to have native data structures.
@@ -316,7 +342,7 @@ class Camera(object):
         largest = None
         print "Getting the frame"
         #get the image
-        ret, bgr = self.cam.read()
+        bgr = self.read()
         
         print "got the Frame, cropping the image"
 
@@ -435,11 +461,7 @@ class Camera(object):
     
     def partial_qr_scan(self):
         #Capture frame-by-frame
-        self.cam.grab()
-        self.cam.grab()
-        self.cam.grab()
-        self.cam.grab()
-        ret, frame = self.cam.read() 
+        frame = self.read()
 
         frame_orig = frame
 

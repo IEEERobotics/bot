@@ -642,7 +642,7 @@ class RobotArm(object):
         self.joints = Look 
         Value = self.IR.read_values()
         print Value
-        while NetDiff > -15:
+        while NetDiff < -30:
             
             print "IR value: "+ str(Value["Arm"])
             Value = self.IR.read_values()

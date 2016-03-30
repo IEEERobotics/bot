@@ -646,6 +646,7 @@ class RobotArm(object):
         
         self.rail.SetMotorPower()
         
+        Value = self.IR.read_values() 
         while Value["Arm"]>Threshold:
             
             if(self.rail.rail_motor.position > 6800): 

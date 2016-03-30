@@ -634,7 +634,8 @@ class RobotArm(object):
         
     @lib.api_call
     def FindBlockWithIR(self):
-        Look = [0,90,125,20,180] 
+        Look = [0,85,125,20,180]
+        NetDiff = 0
         HandSensor = 2 
         Displacement = 150
         Threshold =  120

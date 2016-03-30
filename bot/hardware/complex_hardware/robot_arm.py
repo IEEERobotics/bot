@@ -641,13 +641,16 @@ class RobotArm(object):
         self.joints = Look 
         Value = self.IR.read_values()
         print Value
-        while Threshold < Value["Arm"]:
+        while NetDiff > -15:
             
             print "IR value: "+ str(Value["Arm"])
             Value = self.IR.read_values()
             time.sleep(.5)
             self.rail.DisplacementMover(Displacement)
+            NewValue = self.IR.read_values()
             
+            
+        self.rail.DisplacementMover(-Displacement)   
         print Value["Arm"]
         
         

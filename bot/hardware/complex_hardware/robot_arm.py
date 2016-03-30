@@ -602,8 +602,8 @@ class RobotArm(object):
     @lib.api_call
     def GrabColor(self):
         self.cam.start()
-        time.sleep(1)
         self.TurnOnLight()
+        time.sleep(1)
         ret = self.cam.check_color()
         if ret == None:         #try again
             print "Trying again"

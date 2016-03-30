@@ -1,6 +1,9 @@
 
 
 """Encapsulates functionality of moving around robot arm"""
+
+from bot.hardware.IR import IR 
+
 import os
 
 import zbar
@@ -62,6 +65,8 @@ class RobotArm(object):
         self.joints = HOME
 
         self.hopper = [None, None, None, None]
+        
+        self.IR = IR()
 
     @property
     def joints(self):
@@ -626,4 +631,19 @@ class RobotArm(object):
     @lib.api_call 
     def TurnOffLight(self):
         self.servo_cape_grabber.transmit_block([4] + JUNK_BUFFER) 
+        
+    
+    def FindBlockWithIR(self):
+        Look = [0,90,125,20,180] 
+        HandSensor = 2 
+        Displacement = 50
+        Threshold = 70 
+        self.joints = Look 
+        
+        while Threshold < self.IR.read_values()[HandSensor]:
+            print self.IR.read_values()[HandSensor]
+            self.rail.DisplacementMover(Displacement)
+            
+        
+        
     

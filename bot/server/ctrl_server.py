@@ -166,10 +166,11 @@ class CtrlServer(object):
                 self.logger.info("Exiting control server. Bye!")
                 self.clean_up()
                 sys.exit(0)
-            except:
-                e = sys.exc_info()[0]
-                self.logger.info("massive server error")
-                self.logger.info(e)
+            #except:
+            #    e = sys.exc_info()[0]
+            #    print "error: ", e
+            #    self.logger.info("massive server error")
+            #    self.logger.info(e)
 
     def handle_msg(self, msg):
         """Generic message handler. Hands-off based on type of message.

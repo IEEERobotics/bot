@@ -503,11 +503,6 @@ class RobotArm(object):
         to see what clor it is then update the hopper array with the new data.
         """
         HOPPER_LOOK = [0,65,170,10,180]
-        #check hopper in array
-        if (self.hopper[hopper_pos] != None):
-            if (self.hopper[hopper_pos].value != None):
-                print "Color already known."
-                return 1
         #look at the hopper physically
         self.rail.Orientor(hopper_pos + 1)
         self.joints = HOPPER_LOOK
@@ -621,12 +616,6 @@ class RobotArm(object):
         this function loops to test how color detection works with different lighting conditions
         """
         HOPPER_LOOK = [0,65,170,10,180]
-        #check hopper in array
-        if (self.hopper[hopper_pos] != None):
-            if (self.hopper[hopper_pos].value != None):
-                print "Color already known."  
-                 
-                return 1
         #look at the hopper physically
         self.rail.Orientor(hopper_pos + 1)
         self.joints = HOPPER_LOOK

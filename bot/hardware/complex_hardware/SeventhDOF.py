@@ -9,9 +9,9 @@ class Rail_Mover(object):
     def __init__(self):
     
         self.bin_1 = 200
-        self.bin_2 = 2600
+        self.bin_2 = 2550
         self.bin_3 = 4570
-        self.bin_4 = 6870 
+        self.bin_4 = 6750 
         self.left_extreme = 7100
         
         self.bot_config = lib.get_config()
@@ -154,7 +154,7 @@ class Rail_Mover(object):
         
     def SetMotorPower(self):
         
-        self.rail_motor.power = -40 
+        self.rail_motor.power = 40 
      
     def StopMotor(self):
         self.rail_motor.power = 0 

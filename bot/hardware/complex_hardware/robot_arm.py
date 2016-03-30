@@ -657,20 +657,20 @@ class RobotArm(object):
         Look = [0,85,125,15,180]
         NetDiff = 0
         
-        Displacement = 250
+        
         
         
         self.joints = Look 
         time.sleep(3)
         Threshold = 140
-        
+        self.rail.MoveToPos(self.rail.left_extreme)
         self.rail.SetMotorPower()
         
         Value = self.IR.read_values() 
         while Value["Arm"]>Threshold:
             
-            if(self.rail.rail_motor.position > 6700): 
-                self.arm.orient(1)
+            if(self.rail.rail_motor.position < 100): 
+                self.arm.orient(4)
                 return 0
                 
                 

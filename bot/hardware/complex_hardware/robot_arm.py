@@ -642,9 +642,10 @@ class RobotArm(object):
         Value = self.IR.read_values()
         print Value
         while Threshold < Value["Arm"]:
-            print Value["Arm"]
+            
+            print "IR value: "+ str(Value["Arm"])
             Value = self.IR.read_values()
-            time.sleep(3)
+            time.sleep(1)
             self.rail.DisplacementMover(Displacement)
             
         

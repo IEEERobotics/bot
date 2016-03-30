@@ -82,7 +82,7 @@ class Camera(object):
             #print "In the update camera thread"
             # otherwise, read the next frame from the stream
             (self.grabbed, self.frame) = self.cam.read()
-            cv2.waitKey(100)
+            time.sleep(.1)
         return
 
     def read(self):

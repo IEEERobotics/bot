@@ -62,6 +62,7 @@ class RobotArm(object):
         self.joints = HOME
 
         self.hopper = [None, None, None, None]
+        self.cam.start()
 
     @property
     def joints(self):

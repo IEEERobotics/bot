@@ -648,8 +648,11 @@ class RobotArm(object):
         
         while Value["Arm"]>Threshold:
             
-            
+            if(self.rail.rail_motor.position > 6800) 
+                break
+                
             Value = self.IR.read_values()
+            print Value["Arm"] 
             
             
         

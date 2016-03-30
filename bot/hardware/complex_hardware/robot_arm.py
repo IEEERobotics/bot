@@ -636,14 +636,15 @@ class RobotArm(object):
     def FindBlockWithIR(self):
         Look = [0,90,125,20,180] 
         HandSensor = 2 
-        Displacement = 50
-        Threshold = 70 
+        Displacement = 100
+        Threshold =  150
         self.joints = Look 
         Value = self.IR.read_values()
         print Value
         while Threshold < Value["Arm"]:
             print Value["Arm"]
             Value = self.IR.read_values()
+            time.sleep(3)
             self.rail.DisplacementMover(Displacement)
             
         

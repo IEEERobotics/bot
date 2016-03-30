@@ -73,7 +73,9 @@ class Camera(object):
         
     def start(self):
         # start the thread to read frames from the video stream
-        thread = Thread(target=self.update, args=()).start()
+        thread = Thread(target=self.update, args=())
+        thread.setDaemon(True)
+        thread.start()
         return thread
 
     def update(self):

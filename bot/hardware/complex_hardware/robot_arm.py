@@ -637,13 +637,13 @@ class RobotArm(object):
         Look = [0,85,125,20,180]
         NetDiff = 0
         HandSensor = 2 
-        Displacement = 150
+        Displacement = 200
         Threshold =  120
         self.joints = Look 
         time.sleep(3)
         Value = self.IR.read_values()
         print Value
-        while NetDiff > -30:
+        while NetDiff > -50:
             
             print "IR value: "+ str(Value["Arm"])
             Value = self.IR.read_values()

@@ -659,7 +659,7 @@ class RobotArm(object):
                 return 0
                 
             #self.rail.DisplacementMover(75)
-            time.sleep(.25)
+            time.sleep(.1)
             Value = self.IR.read_values()
             print Value["Arm"] 
        
@@ -669,7 +669,7 @@ class RobotArm(object):
                 self.orient(1)
                 return 0
             #self.rail.DisplacementMover(75) 
-            time.sleep(.25)
+            time.sleep(.1)
             Value = self.IR.read_values()
         
         

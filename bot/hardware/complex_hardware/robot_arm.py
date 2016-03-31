@@ -653,7 +653,7 @@ class RobotArm(object):
         self.joints = Look 
         time.sleep(3)
         Threshold = 140
-        self.rail.MoveToPos(self.rail.left_extreme)
+        self.rail.MoveToPosition(self.rail.left_extreme)
         self.rail.SetMotorPower()
         
         Value = self.IR.read_values() 

@@ -360,11 +360,17 @@ class RobotArm(object):
         if Tier == 'A':
             ## Generic Blocks 
             print "Not coded yet" 
+            
+            self.joints = [0,110,135,75,180]
             if Case == 1:
+            
                 BLOCK_MOVE_5 = [0, 110, 135, 50, 180]
             if Case == 2: 
                 BLOCK_MOVE_5 = [0, 130, 110, 35, 180]
-
+                        LOOK_5 = [0, 25, 170, 10, 180]
+                        
+            HOPPER1 = [0, 45, 145, 55, 180]
+            HOPPER2 = [0, 55, 165, 0, 180]
         elif Tier == 'B':
             ## Mixed QR Blocks 
             if Case == 1:  ## Block on top

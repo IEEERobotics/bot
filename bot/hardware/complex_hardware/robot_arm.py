@@ -650,7 +650,7 @@ class RobotArm(object):
         
         
         
-        #self.rail.SetMotorPower(-40) 
+        self.rail.SetMotorPower(-40) 
         Value = self.IR.read_values()
         while Value["Arm"]>Threshold:
             
@@ -658,8 +658,8 @@ class RobotArm(object):
                 self.orient(1)
                 return 0
                 
-            self.rail.DisplacementMover(75)
-            time.sleep(.25)
+            #self.rail.DisplacementMover(75)
+            
             Value = self.IR.read_values()
             print Value["Arm"] 
        
@@ -668,8 +668,8 @@ class RobotArm(object):
             if(self.rail.rail_motor.position > 6800): 
                 self.orient(1)
                 return 0
-            self.rail.DisplacementMover(75) 
-            time.sleep(.25)
+            #self.rail.DisplacementMover(75) 
+            
             Value = self.IR.read_values()
         
         

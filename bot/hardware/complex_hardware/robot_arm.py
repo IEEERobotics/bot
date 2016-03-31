@@ -17,6 +17,7 @@ from bot.hardware.servo_cape import ServoCape
 
 from bot.hardware.qr_code import QRCode
 from QRCode2 import QRCode2, Block 
+from bot.hardware.color_sensor import ColorSensor
 
 from SeventhDOF import Rail_Mover
 from bot.hardware.complex_hardware.camera_reader import Camera
@@ -67,8 +68,10 @@ class RobotArm(object):
         self.hopper = [None, None, None, None]
         
         self.IR = IR()
+        self.CS = ColorSensor()
         #self.cam.start()
 
+    
     @property
     def joints(self):
         return self.__joints
@@ -678,4 +681,27 @@ class RobotArm(object):
         print Value["Arm"]
         return 1
         
+        
+        
+        
+    def color_sensing(self):
+        while True:
+            time.sleep(.25)
+            self.CS.color = value
+            print value
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+    
+    
     

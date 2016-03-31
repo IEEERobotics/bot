@@ -4,8 +4,6 @@ import time
 
 from i2c_device.i2c_device import I2CDevice
 
-import bbb.gpio as gpio_mod
-import bbb.pwm as pwm_mod
 import bot.lib.lib as lib
 
 
@@ -41,16 +39,6 @@ class ColorSensor(I2CDevice):
             enable.write('PON', 'Enable')
             enable.write('AEN', 'Enable')
             enable = self.registers['ENABLE']  # TODO: Is this needed?
-
-            # Setup PWM pin for dimming LED
-            self.pwm_num = self.bot_config["color_sensor"]["LED_PWM"]
-            self.pwm = pwm_mod.PWM(self.pwm_num)
-            # Duty cycle = 50% (from 20msec)
-            self.pwm.duty = 1000000
-            # Setup ready signal GPIO:
-            self.gpio_num = self.bot_config["color_sensor"]["ready_signal"]
-            self.ready_gpio = gpio_mod.GPIO(self.gpio_num)
-            self.ready_gpio.input()
 
         else:
             self.logger.debug("Running in test mode")
@@ -101,21 +89,6 @@ class ColorSensor(I2CDevice):
             if self.ready_gpio.get_value():
                 return True
         return False
-
-    @lib.api_call
-    def led_brightness(self, brightness):
-        """Changes brightness of LED.
-        :param brightness:
-        :type int: Percent of fully on LED brightness.
-
-        """
-
-        # try:
-        # assert duty_period < 2*10^6
-        # except AssertionError:
-        # raise AssertionError("invalid duty cycle")
-
-        self.pwm.duty = int(brightness / 100. * 2000000)
 
     def read_data(self, bias_color="", bias_constant=0):
         """Reads in raw data directly from color_sensor.

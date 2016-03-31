@@ -275,6 +275,7 @@ class RobotArm(object):
         """
         count = 0
         direction = 1
+        self.cam.start()
         while(True):
             x = 0
             QRList = []
@@ -287,19 +288,12 @@ class RobotArm(object):
                     x_disp = ret.tvec[0]
                     if abs(x_disp) < .125:
                         print "QRCode found at x_disp: ", x_disp
+                        self.cam.stop()
                         return ret
                     else:
                         QRList.append(ret)
                         print "Checking Alignment with x_disp = ", x_disp
                         print "countx = ", x
-                else:       # if no qrcodes are found
-
-                    limit = self.rail.DisplacementConverter(1.5*direction)
-                    if limit == 0:                  #out of range
-                        direction = -1*direction    #reverse direction
-                        ret = self.rail.DisplacementConverter(.75*direction)
-                        if ret == 0:
-                            print "Error: out of range on both ends, shouldn't be possible."
                             
             targetQR = self.cam.selectQR(QRList)
             if targetQR != None:
@@ -509,7 +503,11 @@ class RobotArm(object):
         Takes the hopper posisiton 0-3 as input and will look at the hopper posistion
         to see what clor it is then update the hopper array with the new data.
         """
+<<<<<<< HEAD
         HOPPER_LOOK = [0,75,140,10,180]
+=======
+        HOPPER_LOOK = [0,60,170,10,180]
+>>>>>>> bb57aa1a0b9375b5e2ffdde3f1015d0ddeeb50c7
         #look at the hopper physically
         self.rail.Orientor(hopper_pos + 1)
         self.joints = HOPPER_LOOK
@@ -606,7 +604,7 @@ class RobotArm(object):
     def GrabColor(self):
         self.cam.start()
         self.TurnOnLight()
-        time.sleep(1)
+        time.sleep(2)
         ret = self.cam.check_color()
         if ret == None:         #try again
             print "Trying again"

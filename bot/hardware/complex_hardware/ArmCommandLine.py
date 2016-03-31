@@ -27,9 +27,13 @@ while True:
     print "13: Grab QR           "
     print "14: Grab Color        " 
     print "15: Find block with IR"
+    print "16: Check Hopper Colors"
     
 
     Command = input("Command:  ")
+    if Command == 16:
+        arm.check_hopper()
+    
     if Command == 15:
         arm.FindBlockWithIR() 
         

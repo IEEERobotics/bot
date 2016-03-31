@@ -503,11 +503,10 @@ class RobotArm(object):
         Takes the hopper posisiton 0-3 as input and will look at the hopper posistion
         to see what clor it is then update the hopper array with the new data.
         """
-<<<<<<< HEAD
+
         HOPPER_LOOK = [0,75,140,10,180]
-=======
-        HOPPER_LOOK = [0,60,170,10,180]
->>>>>>> bb57aa1a0b9375b5e2ffdde3f1015d0ddeeb50c7
+
+
         #look at the hopper physically
         self.rail.Orientor(hopper_pos + 1)
         self.joints = HOPPER_LOOK

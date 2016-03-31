@@ -363,7 +363,8 @@ class RobotArm(object):
             ## Generic Blocks 
             print "Not coded yet" 
             
-            self.joints = [0,110,135,75,180]
+            self.joints = [0,90,135,75,180]
+            time.sleep(3)
             if Case == 1:
             
                 BLOCK_MOVE_5 = [0, 110, 135, 50, 180]
@@ -668,8 +669,8 @@ class RobotArm(object):
         Value = self.IR.read_values()
         while Value["Arm"]>Threshold:
             
-            if(self.rail.rail_motor.position < 100): 
-                self.arm.orient(4)
+            if(self.rail.rail_motor.position > 6800): 
+                self.orient(1)
                 return 0
                 
             self.rail.DisplacementMover(75)
@@ -679,8 +680,8 @@ class RobotArm(object):
        
         while Value["Arm"]< 200: 
             
-            if(self.rail.rail_motor.position < 100): 
-                self.arm.orient(4)
+            if(self.rail.rail_motor.position > 6800): 
+                self.orient(1)
                 return 0
             self.rail.DisplacementMover(75) 
             time.sleep(.25)

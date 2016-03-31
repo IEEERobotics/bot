@@ -102,7 +102,6 @@ class Camera(object):
         santized_frame = cv2.bilateralFilter(thresh, 9, 75, 75) 
         return santized_frame
 
-    @lib.api_call
     def get_current_frame(self):
         self.cam.grab()        
         self.cam.grab()        
@@ -118,7 +117,6 @@ class Camera(object):
 
         return zbar.Image(width, height, 'Y800', raw)
 
-    @lib.api_call
     def get_qr_list(self, frame):
         """Recieves frame, assuming it's already been sanitizes, 
         and returns a list of all qr codes in it.
@@ -135,7 +133,6 @@ class Camera(object):
             qr_list.append(QRCode(symbol, self.L))
         return qr_list
  
-    @lib.api_call
     def sort_closest_qr(self, qr_list):
         """returns sortest list with closest qr first"""
 
@@ -149,7 +146,6 @@ class Camera(object):
         qr_list.sort(key=lambda qr: qr.displacement, reverse=False)
         return qr_list 
 
-    @lib.api_call
     def get_target_qr(self):
 
         while True:
@@ -168,7 +164,6 @@ class Camera(object):
         cv2.line(frame, qr.bottomLeft, qr.topLeft, (20, 20, 255), 8, 8)
         return frame
 
-    @lib.api_call 
     def infinite_demo(self):
         while True:
             ret, frame = self.get_current_frame()
@@ -194,7 +189,6 @@ class Camera(object):
         self.cam.release()
         cv2.destroyAllWindows
 
-    @lib.api_call
     def QRSweep(self):
         
         QRList = []
@@ -546,8 +540,4 @@ class Camera(object):
             y_disp = 0.354331 * float(best_y/float(avg_length))
             target_qr = QRCode2([x_disp,y_disp,0], None, 0)
             return target_qr
-        
-        
-        
-
 

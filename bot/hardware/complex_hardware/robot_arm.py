@@ -49,8 +49,8 @@ class RobotArm(object):
         self.scanner.parse_config('enable')
 
         # Figure out what camera is being used
-        cam_model = arm_config["camera"]
-        self.cam = Camera(self.bot_config[cam_model])
+        #cam_model = arm_config["camera"]
+        #self.cam = Camera(self.bot_config[cam_model])
         self.rail = Rail_Mover()  
         
         # initialize vertices of QR code

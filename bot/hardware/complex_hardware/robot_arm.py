@@ -673,7 +673,7 @@ class RobotArm(object):
             Value = self.IR.read_values()
         
         
-        self.rail.DisplacementMover(-100)
+        self.rail.DisplacementMover(-175)
         self.rail.StopMotor()
         print Value["Arm"]
         return 1

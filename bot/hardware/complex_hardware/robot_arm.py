@@ -663,8 +663,8 @@ class RobotArm(object):
                 self.arm.orient(4)
                 return 0
                 
-            self.rail.DisplacementMover(50)
-            time.sleep(.5)
+            self.rail.DisplacementMover(75)
+            time.sleep(.25)
             Value = self.IR.read_values()
             print Value["Arm"] 
        
@@ -673,8 +673,8 @@ class RobotArm(object):
             if(self.rail.rail_motor.position < 100): 
                 self.arm.orient(4)
                 return 0
-            self.rail.DisplacementMover(50) 
-            time.sleep(.5)
+            self.rail.DisplacementMover(75) 
+            time.sleep(.25)
             Value = self.IR.read_values()
         
         

@@ -542,32 +542,12 @@ class RobotArm(object):
     
     @lib.api_call 
     def competition_solver_barge(self,Tier):
-        if Tier == 'A':
-            i = 0
-            while i< 2:
-                Success = self.FindBlockWithIR()
-                if Success:
+        
+        i = 0
+        while i< 2:
+        Success = self.FindBlockWithIR(Tier)
+            if Success:
                     
-                    Position = self.rail.rail_motor.position 
-                    time.sleep(3)
-                    self.Tier_Grab(Tier,1) 
-                 
-                    time.sleep(2)
-                    self.rail.MoveToPosition(Position) 
-                    time.sleep(2) 
-                    self.Tier_Grab(Tier,2) 
-                    self.reset_home_position()
-                
-                    i = i + 1
-                    self.reset_home_position() 
-                
-            return 1
-        elif Tier == 'B' or Tier == 'C': 
-            i = 0
-            while i < 2: 
-                
-                self.MoveToQR()
-                
                 Position = self.rail.rail_motor.position 
                 time.sleep(3)
                 self.Tier_Grab(Tier,1) 
@@ -579,8 +559,10 @@ class RobotArm(object):
                 self.reset_home_position()
                 
                 i = i + 1
-            self.reset_home_position() 
-            return 1 
+                self.reset_home_position() 
+                
+        return 1
+        
             
     @lib.api_call 
     def check_hopper(self):
@@ -653,8 +635,11 @@ class RobotArm(object):
         if Tier == 'A':
             Look = [0,85,125,15,180]
             Threshold = 150
+            NegativeThreshold = 200
         if Tier == 'B':
-            Look = [0,75,125,20,180] 
+            Look = [0,75,125,20,180]
+            Threshold = 105
+            NegativeThreshold = 200
         
         
         
@@ -677,7 +662,7 @@ class RobotArm(object):
             Value = self.IR.read_values()
             print Value["Arm"] 
        
-        while Value["Arm"]< 200: 
+        while Value["Arm"]< NegativeThreshold: 
             
             if(self.rail.rail_motor.position > 6800): 
                 self.orient(1)

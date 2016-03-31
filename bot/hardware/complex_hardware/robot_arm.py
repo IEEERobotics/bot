@@ -275,6 +275,7 @@ class RobotArm(object):
         """
         count = 0
         direction = 1
+        self.cam.start()
         while(True):
             x = 0
             QRList = []
@@ -287,6 +288,7 @@ class RobotArm(object):
                     x_disp = ret.tvec[0]
                     if abs(x_disp) < .125:
                         print "QRCode found at x_disp: ", x_disp
+                        self.cam.stop()
                         return ret
                     else:
                         QRList.append(ret)

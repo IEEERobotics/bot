@@ -363,14 +363,14 @@ class RobotArm(object):
             if Case == 1:
                 BLOCK_MOVE_5 = [0, 110, 135, 50, 180]
             if Case == 2: 
-                BLOCK_GRAB_5 = [0, 130, 110, 35, 180]
+                BLOCK_MOVE_5 = [0, 130, 110, 35, 180]
 
         elif Tier == 'B':
             ## Mixed QR Blocks 
             if Case == 1:  ## Block on top
-                BLOCK_GRAB_5 = [0, 120, 115, 55, 180]
+                BLOCK_MOVE_5 = [0, 120, 115, 55, 180]
             elif Case == 2: ## Block on bottom
-                BLOCK_GRAB_5 = [0, 120, 115, 35, 180]
+                BLOCK_MOVE_5 = [0, 120, 115, 35, 180]
                 
             LOOK_5 = [0, 25, 170, 10, 180]
             HOPPER1 = [0, 45, 145, 55, 180]
@@ -405,7 +405,7 @@ class RobotArm(object):
             return 0 
 
         
-        self.servo_cape.transmit_block([0] + BLOCK_GRAB_5)
+        self.servo_cape.transmit_block([0] + BLOCK_MOVE_5)
         time.sleep(3)                     #wait for arm to move to location
         self.grab()
         time.sleep(3)                       #wait for arm to grab

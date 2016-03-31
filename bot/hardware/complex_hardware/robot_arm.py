@@ -84,24 +84,6 @@ class RobotArm(object):
         print "Joints to be sent: ", vals
         self.servo_cape.transmit_block([0] + self.__joints)
 
-
-    @lib.api_call
-    def draw_qr_on_frame(self, zbar_dat, draw_frame):
-
-        self.scanner.scan(zbar_dat)
-        for symbol in zbar_dat:
-            tl, bl, br, tr = [item for item in symbol.location]
-            points = np.float32([[tl[0], tl[1]],
-                                 [tr[0], tr[1]],
-                                 [bl[0], bl[1]],
-                                 [br[0], br[1]]])
-
-            cv2.line(draw_frame, tl, bl, (100,0,255), 8, 8)
-            cv2.line(draw_frame, bl, br, (100,0,255), 8, 8)
-            cv2.line(draw_frame, br, tr, (100,0,255), 8, 8)
-            cv2.line(draw_frame, tr, tl, (100,0,255), 8, 8)
-
-        return draw_frame
     @lib.api_call
     def grab(self):
  
@@ -122,39 +104,6 @@ class RobotArm(object):
             if set_vals[i] != None:
                 self.joints[i] = set_vals[i]
         self.joints = self.joints
-        
-    @lib.api_call
-    def joint_center_on_qr(self):
-        """Attempts to center arm on qr code using only arm itself.
-        Only the rotational joints, 
-        joint 0 corrects X 
-        joint 3 corrects Y
-        joint 5 corrects rotation
-        """
-        
-        # Correction constants for P(ID) controller.
-        # unlikely that we'll bother using I or D
-        p_x = 10
-        p_y = 10
-
-        while True:
-            ret = self.cam.QRSweep()
-            
-            # Calculate new vector for change
-            if ret != None:
-                
-                dx = ret.tvec[0]
-                dy = ret.tvec[1]
-                
-                if abs(dx) > 0.1:
-                    self.joints[0] += p_x * dx
-                if abs(dy) > 0.1:
-                    self.joints[3] += p_y * dy
-                #print "Joints = ", self.joints
-                self.joints = self.joints
-                #TODO Find method for calculating rotational oreientation
-
-        return True
 
     @lib.api_call
     def demo_set_angles(self):
@@ -220,7 +169,7 @@ class RobotArm(object):
         self.servo_cape.transmit_block([0] + HOME)
         self.rail.RunIntoWall()
         
-    @lib.api_call
+    
     def fancy_demo(self):
         os.system('clear')
         print "Welcome to the Team 26: Robotic Arm Mainipulation and Vision demo function."
@@ -249,25 +198,11 @@ class RobotArm(object):
             else:
                 self.demo(demo_number - 1)
         
-    @lib.api_call
+    
     def demo(self, demo_number):
         """runs demos 1-7"""
         self.servo_cape.transmit_block([demo_number]
                                          + JUNK_BUFFER)        
-    
-    @lib.api_call    
-    def rail_test(self):
-        
-        while True:
-            #time.sleep(2)
-            ret = self.cam.QRSweep()
-            if ret != None:
-                x_disp = ret.tvec[0]
-                print "Checking Alignment with x_disp = ", x_disp
-                if abs(x_disp) > .2:
-                    self.rail.DisplacementConverter(-1 * x_disp)
-            
-            ret = None
             
     def rail_feedback(self):
         """
@@ -309,18 +244,6 @@ class RobotArm(object):
                     if ret == 0:
                         print "Error: out of range on both ends, shouldn't be possible."   
     
-    def test_look(self):
-        self.servo_cape.transmit_block([0] + [0, 125, 0, 170, 0])
-    
-    def basic_solver(self):
-        i = 4
-        while(i>0):
-            self.joints = HOME
-            self.rail.RunIntoWall()
-            time.sleep(4)
-            self.Tier_Grab('B')
-            i= i-1
-           
     @lib.api_call 
     def MoveToQR(self):
     
@@ -562,8 +485,7 @@ class RobotArm(object):
                 self.reset_home_position() 
                 
         return 1
-        
-            
+           
     @lib.api_call 
     def check_hopper(self):
         i = 0
@@ -576,12 +498,9 @@ class RobotArm(object):
     @lib.api_call
     def orient(self, pos):
         self.rail.Orientor(pos)
-    
-    @lib.api_call
     def GrabQR(self):
         self.cam.QRSweep()
         
-    @lib.api_call
     def GrabColor(self):
         self.cam.start()
         self.TurnOnLight()
@@ -620,7 +539,6 @@ class RobotArm(object):
                     continue
             else: 
                 print "Error: No color Found."
-    
     @lib.api_call
     def TurnOnLight(self):
         self.servo_cape_grabber.transmit_block([3] + JUNK_BUFFER)

@@ -67,6 +67,7 @@ class Camera(object):
         
         
         
+    
     def start(self):
         # start the thread to read frames from the video stream
         thread = Thread(target=self.update, args=())
@@ -91,108 +92,6 @@ class Camera(object):
     def stop(self):
         # indicate that the thread should be stopped
         self.stopped = True
-        
-    def apply_filters(self, frame):
-        """Attempts to improve viewing by applying filters """
-        # grayscale
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    
-        thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
-
-        santized_frame = cv2.bilateralFilter(thresh, 9, 75, 75) 
-        return santized_frame
-
-    @lib.api_call
-    def get_current_frame(self):
-        self.cam.grab()        
-        self.cam.grab()        
-        self.cam.grab()        
-        self.cam.grab()       
-        return self.cam.read()
- 
-    def get_zbar_im(self, qr_frame):
-        cv2.imwrite('buffer.png', qr_frame)
-        pil_im = Image.open('buffer.png').convert('L')
-        width, height = pil_im.size
-        raw = pil_im.tobytes()
-
-        return zbar.Image(width, height, 'Y800', raw)
-
-    @lib.api_call
-    def get_qr_list(self, frame):
-        """Recieves frame, assuming it's already been sanitizes, 
-        and returns a list of all qr codes in it.
-        """
- 
-        z_im = self.get_zbar_im(frame)
-        self.scanner.scan(z_im)
-        qr_list = []
-        # Gather list of all QR objects
-        for symbol in z_im:
-            print "qr found"
-            tl, bl, br, tr = [item for item in symbol.location]
-            points = np.float32(np.float32(symbol.location))
-            qr_list.append(QRCode(symbol, self.L))
-        return qr_list
- 
-    @lib.api_call
-    def sort_closest_qr(self, qr_list):
-        """returns sortest list with closest qr first"""
-
-        for code in qr_list:
-            _, code.rvec, code.tvec = cv2.solvePnP(code.verts
-                                               , code.points
-                                               , self.cam_matrix
-                                               , self.dist_coeffs)
-            
-        # Finds qr with smallest displacement 
-        qr_list.sort(key=lambda qr: qr.displacement, reverse=False)
-        return qr_list 
-
-    @lib.api_call
-    def get_target_qr(self):
-
-        while True:
-            ret, frame = self.get_current_frame()
-            clean_frame = self.apply_filters(frame)
-            z_im = self.get_zbar_im(clean_frame)
-            qr_list = self.get_qr_list(z_im)
-            sorted_qr = self.sort_closest_qr
-            if sorted_qr != None:
-                break
-
-    def draw_qr_on_frame(self, frame, qr):
-        cv2.line(frame, qr.topLeft, qr.topRight, (20, 20, 255), 8, 8)
-        cv2.line(frame, qr.topRight, qr.bottomRight, (20, 20, 255), 8, 8)
-        cv2.line(frame, qr.bottomRight, qr.bottomLeft, (20, 20, 255), 8, 8)
-        cv2.line(frame, qr.bottomLeft, qr.topLeft, (20, 20, 255), 8, 8)
-        return frame
-
-    @lib.api_call 
-    def infinite_demo(self):
-        while True:
-            ret, frame = self.get_current_frame()
-            cv2.imshow('frm', frame)
-            clean_frame = self.apply_filters(frame)
-
-            found_qrs = self.get_qr_list(clean_frame)
-  
-            qr_frame = clean_frame
-            for qr in found_qrs:
-                qr_frame = self.draw_qr_on_frame(qr_frame, qr)
-            cv2.imshow('qrs',  qr_frame) 
-            print "found_qrs", found_qrs           
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-
-            if found_qrs == None or found_qrs == []:
-                continue
-
-            sorted_qr = self.sort_closest_qr(found_qrs)
-            targetQR = sorted_qr[0]
-
-        self.cam.release()
-        cv2.destroyAllWindows
 
     @lib.api_call
     def QRSweep(self):
@@ -549,5 +448,3 @@ class Camera(object):
         
         
         
-
-

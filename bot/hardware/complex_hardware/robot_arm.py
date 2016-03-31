@@ -294,14 +294,6 @@ class RobotArm(object):
                         QRList.append(ret)
                         print "Checking Alignment with x_disp = ", x_disp
                         print "countx = ", x
-                else:       # if no qrcodes are found
-
-                    limit = self.rail.DisplacementConverter(1.5*direction)
-                    if limit == 0:                  #out of range
-                        direction = -1*direction    #reverse direction
-                        ret = self.rail.DisplacementConverter(.75*direction)
-                        if ret == 0:
-                            print "Error: out of range on both ends, shouldn't be possible."
                             
             targetQR = self.cam.selectQR(QRList)
             if targetQR != None:

@@ -546,7 +546,7 @@ class RobotArm(object):
         i = 0
         while i< 2:
             Success = self.FindBlockWithIR(Tier)
-                if Success:
+            if Success:
                     
                 Position = self.rail.rail_motor.position 
                 time.sleep(3)

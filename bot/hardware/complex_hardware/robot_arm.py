@@ -539,6 +539,7 @@ class RobotArm(object):
     @lib.api_call 
     def competition_solver_barge(self,Tier):
         if Tier == 'A':
+            i = 0
             while i< 2:
                 Success = self.FindBlockWithIR()
                 if Success:

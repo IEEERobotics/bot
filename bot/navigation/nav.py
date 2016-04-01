@@ -202,13 +202,13 @@ class Navigation(object):
     def move_until_color(self, direction, side, color):
         direction = direction.lower()
         mov_side = self.sides[direction]
-        mov_target = self.sides[side].get_distance()
+        self.logger.info
         self.moving = True
         time_elapsed = time()
         while self.moving:
             timestep = time() - time_elapsed
             time_elapsed = time()
-            self.move_correct(direction, side, mov_target, 50, timestep)
+            self.move_correct(direction, side, 180, 55, timestep)
             ir_values = mov_side.get_values()
             # IR sensor for line detection is attached to South Left
             ir_value = ir_values["South Left"]
@@ -301,7 +301,6 @@ class Navigation(object):
         elif self.west.get_distance() < MAX_VALUE:
             self.logger.info("I'm on left side of course. Going to white line on my right")
             self.move_until_color("east", "north", "white")
-        self.bang()
         self.logger.info("Reached Zone B")
 
     @lib.api_call
@@ -320,19 +319,19 @@ class Navigation(object):
 
     @lib.api_call
     def bang_railcar(self):
-        self.drive_dead(self.rail_cars_side, 50, 0.5)
+        self.drive_dead(self.rail_cars_side, 60, 0.5)
 
     @lib.api_call
     def get_off_railcar(self):
         if self.rail_cars_side == "east":
-            self.drive_dead("west", 50, 0.333)
+            self.drive_dead("west", 60, 0.5)
         else:
-            self.drive_dead("east", 50, 0.333)
+            self.drive_dead("east", 60, 0.5)
 
     @lib.api_call
     def correct_bang_railcar(self):
         self.get_off_railcar()
-        self.drive_dead(self.rail_cars_side, 50, 0.7)
+        self.drive_dead(self.rail_cars_side, 60, 0.7)
         self.logger.info("Aligned with railcars")
     
     def goto_block_zone_C(self):

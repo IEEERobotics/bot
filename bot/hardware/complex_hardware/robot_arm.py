@@ -371,7 +371,7 @@ class RobotArm(object):
             if Case == 1:  ## Block on top
                 BLOCK_MOVE_5 = [0, 120, 115, 55, 180]
             elif Case == 2: ## Block on bottom
-                BLOCK_MOVE_5 = [0, 120, 115, 35, 180]
+                BLOCK_MOVE_5 = [0, 120, 115, 45, 180]
                 
             LOOK_5 = [0, 25, 170, 10, 180]
             HOPPER1 = [0, 45, 145, 55, 180]
@@ -649,7 +649,7 @@ class RobotArm(object):
         
         
         
-        
+        self.rail.SetMotorPower()
         Value = self.IR.read_values()
         while Value["Arm"]>Threshold:
             
@@ -657,8 +657,8 @@ class RobotArm(object):
                 self.orient(1)
                 return 0
                 
-            self.rail.DisplacementMover(75)
-            time.sleep(.25)
+            #self.rail.DisplacementMover(75)
+            #time.sleep(.25)
             Value = self.IR.read_values()
             print Value["Arm"] 
        
@@ -667,11 +667,11 @@ class RobotArm(object):
             if(self.rail.rail_motor.position > 6800): 
                 self.orient(1)
                 return 0
-            self.rail.DisplacementMover(75) 
-            time.sleep(.25)
+            #self.rail.DisplacementMover(75) 
+            #time.sleep(.25)
             Value = self.IR.read_values()
         
-        
+        self.rail.StopMotor() 
         
        
         print Value["Arm"]

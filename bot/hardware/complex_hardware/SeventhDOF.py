@@ -154,7 +154,7 @@ class Rail_Mover(object):
         
     def SetMotorPower(self):
         
-        self.rail_motor.power = 40 
+        self.rail_motor.power = -40 
      
     def StopMotor(self):
         self.rail_motor.power = 0 

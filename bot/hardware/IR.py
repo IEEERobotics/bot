@@ -28,15 +28,21 @@ class IR(object):
         second = msg[1::2]
         data = [second[i] * 256 + first[i] for i in xrange(len(first))]
         return data
-
-    @lib.api_call
+    
+    
     def read_values(self):
-        ms = range(24)
-        #self.bus.write_byte(8,0xA5)
-        #sleep(.1)
-        for i in range(24):
+        ms = range(20)
+        i = 0
+        while True:
             ms[i] = self.bus.read_byte(8)
-        #sleep(.1)30
+            if ms[i] > 254:
+                i = 0
+                continue
+            elif i >= 19:
+                break
+            else:
+                i = i+1
+                
         data = self.parse_packets(ms)
         print data[10], data[11] 
         #data = data[:10]
@@ -54,7 +60,7 @@ class IR(object):
         for j in self.hash_values:
             return_dict[j] = int(data[self.hash_values[j] - 1])
         return return_dict
-        
+
      
     def moving_average_filter(self):
         movingAVG_N = 4.0

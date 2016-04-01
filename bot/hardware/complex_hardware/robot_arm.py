@@ -367,10 +367,11 @@ class RobotArm(object):
             HOPPER1 = [0, 45, 145, 55, 180]
             HOPPER2 = [0, 55, 165, 0, 180]
         elif Tier == 'B':
-            self.joints = [0,120,115,80,180]
+            self.joints = [0,100,115,80,180]
+            time.sleep(3)
             ## Mixed QR Blocks 
             if Case == 1:  ## Block on top
-                BLOCK_MOVE_5 = [0, 120, 115, 55, 180]
+                BLOCK_MOVE_5 = [0, 120, 115, 60, 180]
             elif Case == 2: ## Block on bottom
                 BLOCK_MOVE_5 = [0, 120, 115, 45, 180]
                 

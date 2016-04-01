@@ -2,7 +2,7 @@
 # Install standard software, do git configuration
 
 # Each should only contain the packages that are added at that level
-base="git python-yaml libzmq-dev python-zmq python-simplejson python-smbus python-virtualenv python-pip python-numpy python-dev build-essential vim vim-tiny less cmake pyyaml python-zmq libzbar-dev unzip libopencv-dev python-opencv libjpeg-dev libjpeg8-dev libpng3 libfreetype6-dev"
+base="git python-yaml libzmq-dev python-zmq python-simplejson python-smbus python-virtualenv python-pip python-numpy python-dev build-essential vim vim-tiny less cmake python-zmq libzbar-dev unzip libopencv-dev python-opencv libjpeg-dev libjpeg8-dev libpng3 libfreetype6-dev"
 
 extra="vim-nox ipython tmux screen nmap tree i2c-tools wireless-tools grc"
 
@@ -112,8 +112,8 @@ git config --global user.email "ncsubot@gmail.com"
 fetch_git_repo IEEERobotics/bot
 fetch_git_repo NCSUhardware/DMCC_Library
 fetch_git_repo jschornick/i2c_device
-fetch_git_repo jschornick/pypruss
-fetch_git_repo beagleboard/am335x_pru_package
+#fetch_git_repo jschornick/pypruss
+#fetch_git_repo beagleboard/am335x_pru_package
 
 echo "======================================"
 echo "Building and installing PRU library..."
@@ -130,7 +130,7 @@ python_module() {
 
 python_module i2c_device
 python_module DMCC_Library
-pip install pypruss
+#pip install pypruss
 pip install  sympy
 pip install Pillow
 

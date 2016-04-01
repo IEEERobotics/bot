@@ -27,7 +27,7 @@ import generic_blocks
 
 
 JUNK_BUFFER = [0]*5
-HOME = [3, 25, 170, 0, 180]
+HOME = [0, 25, 170, 0, 180]
 GRAB = 5
 
 

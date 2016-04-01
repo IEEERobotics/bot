@@ -467,12 +467,16 @@ class RobotArm(object):
         return 1 
         
     @lib.api_call
-    def EmptyHopper(self,Bin):
+    def EmptyHopper(self,Bin,Course):
         
         
         Hopper = [0,85,170,20,180]
         PullBack = [0,35,170,30,180]
-        OffSide = [85,75,110,10,180]
+        if(Course == "right"):
+            OffSide = [85,75,110,10,180]
+        if(Course == "left"):
+            Offside = [                             ## Still need 
+           
         
       
         
@@ -485,9 +489,12 @@ class RobotArm(object):
         time.sleep(2)
         self.servo_cape.transmit_block([0] + PullBack) 
         time.sleep(3) 
-        if Bin != 1:
-            
-            self.rail.Orientor(1) 
+        if Course == "Right":
+            if Bin != 1:
+                self.rail.Orientor(1) 
+        if Course == "left": 
+            if Bin!= 4:
+                self.rail.Orientor(
         
         self.servo_cape.transmit_block([0] + OffSide) 
         time.sleep(6)

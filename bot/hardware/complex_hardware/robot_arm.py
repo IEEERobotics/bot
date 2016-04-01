@@ -475,7 +475,7 @@ class RobotArm(object):
         if(Course == "right"):
             OffSide = [85,75,110,10,180]
         if(Course == "left"):
-            Offside = [                             ## Still need 
+            Offside = [85,95,35,180,0]                             ## Still need 
            
         
       
@@ -494,7 +494,7 @@ class RobotArm(object):
                 self.rail.Orientor(1) 
         if Course == "left": 
             if Bin!= 4:
-                self.rail.Orientor(
+                self.rail.Orientor(4) 
         
         self.servo_cape.transmit_block([0] + OffSide) 
         time.sleep(6)
@@ -534,8 +534,11 @@ class RobotArm(object):
             return 0
             
     @lib.api_call 
-    def check_box_color(self):
-        Look = [85, 80, 170, 15, 180]
+    def check_box_color(self,Course):
+        if Course == "right":
+            Look = [85, 80, 170, 15, 180]
+        if Course == "left":
+            Look = [85,
         
         self.reset_home_position()
         self.joints = Look

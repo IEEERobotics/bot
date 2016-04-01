@@ -538,7 +538,7 @@ class RobotArm(object):
         if Course == "right":
             Look = [85, 80, 170, 15, 180]
         if Course == "left":
-            Look = [85,
+            Look = [85,85,35,160,15,0] 
         
         self.reset_home_position()
         self.joints = Look
@@ -563,6 +563,7 @@ class RobotArm(object):
                     
                 Position = self.rail.rail_motor.position 
                 time.sleep(3)
+                self.rail.DisplacmentMover(-75)
                 self.Tier_Grab(Tier,1) 
                  
                 time.sleep(2)

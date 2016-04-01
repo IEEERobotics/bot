@@ -92,63 +92,67 @@ class Pilot:
         running = True
         while running:
             self.goto_block_zone_B()
-            
+            time.sleep(1)
             self.align_on_wall()
-            time.sleep(0.5)
+            time.sleep(1)
             # Do Arm Stuff
             if(do_arm_flag):
                 self.call("arm", "competition_solver_barge", {"Tier" : "B"})
             #grab blocks
             self.goto_railcar()
-            time.sleep(.5)
+            time.sleep(1)
             self.align_on_wall()
-            time.sleep(0.5)
+            time.sleep(1)
             # Do Arm Stuff
             #find positions for railcar and deposit blocks
             
             # Box 1
             self.call("nav", "get_off_wall")
             self.align_on_railcar()
+            time.sleep(1)
             #Deposit blocks
-            time.sleep(0.5)
+            time.sleep(1)
             if (do_arm_flag):
                 box_color = self.call("arm", "check_box_color")
-                time.sleep(0.5)
+                time.sleep(1)
                 self.call("arm", "check_hopper")
                 self.call("arm", "FindAndGetBlock", {'color' : box_color})
 
             self.call('nav', 'goto_next_railcar')
             # Box 2
-            time.sleep(0.5)
+            time.sleep(1)
             self.align_on_railcar()
+            time.sleep(1)
             #Deposit blocks
             if(do_arm_flag):
                 box_color = self.call("arm", "check_box_color")
-                time.sleep(0.5)
+                time.sleep(1)
                 self.call("arm", "FindAndGetBlock", {'color' : box_color})
 
             self.call('nav', 'goto_next_railcar')
             #Box 3
-            time.sleep(0.5)
+            time.sleep(1)
             self.align_on_railcar()
+            time.sleep(1)
             #Deposit blocks
             if(do_arm_flag):
                 box_color = self.call("arm", "check_box_color")
-                time.sleep(0.5)
+                time.sleep(1)
                 self.call("arm", "FindAndGetBlock", {'color' : box_color}) 
 
             self.call('nav', 'goto_next_railcar')
             #Box 4
-            time.sleep(0.5)
+            time.sleep(1)
             self.align_on_railcar()
+            time.sleep(1)
             #Deposit blocks
             if(do_arm_flag):
                 box_color = self.call("arm", "check_box_color")
-                time.sleep(0.5)
+                time.sleep(1)
                 self.call("arm", "FindAndGetBlock", {'color' : box_color})
             
             self.goto_block_zone_B()
-            time.sleep(.5)
+            time.sleep(1)
             self.align_on_wall()
             # Check if blocks left?
             blocks_left = False
@@ -176,6 +180,7 @@ class Pilot:
             return
         elif (val == 1 or val==2):
             self.go_through_tunnel()
+            time.sleep(1)
             self.do_Zone_B()
             self.ctrl_client.exit_server()
             self.ctrl_client.clean_up()

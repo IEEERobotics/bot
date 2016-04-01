@@ -44,7 +44,7 @@ class IR(object):
                 i = i+1
                 
         data = self.parse_packets(ms)
-        print data[10], data[11] 
+        #print data[10], data[11] 
         #data = data[:10]
         #data[3] = data[3] - 40
         for side in self.biases:

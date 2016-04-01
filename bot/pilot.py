@@ -87,6 +87,8 @@ class Pilot:
         self.call("nav", "correct_bang_railcar")
 
     def do_Zone_B(self):
+        do_arm_flag = False
+
         running = True
         while running:
             self.goto_block_zone_B()
@@ -94,6 +96,8 @@ class Pilot:
             self.align_on_wall()
             time.sleep(0.5)
             # Do Arm Stuff
+            if(do_arm_flag):
+                self.call("arm", "competition_solver_barge", {"Tier" : "B"})
             #grab blocks
             self.goto_railcar()
             time.sleep(.5)
@@ -102,28 +106,46 @@ class Pilot:
             # Do Arm Stuff
             #find positions for railcar and deposit blocks
             
+            # Box 1
             self.call("nav", "get_off_wall")
             self.align_on_railcar()
             #Deposit blocks
             time.sleep(0.5)
-            
+            if (do_arm_flag):
+                box_color = self.call("arm", "check_box_color")
+                time.sleep(0.5)
+                self.call("arm", "check_hopper")
+                self.call("arm", "FindAndGetBlock", {'color' : box_color})
+
             self.call('nav', 'goto_next_railcar')
+            # Box 2
             time.sleep(0.5)
             elf.align_on_railcar()
             #Deposit blocks
-            time.sleep(0.5)
- 
+            if(do_arm_flag):
+                box_color = self.call("arm", "check_box_color")
+                time.sleep(0.5)
+                self.call("arm", "FindAndGetBlock", {'color' : box_color})
+
             self.call('nav', 'goto_next_railcar')
+            #Box 3
             time.sleep(0.5)
             elf.align_on_railcar()
             #Deposit blocks
-            time.sleep(0.5)
-            
+            if(do_arm_flag):
+                box_color = self.call("arm", "check_box_color")
+                time.sleep(0.5)
+                self.call("arm", "FindAndGetBlock", {'color' : box_color}) 
+
             self.call('nav', 'goto_next_railcar')
+            #Box 4
             time.sleep(0.5)
             elf.align_on_railcar()
             #Deposit blocks
-            time.sleep(0.5)
+            if(do_arm_flag):
+                box_color = self.call("arm", "check_box_color")
+                time.sleep(0.5)
+                self.call("arm", "FindAndGetBlock", {'color' : box_color})
             
             self.goto_block_zone_B()
             time.sleep(.5)

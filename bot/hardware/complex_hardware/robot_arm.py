@@ -539,7 +539,8 @@ class RobotArm(object):
             if qr != None:
                 return qr.value
             return None
-        
+        self.reset_home_position()
+        time.sleep(8)
         return largest.color 
     
     @lib.api_call 

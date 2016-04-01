@@ -193,6 +193,7 @@ class Navigation(object):
 
     @lib.api_call
     def read_IR_values(self):
+        self.logger.info("Test")
         return self.device.read_values()
         
 
@@ -261,10 +262,10 @@ class Navigation(object):
 
         if self.rail_cars_side == "west":
             self.logger.info("Going west towards railcars")
-            self.move_smooth_until_wall("west", "north", 200, t_type="min")
+            self.move_smooth_until_wall("west", "north", 150, t_type="min")
         elif self.rail_cars_side == "east":
             self.logger.info("Going east towards railcars")
-            self.move_smooth_until_wall("east", "north", 200, t_type="min")
+            self.move_smooth_until_wall("east", "north", 150, t_type="min")
 
     # TODO: Make a gotoBoat function
     # go north towards block, then towards rail cars and straight down
@@ -392,7 +393,7 @@ class Navigation(object):
         
     @lib.api_call
     def drive_through_tunnel(self):
-        self.move_through_tunnel(-75 ,-75 ,75 ,90 ,.8)
+        self.move_through_tunnel(-75 ,-75 ,75 ,90 ,.85)
         sleep(.8)
         self.logger.info("Climbed the tunnel")
         self.rotate_start()

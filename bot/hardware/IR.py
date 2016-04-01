@@ -31,19 +31,20 @@ class IR(object):
 
     @lib.api_call
     def read_values(self):
-        ms = range(20)
+        ms = range(24)
         #self.bus.write_byte(8,0xA5)
         #sleep(.1)
-        for i in range(20):
+        for i in range(24):
             ms[i] = self.bus.read_byte(8)
         #sleep(.1)30
         data = self.parse_packets(ms)
+        print data[10], data[11] 
+        #data = data[:10]
         #data[3] = data[3] - 40
         for side in self.biases:
             data_index = self.hash_values[side] - 1
             data[data_index] += self.biases[side]
-            if data[data_index] <= 0:
-                self.bus.write_byte(8,0xA5)
+            if data[data_index] < 0:
                 sleep(.2)
                 data[data_index] = 1
 

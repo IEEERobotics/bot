@@ -120,7 +120,7 @@ class Pilot:
             self.call('nav', 'goto_next_railcar')
             # Box 2
             time.sleep(0.5)
-            elf.align_on_railcar()
+            self.align_on_railcar()
             #Deposit blocks
             if(do_arm_flag):
                 box_color = self.call("arm", "check_box_color")
@@ -130,7 +130,7 @@ class Pilot:
             self.call('nav', 'goto_next_railcar')
             #Box 3
             time.sleep(0.5)
-            elf.align_on_railcar()
+            self.align_on_railcar()
             #Deposit blocks
             if(do_arm_flag):
                 box_color = self.call("arm", "check_box_color")
@@ -140,7 +140,7 @@ class Pilot:
             self.call('nav', 'goto_next_railcar')
             #Box 4
             time.sleep(0.5)
-            elf.align_on_railcar()
+            self.align_on_railcar()
             #Deposit blocks
             if(do_arm_flag):
                 box_color = self.call("arm", "check_box_color")

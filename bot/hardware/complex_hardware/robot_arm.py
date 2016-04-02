@@ -216,7 +216,7 @@ class RobotArm(object):
         """
         sets angles back to default position. Also resets the position of the 7th DOF
         """
-        
+        self.release()
         self.servo_cape.transmit_block([0] + HOME)
         self.rail.RunIntoWall()
         
@@ -355,7 +355,7 @@ class RobotArm(object):
             ## Generic Blocks 
             print "Not coded yet" 
             
-            self.joints = [0,80,125,85,180]
+            self.joints = [0,60,125,85,180]
             time.sleep(3)
             if Case == 1:
             
@@ -367,17 +367,17 @@ class RobotArm(object):
             HOPPER1 = [0, 45, 145, 55, 180]
             HOPPER2 = [0, 55, 165, 0, 180]
         elif Tier == 'B':
-            self.joints = [0,85,115,80,180]
-            time.sleep(2)
+            self.joints = [0,70,145,60,180]
+            time.sleep(3)
             ## Mixed QR Blocks 
             if Case == 1:  ## Block on top
-                BLOCK_MOVE_5 = [0, 115, 115, 60, 180]
+                BLOCK_MOVE_5 = [0, 85, 160, 70, 180]
             elif Case == 2: ## Block on bottom
-                BLOCK_MOVE_5 = [0, 115, 115, 45, 180]
+                BLOCK_MOVE_5 = [0, 90, 170, 60, 180]
                 
             LOOK_5 = [0, 25, 170, 10, 180]
-            HOPPER1 = [0, 45, 145, 55, 180]
-            HOPPER2 = [0, 55, 165, 0, 180]
+            HOPPER1 = [0, 45, 145, 35, 180]
+            HOPPER2 = [0, 45, 170, 0, 180]
             
 
         elif Tier == 'C':
@@ -467,12 +467,16 @@ class RobotArm(object):
         return 1 
         
     @lib.api_call
-    def EmptyHopper(self,Bin):
+    def EmptyHopper(self,Bin,Course):
         
         
         Hopper = [0,85,170,20,180]
         PullBack = [0,35,170,30,180]
-        OffSide = [85,75,110,10,180]
+        if(Course == "right"):
+            OffSide = [85,75,110,10,180]
+        if(Course == "left"):
+            Offside = [85,95,35,180,0]                             ## Still need 
+           
         
       
         
@@ -485,9 +489,12 @@ class RobotArm(object):
         time.sleep(2)
         self.servo_cape.transmit_block([0] + PullBack) 
         time.sleep(3) 
-        if Bin != 1:
-            
-            self.rail.Orientor(1) 
+        if Course == "Right":
+            if Bin != 1:
+                self.rail.Orientor(1) 
+        if Course == "left": 
+            if Bin!= 4:
+                self.rail.Orientor(4) 
         
         self.servo_cape.transmit_block([0] + OffSide) 
         time.sleep(6)
@@ -527,11 +534,22 @@ class RobotArm(object):
             return 0
             
     @lib.api_call 
-    def check_box_color(self):
-        Look = [85, 80, 170, 15, 180]
+    def check_box_color(self,Course):
+        if Course == "right":
+            Look = [85, 80, 170, 15, 180]
+            self.rail.Orientor(1)
+            self.joints = Look
+            
+        if Course == "left":
+            Look = [85,85,35,160,15,0]
+            self.rail.Orientor(4)  
+            self.joints = [85, 25, 170, 0, 180]
+            time.sleep(3)
+            self.joints = [85, 25, 45, 160, 0]
         
-        self.reset_home_position()
-        self.joints = Look
+        
+        
+        
         time.sleep(8)
         largest = self.GrabColor()
         if largest == None:
@@ -539,7 +557,10 @@ class RobotArm(object):
             if qr != None:
                 return qr.value
             return None
-        self.reset_home_position()
+            
+        self.joints = HOME
+        time.sleep(3)
+        #self.reset_home_position()
         time.sleep(8)
         return largest.color 
     
@@ -551,8 +572,12 @@ class RobotArm(object):
             Success = self.FindBlockWithIR(Tier)
             if Success:
                     
-                Position = self.rail.rail_motor.position 
-                time.sleep(3)
+                 
+                
+                self.rail.DisplacementMover(-475)
+                time.sleep(2)
+                Position = self.rail.rail_motor.position
+                
                 self.Tier_Grab(Tier,1) 
                  
                 time.sleep(2)
@@ -593,6 +618,9 @@ class RobotArm(object):
         if ret == None:         #try again
             print "Trying again"
             ret = self.cam.check_color()
+            if ret == None:
+                print "No color found. Assuming green."
+                ret = Block(0, "green")
         self.TurnOffLight()
         self.cam.stop()
         return ret
@@ -605,7 +633,7 @@ class RobotArm(object):
         
         this function loops to test how color detection works with different lighting conditions
         """
-        HOPPER_LOOK = [0,65,170,10,180]
+        HOPPER_LOOK = [0,75,140,10,180]
         #look at the hopper physically
         self.rail.Orientor(hopper_pos + 1)
         self.joints = HOPPER_LOOK
@@ -641,7 +669,7 @@ class RobotArm(object):
             NegativeThreshold = 200
         if Tier == 'B':
             Look = [0,75,125,20,180]
-            Threshold = 105
+            Threshold = 80
             NegativeThreshold = 200
         
         

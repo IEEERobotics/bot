@@ -474,32 +474,71 @@ class RobotArm(object):
         PullBack = [0,35,170,30,180]
         if(Course == "right"):
             OffSide = [85,75,110,10,180]
+            self.reset_home_position()
+            self.rail.Orientor(Bin)
+            time.sleep(1)
+            self.servo_cape.transmit_block([0] + Hopper)
+            time.sleep(3)
+            self.grab() 
+            time.sleep(2)
+            self.servo_cape.transmit_block([0] + PullBack) 
+            time.sleep(3) 
+            Course == "Right":
+            if Bin != 1:
+                self.rail.Orientor(1)
+            self.servo_cape.transmit_block([0] + OffSide) 
+            time.sleep(6)
+            self.release()
+            time.sleep(2)
+            self.joints = HOME
+            
         if(Course == "left"):
-            Offside = [85,95,35,180,0]                             ## Still need 
+            self.reset_home_position()
+            self.rail.Orientor(Bin)
+            time.sleep(1)
+            self.servo_cape.transmit_block([0] + Hopper)
+            time.sleep(3)
+            self.grab() 
+            
+            if Bin!= 4:
+                self.rail.Orientor(4) 
+                
+            time.sleep(2)
+            self.servo_cape.transmit_block([0] + PullBack) 
+            time.sleep(3)       
+
+          
+            self.joints = [85, 85, 110, 0, 180]
+            time.sleep(3)
+            self.joints = [85, 110, 110, 75, 0]
+            time.sleep(3)
+            self.joints = [85, 145, 90, 110, 0]
+            time.sleep(3)
+            self.joints = [85, 180, 0, 180, 0]
+            time.sleep(3)
+            self.joints = [85, 90,  0, 145, 0]
+            self.release() 
+
+            time.sleep(3)
+            self.joints = [85, 180, 0, 180, 0]
+            time.sleep(3)
+            self.joints = [85, 145, 90, 110, 0]
+            time.sleep(3)
+            self.joints = [85, 110, 110, 75, 0]
+            time.sleep(3)
+            self.joints = [85, 85, 110, 0, 180]
+            
+            self.joints = HOME
+            time.sleep(3)
            
         
       
         
-        self.reset_home_position()
-        self.rail.Orientor(Bin)
-        time.sleep(1)
-        self.servo_cape.transmit_block([0] + Hopper)
-        time.sleep(3)
-        self.grab() 
-        time.sleep(2)
-        self.servo_cape.transmit_block([0] + PullBack) 
-        time.sleep(3) 
-        if Course == "Right":
-            if Bin != 1:
-                self.rail.Orientor(1) 
-        if Course == "left": 
-            if Bin!= 4:
-                self.rail.Orientor(4) 
+
+ 
+ 
         
-        self.servo_cape.transmit_block([0] + OffSide) 
-        time.sleep(6)
-        self.release()
-        time.sleep(2)
+
         
         self.hopper[Bin-1] = None 
         
@@ -564,7 +603,7 @@ class RobotArm(object):
             time.sleep(3)
             self.joints = [85, 180, 0, 180, 0]
             time.sleep(3)
-            self.joints = [85, 90,  0, 165, 0]
+            self.joints = [85, 90,  0, 145, 0]
             largest = self.GrabColor()
 
             time.sleep(3)

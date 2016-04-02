@@ -377,7 +377,7 @@ class RobotArm(object):
                 
             LOOK_5 = [0, 25, 170, 10, 180]
             HOPPER1 = [0, 45, 145, 35, 180]
-            HOPPER2 = [0, 45, 170, 0, 180]
+            HOPPER2 = [0, 40, 170, 0, 180]
             
 
         elif Tier == 'C':

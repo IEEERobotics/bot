@@ -355,7 +355,7 @@ class RobotArm(object):
             ## Generic Blocks 
             print "Not coded yet" 
             
-            self.joints = [0,80,125,85,180]
+            self.joints = [0,60,125,85,180]
             time.sleep(3)
             if Case == 1:
             
@@ -569,7 +569,7 @@ class RobotArm(object):
                     
                  
                 
-                self.rail.DisplacementMover(-150)
+                self.rail.DisplacementMover(-250)
                 Position = self.rail.rail_motor.position
                 
                 self.Tier_Grab(Tier,1) 

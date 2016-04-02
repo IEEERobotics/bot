@@ -425,7 +425,7 @@ class RobotArm(object):
         self.release()
         time.sleep(1) 
 
-        self.hopper[hopper_pos-1] = 1 
+        #self.hopper[hopper_pos-1] = 1 
         
       
 

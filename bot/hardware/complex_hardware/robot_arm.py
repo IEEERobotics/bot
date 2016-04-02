@@ -541,6 +541,9 @@ class RobotArm(object):
         if Course == "left":
             Look = [85,85,35,160,15,0]
             self.rail.Orientor(4)  
+            self.joints = [85, 45, 170, 0, 180]
+            time.sleep(3)
+            self.joints = [85, 45, 170, 160, 0]
         
         
         
@@ -566,7 +569,7 @@ class RobotArm(object):
                     
                 Position = self.rail.rail_motor.position 
                 
-                self.rail.DisplacmentMover(-75)
+                self.rail.DisplacementMover(-75)
                 self.Tier_Grab(Tier,1) 
                  
                 time.sleep(2)

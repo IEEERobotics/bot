@@ -569,7 +569,7 @@ class RobotArm(object):
                     
                  
                 
-                self.rail.DisplacementMover(-475)
+                self.rail.DisplacementMover(-400)
                 time.sleep(2)
                 Position = self.rail.rail_motor.position
                 
@@ -664,7 +664,7 @@ class RobotArm(object):
             NegativeThreshold = 200
         if Tier == 'B':
             Look = [0,75,125,20,180]
-            Threshold = 105
+            Threshold = 80
             NegativeThreshold = 200
         
         

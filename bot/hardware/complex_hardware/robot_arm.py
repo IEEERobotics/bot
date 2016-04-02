@@ -569,7 +569,7 @@ class RobotArm(object):
                     
                  
                 
-                self.rail.DisplacementMover(-300)
+                self.rail.DisplacementMover(-400)
                 time.sleep(2)
                 Position = self.rail.rail_motor.position
                 

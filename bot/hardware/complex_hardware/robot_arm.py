@@ -538,6 +538,8 @@ class RobotArm(object):
         if Course == "right":
             Look = [85, 80, 170, 15, 180]
             self.rail.Orientor(1)
+            self.joints = Look
+            
         if Course == "left":
             Look = [85,85,35,160,15,0]
             self.rail.Orientor(4)  
@@ -547,7 +549,7 @@ class RobotArm(object):
         
         
         
-        self.joints = Look
+        
         time.sleep(8)
         largest = self.GrabColor()
         if largest == None:
@@ -555,6 +557,8 @@ class RobotArm(object):
             if qr != None:
                 return qr.value
             return None
+            
+        self.joints = self.HOME
         self.reset_home_position()
         time.sleep(8)
         return largest.color 
@@ -569,7 +573,7 @@ class RobotArm(object):
                     
                  
                 
-                self.rail.DisplacementMover(-400)
+                self.rail.DisplacementMover(-475)
                 time.sleep(2)
                 Position = self.rail.rail_motor.position
                 

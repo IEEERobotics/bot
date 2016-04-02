@@ -539,30 +539,54 @@ class RobotArm(object):
             Look = [85, 80, 170, 15, 180]
             self.rail.Orientor(1)
             self.joints = Look
+            time.sleep(8)
+            largest = self.GrabColor()
+            if largest == None:
+                qr = self.cam.QRSweep()
+                if qr != None:
+                    return qr.value
+                return None
+            
+            self.joints = HOME
+            time.sleep(3)
+            #self.reset_home_position()
+            time.sleep(8)
+            return largest.color 
             
         if Course == "left":
             Look = [85,85,35,160,15,0]
             self.rail.Orientor(4)  
-            self.joints = [85, 25, 170, 0, 180]
+            self.joints = [85, 85, 110, 0, 180]
             time.sleep(3)
-            self.joints = [85, 25, 45, 160, 0]
-        
-        
-        
-        
-        time.sleep(8)
-        largest = self.GrabColor()
-        if largest == None:
-            qr = self.cam.QRSweep()
-            if qr != None:
-                return qr.value
-            return None
+            self.joints = [85, 110, 110, 75, 0]
+            time.sleep(3)
+            self.joints = [85, 145, 90, 110, 0]
+            time.sleep(3)
+            self.joints = [85, 180, 0, 180, 0]
+            time.sleep(3)
+            self.joints = [85, 90,  0, 180, 0]
+            largest = self.GrabColor()
+
+            time.sleep(3)
+            self.joints = [85, 180, 0, 180, 0]
+            time.sleep(3)
+            self.joints = [85, 145, 90, 110, 0]
+            time.sleep(3)
+            self.joints = [85, 110, 110, 75, 0]
+            time.sleep(3)
+            self.joints = [85, 85, 110, 0, 180]
+            self.joints = HOME
+            time.sleep(3)
+            self.reset_home_position()
+            time.sleep(8)
+            return largest.color 
             
-        self.joints = HOME
-        time.sleep(3)
-        #self.reset_home_position()
-        time.sleep(8)
-        return largest.color 
+            
+        
+        
+        
+        
+
     
     @lib.api_call 
     def competition_solver_barge(self,Tier):

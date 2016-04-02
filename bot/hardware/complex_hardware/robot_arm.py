@@ -216,7 +216,7 @@ class RobotArm(object):
         """
         sets angles back to default position. Also resets the position of the 7th DOF
         """
-        
+        self.release()
         self.servo_cape.transmit_block([0] + HOME)
         self.rail.RunIntoWall()
         
@@ -613,6 +613,9 @@ class RobotArm(object):
         if ret == None:         #try again
             print "Trying again"
             ret = self.cam.check_color()
+            if ret == None:
+                print "No color found. Assuming green."
+                ret = Block(0, "green")
         self.TurnOffLight()
         self.cam.stop()
         return ret
@@ -625,7 +628,7 @@ class RobotArm(object):
         
         this function loops to test how color detection works with different lighting conditions
         """
-        HOPPER_LOOK = [0,65,170,10,180]
+        HOPPER_LOOK = [0,75,140,10,180]
         #look at the hopper physically
         self.rail.Orientor(hopper_pos + 1)
         self.joints = HOPPER_LOOK

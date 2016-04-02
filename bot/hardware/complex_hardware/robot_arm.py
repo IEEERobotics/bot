@@ -367,8 +367,8 @@ class RobotArm(object):
             HOPPER1 = [0, 45, 145, 55, 180]
             HOPPER2 = [0, 55, 165, 0, 180]
         elif Tier == 'B':
-            self.joints = [0,85,145,80,180]
-            time.sleep(2)
+            self.joints = [0,70,145,80,180]
+            time.sleep(3)
             ## Mixed QR Blocks 
             if Case == 1:  ## Block on top
                 BLOCK_MOVE_5 = [0, 85, 160, 70, 180]
@@ -569,7 +569,8 @@ class RobotArm(object):
                     
                  
                 
-                self.rail.DisplacementMover(-250)
+                self.rail.DisplacementMover(-300)
+                time.sleep(2)
                 Position = self.rail.rail_motor.position
                 
                 self.Tier_Grab(Tier,1) 

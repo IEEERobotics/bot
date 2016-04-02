@@ -168,10 +168,10 @@ class ColorSensor(I2CDevice):
 
         """
         self.read_data()
-        diff_c = (self.c - self.bc) / self.bc
-        diff_r = (self.r - self.br) / self.br
-        diff_g = (self.g - self.bg) / self.bg
-        diff_b = (self.b - self.bb) / self.bb
+        diff_c = (self.c - self.bc) / float(self.bc)
+        diff_r = (self.r - self.br) / float(self.br)
+        diff_g = (self.g - self.bg) / float(self.bg)
+        diff_b = (self.b - self.bb) / float(self.bb)
 
         # Green is weakest color, so bias in that direction.
         #diff_g *= 1.01

@@ -537,10 +537,13 @@ class RobotArm(object):
     def check_box_color(self,Course):
         if Course == "right":
             Look = [85, 80, 170, 15, 180]
+            self.rail.Orientor(1)
         if Course == "left":
-            Look = [85,85,35,160,15,0] 
+            Look = [85,85,35,160,15,0]
+            self.rail.Orientor(4)  
         
-        self.reset_home_position()
+        
+        
         self.joints = Look
         time.sleep(8)
         largest = self.GrabColor()
@@ -562,7 +565,7 @@ class RobotArm(object):
             if Success:
                     
                 Position = self.rail.rail_motor.position 
-                time.sleep(3)
+                
                 self.rail.DisplacmentMover(-75)
                 self.Tier_Grab(Tier,1) 
                  

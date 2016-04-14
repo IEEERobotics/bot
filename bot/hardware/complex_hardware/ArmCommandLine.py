@@ -35,7 +35,7 @@ while True:
         arm.check_hopper()
     
     if Command == 15:
-        arm.FindBlockWithIR() 
+        arm.FindBlockWithIR('B') 
         
     if Command == 13: 
         arm.GrabQR()
@@ -74,8 +74,9 @@ while True:
             
     if Command == 4:
         Color = raw_input("Which color:  ")
+        Course = raw_input("which course:  ")
         arm.reset_home_position() 
-        arm.FindAndGetBlock(Color)
+        arm.FindAndGetBlock(Color,Course)
         
     if Command == 5:
         arm.rail.CalibrateRail() 

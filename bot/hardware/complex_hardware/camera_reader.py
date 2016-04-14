@@ -212,11 +212,9 @@ class Camera(object):
         frame = cv2.adaptiveThreshold(frame, 255
                                       , cv2.ADAPTIVE_THRESH_MEAN_C
                                       , cv2.THRESH_BINARY, 19, 0)
-        
-        #ret, thresh = cv2.threshold(gray,50,255,cv2.THRESH_BINARY)
-        cv2.imwrite('buffer.png', frame)
-        pil_im = Image.open('buffer.png').convert('L')
-
+        #cv2.imwrite('buffer.png', frame)
+        #pil_im = Image.open('buffer.png').convert('L')
+        pil_im = Image.fromarray(frame)
         width, height = pil_im.size
         raw = pil_im.tobytes()
         z_im = zbar.Image(width, height, 'Y800', raw)

@@ -1,5 +1,4 @@
 
-
 """Encapsulates functionality of moving around robot arm"""
 
 from bot.hardware.IR import IR 
@@ -65,6 +64,7 @@ class RobotArm(object):
         self.joints = HOME
 
         self.hopper = [None, None, None, None]
+        self.bins = [None, None, None]
         
         self.IR = IR()
         #self.cam.start()
@@ -83,7 +83,6 @@ class RobotArm(object):
             self.__joints[:len(vals)] = vals
         print "Joints to be sent: ", vals
         self.servo_cape.transmit_block([0] + self.__joints)
-
 
     @lib.api_call
     def draw_qr_on_frame(self, zbar_dat, draw_frame):
@@ -581,7 +580,10 @@ class RobotArm(object):
             time.sleep(3)
             #self.reset_home_position()
             time.sleep(8)
-            return largest.color 
+            if largest != None:
+                return largest.color 
+            else:   
+                return None
             
         if Course == "left":
             Look = [85,85,35,160,15,0]
@@ -608,15 +610,11 @@ class RobotArm(object):
             self.joints = HOME
             time.sleep(3)
             self.reset_home_position()
-            time.sleep(8)
-            return largest.color 
-            
-            
-        
-        
-        
-        
-
+            time.sleep(1)
+            if largest != None:
+                return largest.color 
+            else:
+                return None
     
     @lib.api_call 
     def competition_solver_barge(self,Tier):
@@ -645,6 +643,7 @@ class RobotArm(object):
             
             
             
+            
     def design_day_solver(self):
         i = 0
         while i< 2:
@@ -666,6 +665,39 @@ class RobotArm(object):
                 print "No QRCode Found."
                 return 0
         return 1
+    
+    def check_bin(self, bin_id):
+        """
+        Looks at each bin position for the color of the bin
+        saves data in self.bins
+        
+        self.bins order =>[left, back, right]
+        """
+        CHECK_BIN_BACK = [90,90,90,90,90]
+        self.reset_home_position()
+        
+        if bin_id == "left":
+            color = self.check_box_color("right") # yep, its reversed from the course orientation
+            if color != None:
+                self.bins[0] = color
+                
+        elif bin_id == "back":
+            self.rail.DisplacementMover(3500)
+            self.joints = CHECK_BIN_BACK
+            time.sleep(8)
+            largest = self.GrabColor()
+            if color != None:
+                self.bins[1] = largest.color
+            self.reset_home_position()
+            time.sleep(8)
+            
+        elif bin_id == "right":
+            color = self.check_box_color("left") # yep, its reversed from the course orientation
+            if color != None:
+                self.bins[2] = color
+        else:
+            print "Unknown bin location given. Possible locations are 'left' 'back' and 'right'
+            
     
     @lib.api_call 
     def check_hopper(self):

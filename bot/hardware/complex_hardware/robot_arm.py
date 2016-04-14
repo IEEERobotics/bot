@@ -457,24 +457,22 @@ class RobotArm(object):
         return 1 
         
     @lib.api_call
-    def EmptyHopper(self,Bin,Course):
-        
-        
+    def EmptyHopper(self,hopper_pos,Course):
+
         Hopper = [0,85,170,20,180]
         PullBack = [0,35,170,30,180]
         if(Course == "right"):
             OffSide = [85,75,110,10,180]
             self.reset_home_position()
-            self.rail.Orientor(Bin)
+            self.rail.Orientor(hopper_pos)
             time.sleep(1)
             self.servo_cape.transmit_block([0] + Hopper)
             time.sleep(3)
             self.grab() 
             time.sleep(2)
             self.servo_cape.transmit_block([0] + PullBack) 
-            time.sleep(3) 
-            Course == "Right":
-            if Bin != 1:
+            time.sleep(3)
+            if hopper_pos != 1:
                 self.rail.Orientor(1)
             self.servo_cape.transmit_block([0] + OffSide) 
             time.sleep(6)
@@ -484,13 +482,13 @@ class RobotArm(object):
             
         if(Course == "left"):
             self.reset_home_position()
-            self.rail.Orientor(Bin)
+            self.rail.Orientor(hopper_pos)
             time.sleep(1)
             self.servo_cape.transmit_block([0] + Hopper)
             time.sleep(3)
             self.grab() 
             
-            if Bin!= 4:
+            if hopper_pos!= 4:
                 self.rail.Orientor(4) 
                 
             time.sleep(2)
@@ -520,17 +518,8 @@ class RobotArm(object):
             
             self.joints = HOME
             time.sleep(3)
-           
         
-      
-        
-
- 
- 
-        
-
-        
-        self.hopper[Bin-1] = None 
+        self.hopper[hopper_pos-1] = None 
         
         return 0 
         
@@ -643,8 +632,9 @@ class RobotArm(object):
             
             
             
-            
-    def design_day_solver(self):
+    
+    @lib.api_call         
+    def dd_solver(self):
         i = 0
         while i< 2:
             
@@ -665,8 +655,8 @@ class RobotArm(object):
                 print "No QRCode Found."
                 return 0
         return 1
-    
-    def check_bin(self, bin_id):
+    @lib.api_call 
+    def dd_check_bin(self, bin_id):
         """
         Looks at each bin position for the color of the bin
         saves data in self.bins
@@ -698,6 +688,48 @@ class RobotArm(object):
         else:
             print "Unknown bin location given. Possible locations are 'left' 'back' and 'right'
             
+    @lib.api_call 
+    def dd_empty_hopper(self):
+        """
+        Check the hopper items for a color match with a bin.
+        If a match is found then it will deposit the block into that bin.
+        """
+        
+        count = -1
+        for block in self.hopper:
+            count += 1
+            if block == None:
+                continue
+            else:
+                if block.value == self.bins[0]:
+                    self.EmptyHopper(count + 1, "right")
+                    
+                elif block.value == self.bins[1]:
+                    Hopper = [0,85,170,20,180]
+                    PullBack = [0,35,170,30,180]
+                    OffSide = [85,75,110,10,180]
+                    self.reset_home_position()
+                    self.rail.Orientor(hopper_pos)
+                    time.sleep(1)
+                    self.servo_cape.transmit_block([0] + Hopper)
+                    time.sleep(3)
+                    self.grab() 
+                    time.sleep(2)
+                    self.servo_cape.transmit_block([0] + PullBack) 
+                    time.sleep(3)
+                    self.servo_cape.transmit_block([0] + OffSide)
+                    self.rail.DisplacementConverter(3.5)
+                    time.sleep(5)
+                    self.release()
+                    time.sleep(2)
+                    self.reset_home_position()
+                    time.sleep(8)
+                    self.hopper[count] = None
+                    
+                elif block.value == self.bins[2]:
+                    self.EmptyHopper(count + 1, "left")
+                else:
+                    print "No match for color -> bin."
     
     @lib.api_call 
     def check_hopper(self):

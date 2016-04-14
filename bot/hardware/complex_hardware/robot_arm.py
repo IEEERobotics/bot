@@ -682,7 +682,11 @@ class RobotArm(object):
     
     @lib.api_call
     def GrabQR(self):
-        self.cam.QRSweep()
+        self.cam.start()
+        time.sleep(2)
+        QRcode = self.cam.QRSweep()
+        self.cam.stop()
+        return QRCode
         
     @lib.api_call
     def GrabColor(self):

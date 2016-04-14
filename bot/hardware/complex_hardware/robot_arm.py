@@ -254,25 +254,13 @@ class RobotArm(object):
         """runs demos 1-7"""
         self.servo_cape.transmit_block([demo_number]
                                          + JUNK_BUFFER)        
-    
-    @lib.api_call    
-    def rail_test(self):
-        
-        while True:
-            #time.sleep(2)
-            ret = self.cam.QRSweep()
-            if ret != None:
-                x_disp = ret.tvec[0]
-                print "Checking Alignment with x_disp = ", x_disp
-                if abs(x_disp) > .2:
-                    self.rail.DisplacementConverter(-1 * x_disp)
-            
-            ret = None
             
     def rail_feedback(self):
         """
         align the arm on the rail to a qrcode and return the code
+        else when it cannot find a QRCode 4 or more times it will return None.
         """
+        giveup = 0
         count = 0
         direction = 1
         self.cam.start()
@@ -292,6 +280,7 @@ class RobotArm(object):
                         return ret
                     else:
                         QRList.append(ret)
+                        giveup = 0
                         print "Checking Alignment with x_disp = ", x_disp
                         print "countx = ", x
                             
@@ -301,6 +290,9 @@ class RobotArm(object):
                 if rail_ret == 0:
                     #out of range, reset to middle and try again
                     self.rail.MoveToPosition(3500)
+                    if giveup > 4:
+                        return None
+                    giveup += 1
             else:       # if no qrcodes are found
                 limit = self.rail.DisplacementConverter(1.5*direction)
                 if limit == 0:                  #out of range
@@ -428,7 +420,6 @@ class RobotArm(object):
         self.hopper[hopper_pos-1] = QRCode2(0,"None",0) 
         
       
-
     @lib.api_call
     def FindAndGetBlock(self,color):
         """ 
@@ -634,9 +625,6 @@ class RobotArm(object):
         while i< 2:
             Success = self.FindBlockWithIR(Tier)
             if Success:
-                    
-                 
-                
                 self.rail.DisplacementMover(-475)
                 time.sleep(2)
                 Position = self.rail.rail_motor.position
@@ -655,6 +643,30 @@ class RobotArm(object):
         return 1
         
             
+            
+            
+    def design_day_solver(self):
+        i = 0
+        while i< 2:
+            
+            Success = self.rail_feedback
+            if Success != None:
+                #account for error
+                self.rail.DisplacementMover(-500)
+                time.sleep(2)
+                Position = self.rail.rail_motor.position
+                self.Tier_Grab(Tier,1) 
+                time.sleep(2)
+                self.rail.MoveToPosition(Position) 
+                time.sleep(2) 
+                self.Tier_Grab(Tier,2)
+                i = i + 1
+                self.reset_home_position() 
+            else:
+                print "No QRCode Found."
+                return 0
+        return 1
+    
     @lib.api_call 
     def check_hopper(self):
         i = 0

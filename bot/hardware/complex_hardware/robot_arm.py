@@ -635,6 +635,9 @@ class RobotArm(object):
     
     @lib.api_call         
     def dd_solver(self):
+        """
+        Solver for design day. Lines uyp with a qrcode and grabs it and deposits it in the hopper
+        """
         i = 0
         while i< 2:
             
@@ -663,6 +666,7 @@ class RobotArm(object):
         
         self.bins order =>[left, back, right]
         """
+        #TODO: Change values for checking the bins color on the back.
         CHECK_BIN_BACK = [90,90,90,90,90]
         self.reset_home_position()
         
@@ -707,7 +711,8 @@ class RobotArm(object):
                 elif block.value == self.bins[1]:
                     Hopper = [0,85,170,20,180]
                     PullBack = [0,35,170,30,180]
-                    OffSide = [85,75,110,10,180]
+                    #TODO Correct angles for dropping block off back
+                    OffSide = [90,90,90,90,90]]
                     self.reset_home_position()
                     self.rail.Orientor(hopper_pos)
                     time.sleep(1)

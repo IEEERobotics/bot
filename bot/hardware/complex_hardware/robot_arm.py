@@ -581,14 +581,14 @@ class RobotArm(object):
             time.sleep(3)
             self.joints = [85, 180, 0, 180, 0]
             time.sleep(2)
-            self.joints = [65, 90,  0, 145, 0]
+            self.joints = [85, 70,  0, 145, 0]
             time.sleep(5)
             largest = self.GrabColor()
 
             time.sleep(3)
-            self.joints = [85, 180, 0, 180, 0]
+            self.joints = HOME
             time.sleep(3)
-            self.joints = [85, 145, 90, 110, 0]
+          
 
             self.joints = HOME
             time.sleep(5)

@@ -690,7 +690,7 @@ class RobotArm(object):
             if color != None:
                 self.bins[2] = color
         else:
-            print "Unknown bin location given. Possible locations are 'left' 'back' and 'right'
+            print "Unknown bin location given. Possible locations are 'left' 'back' and 'right'"
             
     @lib.api_call 
     def dd_empty_hopper(self):

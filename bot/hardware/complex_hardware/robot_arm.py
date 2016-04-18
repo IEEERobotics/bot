@@ -577,11 +577,7 @@ class RobotArm(object):
         if Course == "left":
             Look = [85,85,35,160,15,0]
             self.rail.Orientor(4)  
-            self.joints = [85, 85, 110, 0, 180]
-            time.sleep(3)
-            self.joints = [85, 110, 110, 75, 0]
-            time.sleep(3)
-            self.joints = [85, 145, 90, 110, 0]
+
             time.sleep(3)
             self.joints = [85, 180, 0, 180, 0]
             time.sleep(3)
@@ -592,10 +588,7 @@ class RobotArm(object):
             self.joints = [85, 180, 0, 180, 0]
             time.sleep(3)
             self.joints = [85, 145, 90, 110, 0]
-            time.sleep(3)
-            self.joints = [85, 110, 110, 75, 0]
-            time.sleep(3)
-            self.joints = [85, 85, 110, 0, 180]
+
             self.joints = HOME
             time.sleep(3)
             self.reset_home_position()

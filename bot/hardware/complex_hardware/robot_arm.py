@@ -554,10 +554,10 @@ class RobotArm(object):
     @lib.api_call 
     def check_box_color(self,Course):
         if Course == "right":
-            Look = [85, 80, 170, 15, 180]
+            Look = [85, 70, 170, 15, 180]
             self.rail.Orientor(1)
             self.joints = Look
-            time.sleep(8)
+            time.sleep(5)
             largest = self.GrabColor()
             if largest == None:
                 qr = self.cam.QRSweep()
@@ -575,12 +575,12 @@ class RobotArm(object):
                 return None
             
         if Course == "left":
-            Look = [85,85,35,160,15,0]
+            Look = [85,70,35,160,15,0]
             self.rail.Orientor(4)  
 
             time.sleep(3)
             self.joints = [85, 180, 0, 180, 0]
-            time.sleep(3)
+            time.sleep(2)
             self.joints = [65, 90,  0, 145, 0]
             time.sleep(5)
             largest = self.GrabColor()
@@ -591,7 +591,7 @@ class RobotArm(object):
             self.joints = [85, 145, 90, 110, 0]
 
             self.joints = HOME
-            time.sleep(3)
+            time.sleep(5)
             self.reset_home_position()
             time.sleep(1)
             if largest != None:
@@ -674,7 +674,7 @@ class RobotArm(object):
             self.joints = CHECK_BIN_BACK
             time.sleep(8)
             largest = self.GrabColor()
-            if color != None:
+            if largest != None:
                 self.bins[1] = largest.color
             self.reset_home_position()
             time.sleep(8)

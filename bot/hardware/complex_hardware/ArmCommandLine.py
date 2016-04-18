@@ -23,7 +23,7 @@ while True:
     print "9:  Check color in bin"
     print "10: Tier Grab         "
     print "11: Turn Light On     "
-    print "12: Turn Light Off    "
+    print "12: dd_check_bin      "
     print "13: Grab QR           "
     print "14: Grab Color        " 
     print "15: Find block with IR"
@@ -44,7 +44,9 @@ while True:
         arm.GrabColor() 
         
     if Command == 12:
-        arm.TurnOffLight()
+        
+        Bin = raw_input("left, back or right:  ")
+        arm.dd_check_bin(Bin) 
     
     if Command == 11:
         

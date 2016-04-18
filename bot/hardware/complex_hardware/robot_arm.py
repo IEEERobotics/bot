@@ -581,7 +581,8 @@ class RobotArm(object):
             time.sleep(3)
             self.joints = [85, 180, 0, 180, 0]
             time.sleep(3)
-            self.joints = [85, 90,  0, 145, 0]
+            self.joints = [65, 90,  0, 145, 0]
+            time.sleep(5)
             largest = self.GrabColor()
 
             time.sleep(3)
@@ -660,7 +661,7 @@ class RobotArm(object):
         self.bins order =>[left, back, right]
         """
         #TODO: Change values for checking the bins color on the back.
-        CHECK_BIN_BACK = [90,90,90,90,90]
+        CHECK_BIN_BACK = [0,80,25,160,2]
         self.reset_home_position()
         
         if bin_id == "left":

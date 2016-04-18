@@ -568,7 +568,7 @@ class RobotArm(object):
             self.joints = HOME
             time.sleep(3)
             #self.reset_home_position()
-            time.sleep(8)
+            
             if largest != None:
                 return largest.color 
             else:   
@@ -578,7 +578,7 @@ class RobotArm(object):
             Look = [85,70,35,160,15,0]
             self.rail.Orientor(4)  
 
-            time.sleep(4)
+            time.sleep(2)
          
             self.joints = [85, 85,  20, 160, 0]
             time.sleep(5)
@@ -590,7 +590,7 @@ class RobotArm(object):
           
 
           
-            time.sleep(6)
+            time.sleep(8)
             self.reset_home_position()
             time.sleep(1)
             if largest != None:
@@ -673,6 +673,7 @@ class RobotArm(object):
             self.joints = CHECK_BIN_BACK
             time.sleep(8)
             largest = self.GrabColor()
+            self.TurnOffLight() 
             if largest != None:
                 self.bins[1] = largest.color
             self.reset_home_position()

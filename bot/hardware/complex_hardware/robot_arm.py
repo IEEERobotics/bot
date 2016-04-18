@@ -712,7 +712,7 @@ class RobotArm(object):
                     Hopper = [0,85,170,20,180]
                     PullBack = [0,35,170,30,180]
                     #TODO Correct angles for dropping block off back
-                    OffSide = [90,90,90,90,90]]
+                    OffSide = [90,90,90,90,90]
                     self.reset_home_position()
                     self.rail.Orientor(hopper_pos)
                     time.sleep(1)

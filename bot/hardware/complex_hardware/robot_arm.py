@@ -578,20 +578,19 @@ class RobotArm(object):
             Look = [85,70,35,160,15,0]
             self.rail.Orientor(4)  
 
-            time.sleep(3)
-            self.joints = [85, 180, 0, 180, 0]
-            time.sleep(2)
-            self.joints = [85, 70,  0, 145, 0]
+            time.sleep(4)
+         
+            self.joints = [85, 85,  20, 160, 0]
             time.sleep(5)
             largest = self.GrabColor()
 
             time.sleep(3)
             self.joints = HOME
-            time.sleep(3)
+            
           
 
-            self.joints = HOME
-            time.sleep(5)
+          
+            time.sleep(6)
             self.reset_home_position()
             time.sleep(1)
             if largest != None:

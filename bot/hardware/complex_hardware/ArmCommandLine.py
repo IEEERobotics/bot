@@ -28,9 +28,11 @@ while True:
     print "14: dd_solver        " 
     print "15: Find block with IR"
     print "16: Check Hopper Colors"
-    
+    print "17: Test Partial QR"
 
     Command = input("Command:  ")
+    if Command == 17:
+        arm.test_partial_qr()
     if Command == 16:
         arm.check_hopper()
     

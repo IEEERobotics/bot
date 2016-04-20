@@ -497,7 +497,7 @@ class RobotArm(object):
             time.sleep(3)       
 
             time.sleep(3)
-            self.joints = [85,70,35,160,15]
+            self.joints = [85,90,60,160,0]
             time.sleep(8)
             self.release() 
             time.sleep(1.5)
@@ -691,7 +691,7 @@ class RobotArm(object):
                     Hopper = [0,85,170,20,180]
                     PullBack = [0,35,170,30,180]
                     #TODO Correct angles for dropping block off back
-                    OffSide = [0,80,25,160,2]
+                    OffSide = [0,90,60,160,2]
                     self.reset_home_position()
                     self.rail.Orientor(count)
                     time.sleep(1)
@@ -706,6 +706,8 @@ class RobotArm(object):
                     time.sleep(5)
                     self.release()
                     time.sleep(2)
+                    self.joints = HOME
+                    time.sleep(5)
                     self.reset_home_position()
                     time.sleep(8)
                     self.hopper[count - 1] = None

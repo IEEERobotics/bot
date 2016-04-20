@@ -462,7 +462,7 @@ class RobotArm(object):
         Hopper = [0,85,170,20,180]
         PullBack = [0,35,170,30,180]
         if(Course == "right"):
-            OffSide = [85,75,110,10,180]
+            OffSide = [85,65,110,10,180]
             self.reset_home_position()
             self.rail.Orientor(hopper_pos)
             time.sleep(1)
@@ -496,25 +496,14 @@ class RobotArm(object):
             time.sleep(3)       
 
           
-            self.joints = [85, 85, 110, 0, 180]
+
             time.sleep(3)
-            self.joints = [85, 110, 110, 75, 0]
-            time.sleep(3)
-            self.joints = [85, 145, 90, 110, 0]
-            time.sleep(3)
-            self.joints = [85, 180, 0, 180, 0]
-            time.sleep(3)
-            self.joints = [85, 90,  0, 145, 0]
+            self.joints = [85, 60,  0, 145, 0]
+            time.sleep(8)
             self.release() 
 
             time.sleep(3)
-            self.joints = [85, 180, 0, 180, 0]
-            time.sleep(3)
-            self.joints = [85, 145, 90, 110, 0]
-            time.sleep(3)
-            self.joints = [85, 110, 110, 75, 0]
-            time.sleep(3)
-            self.joints = [85, 85, 110, 0, 180]
+
             
             self.joints = HOME
             time.sleep(3)

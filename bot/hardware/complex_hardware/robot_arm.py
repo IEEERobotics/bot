@@ -609,7 +609,7 @@ class RobotArm(object):
             Success = self.rail_feedback()
             if Success != None:
                 #account for error
-                self.rail.DisplacementMover(-1000)
+                #self.rail.DisplacementMover(-1000)
                 time.sleep(2)
                 Position = self.rail.rail_motor.position
                 self.Tier_Grab(Tier,1) 

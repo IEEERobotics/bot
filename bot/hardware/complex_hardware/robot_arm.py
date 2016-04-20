@@ -80,8 +80,8 @@ class RobotArm(object):
         if len(vals) == 5:
             self.__joints = vals
         else:
-            self.__joints[:len(vals)] = vals
-        print "Joints to be sent: ", vals
+            print "Error: Joints requires 5 Angles."
+            return
         self.servo_cape.transmit_block([0] + self.__joints)
 
     @lib.api_call

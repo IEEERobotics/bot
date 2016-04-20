@@ -505,7 +505,7 @@ class RobotArm(object):
 
             
             self.joints = HOME
-            time.sleep(3)
+            time.sleep(5)
         
         self.hopper[hopper_pos-1] = None 
         
@@ -548,7 +548,7 @@ class RobotArm(object):
             time.sleep(5)
             largest = self.GrabColor()
             self.joints = HOME
-            time.sleep(3)
+            time.sleep(5)
             self.reset_home_position()
             if largest != None:
                 return largest.color 
@@ -705,7 +705,7 @@ class RobotArm(object):
                     self.joints = HOME 
                     time.sleep(5)
                     self.servo_cape.transmit_block([0] + OffSide)
-                    self.rail.DisplacementConverter(3.5)
+                    self.rail.DisplacementMover(3500)
                     time.sleep(5)
                     self.release()
                     time.sleep(2)

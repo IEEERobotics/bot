@@ -610,7 +610,7 @@ class RobotArm(object):
         i = 0
         while i< 2:
             
-            Success = self.rail_feedback
+            Success = self.rail_feedback()
             if Success != None:
                 #account for error
                 self.rail.DisplacementMover(-500)

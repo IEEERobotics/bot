@@ -78,7 +78,7 @@ class Camera(object):
     def update(self):
         # keep looping infinitely until the thread is stopped
         while not self.stopped:
-            print "In the update camera thread"
+            #print "In the update camera thread"
             # otherwise, read the next frame from the stream
             (self.grabbed, self.frame) = self.cam.read()
             time.sleep(.1)

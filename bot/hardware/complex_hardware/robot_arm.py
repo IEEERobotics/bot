@@ -602,7 +602,8 @@ class RobotArm(object):
             time.sleep(.5)
             partial_list = self.cam.partial_qr_scan()
             ret = self.cam.partial_qr_select(partial_list)
-            print "X = ", ret.tvec[0]
+            if ret != None:
+                print "X = ", ret.tvec[0]
     
     @lib.api_call         
     def dd_solver(self):

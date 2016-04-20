@@ -29,8 +29,15 @@ while True:
     print "15: Find block with IR"
     print "16: Check Hopper Colors"
     print "17: Test Partial QR"
+    print "18: Set bin locations " 
 
     Command = input("Command:  ")
+    
+    if Command == 18:
+        arm.bins[0] = raw_input("Left side bin color:  ") 
+        arm.bins[1] = raw_input("Back side bin color:  ")
+        arm.bins[2] = raw_input("Right side bin color: ") 
+        
     if Command == 17:
         arm.test_partial_qr()
     if Command == 16:

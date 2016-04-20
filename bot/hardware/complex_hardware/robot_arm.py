@@ -79,9 +79,11 @@ class RobotArm(object):
         # validate values
         if len(vals) == 5:
             self.__joints = vals
-        else:
+        else if len(vals) < 5:
             self.__joints[:len(vals)] = vals
-        print "Joints to be sent: ", vals
+        else:
+            return
+        # print "Joints to be sent: ", vals
         self.servo_cape.transmit_block([0] + self.__joints)
 
     @lib.api_call

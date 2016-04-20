@@ -505,7 +505,7 @@ class RobotArm(object):
 
             
             self.joints = HOME
-            time.sleep(5)
+            time.sleep(8)
         
         self.hopper[hopper_pos-1] = None 
         

@@ -606,6 +606,7 @@ class RobotArm(object):
         """
         Solver for design day. Lines uyp with a qrcode and grabs it and deposits it in the hopper
         """
+        Tier = "B"
         i = 0
         while i< 2:
             

@@ -559,16 +559,9 @@ class RobotArm(object):
             self.joints = Look
             time.sleep(5)
             largest = self.GrabColor()
-            if largest == None:
-                qr = self.cam.QRSweep()
-                if qr != None:
-                    return qr.value
-                return None
-            
             self.joints = HOME
             time.sleep(3)
-            #self.reset_home_position()
-            
+            self.reset_home_position()
             if largest != None:
                 return largest.color 
             else:   
@@ -577,19 +570,12 @@ class RobotArm(object):
         if Course == "left":
             Look = [85,70,35,160,15,0]
             self.rail.Orientor(4)  
-
             time.sleep(1)
-         
             self.joints = [85, 85,  20, 160, 0]
             time.sleep(8)
             largest = self.GrabColor()
-
             time.sleep(3)
             self.joints = HOME
-            
-          
-
-          
             time.sleep(8)
             self.reset_home_position()
             time.sleep(1)
@@ -664,7 +650,7 @@ class RobotArm(object):
         self.reset_home_position()
         
         if bin_id == "left":
-            color = self.check_box_color("right") # yep, its reversed from the course orientation
+            color = self.check_box_color("right")       # yep, its reversed from the course orientation
             if color != None:
                 self.bins[0] = color
                 
@@ -673,14 +659,16 @@ class RobotArm(object):
             self.joints = CHECK_BIN_BACK
             time.sleep(8)
             largest = self.GrabColor()
-            self.TurnOffLight() 
+            time.sleep(3)
+            self.joints = HOME
+            time.sleep(8)
+            self.reset_home_position()
+            time.sleep(1)
             if largest != None:
                 self.bins[1] = largest.color
-            self.reset_home_position()
-            time.sleep(8)
             
         elif bin_id == "right":
-            color = self.check_box_color("left") # yep, its reversed from the course orientation
+            color = self.check_box_color("left")        # yep, its reversed from the course orientation
             if color != None:
                 self.bins[2] = color
         else:

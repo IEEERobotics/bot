@@ -681,14 +681,14 @@ class RobotArm(object):
         If a match is found then it will deposit the block into that bin.
         """
         
-        count = -1
+        count = 0
         for block in self.hopper:
             count += 1
             if block == None:
                 continue
             else:
                 if block.value == self.bins[0]:
-                    self.EmptyHopper(count + 1, "right")
+                    self.EmptyHopper(count, "right")
                     
                 elif block.value == self.bins[1]:
                     Hopper = [0,85,170,20,180]
@@ -696,7 +696,7 @@ class RobotArm(object):
                     #TODO Correct angles for dropping block off back
                     OffSide = [0,80,25,160,2]
                     self.reset_home_position()
-                    self.rail.Orientor(hopper_pos)
+                    self.rail.Orientor(count)
                     time.sleep(1)
                     self.servo_cape.transmit_block([0] + Hopper)
                     time.sleep(3)
@@ -714,7 +714,7 @@ class RobotArm(object):
                     self.hopper[count] = None
                     
                 elif block.value == self.bins[2]:
-                    self.EmptyHopper(count + 1, "left")
+                    self.EmptyHopper(count, "left")
                 else:
                     print "No match for color -> bin."
     

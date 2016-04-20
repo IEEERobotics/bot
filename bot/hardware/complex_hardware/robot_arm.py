@@ -486,7 +486,7 @@ class RobotArm(object):
             self.grab()
             time.sleep(5)
             self.joints = HOME
-            
+            time.sleep(4) 
             if hopper_pos!= 4:
                 self.rail.Orientor(4) 
                 
@@ -497,7 +497,7 @@ class RobotArm(object):
           
 
             time.sleep(3)
-            self.joints = [85, 60,  0, 145, 0]
+            self.joints = [85,70,35,160,15,0]
             time.sleep(8)
             self.release() 
 

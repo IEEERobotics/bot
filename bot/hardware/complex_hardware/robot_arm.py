@@ -711,7 +711,7 @@ class RobotArm(object):
                     time.sleep(2)
                     self.reset_home_position()
                     time.sleep(8)
-                    self.hopper[count] = None
+                    self.hopper[count - 1] = None
                     
                 elif block.value == self.bins[2]:
                     self.EmptyHopper(count, "left")

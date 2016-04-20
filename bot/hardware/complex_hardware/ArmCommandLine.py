@@ -24,8 +24,8 @@ while True:
     print "10: Tier Grab         "
     print "11: Turn Light On     "
     print "12: dd_check_bin      "
-    print "13: Grab QR           "
-    print "14: Grab Color        " 
+    print "13: dd_empty_hopper   "
+    print "14: dd_solver        " 
     print "15: Find block with IR"
     print "16: Check Hopper Colors"
     
@@ -38,10 +38,10 @@ while True:
         arm.FindBlockWithIR('B') 
         
     if Command == 13: 
-        arm.GrabQR()
+        arm.dd_empty_hopper()
         
     if Command == 14:
-        arm.GrabColor() 
+        arm.dd_solver() 
         
     if Command == 12:
         

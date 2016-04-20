@@ -578,10 +578,10 @@ class RobotArm(object):
             Look = [85,70,35,160,15,0]
             self.rail.Orientor(4)  
 
-            time.sleep(2)
+            time.sleep(1)
          
             self.joints = [85, 85,  20, 160, 0]
-            time.sleep(5)
+            time.sleep(8)
             largest = self.GrabColor()
 
             time.sleep(3)
@@ -706,7 +706,7 @@ class RobotArm(object):
                     Hopper = [0,85,170,20,180]
                     PullBack = [0,35,170,30,180]
                     #TODO Correct angles for dropping block off back
-                    OffSide = [90,90,90,90,90]
+                    OffSide = [0,80,25,160,2]
                     self.reset_home_position()
                     self.rail.Orientor(hopper_pos)
                     time.sleep(1)

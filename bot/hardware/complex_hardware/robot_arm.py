@@ -554,7 +554,7 @@ class RobotArm(object):
     @lib.api_call 
     def check_box_color(self,Course):
         if Course == "right":
-            Look = [85, 70, 170, 15, 180]
+            Look = [85, 65, 170, 15, 180]
             self.rail.Orientor(1)
             self.joints = Look
             time.sleep(5)
@@ -666,6 +666,7 @@ class RobotArm(object):
             time.sleep(1)
             if largest != None:
                 self.bins[1] = largest.color
+
             
         elif bin_id == "right":
             color = self.check_box_color("left")        # yep, its reversed from the course orientation

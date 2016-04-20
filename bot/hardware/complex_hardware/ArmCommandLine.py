@@ -21,7 +21,7 @@ while True:
     print "7:  Let go        "
     print "8:  Reset the arm and rail"
     print "9:  Check color in bin"
-    print "10: Tier Grab         "
+    print "10: Turn Off Light    "
     print "11: Turn Light On     "
     print "12: dd_check_bin      "
     print "13: dd_empty_hopper   "
@@ -53,7 +53,7 @@ while True:
         arm.TurnOnLight()
     
     if Command == 10:
-        arm.competition_solver_barge('B') 
+        arm.TurnOffLight() 
     
     if Command == -1: 
         print "Good Bye!"

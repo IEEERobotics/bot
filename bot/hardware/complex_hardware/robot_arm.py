@@ -470,8 +470,8 @@ class RobotArm(object):
             time.sleep(3)
             self.grab() 
             time.sleep(2)
-            self.servo_cape.transmit_block([0] + PullBack) 
-            time.sleep(3)
+            self.joints = HOME
+            time.sleep(6)
             if hopper_pos != 1:
                 self.rail.Orientor(1)
             self.servo_cape.transmit_block([0] + OffSide) 
@@ -486,7 +486,9 @@ class RobotArm(object):
             time.sleep(1)
             self.servo_cape.transmit_block([0] + Hopper)
             time.sleep(3)
-            self.grab() 
+            self.grab()
+            time.sleep(5)
+            self.joints = HOME
             
             if hopper_pos!= 4:
                 self.rail.Orientor(4) 
@@ -691,9 +693,9 @@ class RobotArm(object):
                     self.servo_cape.transmit_block([0] + Hopper)
                     time.sleep(3)
                     self.grab() 
-                    time.sleep(2)
-                    self.servo_cape.transmit_block([0] + PullBack) 
-                    time.sleep(3)
+                    time.sleep(5)
+                    self.joints = HOME 
+                    time.sleep(5)
                     self.servo_cape.transmit_block([0] + OffSide)
                     self.rail.DisplacementConverter(3.5)
                     time.sleep(5)

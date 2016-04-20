@@ -497,7 +497,7 @@ class RobotArm(object):
           
 
             time.sleep(3)
-            self.joints = [85,70,35,160,15,0]
+            self.joints = [85,70,35,160,15]
             time.sleep(8)
             self.release() 
 

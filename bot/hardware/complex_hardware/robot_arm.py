@@ -263,6 +263,7 @@ class RobotArm(object):
         count = 0
         direction = 1
         self.cam.start()
+        time.sleep(2)
         while(True):
             x = 0
             QRList = []

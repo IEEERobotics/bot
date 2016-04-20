@@ -270,6 +270,7 @@ class RobotArm(object):
             while (x < 3):
                 x = x + 1
                 ret = None
+                time.sleep(1)           #sleep to update the camera a bit.
                 partial_list = self.cam.partial_qr_scan()
                 ret = self.cam.partial_qr_select(partial_list)
                 if ret != None:
@@ -474,8 +475,9 @@ class RobotArm(object):
             self.servo_cape.transmit_block([0] + OffSide) 
             time.sleep(6)
             self.release()
-            time.sleep(2)
+            time.sleep(1.5)
             self.joints = HOME
+            time.sleep(7)
             
         if(Course == "left"):
             self.reset_home_position()
@@ -494,22 +496,17 @@ class RobotArm(object):
             self.servo_cape.transmit_block([0] + PullBack) 
             time.sleep(3)       
 
-          
-
             time.sleep(3)
             self.joints = [85,70,35,160,15]
             time.sleep(8)
             self.release() 
-
-            time.sleep(3)
-
-            
+            time.sleep(1.5)
             self.joints = HOME
-            time.sleep(5)
+            time.sleep(9)
         
         self.hopper[hopper_pos-1] = None 
         
-        return 0 
+        return 1 
         
         
     @lib.api_call   

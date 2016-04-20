@@ -502,11 +502,11 @@ class RobotArm(object):
             self.release() 
             time.sleep(1.5)
             self.joints = HOME
-<<<<<<< HEAD
-            time.sleep(8)
-=======
+
+
+
             time.sleep(9)
->>>>>>> 282a96c8c154432b4a24bb81ccc1209bc4eb2a54
+
         
         self.hopper[hopper_pos-1] = None 
         
@@ -841,4 +841,17 @@ class RobotArm(object):
         print Value["Arm"]
         return 1
         
-    
+    def dd_pilot(self):
+        self.dd_check_bin("left")
+        self.dd_check_bin("back")
+        self.dd_check_bin("right")
+        
+        self.dd_solver()
+        self.check_hopper()
+        self.reset_home_position()
+        time.sleep(6)
+        self.dd_empty_hopper()
+        
+        self.reset_home_position()
+        print "We did it!"
+        

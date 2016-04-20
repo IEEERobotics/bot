@@ -554,7 +554,7 @@ class RobotArm(object):
     @lib.api_call 
     def check_box_color(self,Course):
         if Course == "right":
-            Look = [85, 70, 170, 15, 180]
+            Look = [85, 65, 170, 15, 180]
             self.rail.Orientor(1)
             self.joints = Look
             time.sleep(5)
@@ -673,9 +673,13 @@ class RobotArm(object):
             self.joints = CHECK_BIN_BACK
             time.sleep(8)
             largest = self.GrabColor()
-            self.TurnOffLight() 
+            time.sleep(2)
+            
             if largest != None:
                 self.bins[1] = largest.color
+            
+            self.joints = HOME
+            time.sleep(3)
             self.reset_home_position()
             time.sleep(8)
             

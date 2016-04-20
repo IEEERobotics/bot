@@ -263,6 +263,7 @@ class RobotArm(object):
         count = 0
         direction = 1
         self.cam.start()
+        time.sleep(2)
         while(True):
             x = 0
             QRList = []
@@ -273,13 +274,12 @@ class RobotArm(object):
                 ret = self.cam.partial_qr_select(partial_list)
                 if ret != None:
                     x_disp = ret.tvec[0]
-                    if abs(x_disp) < .125:
+                    if abs(x_disp) < .15:
                         print "QRCode found at x_disp: ", x_disp
                         self.cam.stop()
                         return ret
                     else:
                         QRList.append(ret)
-                        giveup = 0
                         print "Checking Alignment with x_disp = ", x_disp
                         print "countx = ", x
                             
@@ -289,9 +289,6 @@ class RobotArm(object):
                 if rail_ret == 0:
                     #out of range, reset to middle and try again
                     self.rail.MoveToPosition(3500)
-                    if giveup > 4:
-                        return None
-                    giveup += 1
             else:       # if no qrcodes are found
                 limit = self.rail.DisplacementConverter(1.5*direction)
                 if limit == 0:                  #out of range
@@ -602,19 +599,30 @@ class RobotArm(object):
             
             
             
+            
+    def test_partial_qr(self):
+        self.cam.start()
+        time.sleep(2)
+        while True:
+            time.sleep(.5)
+            partial_list = self.cam.partial_qr_scan()
+            ret = self.cam.partial_qr_select(partial_list)
+            if ret != None:
+                print "X = ", ret.tvec[0]
     
     @lib.api_call         
     def dd_solver(self):
         """
         Solver for design day. Lines uyp with a qrcode and grabs it and deposits it in the hopper
         """
+        Tier = "B"
         i = 0
         while i< 2:
-            
-            Success = self.rail_feedback
+            self.rail.DisplacementConverter(3.5)
+            Success = self.rail_feedback()
             if Success != None:
                 #account for error
-                self.rail.DisplacementMover(-500)
+                self.rail.DisplacementMover(-1100)
                 time.sleep(2)
                 Position = self.rail.rail_motor.position
                 self.Tier_Grab(Tier,1) 

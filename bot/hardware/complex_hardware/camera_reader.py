@@ -78,7 +78,7 @@ class Camera(object):
     def update(self):
         # keep looping infinitely until the thread is stopped
         while not self.stopped:
-            print "In the update camera thread"
+            #print "In the update camera thread"
             # otherwise, read the next frame from the stream
             (self.grabbed, self.frame) = self.cam.read()
             time.sleep(.1)
@@ -262,7 +262,10 @@ class Camera(object):
         return targetQR
     
     def selectQR(self, QRList):
+        
         # find the best QRCode to grab (closest x then highest y)
+        if len(QRList) < 1:
+            return None
         QRList.sort(key=lambda qr: qr.tvec[0], reverse=False)       # sort the list of qr codes by x, smallest to largest
         x_min = 100
         min_qr = 0

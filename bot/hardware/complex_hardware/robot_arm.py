@@ -273,13 +273,12 @@ class RobotArm(object):
                 ret = self.cam.partial_qr_select(partial_list)
                 if ret != None:
                     x_disp = ret.tvec[0]
-                    if abs(x_disp) < .125:
+                    if abs(x_disp) < .15:
                         print "QRCode found at x_disp: ", x_disp
                         self.cam.stop()
                         return ret
                     else:
                         QRList.append(ret)
-                        giveup = 0
                         print "Checking Alignment with x_disp = ", x_disp
                         print "countx = ", x
                             
@@ -289,9 +288,6 @@ class RobotArm(object):
                 if rail_ret == 0:
                     #out of range, reset to middle and try again
                     self.rail.MoveToPosition(3500)
-                    if giveup > 4:
-                        return None
-                    giveup += 1
             else:       # if no qrcodes are found
                 limit = self.rail.DisplacementConverter(1.5*direction)
                 if limit == 0:                  #out of range

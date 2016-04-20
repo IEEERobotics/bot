@@ -598,6 +598,8 @@ class RobotArm(object):
             
             
     def test_partial_qr(self):
+        self.cam.start()
+        time.sleep(2)
         while True:
             time.sleep(.5)
             partial_list = self.cam.partial_qr_scan()

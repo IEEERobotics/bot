@@ -892,7 +892,8 @@ class RobotArm(object):
        
         print Value["Arm"]
         return 1
-        
+    
+    @lib.api_call    
     def dd_pilot(self):
         self.reset_home_position() 
         self.dd_check_bin("left")

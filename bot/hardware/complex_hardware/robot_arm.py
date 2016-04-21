@@ -850,7 +850,6 @@ class RobotArm(object):
         self.dd_solver()
         self.check_hopper()
         self.reset_home_position()
-        time.sleep(6)
         self.dd_empty_hopper()
         
         self.reset_home_position()

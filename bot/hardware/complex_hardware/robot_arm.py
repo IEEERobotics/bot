@@ -79,11 +79,9 @@ class RobotArm(object):
         # validate values
         if len(vals) == 5:
             self.__joints = vals
-        else if len(vals) < 5:
-            self.__joints[:len(vals)] = vals
         else:
+            print "Error: Joints requires 5 Angles."
             return
-        # print "Joints to be sent: ", vals
         self.servo_cape.transmit_block([0] + self.__joints)
 
     @lib.api_call
@@ -272,6 +270,7 @@ class RobotArm(object):
             while (x < 3):
                 x = x + 1
                 ret = None
+                time.sleep(1)           #sleep to update the camera a bit.
                 partial_list = self.cam.partial_qr_scan()
                 ret = self.cam.partial_qr_select(partial_list)
                 if ret != None:
@@ -476,8 +475,9 @@ class RobotArm(object):
             self.servo_cape.transmit_block([0] + OffSide) 
             time.sleep(6)
             self.release()
-            time.sleep(2)
+            time.sleep(1.5)
             self.joints = HOME
+            time.sleep(7)
             
         if(Course == "left"):
             self.reset_home_position()
@@ -496,22 +496,21 @@ class RobotArm(object):
             self.servo_cape.transmit_block([0] + PullBack) 
             time.sleep(3)       
 
-          
-
             time.sleep(3)
-            self.joints = [85,70,35,160,15]
+            self.joints = [85,90,60,160,0]
             time.sleep(8)
             self.release() 
-
-            time.sleep(3)
-
-            
+            time.sleep(1.5)
             self.joints = HOME
-            time.sleep(5)
+
+
+
+            time.sleep(9)
+
         
         self.hopper[hopper_pos-1] = None 
         
-        return 0 
+        return 1 
         
         
     @lib.api_call   
@@ -544,7 +543,7 @@ class RobotArm(object):
     @lib.api_call 
     def check_box_color(self,Course):
         if Course == "right":
-            Look = [85, 65, 170, 15, 180]
+            Look = [85, 60, 170, 15, 180]
             self.rail.Orientor(1)
             self.joints = Look
             time.sleep(5)
@@ -624,7 +623,7 @@ class RobotArm(object):
             Success = self.rail_feedback()
             if Success != None:
                 #account for error
-                self.rail.DisplacementMover(-1100)
+                self.rail.DisplacementMover(-900)
                 time.sleep(2)
                 Position = self.rail.rail_motor.position
                 self.Tier_Grab(Tier,1) 
@@ -696,7 +695,7 @@ class RobotArm(object):
                     Hopper = [0,85,170,20,180]
                     PullBack = [0,35,170,30,180]
                     #TODO Correct angles for dropping block off back
-                    OffSide = [0,80,25,160,2]
+                    OffSide = [0,90,60,160,2]
                     self.reset_home_position()
                     self.rail.Orientor(count)
                     time.sleep(1)
@@ -711,6 +710,8 @@ class RobotArm(object):
                     time.sleep(5)
                     self.release()
                     time.sleep(2)
+                    self.joints = HOME
+                    time.sleep(5)
                     self.reset_home_position()
                     time.sleep(8)
                     self.hopper[count - 1] = None
@@ -751,8 +752,8 @@ class RobotArm(object):
             print "Trying again"
             ret = self.cam.check_color()
             if ret == None:
-                print "No color found. Assuming green."
-                ret = Block(0, "green")
+                print "No color found. Assuming blue."
+                ret = Block(0, "blue")
         self.TurnOffLight()
         self.cam.stop()
         return ret
@@ -796,12 +797,12 @@ class RobotArm(object):
     def FindBlockWithIR(self,Tier):
         
         if Tier == 'A':
-            Look = [0,85,125,15,180]
+            Look = [0,85,135,15,180]
             Threshold = 150
             NegativeThreshold = 200
         if Tier == 'B':
-            Look = [0,75,125,20,180]
-            Threshold = 80
+            Look = [0,65,135,20,180]
+            Threshold = 100
             NegativeThreshold = 200
         
         
@@ -840,4 +841,17 @@ class RobotArm(object):
         print Value["Arm"]
         return 1
         
-    
+    def dd_pilot(self):
+        self.reset_home_position() 
+        self.dd_check_bin("left")
+        self.dd_check_bin("back")
+        self.dd_check_bin("right")
+        
+        self.dd_solver()
+        self.check_hopper()
+        self.reset_home_position()
+        self.dd_empty_hopper()
+        
+        self.reset_home_position()
+        print "We did it!"
+        

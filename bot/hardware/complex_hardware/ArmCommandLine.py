@@ -31,7 +31,12 @@ while True:
     print "17: Test Partial QR"
     print "18: Set bin locations " 
     print "19: Design Day Pilot  "
+    print "20: Design Day Pilot with IR"
     Command = input("Command:  ")
+    
+    if Command == 20:
+        arm.dd_pilot_with_IR() 
+        
     if Command == 19:
         arm.dd_pilot()
     
@@ -46,7 +51,7 @@ while True:
         arm.check_hopper()
     
     if Command == 15:
-        arm.FindBlockWithIR('B') 
+        arm.dd_solver_IR() 
         
     if Command == 13: 
         arm.dd_empty_hopper()

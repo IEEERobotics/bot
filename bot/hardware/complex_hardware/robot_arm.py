@@ -634,6 +634,32 @@ class RobotArm(object):
                 i = i + 1
                 self.reset_home_position() 
             else:
+                print "No Block Found."
+                return 0
+        return 1
+        
+    def dd_solver_IR(self):
+        """
+        Solver for design day. Lines uyp with a qrcode and grabs it and deposits it in the hopper
+        """
+        Tier = "B"
+        i = 0
+        while i< 2:
+            
+            Success = self.FindBlockWithIR('B')
+            if Success != None:
+                #account for error
+                self.rail.DisplacementMover(-900)
+                time.sleep(2)
+                Position = self.rail.rail_motor.position
+                self.Tier_Grab(Tier,1) 
+                time.sleep(2)
+                self.rail.MoveToPosition(Position) 
+                time.sleep(2) 
+                self.Tier_Grab(Tier,2)
+                i = i + 1
+                self.reset_home_position() 
+            else:
                 print "No QRCode Found."
                 return 0
         return 1
@@ -855,3 +881,17 @@ class RobotArm(object):
         self.reset_home_position()
         print "We did it!"
         
+    def dd_pilot_IR(self):
+        self.reset_home_position() 
+        self.dd_check_bin("left")
+        self.dd_check_bin("back")
+        self.dd_check_bin("right")
+        
+        self.dd_solver_IR()
+        self.check_hopper()
+        self.reset_home_position()
+        self.dd_empty_hopper()
+        
+        self.reset_home_position()
+        print "We did it!"
+       

@@ -212,6 +212,8 @@ class Camera(object):
         frame = cv2.adaptiveThreshold(frame, 255
                                       , cv2.ADAPTIVE_THRESH_MEAN_C
                                       , cv2.THRESH_BINARY, 19, 0)
+        
+        frame = cv2.Canny(frame, 50, 150)
         #cv2.imwrite('buffer.png', frame)
         #pil_im = Image.open('buffer.png').convert('L')
         pil_im = Image.fromarray(frame)

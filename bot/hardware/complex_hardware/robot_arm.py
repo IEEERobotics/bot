@@ -853,8 +853,8 @@ class RobotArm(object):
             Threshold = 150
             NegativeThreshold = 200
         if Tier == 'B':
-            Look = [0,75,135,20,180]
-            Threshold = 80
+            Look = [0,65,135,20,180]
+            Threshold = 100
             NegativeThreshold = 200
         
         

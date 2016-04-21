@@ -254,6 +254,7 @@ class RobotArm(object):
         self.servo_cape.transmit_block([demo_number]
                                          + JUNK_BUFFER)        
             
+    
     def rail_feedback(self):
         """
         align the arm on the rail to a qrcode and return the code
@@ -283,6 +284,57 @@ class RobotArm(object):
                         QRList.append(ret)
                         print "Checking Alignment with x_disp = ", x_disp
                         print "countx = ", x
+                else:
+                    print "No QR Found."
+                    print "countx = ", x
+                            
+            targetQR = self.cam.selectQR(QRList)
+            if targetQR != None:
+                rail_ret = self.rail.DisplacementConverter(targetQR.tvec[0])
+                if rail_ret == 0:
+                    #out of range, reset to middle and try again
+                    self.rail.MoveToPosition(3500)
+            else:       # if no qrcodes are found
+                limit = self.rail.DisplacementConverter(1.5*direction)
+                if limit == 0:                  #out of range
+                    direction = -1*direction    #reverse direction
+                    ret = self.rail.DisplacementConverter(.75*direction)
+                    if ret == 0:
+                        print "Error: out of range on both ends, shouldn't be possible."   
+    
+    
+    
+    def rail_feedback_QR(self):
+        """
+        align the arm on the rail to a qrcode and return the code
+        else when it cannot find a QRCode 4 or more times it will return None.
+        """
+        giveup = 0
+        count = 0
+        direction = 1
+        self.cam.start()
+        time.sleep(2)
+        while(True):
+            x = 0
+            QRList = []
+            while (x < 3):
+                x = x + 1
+                ret = None
+                time.sleep(1)           #sleep to update the camera a bit.
+                ret = self.cam.QRSweep()
+                if ret != None:
+                    x_disp = ret.tvec[0]
+                    if abs(x_disp) < .15:
+                        print "QRCode found at x_disp: ", x_disp
+                        self.cam.stop()
+                        return ret
+                    else:
+                        QRList.append(ret)
+                        print "Checking Alignment with x_disp = ", x_disp
+                        print "countx = ", x
+                else:
+                    print "No QR Found."
+                    print "countx = ", x
                             
             targetQR = self.cam.selectQR(QRList)
             if targetQR != None:

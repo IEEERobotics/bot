@@ -752,8 +752,8 @@ class RobotArm(object):
             print "Trying again"
             ret = self.cam.check_color()
             if ret == None:
-                print "No color found. Assuming green."
-                ret = Block(0, "green")
+                print "No color found. Assuming blue."
+                ret = Block(0, "blue")
         self.TurnOffLight()
         self.cam.stop()
         return ret

@@ -30,7 +30,7 @@ while True:
     print "16: Check Hopper Colors"
     print "17: Test Partial QR"
     print "18: Set bin locations " 
-
+    print "19: Design Day Pilot  "
     Command = input("Command:  ")
     
     if Command == 18:

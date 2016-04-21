@@ -797,11 +797,11 @@ class RobotArm(object):
     def FindBlockWithIR(self,Tier):
         
         if Tier == 'A':
-            Look = [0,85,125,15,180]
+            Look = [0,85,135,15,180]
             Threshold = 150
             NegativeThreshold = 200
         if Tier == 'B':
-            Look = [0,75,125,20,180]
+            Look = [0,75,135,20,180]
             Threshold = 80
             NegativeThreshold = 200
         
@@ -842,6 +842,7 @@ class RobotArm(object):
         return 1
         
     def dd_pilot(self):
+        self.reset_home_position() 
         self.dd_check_bin("left")
         self.dd_check_bin("back")
         self.dd_check_bin("right")

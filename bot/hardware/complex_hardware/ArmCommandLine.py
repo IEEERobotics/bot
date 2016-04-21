@@ -32,6 +32,8 @@ while True:
     print "18: Set bin locations " 
     print "19: Design Day Pilot  "
     Command = input("Command:  ")
+    if Command == 19:
+        self.dd_pilot()
     
     if Command == 18:
         arm.bins[0] = raw_input("Left side bin color:  ") 

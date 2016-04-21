@@ -23,8 +23,5 @@ stop)
 esac
 
 
-#remove after 2016 competition
-python /root/bot/bot/start.py -p
-
 exit 0
 

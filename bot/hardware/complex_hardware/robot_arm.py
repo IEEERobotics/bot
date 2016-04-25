@@ -414,7 +414,7 @@ class RobotArm(object):
             if Case == 1:  ## Block on top
                 BLOCK_MOVE_5 = [0, 85, 160, 70, 180]
             elif Case == 2: ## Block on bottom
-                BLOCK_MOVE_5 = [0, 90, 170, 60, 180]
+                BLOCK_MOVE_5 = [0, 90, 170, 65, 180]
                 
             LOOK_5 = [0, 25, 170, 10, 180]
             HOPPER1 = [0, 45, 145, 35, 180]

@@ -701,7 +701,8 @@ class RobotArm(object):
             Success = self.FindBlockWithIR('B')
             if Success != None:
                 #account for error
-                self.rail.DisplacementMover(-900)
+                offest = Success.tvec[0]*1020
+                self.rail.DisplacementMover(-900 - offset)
                 time.sleep(2)
                 Position = self.rail.rail_motor.position
                 self.Tier_Grab(Tier,1) 

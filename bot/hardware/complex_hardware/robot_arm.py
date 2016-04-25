@@ -670,6 +670,7 @@ class RobotArm(object):
         """
         Tier = "B"
         i = 0
+        self.TurnOnLight()
         while i< 2:
             self.rail.DisplacementConverter(3.5)
             Success = self.rail_feedback()
@@ -688,7 +689,9 @@ class RobotArm(object):
                 self.reset_home_position() 
             else:
                 print "No Block Found."
+                self.TurnOffLight()
                 return 0
+        self.TurnOffLight()
         return 1
         
     def dd_solver_IR(self):

@@ -694,6 +694,7 @@ class RobotArm(object):
         """
         Solver for design day. Lines uyp with a qrcode and grabs it and deposits it in the hopper
         """
+        self.TurnOnLight()
         Tier = "B"
         i = 0
         while i< 2:
@@ -714,7 +715,9 @@ class RobotArm(object):
                 self.reset_home_position() 
             else:
                 print "No QRCode Found."
+                self.TurnOffLight()
                 return 0
+        self.TurnOffLight()
         return 1
     @lib.api_call 
     def dd_check_bin(self, bin_id):

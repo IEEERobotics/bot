@@ -1,0 +1,14 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          masquerade
+# Required-Start:    networking
+# Required-Stop:     $local_fs
+# Default-Start:     S
+# Default-Stop:      0 6
+# Short-Description: Turn on masquerading
+# Description: Turn on masquerading
+### END INIT INFO
+
+iptables -t nat -F
+iptables -t nat -A POSTROUTING -o wlan1 -j MASQUERADE
+echo 1 > /proc/sys/net/ipv4/ip_forward
